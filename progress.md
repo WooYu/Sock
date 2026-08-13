@@ -31,3 +31,5 @@
 - Witnessed failing professional-chart widget tests, then implemented timeframe and adjustment controls, viewport zoom actions, explicit real/forecast region labels, and the production candlestick canvas.
 - Corrected a state assertion to inspect the selected segmented-control value instead of relying on hidden test-only text.
 - Fresh chart-foundation verification: all 57 Flutter tests passed and static analysis reported no issues.
+- Witnessed failing annotation-domain tests, then implemented trend line, horizontal line, rectangle, and point models; local per-stock persistence; move/control-point/hide/delete operations; revision tracking; idempotent sync mutations; and delete tombstones.
+- Focused annotation verification: all 4 controller tests passed.
