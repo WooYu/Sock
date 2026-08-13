@@ -4,6 +4,7 @@ import '../../domain/stockcal_domain.dart';
 import '../analysis/stock_analysis_controller.dart';
 import '../analysis/stock_analysis_screen.dart';
 import '../analysis/technical_analysis.dart';
+import '../admin/settings_admin_workspace.dart';
 import '../chart/chart_annotations.dart';
 import '../chart/professional_chart_screen.dart';
 import '../market/market_data.dart';
@@ -206,6 +207,9 @@ class _Workspace extends StatelessWidget {
     if (module == '复盘AI') {
       return const ReviewWorkspace();
     }
+    if (module == '设置后台') {
+      return const SettingsAdminWorkspace();
+    }
     final portfolio = DemoMarketData.portfolio;
     return ListView(
       padding: const EdgeInsets.all(20),
@@ -228,12 +232,6 @@ class _Workspace extends StatelessWidget {
               _ModuleChip(label: '真实行情适配层'),
             ],
           ),
-        ],
-        if (module == '设置后台') ...const [
-          Text('指标参数与主题'),
-          Text('行情源状态'),
-          Text('同步任务失败重试'),
-          Text('审计日志和 AI 调用记录'),
         ],
         if (module == '更多') ...[
           _MoreDestination(

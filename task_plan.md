@@ -42,3 +42,4 @@ Deliver the complete Flutter StockCal product described in the referenced conver
 | Legacy product test expected rules before selecting a stock | 1 | Updated test to follow the explicit search/selection workflow; no implicit demo selection restored |
 | `agent-reach` and `mcporter` commands absent from PATH | 2 | Followed skill fallback chain, then used built-in web search restricted to pub.dev and official package documentation |
 | `agent-browser` CLI and in-app browser runtime absent | 2 | Verified desktop/phone/landscape through widget layout and canvas tests; defer screenshot capture to release hardening |
+| Spring Boot Gradle plugin could not resolve through dead `127.0.0.1:10808` proxy or direct network | 2 | Keep backend test/spec files; continue Flutter admin and API contracts, retry dependency-backed integration later |

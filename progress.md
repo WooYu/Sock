@@ -55,3 +55,8 @@
 - Witnessed failing AI-boundary tests, then implemented deterministic read-only snapshots, text-only adapters, append-only narrative versions, regenerate/user-edit flows, and AI call audit events.
 - Witnessed failing review-workspace tests, then implemented responsive trade comparison, daily/weekly views, summary generation/edit/regeneration, and replaced the static home placeholder.
 - Fresh phase-seven verification: all 92 Flutter tests passed and static analysis reported no issues.
+- Established a Spring Boot 4.1.0/Java 21 backend build and auth API integration-test contract. Local Gradle 9.3 starts successfully, but plugin dependency resolution is currently blocked by the machine's dead proxy/direct network path; no backend test pass is claimed.
+- Witnessed failing administration-service tests, then implemented audited sync retry, market repair, user-role changes, and secret status models that never retain or expose secret values.
+- Witnessed failing settings/admin workspace tests, then implemented responsive user preferences, data/account actions, market source status, sync jobs, repair, users/roles, rule templates, audit, AI logs, and server-only secret status; replaced the static home placeholder.
+- Added Spring Boot auth and incremental-sync controllers, API integration-test contracts, PostgreSQL Flyway foundation schema, Redis configuration, and PostgreSQL/Redis Compose services.
+- Fresh Flutter-side phase-eight checkpoint: all 99 Flutter tests passed and static analysis reported no issues; backend integration remains unverified due dependency network failure.

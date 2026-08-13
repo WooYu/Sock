@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: stockcal-backend
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/stockcal}
+    username: ${DATABASE_USER:stockcal}
+    password: ${DATABASE_PASSWORD:stockcal}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  flyway:
+    enabled: true
+
+server:
+  port: ${PORT:8080}
+
+stockcal:
+  sms-api-key: ${SMS_API_KEY:}
+  market-api-key: ${MARKET_API_KEY:}
+  ai-api-key: ${AI_API_KEY:}
