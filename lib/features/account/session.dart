@@ -9,6 +9,18 @@ class UserSession {
   bool get isSignedIn => accessToken.isNotEmpty;
 }
 
+class UserDevice {
+  const UserDevice({
+    required this.id,
+    required this.name,
+    required this.isCurrent,
+  });
+
+  final String id;
+  final String name;
+  final bool isCurrent;
+}
+
 abstract interface class SessionRepository {
   Future<UserSession?> restore();
   Future<void> save(UserSession session);
@@ -46,9 +58,12 @@ class SessionController extends ChangeNotifier {
 
   final SessionRepository _repository;
   UserSession? session;
+  List<UserDevice> devices = const [];
+  var _tokenVersion = 0;
 
   Future<void> restore() async {
     session = await _repository.restore();
+    if (session != null && devices.isEmpty) _registerCurrentDevice();
     notifyListeners();
   }
 
@@ -65,12 +80,49 @@ class SessionController extends ChangeNotifier {
     );
     await _repository.save(verified);
     session = verified;
+    _registerCurrentDevice();
+    notifyListeners();
+  }
+
+  Future<void> refreshAccessToken() async {
+    final current = session;
+    if (current == null) return;
+    _tokenVersion += 1;
+    final refreshed = UserSession(
+      phone: current.phone,
+      accessToken: 'local-session-${current.phone}-$_tokenVersion',
+    );
+    await _repository.save(refreshed);
+    session = refreshed;
+    notifyListeners();
+  }
+
+  void registerDevice(UserDevice device) {
+    devices = [...devices.where((item) => item.id != device.id), device];
+    notifyListeners();
+  }
+
+  Future<void> revokeDevice(String id) async {
+    devices = devices
+        .where((device) => device.id != id || device.isCurrent)
+        .toList(growable: false);
     notifyListeners();
   }
 
   Future<void> signOut() async {
     await _repository.clear();
     session = null;
+    devices = const [];
     notifyListeners();
+  }
+
+  void _registerCurrentDevice() {
+    devices = const [
+      UserDevice(
+        id: 'current-device',
+        name: 'StockCal Flutter',
+        isCurrent: true,
+      ),
+    ];
   }
 }

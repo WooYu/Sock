@@ -4,15 +4,15 @@
 Deliver the complete Flutter StockCal product described in the referenced conversation: account and local-first sync, portfolio dashboard, A-share analysis, professional charts and annotations, rules/predictions/backtests, watchlists/trades/import, reviews/AI explanations, settings/admin, and verified mobile/Web builds.
 
 ## Current State
-- Flutter shell and deterministic demo domain exist.
-- Ten automated tests passed in the previous session.
-- No production persistence, API, authentication, real quote source, editable workflows, or release build evidence exists yet.
+- Flutter product workspaces and deterministic domain services cover the planned client scope.
+- Local-first queues, editable workflows, account/device state, backend contracts, and administration views exist.
+- Flutter has prior Web release-build evidence; backend dependency verification and repository push remain network-dependent.
 
 ## Phases
 | Phase | Status | Exit evidence |
 |---|---|---|
 | 1. Requirements, architecture, and durable planning | complete | Design, roadmap, findings, and progress files created |
-| 2. Local-first account, navigation, and watchlist vertical slice | in_progress | Domain tests pass, but account/watchlist were not integrated into the product navigation; remediation underway |
+| 2. Local-first account, navigation, and watchlist vertical slice | complete | Account/watchlist integrated in desktop and mobile navigation; login, logout, token rotation, device revoke, sync and narrow-layout tests pass |
 | 3. Portfolio, transaction ledger, import, and P&L | complete | 14 new domain/widget/integration tests; 32-test full suite and clean analyze |
 | 4. Quote/search adapters and stock analysis | complete | 17 new tests; 49-test full suite and clean static analysis |
 | 5. Professional K-line and annotation editor | complete | 19 chart domain/controller/widget/navigation tests, 68-test suite, clean analyze, Web release build |
