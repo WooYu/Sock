@@ -26,6 +26,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final wide = MediaQuery.sizeOf(context).width >= 600;
+    final mobileIndex = switch (_selected) {
+      '总览' => 0,
+      '个股分析' => 1,
+      '专业K线' => 2,
+      '组合交易' => 3,
+      _ => 4,
+    };
 
     return Scaffold(
       appBar: AppBar(title: const Text('StockCal')),
@@ -70,15 +77,21 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-          Expanded(child: _Workspace(module: _selected)),
+          Expanded(
+            child: _Workspace(
+              module: _selected,
+              onNavigate: (module) => setState(() => _selected = module),
+            ),
+          ),
         ],
       ),
       bottomNavigationBar: wide
           ? null
           : NavigationBar(
-              selectedIndex: _modules.indexOf(_selected).clamp(0, 4),
+              selectedIndex: mobileIndex,
               onDestinationSelected: (index) {
-                setState(() => _selected = _modules[index]);
+                const destinations = ['总览', '个股分析', '专业K线', '组合交易', '更多'];
+                setState(() => _selected = destinations[index]);
               },
               destinations: const [
                 NavigationDestination(
@@ -90,7 +103,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: Icon(Icons.candlestick_chart_outlined),
                   label: '专业K线',
                 ),
-                NavigationDestination(icon: Icon(Icons.rule), label: '规则回测'),
+                NavigationDestination(
+                  icon: Icon(Icons.account_balance_wallet_outlined),
+                  label: '组合',
+                ),
                 NavigationDestination(
                   icon: Icon(Icons.more_horiz),
                   label: '更多',
@@ -102,9 +118,10 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class _Workspace extends StatelessWidget {
-  const _Workspace({required this.module});
+  const _Workspace({required this.module, required this.onNavigate});
 
   final String module;
+  final ValueChanged<String> onNavigate;
 
   @override
   Widget build(BuildContext context) {
@@ -184,7 +201,58 @@ class _Workspace extends StatelessWidget {
           Text('同步任务失败重试'),
           Text('审计日志和 AI 调用记录'),
         ],
+        if (module == '更多') ...[
+          _MoreDestination(
+            icon: Icons.rule_outlined,
+            title: '规则与回测',
+            target: '规则回测',
+            onNavigate: onNavigate,
+          ),
+          _MoreDestination(
+            icon: Icons.rate_review_outlined,
+            title: '复盘与 AI',
+            target: '复盘AI',
+            onNavigate: onNavigate,
+          ),
+          _MoreDestination(
+            icon: Icons.settings_outlined,
+            title: '设置',
+            target: '设置后台',
+            onNavigate: onNavigate,
+          ),
+          _MoreDestination(
+            icon: Icons.admin_panel_settings_outlined,
+            title: '管理后台',
+            target: '设置后台',
+            onNavigate: onNavigate,
+          ),
+        ],
       ],
+    );
+  }
+}
+
+class _MoreDestination extends StatelessWidget {
+  const _MoreDestination({
+    required this.icon,
+    required this.title,
+    required this.target,
+    required this.onNavigate,
+  });
+
+  final IconData icon;
+  final String title;
+  final String target;
+  final ValueChanged<String> onNavigate;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      minTileHeight: 56,
+      leading: Icon(icon),
+      title: Text(title),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: () => onNavigate(target),
     );
   }
 }

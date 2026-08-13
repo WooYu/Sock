@@ -1,0 +1,248 @@
+import 'package:flutter/material.dart';
+
+import 'watchlist.dart';
+
+class WatchlistScreen extends StatefulWidget {
+  const WatchlistScreen({super.key, required this.controller});
+
+  final WatchlistController controller;
+
+  @override
+  State<WatchlistScreen> createState() => _WatchlistScreenState();
+}
+
+class _WatchlistScreenState extends State<WatchlistScreen> {
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_refresh);
+    widget.controller.load();
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_refresh);
+    super.dispose();
+  }
+
+  void _refresh() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final outbox = widget.controller.outbox;
+    final pending = outbox is MemoryMutationOutbox ? outbox.pending.length : 0;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('自选股'),
+        actions: [
+          IconButton(
+            tooltip: '新建自选分组',
+            onPressed: _createGroup,
+            icon: const Icon(Icons.create_new_folder_outlined),
+          ),
+        ],
+      ),
+      body: widget.controller.groups.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.bookmark_border, size: 40),
+                  const SizedBox(height: 12),
+                  const Text('还没有自选分组'),
+                  const SizedBox(height: 12),
+                  FilledButton.icon(
+                    onPressed: _createGroup,
+                    icon: const Icon(Icons.add),
+                    label: const Text('新建分组'),
+                  ),
+                ],
+              ),
+            )
+          : ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Chip(
+                    avatar: const Icon(Icons.cloud_upload_outlined, size: 18),
+                    label: Text('待同步 $pending 项'),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                for (final group in widget.controller.groups)
+                  _GroupSection(
+                    group: group,
+                    onAdd: () => _addStock(group.id),
+                    onRemove: (code) => widget.controller.removeStock(
+                      groupId: group.id,
+                      code: code,
+                    ),
+                  ),
+              ],
+            ),
+    );
+  }
+
+  Future<void> _createGroup() async {
+    var groupName = '';
+    final name = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('新建自选分组'),
+        content: TextField(
+          key: const Key('group-name-field'),
+          autofocus: true,
+          onChanged: (value) => groupName = value,
+          decoration: const InputDecoration(labelText: '分组名称'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, groupName.trim()),
+            child: const Text('创建'),
+          ),
+        ],
+      ),
+    );
+    if (name != null && name.isNotEmpty) {
+      await widget.controller.createGroup(name);
+    }
+  }
+
+  Future<void> _addStock(String groupId) async {
+    const candidates = [
+      WatchStock(code: '600519', name: '贵州茅台'),
+      WatchStock(code: '000001', name: '平安银行'),
+      WatchStock(code: '300750', name: '宁德时代'),
+    ];
+    final selected = await showModalBottomSheet<WatchStock>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => const _StockPicker(candidates: candidates),
+    );
+    if (selected != null) {
+      await widget.controller.addStock(groupId: groupId, stock: selected);
+    }
+  }
+}
+
+class _GroupSection extends StatelessWidget {
+  const _GroupSection({
+    required this.group,
+    required this.onAdd,
+    required this.onRemove,
+  });
+
+  final WatchGroup group;
+  final VoidCallback onAdd;
+  final ValueChanged<String> onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                group.name,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+            IconButton(
+              tooltip: '添加股票',
+              onPressed: onAdd,
+              icon: const Icon(Icons.add_circle_outline),
+            ),
+          ],
+        ),
+        if (group.stocks.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Text('分组为空，添加一只股票开始跟踪'),
+          )
+        else
+          for (final stock in group.stocks)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(stock.name),
+              subtitle: Text(stock.code),
+              trailing: IconButton(
+                tooltip: '移除 ${stock.name}',
+                onPressed: () => onRemove(stock.code),
+                icon: const Icon(Icons.remove_circle_outline),
+              ),
+            ),
+        const Divider(),
+      ],
+    );
+  }
+}
+
+class _StockPicker extends StatefulWidget {
+  const _StockPicker({required this.candidates});
+
+  final List<WatchStock> candidates;
+
+  @override
+  State<_StockPicker> createState() => _StockPickerState();
+}
+
+class _StockPickerState extends State<_StockPicker> {
+  var query = '';
+
+  @override
+  Widget build(BuildContext context) {
+    final matches = widget.candidates.where((stock) {
+      final normalized = query.trim().toLowerCase();
+      return normalized.isEmpty ||
+          stock.code.contains(normalized) ||
+          stock.name.toLowerCase().contains(normalized);
+    }).toList();
+
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          16,
+          16,
+          16,
+          16 + MediaQuery.viewInsetsOf(context).bottom,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('添加股票', style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 12),
+            TextField(
+              key: const Key('stock-search-field'),
+              autofocus: true,
+              onChanged: (value) => setState(() => query = value),
+              decoration: const InputDecoration(
+                labelText: '代码、名称或拼音',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 8),
+            for (final stock in matches)
+              ListTile(
+                minTileHeight: 56,
+                title: Text(stock.name),
+                subtitle: Text(stock.code),
+                onTap: () => Navigator.pop(context, stock),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
