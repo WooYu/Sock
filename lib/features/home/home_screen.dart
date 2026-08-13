@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/stockcal_domain.dart';
-import '../../domain/stockcal_services.dart';
 import '../analysis/stock_analysis_controller.dart';
 import '../analysis/stock_analysis_screen.dart';
 import '../analysis/technical_analysis.dart';
@@ -13,6 +12,7 @@ import '../portfolio/portfolio_ledger.dart';
 import '../portfolio/portfolio_screen.dart';
 import '../rules/rule_engine.dart';
 import '../rules/rules_workspace.dart';
+import '../review/review_workspace.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -203,18 +203,10 @@ class _Workspace extends StatelessWidget {
         candles: DemoAshareData.candlesFor('600519'),
       );
     }
+    if (module == '复盘AI') {
+      return const ReviewWorkspace();
+    }
     final portfolio = DemoMarketData.portfolio;
-    final prediction = PredictionEngine().predict(
-      DemoMarketData.candlesFor('600519'),
-    );
-    final quote = DemoMarketAdapter().quote('600519');
-    final review = ReviewAssistant().summarize(
-      symbol: '600519',
-      support: prediction.support,
-      resistance: prediction.resistance,
-      actualClose: quote.price,
-    );
-
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
@@ -237,13 +229,6 @@ class _Workspace extends StatelessWidget {
             ],
           ),
         ],
-        if (module == '复盘AI') ...const [
-          Text('复盘摘要'),
-          Text('预测与实际走势对比'),
-          Text('AI 仅读取确定性计算结果'),
-          Text('用户可编辑或重新生成'),
-        ],
-        if (module == '复盘AI') ...[Text(review)],
         if (module == '设置后台') ...const [
           Text('指标参数与主题'),
           Text('行情源状态'),

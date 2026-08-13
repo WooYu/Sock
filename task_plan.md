@@ -17,8 +17,8 @@ Deliver the complete Flutter StockCal product described in the referenced conver
 | 4. Quote/search adapters and stock analysis | complete | 17 new tests; 49-test full suite and clean static analysis |
 | 5. Professional K-line and annotation editor | complete | 19 chart domain/controller/widget/navigation tests, 68-test suite, clean analyze, Web release build |
 | 6. Rules, immutable predictions, and backtesting | complete | 15 domain/widget/navigation tests, 83-test full suite, clean analyze |
-| 7. Review and constrained AI explanation | in_progress | Deterministic input boundary, edit/regenerate flows, audit evidence |
-| 8. Backend services, auth, sync, and administration | pending | API/integration tests, PostgreSQL/Redis deployment verification |
+| 7. Review and constrained AI explanation | complete | 9 domain/widget/navigation tests, 92-test full suite, clean analyze |
+| 8. Backend services, auth, sync, and administration | in_progress | API/integration tests, PostgreSQL/Redis deployment verification |
 | 9. Release hardening and delivery | pending | Full test suite, analyze, Android/Web builds, visual/accessibility QA, pushed repository |
 
 ## Decisions

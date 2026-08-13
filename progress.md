@@ -51,3 +51,7 @@
 - Focused phase-six domain verification: all 11 rule, prediction, and backtest tests passed.
 - Witnessed failing rules-workspace and navigation tests, then implemented responsive rule/version management, structured rule creation, immutable prediction evidence, and selected-version backtest statistics; replaced the static home placeholder.
 - Fresh phase-six verification: all 83 Flutter tests passed and static analysis reported no issues.
+- Witnessed failing review-domain tests, then implemented immutable trade reviews plus daily/weekly aggregation of execution error, prediction error, and invalidation reasons.
+- Witnessed failing AI-boundary tests, then implemented deterministic read-only snapshots, text-only adapters, append-only narrative versions, regenerate/user-edit flows, and AI call audit events.
+- Witnessed failing review-workspace tests, then implemented responsive trade comparison, daily/weekly views, summary generation/edit/regeneration, and replaced the static home placeholder.
+- Fresh phase-seven verification: all 92 Flutter tests passed and static analysis reported no issues.
