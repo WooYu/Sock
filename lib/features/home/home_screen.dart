@@ -35,18 +35,6 @@ class _HomeScreenState extends State<HomeScreen> {
   late final WatchlistController _watchlistController;
   late final SessionController _sessionController;
 
-  static const _modules = [
-    '总览',
-    '个股分析',
-    '专业K线',
-    '规则回测',
-    '组合交易',
-    '自选股',
-    '复盘AI',
-    '账户同步',
-    '设置后台',
-  ];
-
   @override
   void initState() {
     super.initState();

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stockcal/app/stockcal_app.dart';
 
@@ -14,8 +15,14 @@ void main() {
     expect(find.text('组合交易'), findsOneWidget);
     expect(find.text('复盘AI'), findsOneWidget);
     expect(find.text('设置后台'), findsOneWidget);
-    expect(find.text('离线可用'), findsOneWidget);
-    expect(find.text('真实行情适配层'), findsOneWidget);
+    for (final label in ['离线可用', '真实行情适配层']) {
+      await tester.scrollUntilVisible(
+        find.text(label),
+        180,
+        scrollable: find.byType(Scrollable).last,
+      );
+      expect(find.text(label), findsOneWidget);
+    }
   });
 
   testWidgets(
