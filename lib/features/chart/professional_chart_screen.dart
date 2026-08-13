@@ -33,6 +33,7 @@ class _ProfessionalChartScreenState extends State<ProfessionalChartScreen> {
   ChartTimeframe _timeframe = ChartTimeframe.daily;
   AdjustmentMode _adjustment = AdjustmentMode.none;
   final Set<_IndicatorLayer> _indicatorLayers = {..._IndicatorLayer.values};
+  String? _selectedAnnotationId;
 
   @override
   void initState() {
@@ -165,6 +166,31 @@ class _ProfessionalChartScreenState extends State<ProfessionalChartScreen> {
                                 ),
                               ),
                             ),
+                            if (_selectedAnnotationId != null)
+                              LayoutBuilder(
+                                builder: (context, constraints) =>
+                                    GestureDetector(
+                                      key: const Key(
+                                        'annotation-gesture-layer',
+                                      ),
+                                      behavior: HitTestBehavior.opaque,
+                                      onPanEnd: (_) => setState(
+                                        () => _selectedAnnotationId = null,
+                                      ),
+                                      onPanUpdate: (details) => _moveSelected(
+                                        details.delta,
+                                        constraints.biggest,
+                                        candles,
+                                      ),
+                                      child: const Align(
+                                        alignment: Alignment.topCenter,
+                                        child: Padding(
+                                          padding: EdgeInsets.all(8),
+                                          child: Text('拖动编辑中'),
+                                        ),
+                                      ),
+                                    ),
+                              ),
                           ],
                         ),
                 ),
@@ -174,11 +200,33 @@ class _ProfessionalChartScreenState extends State<ProfessionalChartScreen> {
           if (wide)
             SizedBox(
               width: 280,
-              child: _AnnotationManager(controller: _annotations),
+              child: _AnnotationManager(
+                controller: _annotations,
+                selectedId: _selectedAnnotationId,
+                onSelected: (id) => setState(
+                  () => _selectedAnnotationId = _selectedAnnotationId == id
+                      ? null
+                      : id,
+                ),
+              ),
             ),
         ],
       ),
     );
+  }
+
+  void _moveSelected(Offset delta, Size size, List<Candle> candles) {
+    final id = _selectedAnnotationId;
+    if (id == null || candles.isEmpty || size.isEmpty) return;
+    final high = candles
+        .map((item) => item.high)
+        .reduce((a, b) => a > b ? a : b);
+    final low = candles.map((item) => item.low).reduce((a, b) => a < b ? a : b);
+    final candleDelta = (delta.dx / size.width * candles.length).round();
+    final priceDelta = -delta.dy / (size.height * 0.8) * (high - low);
+    if (candleDelta != 0 || priceDelta != 0) {
+      _annotations.move(id, candleDelta: candleDelta, priceDelta: priceDelta);
+    }
   }
 
   Future<void> _createAnnotation(ChartAnnotationType type) async {
@@ -434,9 +482,15 @@ class _IndicatorPainter extends CustomPainter {
 }
 
 class _AnnotationManager extends StatelessWidget {
-  const _AnnotationManager({required this.controller});
+  const _AnnotationManager({
+    required this.controller,
+    required this.selectedId,
+    required this.onSelected,
+  });
 
   final ChartAnnotationController controller;
+  final String? selectedId;
+  final ValueChanged<String> onSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -462,16 +516,26 @@ class _AnnotationManager extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Row(
-                              children: [
-                                Icon(annotation.type.icon, size: 20),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    '${annotation.type.label} ${index + 1}',
-                                  ),
+                            InkWell(
+                              onTap: () => onSelected(annotation.id),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
                                 ),
-                              ],
+                                child: Row(
+                                  children: [
+                                    Icon(annotation.type.icon, size: 20),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        '${annotation.type.label} ${index + 1}',
+                                      ),
+                                    ),
+                                    if (selectedId == annotation.id)
+                                      const Icon(Icons.open_with, size: 18),
+                                  ],
+                                ),
+                              ),
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,

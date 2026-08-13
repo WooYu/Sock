@@ -41,3 +41,7 @@
 - Witnessed failing annotation-edit and compact-landscape tests, then added precise annotation movement, control-point editing, and a height-aware immersive landscape workspace.
 - Reproduced and corrected another dialog exit-animation controller lifecycle failure by switching to form-owned values and scroll-constrained content.
 - Fresh edit/landscape verification: all 67 Flutter tests passed and static analysis reported no issues.
+- Witnessed a failing direct-drag test, then added explicit annotation selection and a gesture overlay that maps visible chart deltas back to candle indices and prices while leaving normal chart gestures untouched.
+- Focused professional-chart verification: all 8 chart-screen interaction tests passed.
+- Fresh phase-five verification: all 68 Flutter tests passed, static analysis reported no issues, and the Web release build completed successfully.
+- Automated browser screenshot tooling was unavailable in the active runtime; desktop, 375px portrait, and 760x375 landscape remain covered by rendered widget tests with nonblank chart and no-overflow assertions, with screenshot capture retained as a release-hardening gate.

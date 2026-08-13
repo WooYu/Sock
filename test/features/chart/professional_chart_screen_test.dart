@@ -166,6 +166,46 @@ void main() {
     expect(controller.annotations.single.points.first.price, 15.5);
   });
 
+  testWidgets('selected annotation can be dragged directly on the canvas', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1100, 760);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final controller = _annotationController();
+    await controller.create(
+      type: ChartAnnotationType.horizontalLine,
+      points: const [ChartPoint(candleIndex: 5, price: 20)],
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ProfessionalChartScreen(
+            candles: _candles(),
+            annotationController: controller,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('水平线 1'));
+    await tester.pump();
+    expect(find.text('拖动编辑中'), findsOneWidget);
+    await tester.drag(
+      find.byKey(const Key('annotation-gesture-layer')),
+      const Offset(80, -40),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      controller.annotations.single.points.single.candleIndex,
+      greaterThan(5),
+    );
+    expect(controller.annotations.single.points.single.price, greaterThan(20));
+  });
+
   testWidgets(
     'phone exposes drawing tools from a bottom sheet without overflow',
     (tester) async {
