@@ -20,3 +20,9 @@
 - Witnessed failing portfolio widget tests, then implemented the compact summary, holdings, transaction editor, import preview, confirmation, and undo flows.
 - Witnessed failing desktop/phone navigation integration tests and replaced the static portfolio placeholder with one stateful shared portfolio workspace.
 - Fresh portfolio-phase verification: all 32 Flutter tests passed and static analysis reported no issues.
+- Verified a clean 32-test baseline before starting market analysis.
+- Witnessed failing catalog/adapter tests, then implemented code, name, full-pinyin, and initials search; exact-code ranking; quote limits; chronological candles; and freshness-derived realtime/delayed/stale/offline states.
+- Witnessed failing indicator tests, then implemented MA, EMA, BOLL, volume average/ratio, key levels, target, confidence, risk, matched rules, and isolated three-session indicator extension.
+- Witnessed failing controller/page tests, then implemented search-selection-load state, last-success preservation, retry, explicit source state, responsive analysis layout, and a 375px overflow check.
+- Witnessed failing main-workspace integration tests and replaced the static analysis placeholder with one shared interactive analysis controller on phone and desktop.
+- Fresh market-analysis verification: all 49 Flutter tests passed and static analysis reported no issues.

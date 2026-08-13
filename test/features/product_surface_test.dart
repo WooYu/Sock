@@ -26,6 +26,8 @@ void main() {
       await tester.tap(find.text('个股分析'));
       await tester.pumpAndSettle();
       expect(find.text('搜索 A 股'), findsOneWidget);
+      await tester.tap(find.text('贵州茅台'));
+      await tester.pumpAndSettle();
       expect(find.text('命中规则'), findsOneWidget);
 
       await tester.tap(find.text('规则回测'));

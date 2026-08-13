@@ -14,8 +14,8 @@ Deliver the complete Flutter StockCal product described in the referenced conver
 | 1. Requirements, architecture, and durable planning | complete | Design, roadmap, findings, and progress files created |
 | 2. Local-first account, navigation, and watchlist vertical slice | complete | Red/green tests, persistence abstraction, usable responsive flow |
 | 3. Portfolio, transaction ledger, import, and P&L | complete | 14 new domain/widget/integration tests; 32-test full suite and clean analyze |
-| 4. Quote/search adapters and stock analysis | in_progress | Contract tests, delayed-source states, indicators and key levels |
-| 5. Professional K-line and annotation editor | pending | Gesture/drawing tests and desktop/mobile visual verification |
+| 4. Quote/search adapters and stock analysis | complete | 17 new tests; 49-test full suite and clean static analysis |
+| 5. Professional K-line and annotation editor | in_progress | Gesture/drawing tests and desktop/mobile visual verification |
 | 6. Rules, immutable predictions, and backtesting | pending | Versioning and deterministic calculation tests |
 | 7. Review and constrained AI explanation | pending | Deterministic input boundary, edit/regenerate flows, audit evidence |
 | 8. Backend services, auth, sync, and administration | pending | API/integration tests, PostgreSQL/Redis deployment verification |
@@ -38,3 +38,5 @@ Deliver the complete Flutter StockCal product described in the referenced conver
 | Watchlist dialog used a disposed text controller during exit animation | 1 | Reproduced in widget test; replaced controller ownership with dialog-scoped value capture |
 | Portfolio widget test expected compact data fragments as standalone widgets | 3 | Inspected rendered matches and tightened assertions to exact user-visible rows; production UI remained unchanged |
 | Full analyze found an unused direct import in portfolio screen | 1 | Screen consumes import behavior through its controller; removed the redundant import |
+| Standalone stock analysis screen lacked a Material ancestor | 1 | Stack trace showed TextField boundary assumption; screen now owns a transparent Material surface |
+| Legacy product test expected rules before selecting a stock | 1 | Updated test to follow the explicit search/selection workflow; no implicit demo selection restored |

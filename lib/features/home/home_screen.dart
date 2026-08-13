@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../domain/stockcal_domain.dart';
 import '../../domain/stockcal_services.dart';
+import '../analysis/stock_analysis_controller.dart';
+import '../analysis/stock_analysis_screen.dart';
+import '../analysis/technical_analysis.dart';
+import '../market/market_data.dart';
 import '../portfolio/portfolio_controller.dart';
 import '../portfolio/portfolio_ledger.dart';
 import '../portfolio/portfolio_screen.dart';
@@ -16,6 +20,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   var _selected = '总览';
   late final PortfolioController _portfolioController;
+  late final StockAnalysisController _stockAnalysisController;
 
   static const _modules = [
     '总览',
@@ -34,11 +39,17 @@ class _HomeScreenState extends State<HomeScreen> {
       ledger: PortfolioLedger(openingCash: 500000),
       marketPrices: const {'600519': 1742, '000001': 14, '300750': 102},
     );
+    _stockAnalysisController = StockAnalysisController(
+      catalog: const MemoryStockCatalog(DemoAshareData.securities),
+      market: DemoAshareMarketAdapter(),
+      analyzer: StockAnalyzer(),
+    );
   }
 
   @override
   void dispose() {
     _portfolioController.dispose();
+    _stockAnalysisController.dispose();
     super.dispose();
   }
 
@@ -100,6 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: _Workspace(
               module: _selected,
               portfolioController: _portfolioController,
+              stockAnalysisController: _stockAnalysisController,
               onNavigate: (module) => setState(() => _selected = module),
             ),
           ),
@@ -141,17 +153,22 @@ class _Workspace extends StatelessWidget {
   const _Workspace({
     required this.module,
     required this.portfolioController,
+    required this.stockAnalysisController,
     required this.onNavigate,
   });
 
   final String module;
   final PortfolioController portfolioController;
+  final StockAnalysisController stockAnalysisController;
   final ValueChanged<String> onNavigate;
 
   @override
   Widget build(BuildContext context) {
     if (module == '组合交易') {
       return PortfolioScreen(controller: portfolioController);
+    }
+    if (module == '个股分析') {
+      return StockAnalysisScreen(controller: stockAnalysisController);
     }
     final portfolio = DemoMarketData.portfolio;
     final prediction = PredictionEngine().predict(
@@ -186,16 +203,6 @@ class _Workspace extends StatelessWidget {
               _ModuleChip(label: '真实行情适配层'),
             ],
           ),
-        ],
-        if (module == '个股分析') ...[
-          const Text('搜索 A 股'),
-          Text('${quote.name} ${quote.price.toStringAsFixed(2)}'),
-          Text('${quote.sourceName} 延迟 ${quote.delayMinutes} 分钟'),
-          const Text('命中规则'),
-          Text('支撑 ${prediction.support.toStringAsFixed(0)}'),
-          Text('压力 ${prediction.resistance.toStringAsFixed(0)}'),
-          Text('目标 ${prediction.target.toStringAsFixed(0)}'),
-          Text('置信度 ${(prediction.confidence * 100).toStringAsFixed(0)}%'),
         ],
         if (module == '专业K线') ...const [
           Text('日线 / 周线 / 月线'),

@@ -42,9 +42,9 @@
 
 ### Task 3: Search, Quotes, And Analysis
 
-- [ ] Define adapter contracts and fixtures for code/name/pinyin search and delayed quotes.
-- [ ] Add MA, EMA, BOLL, volume, support/resistance, targets, confidence, risk, and three-day extension calculations by TDD.
-- [ ] Add source timestamp, delay, stale, retry, and offline presentation states.
+- [x] Define adapter contracts and fixtures for code/name/pinyin search and delayed quotes.
+- [x] Add MA, EMA, BOLL, volume, support/resistance, targets, confidence, risk, and three-day extension calculations by TDD.
+- [x] Add source timestamp, delay, stale, retry, and offline presentation states.
 
 ### Task 4: Professional Chart And Annotations
 

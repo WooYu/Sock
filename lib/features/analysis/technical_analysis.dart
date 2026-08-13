@@ -1,0 +1,283 @@
+import 'dart:math' as math;
+
+import '../../domain/stockcal_domain.dart';
+
+class AnalysisException implements Exception {
+  const AnalysisException(this.message);
+
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
+class BollingerBand {
+  const BollingerBand({
+    required this.middle,
+    required this.upper,
+    required this.lower,
+  });
+
+  final double middle;
+  final double upper;
+  final double lower;
+}
+
+class VolumeIndicator {
+  const VolumeIndicator({required this.average, required this.latestRatio});
+
+  final List<double?> average;
+  final double latestRatio;
+}
+
+class IndicatorCalculator {
+  List<double?> sma(List<Candle> candles, {required int period}) {
+    _validatePeriod(period);
+    if (candles.length < period) {
+      throw AnalysisException('计算 MA$period 至少需要 $period 根 K 线');
+    }
+    final result = List<double?>.filled(candles.length, null);
+    var sum = 0.0;
+    for (var index = 0; index < candles.length; index++) {
+      sum += candles[index].close;
+      if (index >= period) sum -= candles[index - period].close;
+      if (index >= period - 1) result[index] = sum / period;
+    }
+    return result;
+  }
+
+  List<double?> ema(List<Candle> candles, {required int period}) {
+    _validatePeriod(period);
+    if (candles.length < period) {
+      throw AnalysisException('计算 EMA$period 至少需要 $period 根 K 线');
+    }
+    final result = List<double?>.filled(candles.length, null);
+    final seed =
+        candles.take(period).fold<double>(0, (sum, item) => sum + item.close) /
+        period;
+    result[period - 1] = seed;
+    final alpha = 2 / (period + 1);
+    var previous = seed;
+    for (var index = period; index < candles.length; index++) {
+      previous = candles[index].close * alpha + previous * (1 - alpha);
+      result[index] = previous;
+    }
+    return result;
+  }
+
+  List<BollingerBand?> bollinger(
+    List<Candle> candles, {
+    required int period,
+    double multiplier = 2,
+  }) {
+    _validatePeriod(period);
+    if (candles.length < period) {
+      throw AnalysisException('计算 BOLL$period 至少需要 $period 根 K 线');
+    }
+    final result = List<BollingerBand?>.filled(candles.length, null);
+    for (var index = period - 1; index < candles.length; index++) {
+      final values = candles
+          .sublist(index - period + 1, index + 1)
+          .map((item) => item.close)
+          .toList();
+      final mean = values.fold<double>(0, (sum, value) => sum + value) / period;
+      final variance =
+          values.fold<double>(
+            0,
+            (sum, value) => sum + math.pow(value - mean, 2),
+          ) /
+          period;
+      final deviation = math.sqrt(variance);
+      result[index] = BollingerBand(
+        middle: mean,
+        upper: mean + deviation * multiplier,
+        lower: mean - deviation * multiplier,
+      );
+    }
+    return result;
+  }
+
+  VolumeIndicator volume(List<Candle> candles, {required int period}) {
+    _validatePeriod(period);
+    if (candles.length < period) {
+      throw AnalysisException('计算成交量均线至少需要 $period 根 K 线');
+    }
+    final average = List<double?>.filled(candles.length, null);
+    var sum = 0.0;
+    for (var index = 0; index < candles.length; index++) {
+      sum += candles[index].volume;
+      if (index >= period) sum -= candles[index - period].volume;
+      if (index >= period - 1) average[index] = sum / period;
+    }
+    final latestAverage = average.last!;
+    return VolumeIndicator(
+      average: average,
+      latestRatio: latestAverage == 0 ? 0 : candles.last.volume / latestAverage,
+    );
+  }
+
+  void _validatePeriod(int period) {
+    if (period <= 0) throw ArgumentError.value(period, 'period', '必须大于零');
+  }
+}
+
+enum RiskLevel { low, medium, high }
+
+class FutureIndicatorPoint {
+  const FutureIndicatorPoint({
+    required this.day,
+    required this.ma5,
+    required this.ma20,
+    required this.bollUpper,
+    required this.bollMiddle,
+    required this.bollLower,
+  });
+
+  final DateTime day;
+  final double ma5;
+  final double ma20;
+  final double bollUpper;
+  final double bollMiddle;
+  final double bollLower;
+}
+
+class StockAnalysis {
+  const StockAnalysis({
+    required this.lastClose,
+    required this.support,
+    required this.resistance,
+    required this.target,
+    required this.confidence,
+    required this.riskLevel,
+    required this.matchedRules,
+    required this.ma5,
+    required this.ma20,
+    required this.ema12,
+    required this.bollinger,
+    required this.volumeRatio,
+    required this.future,
+  });
+
+  final double lastClose;
+  final double support;
+  final double resistance;
+  final double target;
+  final double confidence;
+  final RiskLevel riskLevel;
+  final List<String> matchedRules;
+  final double ma5;
+  final double ma20;
+  final double ema12;
+  final BollingerBand bollinger;
+  final double volumeRatio;
+  final List<FutureIndicatorPoint> future;
+}
+
+class StockAnalyzer {
+  StockAnalyzer({IndicatorCalculator? calculator})
+    : _calculator = calculator ?? IndicatorCalculator();
+
+  final IndicatorCalculator _calculator;
+
+  StockAnalysis analyze(List<Candle> source) {
+    if (source.length < 20) {
+      throw const AnalysisException('个股分析至少需要 20 根日 K 线');
+    }
+    final candles = List<Candle>.of(source);
+    final recent = candles.sublist(candles.length - 20);
+    final support = recent.map((item) => item.low).reduce(math.min);
+    final resistance = recent.map((item) => item.high).reduce(math.max);
+    final range = resistance - support;
+    final lastClose = candles.last.close;
+    final ma5 = _calculator.sma(candles, period: 5).last!;
+    final ma20 = _calculator.sma(candles, period: 20).last!;
+    final ema12 = _calculator.ema(candles, period: 12).last!;
+    final boll = _calculator.bollinger(candles, period: 20).last!;
+    final volumeRatio = _calculator.volume(candles, period: 5).latestRatio;
+    final trendPositive = lastClose >= ma20 && ma5 >= ma20;
+    final nearSupport = lastClose - support <= range * 0.35;
+    final matchedRules = <String>[
+      if (trendPositive) 'MA5 上穿并站稳 MA20',
+      if (lastClose >= ema12) '收盘价位于 EMA12 上方',
+      if (volumeRatio >= 1) '成交量不低于五日均量',
+      if (nearSupport) '价格接近二十日支撑区',
+      if (lastClose < boll.upper) '仍处于 BOLL 上轨以内',
+    ];
+    final confidence = (0.5 + matchedRules.length * 0.08).clamp(0.5, 0.9);
+    final supportDistance = lastClose == 0
+        ? 1
+        : (lastClose - support) / lastClose;
+    final risk = supportDistance < 0.02
+        ? RiskLevel.high
+        : volumeRatio > 1.5
+        ? RiskLevel.medium
+        : RiskLevel.low;
+
+    return StockAnalysis(
+      lastClose: lastClose,
+      support: support,
+      resistance: resistance,
+      target: resistance + range * 0.382,
+      confidence: confidence,
+      riskLevel: risk,
+      matchedRules: List.unmodifiable(matchedRules),
+      ma5: ma5,
+      ma20: ma20,
+      ema12: ema12,
+      bollinger: boll,
+      volumeRatio: volumeRatio,
+      future: _extend(candles, sessions: 3),
+    );
+  }
+
+  List<FutureIndicatorPoint> _extend(
+    List<Candle> source, {
+    required int sessions,
+  }) {
+    final rolling = List<Candle>.of(source);
+    final result = <FutureIndicatorPoint>[];
+    var day = source.last.day;
+    for (var index = 0; index < sessions; index++) {
+      day = _nextTradingDay(day);
+      final projectedClose = _linearProjection(rolling);
+      rolling.add(
+        Candle(
+          day: day,
+          open: projectedClose,
+          high: projectedClose,
+          low: projectedClose,
+          close: projectedClose,
+          volume: rolling.last.volume,
+        ),
+      );
+      final boll = _calculator.bollinger(rolling, period: 20).last!;
+      result.add(
+        FutureIndicatorPoint(
+          day: day,
+          ma5: _calculator.sma(rolling, period: 5).last!,
+          ma20: _calculator.sma(rolling, period: 20).last!,
+          bollUpper: boll.upper,
+          bollMiddle: boll.middle,
+          bollLower: boll.lower,
+        ),
+      );
+    }
+    return List.unmodifiable(result);
+  }
+
+  double _linearProjection(List<Candle> candles) {
+    final recent = candles.sublist(candles.length - 5);
+    final dailyChange =
+        (recent.last.close - recent.first.close) / (recent.length - 1);
+    return recent.last.close + dailyChange;
+  }
+
+  DateTime _nextTradingDay(DateTime day) {
+    var next = day.add(const Duration(days: 1));
+    while (next.weekday == DateTime.saturday ||
+        next.weekday == DateTime.sunday) {
+      next = next.add(const Duration(days: 1));
+    }
+    return next;
+  }
+}
