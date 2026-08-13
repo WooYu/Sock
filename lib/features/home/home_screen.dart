@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../domain/stockcal_domain.dart';
 import '../../domain/stockcal_services.dart';
+import '../portfolio/portfolio_controller.dart';
+import '../portfolio/portfolio_ledger.dart';
+import '../portfolio/portfolio_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   var _selected = '总览';
+  late final PortfolioController _portfolioController;
 
   static const _modules = [
     '总览',
@@ -22,6 +26,21 @@ class _HomeScreenState extends State<HomeScreen> {
     '复盘AI',
     '设置后台',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _portfolioController = PortfolioController(
+      ledger: PortfolioLedger(openingCash: 500000),
+      marketPrices: const {'600519': 1742, '000001': 14, '300750': 102},
+    );
+  }
+
+  @override
+  void dispose() {
+    _portfolioController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,6 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: _Workspace(
               module: _selected,
+              portfolioController: _portfolioController,
               onNavigate: (module) => setState(() => _selected = module),
             ),
           ),
@@ -118,13 +138,21 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class _Workspace extends StatelessWidget {
-  const _Workspace({required this.module, required this.onNavigate});
+  const _Workspace({
+    required this.module,
+    required this.portfolioController,
+    required this.onNavigate,
+  });
 
   final String module;
+  final PortfolioController portfolioController;
   final ValueChanged<String> onNavigate;
 
   @override
   Widget build(BuildContext context) {
+    if (module == '组合交易') {
+      return PortfolioScreen(controller: portfolioController);
+    }
     final portfolio = DemoMarketData.portfolio;
     final prediction = PredictionEngine().predict(
       DemoMarketData.candlesFor('600519'),
@@ -181,12 +209,6 @@ class _Workspace extends StatelessWidget {
           Text('平均误差 2.8%'),
           Text('最大回撤'),
           Text('预测结果新版本'),
-        ],
-        if (module == '组合交易') ...const [
-          Text('持仓与资金账户'),
-          Text('买入 卖出 分红 送转 费用'),
-          Text('CSV/Excel 导入预览'),
-          Text('撤销最近导入'),
         ],
         if (module == '复盘AI') ...const [
           Text('复盘摘要'),

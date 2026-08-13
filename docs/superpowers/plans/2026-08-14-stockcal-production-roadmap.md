@@ -26,19 +26,19 @@
 **Interfaces:**
 - Produces an injectable session repository, watchlist repository, local sync outbox, and responsive app shell.
 
-- [ ] Write failing repository tests for session persistence, watchlist grouping/order, duplicate prevention, and queued mutations.
-- [ ] Run those tests and confirm failures identify missing behavior.
-- [ ] Implement minimal in-memory/local repository behavior.
-- [ ] Write failing widget tests for phone More navigation and editable watchlists.
-- [ ] Implement the responsive shell and watchlist interactions.
-- [ ] Run focused and full suites, refactor, and commit.
+- [x] Write failing repository tests for session persistence, watchlist grouping/order, duplicate prevention, and queued mutations.
+- [x] Run those tests and confirm failures identify missing behavior.
+- [x] Implement minimal in-memory/local repository behavior.
+- [x] Write failing widget tests for phone More navigation and editable watchlists.
+- [x] Implement the responsive shell and watchlist interactions.
+- [x] Run focused and full suites, refactor, and commit.
 
 ### Task 2: Portfolio Ledger And Import
 
-- [ ] Specify transaction invariants for buy, sell, dividend, corporate action, and fees.
-- [ ] Build the ledger by red-green cycles and derive cost, realized/floating P&L, and returns.
-- [ ] Add CSV/Excel mapping, preview, validation, atomic commit, and undo with tests.
-- [ ] Deliver portfolio and transaction workspaces across phone and desktop.
+- [x] Specify transaction invariants for buy, sell, dividend, corporate action, and fees.
+- [x] Build the ledger by red-green cycles and derive cost, realized/floating P&L, and returns.
+- [x] Add CSV/Excel mapping, preview, validation, atomic commit, and undo with tests.
+- [x] Deliver portfolio and transaction workspaces across phone and desktop.
 
 ### Task 3: Search, Quotes, And Analysis
 
@@ -76,4 +76,3 @@
 - [ ] Build Android and Web release artifacts.
 - [ ] Verify phone/tablet/desktop visuals, keyboard/screen-reader semantics, text scaling, offline and delayed-source states.
 - [ ] Audit every requirement against executable or rendered evidence, commit, and push to GitHub.
-

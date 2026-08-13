@@ -12,9 +12,9 @@ Deliver the complete Flutter StockCal product described in the referenced conver
 | Phase | Status | Exit evidence |
 |---|---|---|
 | 1. Requirements, architecture, and durable planning | complete | Design, roadmap, findings, and progress files created |
-| 2. Local-first account, navigation, and watchlist vertical slice | in_progress | Red/green tests, persistence abstraction, usable responsive flow |
-| 3. Portfolio, transaction ledger, import, and P&L | pending | Domain and widget tests plus complete CRUD/import/undo flow |
-| 4. Quote/search adapters and stock analysis | pending | Contract tests, delayed-source states, indicators and key levels |
+| 2. Local-first account, navigation, and watchlist vertical slice | complete | Red/green tests, persistence abstraction, usable responsive flow |
+| 3. Portfolio, transaction ledger, import, and P&L | complete | 14 new domain/widget/integration tests; 32-test full suite and clean analyze |
+| 4. Quote/search adapters and stock analysis | in_progress | Contract tests, delayed-source states, indicators and key levels |
 | 5. Professional K-line and annotation editor | pending | Gesture/drawing tests and desktop/mobile visual verification |
 | 6. Rules, immutable predictions, and backtesting | pending | Versioning and deterministic calculation tests |
 | 7. Review and constrained AI explanation | pending | Deterministic input boundary, edit/regenerate flows, audit evidence |
@@ -36,3 +36,5 @@ Deliver the complete Flutter StockCal product described in the referenced conver
 | GitHub push could not reach proxy `127.0.0.1` | 1 | Keep commits local and retry after checking current proxy/network state |
 | Flutter Web and Windows builds timed out | 1 | Retry after feature work with bounded diagnostics and platform-specific build checks |
 | Watchlist dialog used a disposed text controller during exit animation | 1 | Reproduced in widget test; replaced controller ownership with dialog-scoped value capture |
+| Portfolio widget test expected compact data fragments as standalone widgets | 3 | Inspected rendered matches and tightened assertions to exact user-visible rows; production UI remained unchanged |
+| Full analyze found an unused direct import in portfolio screen | 1 | Screen consumes import behavior through its controller; removed the redundant import |

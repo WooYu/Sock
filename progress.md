@@ -14,3 +14,9 @@
 - Diagnosed a dialog controller lifecycle failure from its stack trace and verified the corrected interaction test passes.
 - Fresh full verification: 18 Flutter tests passed and `flutter analyze` reported no issues.
 - GitHub diagnostics: `gh` is not installed; global Git HTTP/HTTPS proxy points to `127.0.0.1:10808`.
+- Verified a clean 18-test baseline before starting the portfolio phase.
+- Witnessed failing ledger tests, then implemented buy/sell/dividend/bonus/fee records, average cost, realized/floating P&L, cash balance, oversell rejection, atomic batches, and batch removal.
+- Witnessed failing import tests, then implemented broker column mapping, row-level preview errors, valid-only commit, atomic rollback, latest-batch undo, and all required transaction row types.
+- Witnessed failing portfolio widget tests, then implemented the compact summary, holdings, transaction editor, import preview, confirmation, and undo flows.
+- Witnessed failing desktop/phone navigation integration tests and replaced the static portfolio placeholder with one stateful shared portfolio workspace.
+- Fresh portfolio-phase verification: all 32 Flutter tests passed and static analysis reported no issues.
