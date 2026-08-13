@@ -121,6 +121,51 @@ void main() {
     expect(controller.annotations, isEmpty);
   });
 
+  testWidgets('desktop manager moves and edits annotation control points', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1100, 760);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final controller = _annotationController();
+    await controller.create(
+      type: ChartAnnotationType.trendLine,
+      points: const [
+        ChartPoint(candleIndex: 2, price: 12),
+        ChartPoint(candleIndex: 8, price: 18),
+      ],
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ProfessionalChartScreen(
+            stockCode: '600519',
+            candles: _candles(),
+            annotationController: controller,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('向右移动'));
+    await tester.pumpAndSettle();
+    expect(controller.annotations.single.points.first.candleIndex, 3);
+
+    await tester.tap(find.byTooltip('编辑控制点'));
+    await tester.pumpAndSettle();
+    expect(find.text('编辑标注'), findsOneWidget);
+    final fields = find.byType(TextFormField);
+    await tester.enterText(fields.at(0), '5');
+    await tester.enterText(fields.at(1), '15.5');
+    await tester.tap(find.text('保存'));
+    await tester.pumpAndSettle();
+    expect(controller.annotations.single.points.first.candleIndex, 5);
+    expect(controller.annotations.single.points.first.price, 15.5);
+  });
+
   testWidgets(
     'phone exposes drawing tools from a bottom sheet without overflow',
     (tester) async {
@@ -156,6 +201,28 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('landscape phone prioritizes an immersive chart viewport', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(760, 375);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(body: ProfessionalChartScreen(candles: _candles())),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('landscape-chart-workspace')), findsOneWidget);
+    expect(find.text('真实行情'), findsNothing);
+    expect(find.text('标注管理'), findsNothing);
+    expect(find.byType(Candlesticks), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }
 
 ChartAnnotationController _annotationController() {

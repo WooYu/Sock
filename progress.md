@@ -38,3 +38,6 @@
 - Witnessed failing main-navigation integration, then replaced the professional-chart placeholder with the production chart and lifted annotation ownership to the home lifecycle so annotations survive module switches.
 - Witnessed failing indicator-layer tests, then reused the deterministic indicator calculator to render independently toggleable MA5, MA20, EMA12, and BOLL overlays without mutating OHLCV input.
 - Fresh chart-workspace verification: all 65 Flutter tests passed and static analysis reported no issues.
+- Witnessed failing annotation-edit and compact-landscape tests, then added precise annotation movement, control-point editing, and a height-aware immersive landscape workspace.
+- Reproduced and corrected another dialog exit-animation controller lifecycle failure by switching to form-owned values and scroll-constrained content.
+- Fresh edit/landscape verification: all 67 Flutter tests passed and static analysis reported no issues.

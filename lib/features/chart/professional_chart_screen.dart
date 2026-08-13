@@ -73,11 +73,14 @@ class _ProfessionalChartScreenState extends State<ProfessionalChartScreen> {
     final candles = ChartDataTransformer.aggregate(adjusted, _timeframe);
     final rendered = CandlestickAdapter.newestFirst(candles);
     final colors = Theme.of(context).colorScheme;
-    final wide = MediaQuery.sizeOf(context).width >= 760;
+    final size = MediaQuery.sizeOf(context);
+    final landscapeCompact = size.height < 500 && size.width > size.height;
+    final wide = size.width >= 760 && !landscapeCompact;
 
     return Material(
       color: colors.surface,
       child: Row(
+        key: landscapeCompact ? const Key('landscape-chart-workspace') : null,
         children: [
           Expanded(
             child: Column(
@@ -106,22 +109,23 @@ class _ProfessionalChartScreenState extends State<ProfessionalChartScreen> {
                     });
                   },
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-                  child: Row(
-                    children: [
-                      const _RegionLabel(
-                        label: '真实行情',
-                        color: Color(0xFF147D64),
-                      ),
-                      Expanded(child: Divider(color: colors.outlineVariant)),
-                      const _RegionLabel(
-                        label: '预测区',
-                        color: Color(0xFFB57900),
-                      ),
-                    ],
+                if (!landscapeCompact)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+                    child: Row(
+                      children: [
+                        const _RegionLabel(
+                          label: '真实行情',
+                          color: Color(0xFF147D64),
+                        ),
+                        Expanded(child: Divider(color: colors.outlineVariant)),
+                        const _RegionLabel(
+                          label: '预测区',
+                          color: Color(0xFFB57900),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
                 Expanded(
                   child: rendered.length < 2
                       ? const Center(child: Text('至少需要两根 K 线'))
@@ -169,7 +173,7 @@ class _ProfessionalChartScreenState extends State<ProfessionalChartScreen> {
           ),
           if (wide)
             SizedBox(
-              width: 240,
+              width: 280,
               child: _AnnotationManager(controller: _annotations),
             ),
         ],
@@ -453,29 +457,62 @@ class _AnnotationManager extends StatelessWidget {
                     itemCount: controller.annotations.length,
                     itemBuilder: (context, index) {
                       final annotation = controller.annotations[index];
-                      return ListTile(
-                        dense: true,
-                        leading: Icon(annotation.type.icon),
-                        title: Text('${annotation.type.label} ${index + 1}'),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            IconButton(
-                              tooltip: annotation.hidden ? '显示标注' : '隐藏标注',
-                              onPressed: () => controller.setHidden(
-                                annotation.id,
-                                !annotation.hidden,
-                              ),
-                              icon: Icon(
-                                annotation.hidden
-                                    ? Icons.visibility_off_outlined
-                                    : Icons.visibility_outlined,
-                              ),
+                            Row(
+                              children: [
+                                Icon(annotation.type.icon, size: 20),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    '${annotation.type.label} ${index + 1}',
+                                  ),
+                                ),
+                              ],
                             ),
-                            IconButton(
-                              tooltip: '删除标注',
-                              onPressed: () => controller.delete(annotation.id),
-                              icon: const Icon(Icons.delete_outline),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                IconButton(
+                                  tooltip: '向右移动',
+                                  onPressed: () => controller.move(
+                                    annotation.id,
+                                    candleDelta: 1,
+                                    priceDelta: 0,
+                                  ),
+                                  icon: const Icon(Icons.arrow_forward),
+                                ),
+                                IconButton(
+                                  tooltip: '编辑控制点',
+                                  onPressed: () => _editAnnotation(
+                                    context,
+                                    controller,
+                                    annotation,
+                                  ),
+                                  icon: const Icon(Icons.edit_outlined),
+                                ),
+                                IconButton(
+                                  tooltip: annotation.hidden ? '显示标注' : '隐藏标注',
+                                  onPressed: () => controller.setHidden(
+                                    annotation.id,
+                                    !annotation.hidden,
+                                  ),
+                                  icon: Icon(
+                                    annotation.hidden
+                                        ? Icons.visibility_off_outlined
+                                        : Icons.visibility_outlined,
+                                  ),
+                                ),
+                                IconButton(
+                                  tooltip: '删除标注',
+                                  onPressed: () =>
+                                      controller.delete(annotation.id),
+                                  icon: const Icon(Icons.delete_outline),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -490,6 +527,65 @@ class _AnnotationManager extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _editAnnotation(
+    BuildContext context,
+    ChartAnnotationController controller,
+    ChartAnnotation annotation,
+  ) async {
+    final point = annotation.points.first;
+    var candleText = point.candleIndex.toString();
+    var priceText = point.price.toString();
+    final result = await showDialog<ChartPoint>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('编辑标注'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                initialValue: candleText,
+                onChanged: (value) => candleText = value,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'K 线序号'),
+              ),
+              TextFormField(
+                initialValue: priceText,
+                onChanged: (value) => priceText = value,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(labelText: '价格'),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () {
+              final candleIndex = int.tryParse(candleText);
+              final price = double.tryParse(priceText);
+              if (candleIndex != null && price != null) {
+                Navigator.pop(
+                  context,
+                  ChartPoint(candleIndex: candleIndex, price: price),
+                );
+              }
+            },
+            child: const Text('保存'),
+          ),
+        ],
+      ),
+    );
+    if (result != null) {
+      await controller.updatePoint(annotation.id, 0, result);
+    }
   }
 }
 
