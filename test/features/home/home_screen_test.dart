@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stockcal/app/stockcal_app.dart';
 
@@ -8,9 +9,23 @@ void main() {
     await tester.pumpWidget(const StockCalApp());
 
     expect(find.text('StockCal'), findsOneWidget);
-    expect(find.text('Trade Calendar'), findsOneWidget);
-    expect(find.text('Position Calculator'), findsOneWidget);
-    expect(find.text('Risk Dashboard'), findsOneWidget);
+    expect(find.text('持仓与自选'), findsOneWidget);
+    expect(find.textContaining('延迟 15 分钟'), findsOneWidget);
+    for (final label in [
+      '关键位提醒',
+      '最新预测',
+      '待复盘',
+      'Trade Calendar',
+      'Position Calculator',
+      'Risk Dashboard',
+    ]) {
+      await tester.scrollUntilVisible(
+        find.text(label),
+        180,
+        scrollable: find.byType(Scrollable).last,
+      );
+      expect(find.text(label), findsOneWidget);
+    }
   });
 
   testWidgets('desktop navigation opens watchlist and account workspaces', (

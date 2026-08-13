@@ -245,29 +245,14 @@ class _Workspace extends StatelessWidget {
     if (module == '设置后台') {
       return const SettingsAdminWorkspace();
     }
-    final portfolio = DemoMarketData.portfolio;
+    if (module == '总览') {
+      return const _Dashboard();
+    }
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
         Text(module, style: Theme.of(context).textTheme.headlineMedium),
         const SizedBox(height: 12),
-        if (module == '总览') ...[
-          Text('总资产 ${portfolio.marketValue.toStringAsFixed(0)}'),
-          Text('累计盈亏 ${portfolio.totalProfit.toStringAsFixed(0)}'),
-          Text('今日盈亏 ${portfolio.dayProfit.toStringAsFixed(0)}'),
-          const SizedBox(height: 14),
-          const Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              _ModuleChip(label: 'Trade Calendar'),
-              _ModuleChip(label: 'Position Calculator'),
-              _ModuleChip(label: 'Risk Dashboard'),
-              _ModuleChip(label: '离线可用'),
-              _ModuleChip(label: '真实行情适配层'),
-            ],
-          ),
-        ],
         if (module == '更多') ...[
           _MoreDestination(
             icon: Icons.bookmark_outline,
@@ -309,6 +294,128 @@ class _Workspace extends StatelessWidget {
       ],
     );
   }
+}
+
+class _Dashboard extends StatelessWidget {
+  const _Dashboard();
+
+  @override
+  Widget build(BuildContext context) {
+    final portfolio = DemoMarketData.portfolio;
+    final prediction = PredictionEngine().predict(
+      DemoMarketData.candlesFor('600519'),
+    );
+    return ListView(
+      padding: const EdgeInsets.all(20),
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                '组合总览',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+            ),
+            const Chip(
+              avatar: Icon(Icons.schedule, size: 16),
+              label: Text('延迟 15 分钟'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 24,
+          runSpacing: 12,
+          children: [
+            _Metric(label: '总资产', value: portfolio.marketValue),
+            _Metric(label: '累计盈亏', value: portfolio.totalProfit),
+            _Metric(label: '今日盈亏', value: portfolio.dayProfit),
+          ],
+        ),
+        const Divider(height: 32),
+        const _SectionTitle(title: '持仓与自选'),
+        for (final position in portfolio.positions)
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text('${position.name} ${position.code}'),
+            subtitle: Text(
+              '持仓 ${position.quantity} · 成本 ${position.costPrice}',
+            ),
+            trailing: Text(position.lastPrice.toStringAsFixed(2)),
+          ),
+        const Divider(height: 32),
+        const _SectionTitle(title: '关键位提醒'),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.notifications_active_outlined),
+          title: const Text('贵州茅台接近压力区'),
+          subtitle: Text('压力 ${prediction.resistance.toStringAsFixed(2)}'),
+        ),
+        const _SectionTitle(title: '最新预测'),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.insights_outlined),
+          title: Text('目标 ${prediction.target.toStringAsFixed(2)}'),
+          subtitle: Text(
+            '置信度 ${(prediction.confidence * 100).round()}% · 3 条规则命中',
+          ),
+        ),
+        const _SectionTitle(title: '待复盘'),
+        const ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: Icon(Icons.fact_check_outlined),
+          title: Text('本周交易复盘'),
+          subtitle: Text('1 项待完成'),
+        ),
+        const SizedBox(height: 8),
+        const Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: [
+            _ModuleChip(label: 'Trade Calendar'),
+            _ModuleChip(label: 'Position Calculator'),
+            _ModuleChip(label: 'Risk Dashboard'),
+            _ModuleChip(label: '离线可用'),
+            _ModuleChip(label: '真实行情适配层'),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _Metric extends StatelessWidget {
+  const _Metric({required this.label, required this.value});
+  final String label;
+  final double value;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 150,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: Theme.of(context).textTheme.bodySmall),
+          Text(
+            value.toStringAsFixed(0),
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle({required this.title});
+  final String title;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(top: 8, bottom: 4),
+    child: Text(title, style: Theme.of(context).textTheme.titleMedium),
+  );
 }
 
 class _MoreDestination extends StatelessWidget {
