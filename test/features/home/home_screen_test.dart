@@ -12,4 +12,21 @@ void main() {
     expect(find.text('Position Calculator'), findsOneWidget);
     expect(find.text('Risk Dashboard'), findsOneWidget);
   });
+
+  testWidgets('desktop navigation opens watchlist and account workspaces', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const StockCalApp());
+
+    expect(find.text('自选股'), findsOneWidget);
+    expect(find.text('账户同步'), findsOneWidget);
+
+    await tester.tap(find.text('自选股'));
+    await tester.pumpAndSettle();
+    expect(find.text('还没有自选分组'), findsOneWidget);
+
+    await tester.tap(find.text('账户同步'));
+    await tester.pumpAndSettle();
+    expect(find.text('手机验证码登录'), findsOneWidget);
+  });
 }

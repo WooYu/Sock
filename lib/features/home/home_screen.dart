@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/stockcal_domain.dart';
+import '../account/account_workspace.dart';
+import '../account/session.dart';
 import '../analysis/stock_analysis_controller.dart';
 import '../analysis/stock_analysis_screen.dart';
 import '../analysis/technical_analysis.dart';
@@ -14,6 +16,8 @@ import '../portfolio/portfolio_screen.dart';
 import '../rules/rule_engine.dart';
 import '../rules/rules_workspace.dart';
 import '../review/review_workspace.dart';
+import '../watchlist/watchlist.dart';
+import '../watchlist/watchlist_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,6 +32,8 @@ class _HomeScreenState extends State<HomeScreen> {
   late final StockAnalysisController _stockAnalysisController;
   late final ChartAnnotationController _chartAnnotationController;
   late final RuleBook _ruleBook;
+  late final WatchlistController _watchlistController;
+  late final SessionController _sessionController;
 
   static const _modules = [
     '总览',
@@ -35,7 +41,9 @@ class _HomeScreenState extends State<HomeScreen> {
     '专业K线',
     '规则回测',
     '组合交易',
+    '自选股',
     '复盘AI',
+    '账户同步',
     '设置后台',
   ];
 
@@ -58,6 +66,11 @@ class _HomeScreenState extends State<HomeScreen> {
       idFactory: () => 'annotation-${DateTime.now().microsecondsSinceEpoch}',
     );
     _ruleBook = RuleBook.withSystemDefaults();
+    _watchlistController = WatchlistController(
+      repository: MemoryWatchlistRepository(),
+      outbox: MemoryMutationOutbox(),
+    );
+    _sessionController = SessionController(MemorySessionRepository());
   }
 
   @override
@@ -65,6 +78,8 @@ class _HomeScreenState extends State<HomeScreen> {
     _portfolioController.dispose();
     _stockAnalysisController.dispose();
     _chartAnnotationController.dispose();
+    _watchlistController.dispose();
+    _sessionController.dispose();
     super.dispose();
   }
 
@@ -84,43 +99,9 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Row(
         children: [
           if (wide)
-            NavigationRail(
-              selectedIndex: _modules.indexOf(_selected),
-              onDestinationSelected: (index) {
-                setState(() => _selected = _modules[index]);
-              },
-              labelType: NavigationRailLabelType.all,
-              destinations: const [
-                NavigationRailDestination(
-                  icon: Icon(Icons.dashboard_outlined),
-                  selectedIcon: Icon(Icons.dashboard),
-                  label: Text('总览'),
-                ),
-                NavigationRailDestination(
-                  icon: Icon(Icons.search),
-                  label: Text('个股分析'),
-                ),
-                NavigationRailDestination(
-                  icon: Icon(Icons.candlestick_chart_outlined),
-                  label: Text('专业K线'),
-                ),
-                NavigationRailDestination(
-                  icon: Icon(Icons.rule),
-                  label: Text('规则回测'),
-                ),
-                NavigationRailDestination(
-                  icon: Icon(Icons.account_balance_wallet_outlined),
-                  label: Text('组合交易'),
-                ),
-                NavigationRailDestination(
-                  icon: Icon(Icons.rate_review_outlined),
-                  label: Text('复盘AI'),
-                ),
-                NavigationRailDestination(
-                  icon: Icon(Icons.settings_outlined),
-                  label: Text('设置后台'),
-                ),
-              ],
+            _DesktopNavigation(
+              selected: _selected,
+              onSelected: (module) => setState(() => _selected = module),
             ),
           Expanded(
             child: _Workspace(
@@ -129,6 +110,8 @@ class _HomeScreenState extends State<HomeScreen> {
               stockAnalysisController: _stockAnalysisController,
               chartAnnotationController: _chartAnnotationController,
               ruleBook: _ruleBook,
+              watchlistController: _watchlistController,
+              sessionController: _sessionController,
               onNavigate: (module) => setState(() => _selected = module),
             ),
           ),
@@ -166,6 +149,48 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+class _DesktopNavigation extends StatelessWidget {
+  const _DesktopNavigation({required this.selected, required this.onSelected});
+
+  final String selected;
+  final ValueChanged<String> onSelected;
+
+  static const _items = <(String, IconData)>[
+    ('总览', Icons.dashboard_outlined),
+    ('个股分析', Icons.search),
+    ('专业K线', Icons.candlestick_chart_outlined),
+    ('规则回测', Icons.rule_outlined),
+    ('组合交易', Icons.account_balance_wallet_outlined),
+    ('自选股', Icons.bookmark_outline),
+    ('复盘AI', Icons.rate_review_outlined),
+    ('账户同步', Icons.person_outline),
+    ('设置后台', Icons.settings_outlined),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 152,
+      child: Material(
+        color: Theme.of(context).colorScheme.surfaceContainerLow,
+        child: ListView(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          children: [
+            for (final item in _items)
+              ListTile(
+                dense: true,
+                selected: selected == item.$1,
+                leading: Icon(item.$2, size: 21),
+                title: Text(item.$1),
+                onTap: () => onSelected(item.$1),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _Workspace extends StatelessWidget {
   const _Workspace({
     required this.module,
@@ -173,6 +198,8 @@ class _Workspace extends StatelessWidget {
     required this.stockAnalysisController,
     required this.chartAnnotationController,
     required this.ruleBook,
+    required this.watchlistController,
+    required this.sessionController,
     required this.onNavigate,
   });
 
@@ -181,6 +208,8 @@ class _Workspace extends StatelessWidget {
   final StockAnalysisController stockAnalysisController;
   final ChartAnnotationController chartAnnotationController;
   final RuleBook ruleBook;
+  final WatchlistController watchlistController;
+  final SessionController sessionController;
   final ValueChanged<String> onNavigate;
 
   @override
@@ -206,6 +235,12 @@ class _Workspace extends StatelessWidget {
     }
     if (module == '复盘AI') {
       return const ReviewWorkspace();
+    }
+    if (module == '自选股') {
+      return WatchlistScreen(controller: watchlistController);
+    }
+    if (module == '账户同步') {
+      return AccountWorkspace(controller: sessionController);
     }
     if (module == '设置后台') {
       return const SettingsAdminWorkspace();
@@ -235,9 +270,21 @@ class _Workspace extends StatelessWidget {
         ],
         if (module == '更多') ...[
           _MoreDestination(
+            icon: Icons.bookmark_outline,
+            title: '自选股',
+            target: '自选股',
+            onNavigate: onNavigate,
+          ),
+          _MoreDestination(
             icon: Icons.rule_outlined,
             title: '规则与回测',
             target: '规则回测',
+            onNavigate: onNavigate,
+          ),
+          _MoreDestination(
+            icon: Icons.person_outline,
+            title: '账户与同步',
+            target: '账户同步',
             onNavigate: onNavigate,
           ),
           _MoreDestination(

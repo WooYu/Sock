@@ -12,7 +12,7 @@ Deliver the complete Flutter StockCal product described in the referenced conver
 | Phase | Status | Exit evidence |
 |---|---|---|
 | 1. Requirements, architecture, and durable planning | complete | Design, roadmap, findings, and progress files created |
-| 2. Local-first account, navigation, and watchlist vertical slice | complete | Red/green tests, persistence abstraction, usable responsive flow |
+| 2. Local-first account, navigation, and watchlist vertical slice | in_progress | Domain tests pass, but account/watchlist were not integrated into the product navigation; remediation underway |
 | 3. Portfolio, transaction ledger, import, and P&L | complete | 14 new domain/widget/integration tests; 32-test full suite and clean analyze |
 | 4. Quote/search adapters and stock analysis | complete | 17 new tests; 49-test full suite and clean static analysis |
 | 5. Professional K-line and annotation editor | complete | 19 chart domain/controller/widget/navigation tests, 68-test suite, clean analyze, Web release build |
