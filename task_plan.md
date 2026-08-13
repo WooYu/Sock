@@ -40,3 +40,4 @@ Deliver the complete Flutter StockCal product described in the referenced conver
 | Full analyze found an unused direct import in portfolio screen | 1 | Screen consumes import behavior through its controller; removed the redundant import |
 | Standalone stock analysis screen lacked a Material ancestor | 1 | Stack trace showed TextField boundary assumption; screen now owns a transparent Material surface |
 | Legacy product test expected rules before selecting a stock | 1 | Updated test to follow the explicit search/selection workflow; no implicit demo selection restored |
+| `agent-reach` and `mcporter` commands absent from PATH | 2 | Followed skill fallback chain, then used built-in web search restricted to pub.dev and official package documentation |

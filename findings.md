@@ -24,3 +24,8 @@ The authoritative conversation defines eight major areas: account/sync, dashboar
 - Immutable records and calculation snapshots provide auditability.
 - App state is injected so widget tests exercise real controllers and in-memory repositories.
 
+## Chart Library Research (2026-08-14)
+- Selected `candlesticks` 3.0.1 from pub.dev. Its official package documentation states support for Android, iOS, Linux, macOS, Web, and Windows, plus pan, zoom, touch/desktop crosshair, volume, theme styling, lazy history, and programmatic viewport control.
+- The library requires candles newest-first. StockCal's domain remains chronological oldest-first, so an explicit adapter reverses data only at the rendering boundary.
+- `trading_chart_flutter` was not selected because its official package page marks its 0.x API as subject to change. Older `k_chart` forks have weaker or inconsistent current package metadata.
+- StockCal owns timeframe aggregation, adjustment transformations, indicators, forecast separation, annotations, persistence, and sync. The selected library owns only candlestick/volume rendering and viewport gestures.

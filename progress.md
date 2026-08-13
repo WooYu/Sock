@@ -26,3 +26,8 @@
 - Witnessed failing controller/page tests, then implemented search-selection-load state, last-success preservation, retry, explicit source state, responsive analysis layout, and a 375px overflow check.
 - Witnessed failing main-workspace integration tests and replaced the static analysis placeholder with one shared interactive analysis controller on phone and desktop.
 - Fresh market-analysis verification: all 49 Flutter tests passed and static analysis reported no issues.
+- Researched current Flutter chart packages against official package documentation and selected `candlesticks` 3.0.1 for rendering, viewport gestures, crosshair, and volume.
+- Witnessed failing chart-domain tests, then implemented chronological daily/weekly/monthly aggregation, provider-supplied forward/backward adjustment factors, and a newest-first rendering adapter.
+- Witnessed failing professional-chart widget tests, then implemented timeframe and adjustment controls, viewport zoom actions, explicit real/forecast region labels, and the production candlestick canvas.
+- Corrected a state assertion to inspect the selected segmented-control value instead of relying on hidden test-only text.
+- Fresh chart-foundation verification: all 57 Flutter tests passed and static analysis reported no issues.
