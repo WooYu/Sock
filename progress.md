@@ -45,3 +45,7 @@
 - Focused professional-chart verification: all 8 chart-screen interaction tests passed.
 - Fresh phase-five verification: all 68 Flutter tests passed, static analysis reported no issues, and the Web release build completed successfully.
 - Automated browser screenshot tooling was unavailable in the active runtime; desktop, 375px portrait, and 760x375 landscape remain covered by rendered widget tests with nonblank chart and no-overflow assertions, with screenshot capture retained as a release-hardening gate.
+- Witnessed failing rule-book tests, then implemented immutable system/user rule versions, structured conditions, deterministic evaluation, priority ordering, and versioned enable state.
+- Witnessed failing prediction-store tests, then implemented append-only prediction records with deep-copied candle inputs, exact matched-rule versions, calculation evidence, outputs, and sequential regeneration versions.
+- Witnessed failing backtest tests, then implemented stock/rule/date filtering, historical-only signal evaluation, hit rate, mean error, maximum drawdown, and empty-range validation.
+- Focused phase-six domain verification: all 11 rule, prediction, and backtest tests passed.
