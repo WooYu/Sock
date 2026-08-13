@@ -33,3 +33,8 @@
 - Fresh chart-foundation verification: all 57 Flutter tests passed and static analysis reported no issues.
 - Witnessed failing annotation-domain tests, then implemented trend line, horizontal line, rectangle, and point models; local per-stock persistence; move/control-point/hide/delete operations; revision tracking; idempotent sync mutations; and delete tombstones.
 - Focused annotation verification: all 4 controller tests passed.
+- Witnessed failing responsive annotation-workspace tests, then implemented a CustomPaint annotation overlay, desktop drawing toolbar and annotation manager, and a fixed-access phone drawing bottom sheet.
+- Corrected a real 375px usability failure by pinning the mobile drawing action outside the horizontally scrolling chart controls.
+- Witnessed failing main-navigation integration, then replaced the professional-chart placeholder with the production chart and lifted annotation ownership to the home lifecycle so annotations survive module switches.
+- Witnessed failing indicator-layer tests, then reused the deterministic indicator calculator to render independently toggleable MA5, MA20, EMA12, and BOLL overlays without mutating OHLCV input.
+- Fresh chart-workspace verification: all 65 Flutter tests passed and static analysis reported no issues.

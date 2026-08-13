@@ -5,6 +5,8 @@ import '../../domain/stockcal_services.dart';
 import '../analysis/stock_analysis_controller.dart';
 import '../analysis/stock_analysis_screen.dart';
 import '../analysis/technical_analysis.dart';
+import '../chart/chart_annotations.dart';
+import '../chart/professional_chart_screen.dart';
 import '../market/market_data.dart';
 import '../portfolio/portfolio_controller.dart';
 import '../portfolio/portfolio_ledger.dart';
@@ -21,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   var _selected = '总览';
   late final PortfolioController _portfolioController;
   late final StockAnalysisController _stockAnalysisController;
+  late final ChartAnnotationController _chartAnnotationController;
 
   static const _modules = [
     '总览',
@@ -44,12 +47,19 @@ class _HomeScreenState extends State<HomeScreen> {
       market: DemoAshareMarketAdapter(),
       analyzer: StockAnalyzer(),
     );
+    _chartAnnotationController = ChartAnnotationController(
+      stockCode: '600519',
+      repository: MemoryChartAnnotationRepository(),
+      outbox: MemoryChartAnnotationOutbox(),
+      idFactory: () => 'annotation-${DateTime.now().microsecondsSinceEpoch}',
+    );
   }
 
   @override
   void dispose() {
     _portfolioController.dispose();
     _stockAnalysisController.dispose();
+    _chartAnnotationController.dispose();
     super.dispose();
   }
 
@@ -112,6 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
               module: _selected,
               portfolioController: _portfolioController,
               stockAnalysisController: _stockAnalysisController,
+              chartAnnotationController: _chartAnnotationController,
               onNavigate: (module) => setState(() => _selected = module),
             ),
           ),
@@ -154,12 +165,14 @@ class _Workspace extends StatelessWidget {
     required this.module,
     required this.portfolioController,
     required this.stockAnalysisController,
+    required this.chartAnnotationController,
     required this.onNavigate,
   });
 
   final String module;
   final PortfolioController portfolioController;
   final StockAnalysisController stockAnalysisController;
+  final ChartAnnotationController chartAnnotationController;
   final ValueChanged<String> onNavigate;
 
   @override
@@ -169,6 +182,13 @@ class _Workspace extends StatelessWidget {
     }
     if (module == '个股分析') {
       return StockAnalysisScreen(controller: stockAnalysisController);
+    }
+    if (module == '专业K线') {
+      return ProfessionalChartScreen(
+        stockCode: '600519',
+        candles: DemoAshareData.candlesFor('600519'),
+        annotationController: chartAnnotationController,
+      );
     }
     final portfolio = DemoMarketData.portfolio;
     final prediction = PredictionEngine().predict(
@@ -203,12 +223,6 @@ class _Workspace extends StatelessWidget {
               _ModuleChip(label: '真实行情适配层'),
             ],
           ),
-        ],
-        if (module == '专业K线') ...const [
-          Text('日线 / 周线 / 月线'),
-          Text('缩放 平移 十字光标'),
-          Text('趋势线 水平线 矩形 标注'),
-          Text('真实行情与未来预测区域'),
         ],
         if (module == '规则回测') ...const [
           Text('回测统计'),
