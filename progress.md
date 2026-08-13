@@ -49,3 +49,5 @@
 - Witnessed failing prediction-store tests, then implemented append-only prediction records with deep-copied candle inputs, exact matched-rule versions, calculation evidence, outputs, and sequential regeneration versions.
 - Witnessed failing backtest tests, then implemented stock/rule/date filtering, historical-only signal evaluation, hit rate, mean error, maximum drawdown, and empty-range validation.
 - Focused phase-six domain verification: all 11 rule, prediction, and backtest tests passed.
+- Witnessed failing rules-workspace and navigation tests, then implemented responsive rule/version management, structured rule creation, immutable prediction evidence, and selected-version backtest statistics; replaced the static home placeholder.
+- Fresh phase-six verification: all 83 Flutter tests passed and static analysis reported no issues.

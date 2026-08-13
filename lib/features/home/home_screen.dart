@@ -11,6 +11,8 @@ import '../market/market_data.dart';
 import '../portfolio/portfolio_controller.dart';
 import '../portfolio/portfolio_ledger.dart';
 import '../portfolio/portfolio_screen.dart';
+import '../rules/rule_engine.dart';
+import '../rules/rules_workspace.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late final PortfolioController _portfolioController;
   late final StockAnalysisController _stockAnalysisController;
   late final ChartAnnotationController _chartAnnotationController;
+  late final RuleBook _ruleBook;
 
   static const _modules = [
     '总览',
@@ -53,6 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
       outbox: MemoryChartAnnotationOutbox(),
       idFactory: () => 'annotation-${DateTime.now().microsecondsSinceEpoch}',
     );
+    _ruleBook = RuleBook.withSystemDefaults();
   }
 
   @override
@@ -123,6 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
               portfolioController: _portfolioController,
               stockAnalysisController: _stockAnalysisController,
               chartAnnotationController: _chartAnnotationController,
+              ruleBook: _ruleBook,
               onNavigate: (module) => setState(() => _selected = module),
             ),
           ),
@@ -166,6 +171,7 @@ class _Workspace extends StatelessWidget {
     required this.portfolioController,
     required this.stockAnalysisController,
     required this.chartAnnotationController,
+    required this.ruleBook,
     required this.onNavigate,
   });
 
@@ -173,6 +179,7 @@ class _Workspace extends StatelessWidget {
   final PortfolioController portfolioController;
   final StockAnalysisController stockAnalysisController;
   final ChartAnnotationController chartAnnotationController;
+  final RuleBook ruleBook;
   final ValueChanged<String> onNavigate;
 
   @override
@@ -188,6 +195,12 @@ class _Workspace extends StatelessWidget {
         stockCode: '600519',
         candles: DemoAshareData.candlesFor('600519'),
         annotationController: chartAnnotationController,
+      );
+    }
+    if (module == '规则回测') {
+      return RulesWorkspace(
+        ruleBook: ruleBook,
+        candles: DemoAshareData.candlesFor('600519'),
       );
     }
     final portfolio = DemoMarketData.portfolio;
@@ -223,13 +236,6 @@ class _Workspace extends StatelessWidget {
               _ModuleChip(label: '真实行情适配层'),
             ],
           ),
-        ],
-        if (module == '规则回测') ...const [
-          Text('回测统计'),
-          Text('命中率 76%'),
-          Text('平均误差 2.8%'),
-          Text('最大回撤'),
-          Text('预测结果新版本'),
         ],
         if (module == '复盘AI') ...const [
           Text('复盘摘要'),
