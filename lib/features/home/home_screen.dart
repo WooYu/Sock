@@ -18,6 +18,8 @@ import '../portfolio/persistent_portfolio_repository.dart';
 import '../portfolio/portfolio_ledger.dart';
 import '../portfolio/portfolio_screen.dart';
 import '../rules/rule_engine.dart';
+import '../rules/persistent_rules_repository.dart';
+import '../rules/persistent_prediction_repository.dart';
 import '../rules/rules_workspace.dart';
 import '../review/review_workspace.dart';
 import '../sync/remote_sync_service.dart';
@@ -38,6 +40,8 @@ class _HomeScreenState extends State<HomeScreen> {
   late final StockAnalysisController _stockAnalysisController;
   late final ChartAnnotationController _chartAnnotationController;
   late final RuleBook _ruleBook;
+  late final PersistentRuleRepository _ruleRepository;
+  late final PersistentPredictionRepository _predictionRepository;
   late final WatchlistController _watchlistController;
   late final SessionController _sessionController;
   late final PersistentChartAnnotationStore _annotationStore;
@@ -65,6 +69,9 @@ class _HomeScreenState extends State<HomeScreen> {
       idFactory: () => 'annotation-${DateTime.now().microsecondsSinceEpoch}',
     );
     _ruleBook = RuleBook.withSystemDefaults();
+    _ruleRepository = PersistentRuleRepository();
+    _predictionRepository = PersistentPredictionRepository();
+    _restoreRules();
     _watchlistController = WatchlistController(
       repository: PersistentWatchlistRepository(),
       outbox: PersistentMutationOutbox(),
@@ -102,6 +109,11 @@ class _HomeScreenState extends State<HomeScreen> {
     _annotationSyncWorker.drain(token);
   }
 
+  Future<void> _restoreRules() async {
+    await _ruleRepository.restoreInto(_ruleBook);
+    if (mounted) setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     final wide = MediaQuery.sizeOf(context).width >= 600;
@@ -129,6 +141,8 @@ class _HomeScreenState extends State<HomeScreen> {
               stockAnalysisController: _stockAnalysisController,
               chartAnnotationController: _chartAnnotationController,
               ruleBook: _ruleBook,
+              ruleRepository: _ruleRepository,
+              predictionRepository: _predictionRepository,
               watchlistController: _watchlistController,
               sessionController: _sessionController,
               onNavigate: (module) => setState(() => _selected = module),
@@ -217,6 +231,8 @@ class _Workspace extends StatelessWidget {
     required this.stockAnalysisController,
     required this.chartAnnotationController,
     required this.ruleBook,
+    required this.ruleRepository,
+    required this.predictionRepository,
     required this.watchlistController,
     required this.sessionController,
     required this.onNavigate,
@@ -227,6 +243,8 @@ class _Workspace extends StatelessWidget {
   final StockAnalysisController stockAnalysisController;
   final ChartAnnotationController chartAnnotationController;
   final RuleBook ruleBook;
+  final PersistentRuleRepository ruleRepository;
+  final PersistentPredictionRepository predictionRepository;
   final WatchlistController watchlistController;
   final SessionController sessionController;
   final ValueChanged<String> onNavigate;
@@ -249,6 +267,8 @@ class _Workspace extends StatelessWidget {
     if (module == '规则回测') {
       return RulesWorkspace(
         ruleBook: ruleBook,
+        ruleRepository: ruleRepository,
+        predictionRepository: predictionRepository,
         candles: DemoAshareData.candlesFor('600519'),
       );
     }

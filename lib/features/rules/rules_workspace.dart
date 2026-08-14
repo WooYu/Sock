@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../domain/stockcal_domain.dart';
 import 'backtest_engine.dart';
 import 'prediction_store.dart';
+import 'persistent_rules_repository.dart';
 import 'rule_engine.dart';
 
 class RulesWorkspace extends StatefulWidget {
@@ -11,11 +14,15 @@ class RulesWorkspace extends StatefulWidget {
     required this.ruleBook,
     required this.candles,
     this.stockCode = '600519',
+    this.ruleRepository,
+    this.predictionRepository,
   });
 
   final RuleBook ruleBook;
   final List<Candle> candles;
   final String stockCode;
+  final PersistentRuleRepository? ruleRepository;
+  final PredictionRepository? predictionRepository;
 
   @override
   State<RulesWorkspace> createState() => _RulesWorkspaceState();
@@ -33,7 +40,7 @@ class _RulesWorkspaceState extends State<RulesWorkspace> {
   void initState() {
     super.initState();
     _predictions = PredictionService(
-      repository: MemoryPredictionRepository(),
+      repository: widget.predictionRepository ?? MemoryPredictionRepository(),
       idFactory: () => 'prediction-${++_predictionSequence}',
     );
     if (widget.ruleBook.activeRules.isNotEmpty) {
@@ -153,12 +160,15 @@ class _RulesWorkspaceState extends State<RulesWorkspace> {
         ],
       );
       setState(() => _selected = rule);
+      await widget.ruleRepository?.save(widget.ruleBook);
     }
   }
 
   void _toggleRule(RuleVersion rule, bool enabled) {
     final version = widget.ruleBook.setEnabled(rule.id, enabled);
     setState(() => _selected = version);
+    final repository = widget.ruleRepository;
+    if (repository != null) unawaited(repository.save(widget.ruleBook));
   }
 
   Future<void> _generatePrediction() async {

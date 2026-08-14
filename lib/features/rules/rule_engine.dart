@@ -64,8 +64,8 @@ class RuleBook {
   RuleBook({required this.idFactory, DateTime Function()? clock})
     : _clock = clock ?? DateTime.now;
 
-  factory RuleBook.withSystemDefaults() {
-    final book = RuleBook(idFactory: () => 'system-unused');
+  factory RuleBook.withSystemDefaults({String Function()? idFactory}) {
+    final book = RuleBook(idFactory: idFactory ?? () => 'system-unused');
     book._history.addAll({
       'system-trend': [
         RuleVersion(
@@ -110,6 +110,20 @@ class RuleBook {
   final String Function() idFactory;
   final DateTime Function() _clock;
   final Map<String, List<RuleVersion>> _history = {};
+
+  List<RuleVersion> get allVersions =>
+      List.unmodifiable(_history.values.expand((versions) => versions));
+
+  void restoreUserVersions(Iterable<RuleVersion> versions) {
+    final grouped = <String, List<RuleVersion>>{};
+    for (final rule in versions.where((item) => !item.system)) {
+      grouped.putIfAbsent(rule.id, () => []).add(rule);
+    }
+    for (final entry in grouped.entries) {
+      entry.value.sort((a, b) => a.version.compareTo(b.version));
+      _history[entry.key] = List.unmodifiable(entry.value);
+    }
+  }
 
   List<RuleVersion> get activeRules {
     final rules = _history.values
