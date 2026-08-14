@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'session.dart';
@@ -16,6 +18,10 @@ class _AccountWorkspaceState extends State<AccountWorkspace> {
   var _phone = '';
   var _code = '';
   String? _error;
+  String? _notice;
+  var _secondsUntilResend = 0;
+  var _isRequesting = false;
+  Timer? _resendTimer;
 
   @override
   void initState() {
@@ -25,6 +31,7 @@ class _AccountWorkspaceState extends State<AccountWorkspace> {
 
   @override
   void dispose() {
+    _resendTimer?.cancel();
     widget.controller.removeListener(_refresh);
     super.dispose();
   }
@@ -73,13 +80,36 @@ class _AccountWorkspaceState extends State<AccountWorkspace> {
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: '验证码',
-                    prefixIcon: Icon(Icons.password_outlined),
+                    prefixIcon: const Icon(Icons.password_outlined),
+                    suffixIcon: Padding(
+                      padding: const EdgeInsets.only(right: 4),
+                      child: TextButton(
+                        onPressed: _isRequesting || _secondsUntilResend > 0
+                            ? null
+                            : _requestCode,
+                        child: Text(
+                          _secondsUntilResend > 0
+                              ? '$_secondsUntilResend 秒后重发'
+                              : '获取验证码',
+                        ),
+                      ),
+                    ),
+                    suffixIconConstraints: const BoxConstraints(minWidth: 112),
                   ),
                   keyboardType: TextInputType.number,
                   onChanged: (value) => _code = value.trim(),
                 ),
+                if (_notice != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    _notice!,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ],
                 if (_error != null) ...[
                   const SizedBox(height: 8),
                   Text(
@@ -120,13 +150,34 @@ class _AccountWorkspaceState extends State<AccountWorkspace> {
         ),
         const Divider(height: 32),
         Text('设备管理', style: Theme.of(context).textTheme.titleMedium),
-        const ListTile(
-          contentPadding: EdgeInsets.zero,
-          leading: Icon(Icons.devices_outlined),
-          title: Text('当前设备'),
-          subtitle: Text('StockCal Flutter · 最近活跃'),
-          trailing: Icon(Icons.verified_user_outlined),
-        ),
+        if (widget.controller.devices.isEmpty)
+          const ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(Icons.devices_outlined),
+            title: Text('设备信息暂不可用'),
+            subtitle: Text('网络恢复后将自动更新'),
+          )
+        else
+          for (final device in widget.controller.devices)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(
+                device.isCurrent
+                    ? Icons.devices_outlined
+                    : Icons.laptop_outlined,
+              ),
+              title: Text(device.isCurrent ? '当前设备' : device.name),
+              subtitle: Text(
+                device.isCurrent ? '${device.name} · 最近活跃' : '已登录设备',
+              ),
+              trailing: device.isCurrent
+                  ? const Icon(Icons.verified_user_outlined)
+                  : IconButton(
+                      onPressed: () => _revokeDevice(device),
+                      tooltip: '撤销 ${device.name}',
+                      icon: const Icon(Icons.logout),
+                    ),
+            ),
         const Divider(height: 32),
         Text('同步状态', style: Theme.of(context).textTheme.titleMedium),
         const ListTile(
@@ -149,6 +200,49 @@ class _AccountWorkspaceState extends State<AccountWorkspace> {
   Future<void> _signIn() async {
     try {
       await widget.controller.verifyPhone(phone: _phone, code: _code);
+      if (mounted) setState(() => _error = null);
+    } on VerificationException catch (error) {
+      if (mounted) setState(() => _error = error.message);
+    }
+  }
+
+  Future<void> _requestCode() async {
+    setState(() {
+      _isRequesting = true;
+      _error = null;
+      _notice = null;
+    });
+    try {
+      await widget.controller.requestVerificationCode(_phone);
+      if (!mounted) return;
+      setState(() {
+        _isRequesting = false;
+        _secondsUntilResend = 60;
+        _notice = '验证码已发送';
+      });
+      _resendTimer?.cancel();
+      _resendTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (!mounted) {
+          timer.cancel();
+          return;
+        }
+        setState(() {
+          _secondsUntilResend -= 1;
+          if (_secondsUntilResend <= 0) timer.cancel();
+        });
+      });
+    } on VerificationException catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _isRequesting = false;
+        _error = error.message;
+      });
+    }
+  }
+
+  Future<void> _revokeDevice(UserDevice device) async {
+    try {
+      await widget.controller.revokeDevice(device.id);
       if (mounted) setState(() => _error = null);
     } on VerificationException catch (error) {
       if (mounted) setState(() => _error = error.message);

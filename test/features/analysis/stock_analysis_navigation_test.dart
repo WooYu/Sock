@@ -16,9 +16,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('stock-search')), findsOneWidget);
-      await tester.enterText(find.byKey(const Key('stock-search')), 'payh');
-      await tester.pumpAndSettle();
-      expect(find.text('平安银行'), findsOneWidget);
+      expect(find.textContaining('请先登录后查看行情'), findsOneWidget);
+      expect(find.text('平安银行'), findsNothing);
     },
   );
 

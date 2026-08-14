@@ -1,9 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:stockcal/features/account/account_workspace.dart';
+import 'package:stockcal/features/account/remote_auth_service.dart';
 import 'package:stockcal/features/account/session.dart';
 
 void main() {
+  testWidgets('requests a code and starts the resend countdown', (
+    tester,
+  ) async {
+    var requests = 0;
+    final controller = SessionController(
+      MemorySessionRepository(),
+      remote: RemoteAuthService(
+        baseUrl: Uri.parse('https://api.stockcal.test'),
+        client: MockClient((request) async {
+          requests += 1;
+          return http.Response('', 202);
+        }),
+      ),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(body: AccountWorkspace(controller: controller)),
+      ),
+    );
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, '手机号'),
+      '13800138000',
+    );
+    await tester.tap(find.text('获取验证码'));
+    await tester.pump();
+
+    expect(requests, 1);
+    expect(find.text('验证码已发送'), findsOneWidget);
+    expect(find.text('60 秒后重发'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+  });
+
   testWidgets('signs in by phone and shows profile devices and sync', (
     tester,
   ) async {
@@ -44,6 +80,25 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('手机验证码登录'), findsOneWidget);
     expect(controller.session, isNull);
+  });
+
+  testWidgets('shows and revokes a non-current device', (tester) async {
+    final controller = SessionController(MemorySessionRepository());
+    await controller.verifyPhone(phone: '13800138000', code: '123456');
+    controller.registerDevice(
+      const UserDevice(id: 'web-1', name: 'Chrome Web', isCurrent: false),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(body: AccountWorkspace(controller: controller)),
+      ),
+    );
+
+    expect(find.text('Chrome Web'), findsOneWidget);
+    await tester.tap(find.byTooltip('撤销 Chrome Web'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Chrome Web'), findsNothing);
   });
 
   testWidgets('phone layout does not overflow', (tester) async {

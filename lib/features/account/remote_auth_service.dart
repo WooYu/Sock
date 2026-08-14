@@ -30,6 +30,13 @@ class RemoteSession {
   final RemoteDevice device;
 }
 
+class RemoteToken {
+  const RemoteToken({required this.accessToken, required this.expiresAt});
+
+  final String accessToken;
+  final DateTime expiresAt;
+}
+
 class RemoteAuthException implements Exception {
   const RemoteAuthException(this.statusCode, this.message);
   final int statusCode;
@@ -42,6 +49,17 @@ class RemoteAuthService {
 
   final Uri baseUrl;
   final http.Client _client;
+
+  Future<void> requestCode(String phone) async {
+    final response = await _client.post(
+      baseUrl.resolve('/api/v1/auth/request-code'),
+      headers: {'content-type': 'application/json'},
+      body: jsonEncode({'phone': phone}),
+    );
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw RemoteAuthException(response.statusCode, response.body);
+    }
+  }
 
   Future<RemoteSession> verify({
     required String phone,
@@ -65,6 +83,19 @@ class RemoteAuthService {
       refreshToken: json['refreshToken']! as String,
       expiresAt: DateTime.parse(json['expiresAt']! as String),
       device: _device(json['device']! as Map<String, Object?>),
+    );
+  }
+
+  Future<RemoteToken> refresh(String refreshToken) async {
+    final response = await _client.post(
+      baseUrl.resolve('/api/v1/auth/refresh'),
+      headers: {'content-type': 'application/json'},
+      body: jsonEncode({'refreshToken': refreshToken}),
+    );
+    final json = _json(response);
+    return RemoteToken(
+      accessToken: json['accessToken']! as String,
+      expiresAt: DateTime.parse(json['expiresAt']! as String),
     );
   }
 

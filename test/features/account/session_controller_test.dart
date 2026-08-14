@@ -2,6 +2,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:stockcal/features/account/session.dart';
 
 void main() {
+  test('rejects an invalid phone before requesting a code', () async {
+    final controller = SessionController(MemorySessionRepository());
+
+    expect(
+      () => controller.requestVerificationCode('123'),
+      throwsA(isA<VerificationException>()),
+    );
+  });
+
   test('successful phone verification persists a signed-in session', () async {
     final repository = MemorySessionRepository();
     final controller = SessionController(repository);

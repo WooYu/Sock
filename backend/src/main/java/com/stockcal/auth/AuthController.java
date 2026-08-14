@@ -23,14 +23,22 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
     private final JdbcClient jdbc;
+    private final SmsChallengeService challenges;
 
-    AuthController(JdbcClient jdbc) {
+    AuthController(JdbcClient jdbc, SmsChallengeService challenges) {
         this.jdbc = jdbc;
+        this.challenges = challenges;
+    }
+
+    @PostMapping("/request-code")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    void requestCode(@Valid @RequestBody CodeRequest request) {
+        challenges.request(request.phone());
     }
 
     @PostMapping("/verify")
     SessionResponse verify(@Valid @RequestBody VerifyRequest request) {
-        if (!"123456".equals(request.code())) {
+        if (!challenges.consume(request.phone(), request.code())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "验证码无效");
         }
         var userId = userId(request.phone());
@@ -118,6 +126,7 @@ public class AuthController {
         @Pattern(regexp = "^1\\d{10}$") String phone,
         @Pattern(regexp = "^\\d{6}$") String code,
         @NotBlank String deviceName) {}
+    record CodeRequest(@Pattern(regexp = "^1\\d{10}$") String phone) {}
     record RefreshRequest(@NotBlank String refreshToken) {}
     record Profile(String phone, String displayName) {}
     record Device(String id, String name, Instant lastSeenAt) {}

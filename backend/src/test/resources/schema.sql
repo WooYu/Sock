@@ -35,6 +35,15 @@ create table if not exists access_token (
     expires_at timestamp with time zone not null
 );
 
+create table if not exists sms_challenge (
+    phone varchar(20) primary key,
+    code_hash varchar(128) not null,
+    expires_at timestamp with time zone not null,
+    requested_at timestamp with time zone not null,
+    attempts integer not null,
+    consumed_at timestamp with time zone
+);
+
 create table if not exists knowledge_source (
     id varchar(36) primary key, source_path varchar(1000) not null, title varchar(500) not null,
     content_hash varchar(64) not null, original_content clob not null,

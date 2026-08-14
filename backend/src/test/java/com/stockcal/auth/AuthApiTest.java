@@ -14,17 +14,24 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Import;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Import(AuthApiTest.SmsTestConfiguration.class)
 class AuthApiTest {
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper objectMapper;
     @Autowired JdbcClient jdbc;
+    @Autowired RecordingSmsGateway sms;
 
     @org.junit.jupiter.api.BeforeEach
     void reset() {
+        jdbc.sql("delete from sms_challenge").update();
         jdbc.sql("delete from access_token").update();
         jdbc.sql("delete from device_session").update();
         jdbc.sql("delete from app_user").update();
@@ -32,9 +39,10 @@ class AuthApiTest {
 
     @Test
     void verificationIssuesAccessAndRefreshTokens() throws Exception {
+        var code = requestCode("13800138000");
         mvc.perform(post("/api/v1/auth/verify")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"phone\":\"13800138000\",\"code\":\"123456\",\"deviceName\":\"Pixel\"}"))
+                .content("{\"phone\":\"13800138000\",\"code\":\"" + code + "\",\"deviceName\":\"Pixel\"}"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.accessToken").isNotEmpty())
             .andExpect(jsonPath("$.refreshToken").isNotEmpty())
@@ -44,9 +52,10 @@ class AuthApiTest {
 
     @Test
     void refreshRotatesAccessToken() throws Exception {
+        var code = requestCode("13800138000");
         var response = mvc.perform(post("/api/v1/auth/verify")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"phone\":\"13800138000\",\"code\":\"123456\",\"deviceName\":\"Web\"}"))
+                .content("{\"phone\":\"13800138000\",\"code\":\"" + code + "\",\"deviceName\":\"Web\"}"))
             .andReturn().getResponse().getContentAsString();
         var refresh = objectMapper.readTree(response).get("refreshToken").asText();
 
@@ -59,6 +68,7 @@ class AuthApiTest {
 
     @Test
     void invalidCodeIsRejected() throws Exception {
+        requestCode("13800138000");
         mvc.perform(post("/api/v1/auth/verify")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"phone\":\"13800138000\",\"code\":\"000000\",\"deviceName\":\"Web\"}"))
@@ -67,9 +77,10 @@ class AuthApiTest {
 
     @Test
     void listsAndRevokesOtherDevices() throws Exception {
+        var code = requestCode("13800138000");
         var response = mvc.perform(post("/api/v1/auth/verify")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"phone\":\"13800138000\",\"code\":\"123456\",\"deviceName\":\"Web\"}"))
+                .content("{\"phone\":\"13800138000\",\"code\":\"" + code + "\",\"deviceName\":\"Web\"}"))
             .andReturn().getResponse().getContentAsString();
         var deviceId = objectMapper.readTree(response).get("device").get("id").asText();
 
@@ -85,14 +96,43 @@ class AuthApiTest {
 
     @Test
     void issuedBearerTokenAuthenticatesProtectedRequests() throws Exception {
+        var code = requestCode("13800138000");
         var response = mvc.perform(post("/api/v1/auth/verify")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"phone\":\"13800138000\",\"code\":\"123456\",\"deviceName\":\"Android\"}"))
+                .content("{\"phone\":\"13800138000\",\"code\":\"" + code + "\",\"deviceName\":\"Android\"}"))
             .andReturn().getResponse().getContentAsString();
         var token = objectMapper.readTree(response).get("accessToken").asText();
 
         mvc.perform(get("/api/v1/auth/devices").header("Authorization", "Bearer " + token))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].name").value("Android"));
+    }
+
+    @Test
+    void verificationCodeCanOnlyBeUsedOnce() throws Exception {
+        var code = requestCode("13800138000");
+        var body = "{\"phone\":\"13800138000\",\"code\":\"" + code + "\",\"deviceName\":\"Web\"}";
+        mvc.perform(post("/api/v1/auth/verify").contentType(MediaType.APPLICATION_JSON).content(body))
+            .andExpect(status().isOk());
+        mvc.perform(post("/api/v1/auth/verify").contentType(MediaType.APPLICATION_JSON).content(body))
+            .andExpect(status().isUnauthorized());
+    }
+
+    private String requestCode(String phone) throws Exception {
+        mvc.perform(post("/api/v1/auth/request-code")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"phone\":\"" + phone + "\"}"))
+            .andExpect(status().isAccepted());
+        return sms.lastCode;
+    }
+
+    @TestConfiguration
+    static class SmsTestConfiguration {
+        @Bean @Primary RecordingSmsGateway recordingSmsGateway() { return new RecordingSmsGateway(); }
+    }
+
+    static final class RecordingSmsGateway implements SmsGateway {
+        String lastCode;
+        public void sendCode(String phone, String code) { lastCode = code; }
     }
 }
