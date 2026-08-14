@@ -8,15 +8,17 @@ import 'trade_import.dart';
 
 class PortfolioController extends ChangeNotifier {
   PortfolioController({
-    required this.ledger,
-    required this.marketPrices,
+    required PortfolioLedger ledger,
+    required Map<String, double> marketPrices,
     this.repository,
-  }) : importer = TradeImportService(ledger);
+  }) : ledger = ledger,
+       marketPrices = Map.of(marketPrices),
+       importer = TradeImportService(ledger);
 
-  final PortfolioLedger ledger;
+  PortfolioLedger ledger;
   final Map<String, double> marketPrices;
   final PortfolioRepository? repository;
-  final TradeImportService importer;
+  TradeImportService importer;
   var _entrySequence = 0;
   TradeImportBatch? latestImport;
 
@@ -24,7 +26,8 @@ class PortfolioController extends ChangeNotifier {
     final source = repository;
     if (source == null || ledger.entries.isNotEmpty) return;
     final restored = await source.load();
-    ledger.recordAll(restored.entries);
+    ledger = restored;
+    importer = TradeImportService(ledger);
     _entrySequence = ledger.entries.length;
     notifyListeners();
   }
@@ -35,6 +38,12 @@ class PortfolioController extends ChangeNotifier {
   double get floatingProfit =>
       positions.fold(0, (sum, item) => sum + item.floatingProfit);
   double get totalProfit => floatingProfit + ledger.realizedProfit;
+
+  void updateMarketPrice(String code, double price) {
+    if (price <= 0 || !price.isFinite) return;
+    marketPrices[code] = price;
+    notifyListeners();
+  }
 
   void record({
     required TradeEntryType type,

@@ -19,6 +19,6 @@ void main() {
     await tester.tap(find.text('管理后台'));
     await tester.pumpAndSettle();
     expect(find.text('行情源状态'), findsOneWidget);
-    expect(find.text('服务端密钥'), findsOneWidget);
+    expect(find.textContaining('请先使用管理员账户登录'), findsOneWidget);
   });
 }

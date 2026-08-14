@@ -10,6 +10,7 @@ import '../analysis/stock_analysis_controller.dart';
 import '../analysis/stock_analysis_screen.dart';
 import '../analysis/technical_analysis.dart';
 import '../admin/settings_admin_workspace.dart';
+import '../admin/remote_admin_service.dart';
 import '../chart/chart_annotations.dart';
 import '../chart/professional_chart_screen.dart';
 import '../chart/persistent_chart_annotation_store.dart';
@@ -45,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late final PortfolioController _portfolioController;
   late final StockAnalysisController _stockAnalysisController;
   late final RemoteMarketService _marketService;
+  late final RemoteAdminService _adminService;
   late final ChartAnnotationController _chartAnnotationController;
   late final RuleBook _ruleBook;
   late final PersistentRuleRepository _ruleRepository;
@@ -71,12 +73,16 @@ class _HomeScreenState extends State<HomeScreen> {
       baseUrl: Uri.parse(apiUrl),
       accessToken: () => _sessionController.session?.accessToken,
     );
+    _adminService = RemoteAdminService(
+      baseUrl: Uri.parse(apiUrl),
+      accessToken: () => _sessionController.session?.accessToken,
+    );
     _portfolioController = PortfolioController(
-      ledger: PortfolioLedger(openingCash: 500000),
-      marketPrices: const {'600519': 1742, '000001': 14, '300750': 102},
+      ledger: PortfolioLedger(),
+      marketPrices: const {},
       repository: PersistentPortfolioRepository(),
     );
-    _portfolioController.load();
+    unawaited(_restorePortfolio());
     _stockAnalysisController = StockAnalysisController(
       catalog: _marketService,
       market: _marketService,
@@ -128,12 +134,37 @@ class _HomeScreenState extends State<HomeScreen> {
     final token = _sessionController.session?.accessToken;
     if (token == null || token.isEmpty) return;
     _annotationSyncWorker.drain(token);
+    unawaited(_refreshPortfolioPrices());
     if (_knowledgeController.sources.isEmpty && !_knowledgeController.loading) {
       unawaited(_knowledgeController.load());
     }
     if (_stockAnalysisController.results.isEmpty) {
       unawaited(_stockAnalysisController.search(''));
     }
+  }
+
+  Future<void> _restorePortfolio() async {
+    await _portfolioController.load();
+    await _refreshPortfolioPrices();
+  }
+
+  Future<void> _refreshPortfolioPrices() async {
+    if (_sessionController.session?.isSignedIn != true) return;
+    final codes = _portfolioController.positions
+        .map((item) => item.code)
+        .toSet();
+    await Future.wait([
+      for (final code in codes)
+        _marketService
+            .snapshot(code)
+            .then(
+              (snapshot) => _portfolioController.updateMarketPrice(
+                code,
+                snapshot.quote.price,
+              ),
+              onError: (_) {},
+            ),
+    ]);
   }
 
   Future<void> _restoreRules() async {
@@ -175,6 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
               knowledgeController: _knowledgeController,
               watchlistController: _watchlistController,
               sessionController: _sessionController,
+              adminService: _adminService,
               onNavigate: (module) => setState(() => _selected = module),
             ),
           ),
@@ -269,6 +301,7 @@ class _Workspace extends StatelessWidget {
     required this.knowledgeController,
     required this.watchlistController,
     required this.sessionController,
+    required this.adminService,
     required this.onNavigate,
   });
 
@@ -284,6 +317,7 @@ class _Workspace extends StatelessWidget {
   final KnowledgeController knowledgeController;
   final WatchlistController watchlistController;
   final SessionController sessionController;
+  final RemoteAdminService adminService;
   final ValueChanged<String> onNavigate;
 
   @override
@@ -332,7 +366,7 @@ class _Workspace extends StatelessWidget {
       return AccountWorkspace(controller: sessionController);
     }
     if (module == '设置后台') {
-      return const SettingsAdminWorkspace();
+      return SettingsAdminWorkspace(remote: adminService);
     }
     if (module == '总览') {
       return _Dashboard(

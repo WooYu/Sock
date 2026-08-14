@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 import 'admin_service.dart';
+import 'remote_admin_service.dart';
 
 class SettingsAdminWorkspace extends StatefulWidget {
-  const SettingsAdminWorkspace({super.key});
+  const SettingsAdminWorkspace({super.key, this.remote});
+
+  final RemoteAdminService? remote;
 
   @override
   State<SettingsAdminWorkspace> createState() => _SettingsAdminWorkspaceState();
@@ -11,21 +14,38 @@ class SettingsAdminWorkspace extends StatefulWidget {
 
 class _SettingsAdminWorkspaceState extends State<SettingsAdminWorkspace> {
   late final AdminService _admin;
-  var _job = const SyncJob(
-    id: 'sync-annotation-1',
-    type: '标注同步',
-    status: SyncJobStatus.failed,
-    attempts: 2,
-    error: '网络超时',
-  );
+  var _jobs = <SyncJob>[
+    const SyncJob(
+      id: 'sync-annotation-1',
+      type: '标注同步',
+      status: SyncJobStatus.failed,
+      attempts: 2,
+      error: '网络超时',
+    ),
+  ];
+  var _marketStatus = 'A 股日线源 · 正常 · 延迟 15 分钟';
+  var _secrets = const <SecretStatus>[
+    SecretStatus(name: '短信服务', configured: true),
+    SecretStatus(name: '行情服务', configured: true),
+    SecretStatus(name: 'AI 服务', configured: true),
+  ];
+  var _users = const <ManagedUser>[];
   var _darkMode = false;
   var _notifications = true;
   var _repairSubmitted = false;
+  var _loadingAdmin = false;
+  String? _adminError;
 
   @override
   void initState() {
     super.initState();
     _admin = AdminService(audit: MemoryAdminAuditRepository());
+    if (widget.remote != null) {
+      _jobs = [];
+      _secrets = const [];
+      _loadingAdmin = true;
+      _loadRemote();
+    }
   }
 
   @override
@@ -53,11 +73,16 @@ class _SettingsAdminWorkspaceState extends State<SettingsAdminWorkspace> {
                         setState(() => _notifications = value),
                   ),
                   _AdminPanel(
-                    service: _admin,
-                    job: _job,
+                    marketStatus: _marketStatus,
+                    secrets: _secrets,
+                    jobs: _jobs,
+                    users: _users,
+                    loading: _loadingAdmin,
+                    error: _adminError,
                     repairSubmitted: _repairSubmitted,
                     onRetry: _retry,
                     onRepair: _repair,
+                    onReload: _loadRemote,
                   ),
                 ],
               ),
@@ -68,13 +93,51 @@ class _SettingsAdminWorkspaceState extends State<SettingsAdminWorkspace> {
     );
   }
 
-  Future<void> _retry() async {
-    final job = await _admin.retry(_job, actor: 'admin');
-    setState(() => _job = job);
+  Future<void> _loadRemote() async {
+    final remote = widget.remote;
+    if (remote == null) return;
+    setState(() {
+      _loadingAdmin = true;
+      _adminError = null;
+    });
+    try {
+      final snapshot = await remote.load();
+      if (!mounted) return;
+      setState(() {
+        _marketStatus = snapshot.marketStatus;
+        _secrets = snapshot.secrets;
+        _jobs = snapshot.jobs;
+        _users = snapshot.users;
+        _loadingAdmin = false;
+      });
+    } on Object catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _loadingAdmin = false;
+        _adminError = error.toString();
+      });
+    }
+  }
+
+  Future<void> _retry(SyncJob failed) async {
+    final job = widget.remote == null
+        ? await _admin.retry(failed, actor: 'admin')
+        : await widget.remote!.retry(failed.id);
+    setState(() {
+      _jobs = [
+        for (final item in _jobs)
+          if (item.id == job.id) job else item,
+      ];
+    });
   }
 
   Future<void> _repair() async {
-    await _admin.repair(stockCode: '600519', actor: 'admin');
+    if (widget.remote == null) {
+      await _admin.repair(stockCode: '600519', actor: 'admin');
+    } else {
+      final job = await widget.remote!.repair('600519');
+      _jobs = [job, ..._jobs];
+    }
     setState(() => _repairSubmitted = true);
   }
 }
@@ -137,78 +200,149 @@ class _SettingsPanel extends StatelessWidget {
 
 class _AdminPanel extends StatelessWidget {
   const _AdminPanel({
-    required this.service,
-    required this.job,
+    required this.marketStatus,
+    required this.secrets,
+    required this.jobs,
+    required this.users,
+    required this.loading,
+    required this.error,
     required this.repairSubmitted,
     required this.onRetry,
     required this.onRepair,
+    required this.onReload,
   });
 
-  final AdminService service;
-  final SyncJob job;
+  final String marketStatus;
+  final List<SecretStatus> secrets;
+  final List<SyncJob> jobs;
+  final List<ManagedUser> users;
+  final bool loading;
+  final String? error;
   final bool repairSubmitted;
-  final VoidCallback onRetry;
+  final ValueChanged<SyncJob> onRetry;
   final VoidCallback onRepair;
+  final VoidCallback onReload;
 
   @override
   Widget build(BuildContext context) {
-    final secrets = service.secretStatuses({
-      '短信服务': 'configured',
-      '行情服务': 'configured',
-      'AI 服务': 'configured',
-    });
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         _Section(
           title: '行情源状态',
-          child: Row(
-            children: [
-              const Expanded(child: Text('A 股日线源 · 正常 · 延迟 15 分钟')),
-              FilledButton.icon(
-                onPressed: onRepair,
-                icon: const Icon(Icons.build_outlined),
-                label: const Text('修复数据'),
-              ),
-            ],
-          ),
+          child: loading
+              ? const Center(child: CircularProgressIndicator())
+              : error != null
+              ? _AdminError(message: error!, onReload: onReload)
+              : Row(
+                  children: [
+                    Expanded(child: Text(marketStatus)),
+                    FilledButton.icon(
+                      onPressed: onRepair,
+                      icon: const Icon(Icons.build_outlined),
+                      label: const Text('修复数据'),
+                    ),
+                  ],
+                ),
         ),
         if (repairSubmitted) const Text('修复任务已提交'),
-        _Section(
-          title: '同步任务',
-          child: ListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(job.type),
-            subtitle: Text(
-              job.status == SyncJobStatus.queued
-                  ? '等待执行'
-                  : '失败 ${job.attempts} 次 · ${job.error}',
-            ),
-            trailing: job.status == SyncJobStatus.failed
-                ? TextButton(onPressed: onRetry, child: const Text('重试'))
-                : const Icon(Icons.schedule),
+        if (!loading && error == null) ...[
+          _Section(
+            title: '同步任务',
+            child: jobs.isEmpty
+                ? const Text('暂无同步任务')
+                : Column(
+                    children: [
+                      for (final job in jobs)
+                        _JobTile(job: job, onRetry: onRetry),
+                    ],
+                  ),
           ),
-        ),
-        const _Section(title: '用户与权限', child: Text('用户 · 分析师 · 管理员')),
+          _Section(
+            title: '用户与权限',
+            child: users.isEmpty
+                ? const Text('暂无用户记录')
+                : Column(
+                    children: [for (final user in users) _UserTile(user: user)],
+                  ),
+          ),
+        ],
         const _Section(title: '规则模板', child: Text('系统规则 2 · 用户模板 0')),
         const _Section(title: '审计日志', child: Text('管理操作均保留操作者、目标与时间')),
         const _Section(title: 'AI 调用记录', child: Text('只读输入快照 · 文案版本 · 调用状态')),
-        _Section(
-          title: '服务端密钥',
-          child: Column(
-            children: [
-              for (final secret in secrets)
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(secret.name),
-                  trailing: Text(secret.configured ? '已配置' : '未配置'),
-                ),
-            ],
+        if (!loading && error == null)
+          _Section(
+            title: '服务端密钥',
+            child: Column(
+              children: [
+                for (final secret in secrets)
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(secret.name),
+                    trailing: Text(secret.configured ? '已配置' : '未配置'),
+                  ),
+              ],
+            ),
           ),
-        ),
       ],
     );
   }
+}
+
+class _AdminError extends StatelessWidget {
+  const _AdminError({required this.message, required this.onReload});
+  final String message;
+  final VoidCallback onReload;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      const Icon(Icons.lock_outline),
+      const SizedBox(width: 8),
+      Expanded(child: Text(message)),
+      IconButton(
+        tooltip: '重新加载管理数据',
+        onPressed: onReload,
+        icon: const Icon(Icons.refresh),
+      ),
+    ],
+  );
+}
+
+class _JobTile extends StatelessWidget {
+  const _JobTile({required this.job, required this.onRetry});
+  final SyncJob job;
+  final ValueChanged<SyncJob> onRetry;
+
+  @override
+  Widget build(BuildContext context) => ListTile(
+    contentPadding: EdgeInsets.zero,
+    title: Text(job.type),
+    subtitle: Text(
+      job.status == SyncJobStatus.queued
+          ? '等待执行'
+          : job.status == SyncJobStatus.failed
+          ? '失败 ${job.attempts} 次 · ${job.error}'
+          : job.status.name,
+    ),
+    trailing: job.status == SyncJobStatus.failed
+        ? TextButton(onPressed: () => onRetry(job), child: const Text('重试'))
+        : const Icon(Icons.schedule),
+  );
+}
+
+class _UserTile extends StatelessWidget {
+  const _UserTile({required this.user});
+  final ManagedUser user;
+
+  @override
+  Widget build(BuildContext context) => ListTile(
+    contentPadding: EdgeInsets.zero,
+    leading: const Icon(Icons.person_outline),
+    title: Text(user.phoneMasked),
+    subtitle: Text(user.role.name.toUpperCase()),
+    trailing: Icon(user.enabled ? Icons.check_circle_outline : Icons.block),
+  );
 }
 
 class _Section extends StatelessWidget {

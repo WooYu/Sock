@@ -62,3 +62,32 @@ create table if not exists published_rule_source (
     source_line_start integer not null, source_line_end integer not null, approved_by varchar(100) not null,
     published_at timestamp with time zone not null
 );
+
+create table if not exists admin_job (
+    id varchar(36) primary key,
+    type varchar(40) not null,
+    target varchar(180) not null,
+    status varchar(20) not null,
+    attempts integer not null default 0,
+    error varchar(2000),
+    created_at timestamp with time zone not null,
+    updated_at timestamp with time zone not null
+);
+
+create table if not exists audit_event (
+    id varchar(36) primary key,
+    actor_id varchar(100),
+    action varchar(80) not null,
+    target varchar(180) not null,
+    evidence varchar(10000) not null,
+    created_at timestamp with time zone not null default current_timestamp
+);
+
+create table if not exists ai_call_log (
+    id varchar(36) primary key,
+    actor_id varchar(100),
+    purpose varchar(80) not null,
+    model varchar(100) not null,
+    status varchar(20) not null,
+    created_at timestamp with time zone not null default current_timestamp
+);

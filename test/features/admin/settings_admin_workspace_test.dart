@@ -1,8 +1,63 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
+import 'package:stockcal/features/admin/remote_admin_service.dart';
 import 'package:stockcal/features/admin/settings_admin_workspace.dart';
 
 void main() {
+  testWidgets('remote administration renders server state instead of samples', (
+    tester,
+  ) async {
+    final remote = RemoteAdminService(
+      baseUrl: Uri.parse('https://api.stockcal.test'),
+      accessToken: () => 'admin-token',
+      client: MockClient((request) async {
+        if (request.url.path.endsWith('/overview')) {
+          return http.Response(
+            jsonEncode({
+              'marketStatus': 'Tushare 已连接',
+              'secrets': [
+                {'name': '短信服务', 'configured': false},
+              ],
+            }),
+            200,
+            headers: {'content-type': 'application/json; charset=utf-8'},
+          );
+        }
+        if (request.url.path.endsWith('/jobs')) {
+          return http.Response(
+            '[{"id":"job-9","type":"MARKET_REPAIR","target":"600519","status":"FAILED","attempts":1,"error":"provider timeout","updatedAt":"2026-08-14T00:00:00Z"}]',
+            200,
+          );
+        }
+        return http.Response(
+          '[{"id":"u9","phoneMasked":"139****9000","displayName":"管理员","role":"ADMIN","enabled":true}]',
+          200,
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(body: SettingsAdminWorkspace(remote: remote)),
+      ),
+    );
+
+    await tester.tap(find.text('管理后台'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Tushare 已连接'), findsOneWidget);
+    expect(find.text('MARKET_REPAIR'), findsOneWidget);
+    expect(find.text('139****9000'), findsOneWidget);
+    expect(find.text('网络超时'), findsNothing);
+    await tester.drag(find.byType(ListView).last, const Offset(0, -650));
+    await tester.pumpAndSettle();
+    expect(find.text('未配置'), findsOneWidget);
+  });
+
   testWidgets(
     'user settings expose indicators theme notifications and data actions',
     (tester) async {

@@ -15,7 +15,7 @@ class PersistentPortfolioRepository implements PortfolioRepository {
   @override
   Future<PortfolioLedger> load() async {
     final value = (await SharedPreferences.getInstance()).getString(_key);
-    if (value == null) return PortfolioLedger(openingCash: 500000);
+    if (value == null) return PortfolioLedger();
     final json = jsonDecode(value) as Map<String, Object?>;
     final ledger = PortfolioLedger(
       openingCash: (json['openingCash']! as num).toDouble(),
