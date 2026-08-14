@@ -10,6 +10,7 @@ import '../analysis/technical_analysis.dart';
 import '../admin/settings_admin_workspace.dart';
 import '../chart/chart_annotations.dart';
 import '../chart/professional_chart_screen.dart';
+import '../chart/persistent_chart_annotation_store.dart';
 import '../market/market_data.dart';
 import '../portfolio/portfolio_controller.dart';
 import '../portfolio/portfolio_ledger.dart';
@@ -49,10 +50,11 @@ class _HomeScreenState extends State<HomeScreen> {
       market: DemoAshareMarketAdapter(),
       analyzer: StockAnalyzer(),
     );
+    final annotationStore = PersistentChartAnnotationStore();
     _chartAnnotationController = ChartAnnotationController(
       stockCode: '600519',
-      repository: MemoryChartAnnotationRepository(),
-      outbox: MemoryChartAnnotationOutbox(),
+      repository: annotationStore,
+      outbox: annotationStore,
       idFactory: () => 'annotation-${DateTime.now().microsecondsSinceEpoch}',
     );
     _ruleBook = RuleBook.withSystemDefaults();

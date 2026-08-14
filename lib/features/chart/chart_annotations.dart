@@ -94,12 +94,16 @@ class PendingAnnotationMutation {
 
 abstract interface class ChartAnnotationOutbox {
   Future<void> add(PendingAnnotationMutation mutation);
+  Future<List<PendingAnnotationMutation>> loadPending();
 }
 
 class MemoryChartAnnotationOutbox implements ChartAnnotationOutbox {
   final List<PendingAnnotationMutation> _pending = [];
 
   List<PendingAnnotationMutation> get pending => List.unmodifiable(_pending);
+
+  @override
+  Future<List<PendingAnnotationMutation>> loadPending() async => pending;
 
   @override
   Future<void> add(PendingAnnotationMutation mutation) async {
@@ -128,9 +132,15 @@ class ChartAnnotationController extends ChangeNotifier {
   final DateTime Function() _clock;
 
   List<ChartAnnotation> annotations = [];
+  bool _loaded = false;
+  int _localWrites = 0;
 
   Future<void> load() async {
-    annotations = await repository.load(stockCode);
+    if (_loaded) return;
+    final writesAtStart = _localWrites;
+    final restored = await repository.load(stockCode);
+    if (_localWrites == writesAtStart) annotations = restored;
+    _loaded = true;
     notifyListeners();
   }
 
@@ -138,6 +148,7 @@ class ChartAnnotationController extends ChangeNotifier {
     required ChartAnnotationType type,
     required List<ChartPoint> points,
   }) async {
+    _localWrites += 1;
     final annotation = ChartAnnotation(
       id: idFactory(),
       stockCode: stockCode,
@@ -209,6 +220,8 @@ class ChartAnnotationController extends ChangeNotifier {
     ChartAnnotation annotation,
     AnnotationOperation operation,
   ) async {
+    if (annotation.revision > 1) _localWrites += 1;
+    notifyListeners();
     await repository.save(stockCode, annotations);
     await outbox.add(
       PendingAnnotationMutation(
@@ -221,6 +234,5 @@ class ChartAnnotationController extends ChangeNotifier {
         updatedAt: annotation.updatedAt,
       ),
     );
-    notifyListeners();
   }
 }
