@@ -22,6 +22,7 @@ import '../rules/persistent_rules_repository.dart';
 import '../rules/persistent_prediction_repository.dart';
 import '../rules/rules_workspace.dart';
 import '../review/review_workspace.dart';
+import '../review/persistent_review_store.dart';
 import '../sync/remote_sync_service.dart';
 import '../watchlist/watchlist.dart';
 import '../watchlist/persistent_watchlist_repository.dart';
@@ -42,6 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late final RuleBook _ruleBook;
   late final PersistentRuleRepository _ruleRepository;
   late final PersistentPredictionRepository _predictionRepository;
+  late final PersistentReviewStore _reviewStore;
   late final WatchlistController _watchlistController;
   late final SessionController _sessionController;
   late final PersistentChartAnnotationStore _annotationStore;
@@ -71,6 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _ruleBook = RuleBook.withSystemDefaults();
     _ruleRepository = PersistentRuleRepository();
     _predictionRepository = PersistentPredictionRepository();
+    _reviewStore = PersistentReviewStore();
     _restoreRules();
     _watchlistController = WatchlistController(
       repository: PersistentWatchlistRepository(),
@@ -143,6 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ruleBook: _ruleBook,
               ruleRepository: _ruleRepository,
               predictionRepository: _predictionRepository,
+              reviewStore: _reviewStore,
               watchlistController: _watchlistController,
               sessionController: _sessionController,
               onNavigate: (module) => setState(() => _selected = module),
@@ -233,6 +237,7 @@ class _Workspace extends StatelessWidget {
     required this.ruleBook,
     required this.ruleRepository,
     required this.predictionRepository,
+    required this.reviewStore,
     required this.watchlistController,
     required this.sessionController,
     required this.onNavigate,
@@ -245,6 +250,7 @@ class _Workspace extends StatelessWidget {
   final RuleBook ruleBook;
   final PersistentRuleRepository ruleRepository;
   final PersistentPredictionRepository predictionRepository;
+  final PersistentReviewStore reviewStore;
   final WatchlistController watchlistController;
   final SessionController sessionController;
   final ValueChanged<String> onNavigate;
@@ -273,7 +279,7 @@ class _Workspace extends StatelessWidget {
       );
     }
     if (module == '复盘AI') {
-      return const ReviewWorkspace();
+      return ReviewWorkspace(store: reviewStore);
     }
     if (module == '自选股') {
       return WatchlistScreen(controller: watchlistController);

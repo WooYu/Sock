@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
+import 'persistent_review_store.dart';
 import 'review_ai.dart';
 import 'review_service.dart';
 
 class ReviewWorkspace extends StatefulWidget {
-  const ReviewWorkspace({super.key});
+  const ReviewWorkspace({super.key, this.store});
+
+  final PersistentReviewStore? store;
 
   @override
   State<ReviewWorkspace> createState() => _ReviewWorkspaceState();
@@ -22,7 +25,8 @@ class _ReviewWorkspaceState extends State<ReviewWorkspace> {
   @override
   void initState() {
     super.initState();
-    final repository = MemoryReviewRepository();
+    final ReviewRepository repository =
+        widget.store ?? MemoryReviewRepository();
     _reviews = ReviewService(
       repository: repository,
       idFactory: () => 'review-1',
@@ -40,14 +44,27 @@ class _ReviewWorkspaceState extends State<ReviewWorkspace> {
       reason: '突破后回踩确认',
       invalidationReason: '量能不足',
     );
-    repository.saveTrade(_review);
+    final ReviewNarrativeRepository narrativeRepository =
+        widget.store ?? MemoryReviewNarrativeRepository();
+    final AiAuditLog audit = widget.store ?? MemoryAiAuditLog();
     _ai = ReviewAiService(
       adapter: const _DeterministicExplanationAdapter(),
-      repository: MemoryReviewNarrativeRepository(),
-      audit: MemoryAiAuditLog(),
+      repository: narrativeRepository,
+      audit: audit,
       idFactory: () => 'narrative-${++_narrativeId}',
     );
-    _loadSummary();
+    _initialize(repository, narrativeRepository);
+  }
+
+  Future<void> _initialize(
+    ReviewRepository repository,
+    ReviewNarrativeRepository narratives,
+  ) async {
+    await repository.saveTrade(_review);
+    final history = await narratives.history(_review.id);
+    _narrativeId = history.length;
+    if (history.isNotEmpty) _narrative = history.last;
+    await _loadSummary();
   }
 
   Future<void> _loadSummary() async {
