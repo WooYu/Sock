@@ -92,7 +92,7 @@ void main() {
         expect(analysis.future.first.day.isAfter(snapshot.last.day), isTrue);
         expect(analysis.future.last.day.weekday, isNot(DateTime.saturday));
         expect(analysis.future.last.day.weekday, isNot(DateTime.sunday));
-        expect(analysis.future.every((point) => point.ma5 > 0), isTrue);
+        expect(analysis.future.every((point) => point.maShort > 0), isTrue);
         expect(
           analysis.future.every((point) => point.bollUpper > point.bollLower),
           isTrue,

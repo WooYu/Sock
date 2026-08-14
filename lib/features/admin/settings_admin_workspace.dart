@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../account/session.dart';
+import '../analysis/technical_analysis.dart';
 import '../preferences/preferences_controller.dart';
 import '../preferences/user_preferences.dart';
 import 'admin_service.dart';
@@ -13,6 +14,11 @@ String _themeLabel(ThemePreference theme) => switch (theme) {
   ThemePreference.light => '浅色',
   ThemePreference.dark => '深色',
 };
+
+String _indicatorLabel(IndicatorSettings settings) =>
+    'MA ${settings.maShortPeriod} / ${settings.maLongPeriod} · '
+    'EMA ${settings.emaPeriod} · BOLL ${settings.bollPeriod}, '
+    '${settings.bollMultiplier}';
 
 class SettingsAdminWorkspace extends StatefulWidget {
   const SettingsAdminWorkspace({
@@ -53,6 +59,7 @@ class _SettingsAdminWorkspaceState extends State<SettingsAdminWorkspace> {
   var _aiCallLogs = const <AiCallLog>[];
   var _theme = ThemePreference.system;
   var _notifications = true;
+  var _indicatorSettings = const IndicatorSettings();
   var _repairSubmitted = false;
   var _loadingAdmin = false;
   String? _adminError;
@@ -75,8 +82,11 @@ class _SettingsAdminWorkspaceState extends State<SettingsAdminWorkspace> {
       return _SettingsPanel(
         theme: _theme,
         notifications: _notifications,
+        indicatorSettings: _indicatorSettings,
         onTheme: (value) => setState(() => _theme = value),
         onNotifications: (value) => setState(() => _notifications = value),
+        onIndicatorSettings: (value) =>
+            setState(() => _indicatorSettings = value),
         onBackup: _backup,
         onExport: _export,
         onImport: _import,
@@ -88,8 +98,10 @@ class _SettingsAdminWorkspaceState extends State<SettingsAdminWorkspace> {
       builder: (context, _) => _SettingsPanel(
         theme: preferences.preferences.theme,
         notifications: preferences.preferences.notificationsEnabled,
+        indicatorSettings: preferences.preferences.indicatorSettings,
         onTheme: preferences.setTheme,
         onNotifications: preferences.setNotificationsEnabled,
+        onIndicatorSettings: preferences.setIndicatorSettings,
         onBackup: _backup,
         onExport: _export,
         onImport: _import,
@@ -315,8 +327,10 @@ class _SettingsPanel extends StatelessWidget {
   const _SettingsPanel({
     required this.theme,
     required this.notifications,
+    required this.indicatorSettings,
     required this.onTheme,
     required this.onNotifications,
+    required this.onIndicatorSettings,
     required this.onBackup,
     required this.onExport,
     required this.onImport,
@@ -325,8 +339,10 @@ class _SettingsPanel extends StatelessWidget {
 
   final ThemePreference theme;
   final bool notifications;
+  final IndicatorSettings indicatorSettings;
   final ValueChanged<ThemePreference> onTheme;
   final ValueChanged<bool> onNotifications;
+  final ValueChanged<IndicatorSettings> onIndicatorSettings;
   final VoidCallback onBackup;
   final VoidCallback onExport;
   final VoidCallback onImport;
@@ -338,11 +354,12 @@ class _SettingsPanel extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       children: [
         Text('看盘偏好', style: Theme.of(context).textTheme.titleMedium),
-        const ListTile(
+        ListTile(
           contentPadding: EdgeInsets.zero,
-          title: Text('指标参数'),
-          subtitle: Text('MA 5 / 20 · EMA 12 · BOLL 20, 2'),
-          trailing: Icon(Icons.chevron_right),
+          title: const Text('指标参数'),
+          subtitle: Text(_indicatorLabel(indicatorSettings)),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => _editIndicatorSettings(context),
         ),
         const ListTile(
           contentPadding: EdgeInsets.zero,
@@ -393,6 +410,116 @@ class _SettingsPanel extends StatelessWidget {
           onTap: onDeleteAccount,
         ),
       ],
+    );
+  }
+
+  Future<void> _editIndicatorSettings(BuildContext context) async {
+    final result = await showDialog<IndicatorSettings>(
+      context: context,
+      builder: (context) => _IndicatorSettingsDialog(
+        initial: indicatorSettings,
+      ),
+    );
+    if (result != null) onIndicatorSettings(result);
+  }
+}
+
+class _IndicatorSettingsDialog extends StatefulWidget {
+  const _IndicatorSettingsDialog({required this.initial});
+
+  final IndicatorSettings initial;
+
+  @override
+  State<_IndicatorSettingsDialog> createState() =>
+      _IndicatorSettingsDialogState();
+}
+
+class _IndicatorSettingsDialogState extends State<_IndicatorSettingsDialog> {
+  late String _maShort;
+  late String _maLong;
+  late String _ema;
+  late String _boll;
+  late String _multiplier;
+  late String _volume;
+
+  @override
+  void initState() {
+    super.initState();
+    final initial = widget.initial;
+    _maShort = '${initial.maShortPeriod}';
+    _maLong = '${initial.maLongPeriod}';
+    _ema = '${initial.emaPeriod}';
+    _boll = '${initial.bollPeriod}';
+    _multiplier = '${initial.bollMultiplier}';
+    _volume = '${initial.volumePeriod}';
+  }
+
+  void _save() {
+    final initial = widget.initial;
+    final settings = IndicatorSettings(
+      maShortPeriod: int.tryParse(_maShort) ?? initial.maShortPeriod,
+      maLongPeriod: int.tryParse(_maLong) ?? initial.maLongPeriod,
+      emaPeriod: int.tryParse(_ema) ?? initial.emaPeriod,
+      bollPeriod: int.tryParse(_boll) ?? initial.bollPeriod,
+      bollMultiplier: double.tryParse(_multiplier) ?? initial.bollMultiplier,
+      volumePeriod: int.tryParse(_volume) ?? initial.volumePeriod,
+    );
+    Navigator.pop(context, settings);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('指标参数'),
+      content: SizedBox(
+        width: 320,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _field('ind-ma-short', 'MA 短周期', _maShort, (v) => _maShort = v),
+              _field('ind-ma-long', 'MA 长周期', _maLong, (v) => _maLong = v),
+              _field('ind-ema', 'EMA 周期', _ema, (v) => _ema = v),
+              _field('ind-boll', 'BOLL 周期', _boll, (v) => _boll = v),
+              _field(
+                'ind-multiplier',
+                'BOLL 倍数',
+                _multiplier,
+                (v) => _multiplier = v,
+              ),
+              _field('ind-volume', '量能周期', _volume, (v) => _volume = v),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('取消'),
+        ),
+        FilledButton(onPressed: _save, child: const Text('保存')),
+      ],
+    );
+  }
+
+  Widget _field(
+    String key,
+    String label,
+    String initial,
+    ValueChanged<String> onChanged,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: TextFormField(
+        key: Key(key),
+        initialValue: initial,
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+        ),
+        onChanged: onChanged,
+      ),
     );
   }
 }

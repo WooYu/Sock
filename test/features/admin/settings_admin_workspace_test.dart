@@ -251,6 +251,32 @@ void main() {
     expect(controller.preferences.notificationsEnabled, isFalse);
   });
 
+  testWidgets('editing indicator parameters persists through preferences', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    final controller = PreferencesController(
+      repository: PersistentPreferencesRepository(),
+    );
+    await controller.load();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(body: SettingsAdminWorkspace(preferences: controller)),
+      ),
+    );
+
+    await tester.tap(find.text('指标参数'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const Key('ind-ma-short')), '3');
+    await tester.enterText(find.byKey(const Key('ind-ma-long')), '10');
+    await tester.tap(find.text('保存'));
+    await tester.pumpAndSettle();
+
+    expect(controller.preferences.indicatorSettings.maShortPeriod, 3);
+    expect(controller.preferences.indicatorSettings.maLongPeriod, 10);
+  });
+
   testWidgets('admin panel renders audit and AI call logs from the server', (
     tester,
   ) async {

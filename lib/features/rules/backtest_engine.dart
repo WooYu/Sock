@@ -84,7 +84,7 @@ class BacktestEngine {
       final historical = ordered.sublist(0, index + 1);
       final analysis = analyzer.analyze(historical);
       final facts = RuleFacts(
-        closeAboveMa20: analysis.lastClose >= analysis.ma20,
+        closeAboveMa20: analysis.lastClose >= analysis.maLong,
         volumeRatio: analysis.volumeRatio,
         supportDistance: analysis.lastClose == 0
             ? 1

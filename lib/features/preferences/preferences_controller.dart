@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../analysis/technical_analysis.dart';
 import 'preferences_repository.dart';
 import 'user_preferences.dart';
 
@@ -28,6 +29,12 @@ class PreferencesController extends ChangeNotifier {
 
   Future<void> setNotificationsEnabled(bool enabled) async {
     _preferences = _preferences.copyWith(notificationsEnabled: enabled);
+    notifyListeners();
+    await repository.save(_preferences);
+  }
+
+  Future<void> setIndicatorSettings(IndicatorSettings settings) async {
+    _preferences = _preferences.copyWith(indicatorSettings: settings);
     notifyListeners();
     await repository.save(_preferences);
   }

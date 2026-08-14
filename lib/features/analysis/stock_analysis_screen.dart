@@ -231,9 +231,18 @@ class _AnalysisContent extends StatelessWidget {
           spacing: 8,
           runSpacing: 8,
           children: [
-            _Indicator(label: 'MA5', value: analysis.ma5),
-            _Indicator(label: 'MA20', value: analysis.ma20),
-            _Indicator(label: 'EMA12', value: analysis.ema12),
+            _Indicator(
+              label: 'MA${analysis.settings.maShortPeriod}',
+              value: analysis.maShort,
+            ),
+            _Indicator(
+              label: 'MA${analysis.settings.maLongPeriod}',
+              value: analysis.maLong,
+            ),
+            _Indicator(
+              label: 'EMA${analysis.settings.emaPeriod}',
+              value: analysis.ema,
+            ),
             _Indicator(label: 'BOLL 上轨', value: analysis.bollinger.upper),
             _Indicator(label: '量比', value: analysis.volumeRatio),
             Chip(label: Text('风险 ${_riskLabel(analysis.riskLevel)}')),
@@ -275,7 +284,10 @@ class _AnalysisContent extends StatelessWidget {
             contentPadding: EdgeInsets.zero,
             title: Text(_date(point.day)),
             subtitle: Text(
-              'MA5 ${point.ma5.toStringAsFixed(2)}  ·  MA20 ${point.ma20.toStringAsFixed(2)}',
+              'MA${analysis.settings.maShortPeriod} '
+              '${point.maShort.toStringAsFixed(2)}  ·  '
+              'MA${analysis.settings.maLongPeriod} '
+              '${point.maLong.toStringAsFixed(2)}',
             ),
             trailing: Text('BOLL ${point.bollUpper.toStringAsFixed(2)}'),
           ),

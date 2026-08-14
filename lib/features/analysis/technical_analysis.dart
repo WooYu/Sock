@@ -11,6 +11,79 @@ class AnalysisException implements Exception {
   String toString() => message;
 }
 
+class IndicatorSettings {
+  const IndicatorSettings({
+    this.maShortPeriod = 5,
+    this.maLongPeriod = 20,
+    this.emaPeriod = 12,
+    this.bollPeriod = 20,
+    this.bollMultiplier = 2,
+    this.volumePeriod = 5,
+  });
+
+  final int maShortPeriod;
+  final int maLongPeriod;
+  final int emaPeriod;
+  final int bollPeriod;
+  final double bollMultiplier;
+  final int volumePeriod;
+
+  IndicatorSettings copyWith({
+    int? maShortPeriod,
+    int? maLongPeriod,
+    int? emaPeriod,
+    int? bollPeriod,
+    double? bollMultiplier,
+    int? volumePeriod,
+  }) => IndicatorSettings(
+    maShortPeriod: maShortPeriod ?? this.maShortPeriod,
+    maLongPeriod: maLongPeriod ?? this.maLongPeriod,
+    emaPeriod: emaPeriod ?? this.emaPeriod,
+    bollPeriod: bollPeriod ?? this.bollPeriod,
+    bollMultiplier: bollMultiplier ?? this.bollMultiplier,
+    volumePeriod: volumePeriod ?? this.volumePeriod,
+  );
+
+  Map<String, Object?> toJson() => {
+    'maShortPeriod': maShortPeriod,
+    'maLongPeriod': maLongPeriod,
+    'emaPeriod': emaPeriod,
+    'bollPeriod': bollPeriod,
+    'bollMultiplier': bollMultiplier,
+    'volumePeriod': volumePeriod,
+  };
+
+  static IndicatorSettings fromJson(Map<String, Object?> json) =>
+      IndicatorSettings(
+        maShortPeriod: (json['maShortPeriod']! as num).toInt(),
+        maLongPeriod: (json['maLongPeriod']! as num).toInt(),
+        emaPeriod: (json['emaPeriod']! as num).toInt(),
+        bollPeriod: (json['bollPeriod']! as num).toInt(),
+        bollMultiplier: (json['bollMultiplier']! as num).toDouble(),
+        volumePeriod: (json['volumePeriod']! as num).toInt(),
+      );
+
+  @override
+  bool operator ==(Object other) =>
+      other is IndicatorSettings &&
+      other.maShortPeriod == maShortPeriod &&
+      other.maLongPeriod == maLongPeriod &&
+      other.emaPeriod == emaPeriod &&
+      other.bollPeriod == bollPeriod &&
+      other.bollMultiplier == bollMultiplier &&
+      other.volumePeriod == volumePeriod;
+
+  @override
+  int get hashCode => Object.hash(
+    maShortPeriod,
+    maLongPeriod,
+    emaPeriod,
+    bollPeriod,
+    bollMultiplier,
+    volumePeriod,
+  );
+}
+
 class BollingerBand {
   const BollingerBand({
     required this.middle,
@@ -126,16 +199,16 @@ enum RiskLevel { low, medium, high }
 class FutureIndicatorPoint {
   const FutureIndicatorPoint({
     required this.day,
-    required this.ma5,
-    required this.ma20,
+    required this.maShort,
+    required this.maLong,
     required this.bollUpper,
     required this.bollMiddle,
     required this.bollLower,
   });
 
   final DateTime day;
-  final double ma5;
-  final double ma20;
+  final double maShort;
+  final double maLong;
   final double bollUpper;
   final double bollMiddle;
   final double bollLower;
@@ -150,12 +223,13 @@ class StockAnalysis {
     required this.confidence,
     required this.riskLevel,
     required this.matchedRules,
-    required this.ma5,
-    required this.ma20,
-    required this.ema12,
+    required this.maShort,
+    required this.maLong,
+    required this.ema,
     required this.bollinger,
     required this.volumeRatio,
     required this.future,
+    required this.settings,
   });
 
   final double lastClose;
@@ -165,19 +239,23 @@ class StockAnalysis {
   final double confidence;
   final RiskLevel riskLevel;
   final List<String> matchedRules;
-  final double ma5;
-  final double ma20;
-  final double ema12;
+  final double maShort;
+  final double maLong;
+  final double ema;
   final BollingerBand bollinger;
   final double volumeRatio;
   final List<FutureIndicatorPoint> future;
+  final IndicatorSettings settings;
 }
 
 class StockAnalyzer {
-  StockAnalyzer({IndicatorCalculator? calculator})
-    : _calculator = calculator ?? IndicatorCalculator();
+  StockAnalyzer({
+    IndicatorCalculator? calculator,
+    this.settings = const IndicatorSettings(),
+  }) : _calculator = calculator ?? IndicatorCalculator();
 
   final IndicatorCalculator _calculator;
+  IndicatorSettings settings;
 
   StockAnalysis analyze(List<Candle> source) {
     if (source.length < 20) {
@@ -189,17 +267,26 @@ class StockAnalyzer {
     final resistance = recent.map((item) => item.high).reduce(math.max);
     final range = resistance - support;
     final lastClose = candles.last.close;
-    final ma5 = _calculator.sma(candles, period: 5).last!;
-    final ma20 = _calculator.sma(candles, period: 20).last!;
-    final ema12 = _calculator.ema(candles, period: 12).last!;
-    final boll = _calculator.bollinger(candles, period: 20).last!;
-    final volumeRatio = _calculator.volume(candles, period: 5).latestRatio;
-    final trendPositive = lastClose >= ma20 && ma5 >= ma20;
+    final maShort = _calculator.sma(candles, period: settings.maShortPeriod).last!;
+    final maLong = _calculator.sma(candles, period: settings.maLongPeriod).last!;
+    final ema = _calculator.ema(candles, period: settings.emaPeriod).last!;
+    final boll = _calculator
+        .bollinger(
+          candles,
+          period: settings.bollPeriod,
+          multiplier: settings.bollMultiplier,
+        )
+        .last!;
+    final volumeRatio = _calculator
+        .volume(candles, period: settings.volumePeriod)
+        .latestRatio;
+    final trendPositive = lastClose >= maLong && maShort >= maLong;
     final nearSupport = lastClose - support <= range * 0.35;
     final matchedRules = <String>[
-      if (trendPositive) 'MA5 上穿并站稳 MA20',
-      if (lastClose >= ema12) '收盘价位于 EMA12 上方',
-      if (volumeRatio >= 1) '成交量不低于五日均量',
+      if (trendPositive)
+        'MA${settings.maShortPeriod} 上穿并站稳 MA${settings.maLongPeriod}',
+      if (lastClose >= ema) '收盘价位于 EMA${settings.emaPeriod} 上方',
+      if (volumeRatio >= 1) '成交量不低于${settings.volumePeriod}日均量',
       if (nearSupport) '价格接近二十日支撑区',
       if (lastClose < boll.upper) '仍处于 BOLL 上轨以内',
     ];
@@ -221,12 +308,13 @@ class StockAnalyzer {
       confidence: confidence,
       riskLevel: risk,
       matchedRules: List.unmodifiable(matchedRules),
-      ma5: ma5,
-      ma20: ma20,
-      ema12: ema12,
+      maShort: maShort,
+      maLong: maLong,
+      ema: ema,
       bollinger: boll,
       volumeRatio: volumeRatio,
       future: _extend(candles, sessions: 3),
+      settings: settings,
     );
   }
 
@@ -250,12 +338,18 @@ class StockAnalyzer {
           volume: rolling.last.volume,
         ),
       );
-      final boll = _calculator.bollinger(rolling, period: 20).last!;
+      final boll = _calculator
+          .bollinger(
+            rolling,
+            period: settings.bollPeriod,
+            multiplier: settings.bollMultiplier,
+          )
+          .last!;
       result.add(
         FutureIndicatorPoint(
           day: day,
-          ma5: _calculator.sma(rolling, period: 5).last!,
-          ma20: _calculator.sma(rolling, period: 20).last!,
+          maShort: _calculator.sma(rolling, period: settings.maShortPeriod).last!,
+          maLong: _calculator.sma(rolling, period: settings.maLongPeriod).last!,
           bollUpper: boll.upper,
           bollMiddle: boll.middle,
           bollLower: boll.lower,

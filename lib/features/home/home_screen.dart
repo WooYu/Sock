@@ -91,6 +91,8 @@ class _HomeScreenState extends State<HomeScreen> {
       market: _marketService,
       analyzer: StockAnalyzer(),
     );
+    widget.preferences?.addListener(_applyIndicatorSettings);
+    _applyIndicatorSettings();
     _annotationStore = PersistentChartAnnotationStore();
     _chartAnnotationController = ChartAnnotationController(
       stockCode: '600519',
@@ -127,6 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    widget.preferences?.removeListener(_applyIndicatorSettings);
     _portfolioController.dispose();
     _stockAnalysisController.dispose();
     _chartAnnotationController.dispose();
@@ -147,6 +150,18 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     if (_stockAnalysisController.results.isEmpty) {
       unawaited(_stockAnalysisController.search(''));
+    }
+  }
+
+  void _applyIndicatorSettings() {
+    final preferences = widget.preferences;
+    if (preferences == null) return;
+    final analyzer = _stockAnalysisController.analyzer;
+    final settings = preferences.preferences.indicatorSettings;
+    if (analyzer.settings == settings) return;
+    analyzer.settings = settings;
+    if (_stockAnalysisController.analysis != null) {
+      unawaited(_stockAnalysisController.refresh());
     }
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:stockcal/features/analysis/technical_analysis.dart';
 import 'package:stockcal/features/preferences/preferences_controller.dart';
 import 'package:stockcal/features/preferences/preferences_repository.dart';
 import 'package:stockcal/features/preferences/user_preferences.dart';
@@ -63,5 +64,21 @@ void main() {
     final restored = await PersistentPreferencesRepository().load();
     expect(restored.theme, ThemePreference.dark);
     expect(restored.notificationsEnabled, isFalse);
+  });
+
+  test('controller persists custom indicator settings', () async {
+    SharedPreferences.setMockInitialValues({});
+    final controller = PreferencesController(
+      repository: PersistentPreferencesRepository(),
+    );
+    await controller.load();
+
+    await controller.setIndicatorSettings(
+      const IndicatorSettings(maShortPeriod: 3, maLongPeriod: 10),
+    );
+
+    expect(controller.preferences.indicatorSettings.maShortPeriod, 3);
+    final restored = await PersistentPreferencesRepository().load();
+    expect(restored.indicatorSettings.maLongPeriod, 10);
   });
 }
