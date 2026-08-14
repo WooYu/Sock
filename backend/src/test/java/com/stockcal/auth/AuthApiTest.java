@@ -32,6 +32,8 @@ class AuthApiTest {
     @org.junit.jupiter.api.BeforeEach
     void reset() {
         jdbc.sql("delete from sms_challenge").update();
+        jdbc.sql("delete from sync_mutation").update();
+        jdbc.sql("delete from sync_change").update();
         jdbc.sql("delete from access_token").update();
         jdbc.sql("delete from device_session").update();
         jdbc.sql("delete from app_user").update();
@@ -115,6 +117,38 @@ class AuthApiTest {
         mvc.perform(post("/api/v1/auth/verify").contentType(MediaType.APPLICATION_JSON).content(body))
             .andExpect(status().isOk());
         mvc.perform(post("/api/v1/auth/verify").contentType(MediaType.APPLICATION_JSON).content(body))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void accountDeletionRemovesIdentitySessionsAndSyncData() throws Exception {
+        var code = requestCode("13800138000");
+        var response = mvc.perform(post("/api/v1/auth/verify")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"phone\":\"13800138000\",\"code\":\"" + code + "\",\"deviceName\":\"Web\"}"))
+            .andReturn().getResponse().getContentAsString();
+        var token = objectMapper.readTree(response).get("accessToken").asText();
+        var userId = jdbc.sql("select id from app_user where phone='13800138000'")
+            .query(String.class).single();
+        jdbc.sql("""
+                insert into sync_change(user_id,idempotency_key,entity_type,entity_id,operation,revision,payload)
+                values('13800138000','key-1','watchlist','s1','UPSERT',1,'{}')
+                """).update();
+        jdbc.sql("insert into sync_mutation(id,user_id) values('m1',:userId)")
+            .param("userId", userId).update();
+
+        mvc.perform(delete("/api/v1/account")
+                .header("Authorization", "Bearer " + token))
+            .andExpect(status().isNoContent());
+
+        org.junit.jupiter.api.Assertions.assertEquals(0,
+            jdbc.sql("select count(*) from app_user").query(Integer.class).single());
+        org.junit.jupiter.api.Assertions.assertEquals(0,
+            jdbc.sql("select count(*) from sync_change").query(Integer.class).single());
+        org.junit.jupiter.api.Assertions.assertEquals(0,
+            jdbc.sql("select count(*) from sync_mutation").query(Integer.class).single());
+        mvc.perform(get("/api/v1/auth/devices")
+                .header("Authorization", "Bearer " + token))
             .andExpect(status().isUnauthorized());
     }
 

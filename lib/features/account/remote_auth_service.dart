@@ -125,6 +125,16 @@ class RemoteAuthService {
     }
   }
 
+  Future<void> deleteAccount(String accessToken) async {
+    final response = await _client.delete(
+      baseUrl.resolve('/api/v1/account'),
+      headers: _authorization(accessToken),
+    );
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw RemoteAuthException(response.statusCode, response.body);
+    }
+  }
+
   Map<String, Object?> _json(http.Response response) {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw RemoteAuthException(response.statusCode, response.body);

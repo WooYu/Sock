@@ -379,7 +379,10 @@ class _Workspace extends StatelessWidget {
       return AccountWorkspace(controller: sessionController);
     }
     if (module == '设置后台') {
-      return SettingsAdminWorkspace(remote: adminService);
+      return SettingsAdminWorkspace(
+        remote: adminService,
+        sessionController: sessionController,
+      );
     }
     if (module == '总览') {
       return _Dashboard(

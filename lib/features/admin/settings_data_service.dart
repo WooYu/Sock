@@ -60,6 +60,17 @@ class SettingsDataService {
     }
   }
 
+  Future<void> clearAllData() async {
+    final preferences = await SharedPreferences.getInstance();
+    final keys = preferences
+        .getKeys()
+        .where((key) => key.startsWith(_prefix))
+        .toList(growable: false);
+    for (final key in keys) {
+      await preferences.remove(key);
+    }
+  }
+
   Future<void> _set(
     SharedPreferences preferences,
     String key,

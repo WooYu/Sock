@@ -60,3 +60,11 @@
 - Witnessed failing settings/admin workspace tests, then implemented responsive user preferences, data/account actions, market source status, sync jobs, repair, users/roles, rule templates, audit, AI logs, and server-only secret status; replaced the static home placeholder.
 - Added Spring Boot auth and incremental-sync controllers, API integration-test contracts, PostgreSQL Flyway foundation schema, Redis configuration, and PostgreSQL/Redis Compose services.
 - Fresh Flutter-side phase-eight checkpoint: all 99 Flutter tests passed and static analysis reported no issues; backend integration remains unverified due dependency network failure.
+- Added authenticated market and administrative paths, persistent account/session handling, real portfolio-backed reviews, audited AI review generation, graceful AI-unavailable behavior, and local data backup in subsequent focused TDD commits.
+- Added account deletion across Flutter and Spring Boot, including deletion of sessions and sync data, audit-actor anonymization, stricter authentication matcher rules, confirmation UI, and local-data cleanup.
+- Connected settings data export/import actions to versioned JSON archives and retained local backup support.
+- Replaced the generated Flutter README with project setup, architecture, environment, verification, and safety guidance.
+- Added `docs/handoff/2026-08-14-stockcal-current-status.md` to distinguish implemented behavior from external-service and production-release gaps.
+- Added the Gradle 9.3 Wrapper so backend verification no longer depends on a machine-global Gradle installation.
+- Corrected stale navigation assertions and initialized persistent storage explicitly in tests after the review workspace moved from demo fixtures to real persisted records.
+- Fresh handoff verification: 149 Flutter tests passed, `flutter analyze` reported no issues, the Web release build succeeded, and all 30 backend tests passed with no failures, errors, or skips.

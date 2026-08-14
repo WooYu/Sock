@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stockcal/app/stockcal_app.dart';
 
 void main() {
   testWidgets('phone More destination opens every secondary module', (
     tester,
   ) async {
+    SharedPreferences.setMockInitialValues({});
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -22,6 +24,6 @@ void main() {
 
     await tester.tap(find.text('复盘与 AI'));
     await tester.pumpAndSettle();
-    expect(find.text('复盘摘要'), findsOneWidget);
+    expect(find.text('暂无复盘记录'), findsOneWidget);
   });
 }

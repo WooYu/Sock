@@ -84,6 +84,23 @@ void main() {
     );
   });
 
+  test('deletes the authenticated account with bearer authorization', () async {
+    late http.Request sent;
+    final service = RemoteAuthService(
+      baseUrl: Uri.parse('https://api.stockcal.test'),
+      client: MockClient((request) async {
+        sent = request;
+        return http.Response('', 204);
+      }),
+    );
+
+    await service.deleteAccount('access-1');
+
+    expect(sent.method, 'DELETE');
+    expect(sent.url.path, '/api/v1/account');
+    expect(sent.headers['authorization'], 'Bearer access-1');
+  });
+
   test('refreshes an access token with the persisted refresh token', () async {
     final service = RemoteAuthService(
       baseUrl: Uri.parse('https://api.stockcal.test'),
@@ -215,4 +232,29 @@ void main() {
     expect(paths, ['/api/v1/auth/refresh', '/api/v1/auth/devices']);
     expect(controller.session?.accessToken, 'renewed-access');
   });
+
+  test(
+    'controller clears persisted session after remote account deletion',
+    () async {
+      final repository = MemorySessionRepository();
+      await repository.save(
+        const UserSession(phone: '13800138000', accessToken: 'access-1'),
+      );
+      final service = RemoteAuthService(
+        baseUrl: Uri.parse('https://api.stockcal.test'),
+        client: MockClient((request) async {
+          if (request.method == 'GET') return http.Response('[]', 200);
+          return http.Response('', 204);
+        }),
+      );
+      final controller = SessionController(repository, remote: service);
+      await controller.restore();
+
+      await controller.deleteAccount();
+
+      expect(controller.session, isNull);
+      expect(controller.devices, isEmpty);
+      expect(await repository.restore(), isNull);
+    },
+  );
 }

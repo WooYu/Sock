@@ -8,8 +8,73 @@ import 'package:stockcal/features/admin/remote_admin_service.dart';
 import 'package:stockcal/features/admin/settings_admin_workspace.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stockcal/features/admin/settings_data_service.dart';
+import 'package:stockcal/features/account/session.dart';
 
 void main() {
+  testWidgets('exports a copyable archive and imports it after validation', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({'stockcal.watchlist.v1': '[]'});
+    await tester.pumpWidget(
+      const MaterialApp(home: Scaffold(body: SettingsAdminWorkspace())),
+    );
+
+    await tester.tap(find.text('导出数据'));
+    await tester.pumpAndSettle();
+    expect(find.text('StockCal 数据归档'), findsOneWidget);
+    expect(find.textContaining('stockcal.watchlist.v1'), findsOneWidget);
+    await tester.tap(find.text('关闭'));
+    await tester.pumpAndSettle();
+
+    final archive = await SettingsDataService().exportArchive();
+    await SettingsDataService().clearLocalData();
+    await tester.tap(find.text('导入数据'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextFormField), archive);
+    await tester.tap(find.text('恢复数据'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('数据已恢复，请重新打开页面'), findsOneWidget);
+    expect(
+      (await SharedPreferences.getInstance()).getString(
+        'stockcal.watchlist.v1',
+      ),
+      '[]',
+    );
+  });
+
+  testWidgets('account deletion requires confirmation and clears local data', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({'stockcal.watchlist.v1': '[]'});
+    final session = SessionController(MemorySessionRepository());
+    await session.verifyPhone(phone: '13800138000', code: '123456');
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SettingsAdminWorkspace(sessionController: session),
+        ),
+      ),
+    );
+    await tester.drag(find.byType(ListView).first, const Offset(0, -400));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('注销账户'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('此操作不可撤销'), findsOneWidget);
+    await tester.tap(find.text('确认注销'));
+    await tester.pumpAndSettle();
+
+    expect(session.session, isNull);
+    expect(
+      (await SharedPreferences.getInstance()).getString(
+        'stockcal.watchlist.v1',
+      ),
+      isNull,
+    );
+    expect(find.text('账户与本地数据已删除'), findsOneWidget);
+  });
+
   testWidgets('backup action persists an archive and confirms completion', (
     tester,
   ) async {

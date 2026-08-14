@@ -11,6 +11,11 @@ create table if not exists sync_change (
     unique (user_id, idempotency_key)
 );
 
+create table if not exists sync_mutation (
+    id varchar(36) primary key,
+    user_id varchar(36) not null
+);
+
 create table if not exists app_user (
     id varchar(36) primary key,
     phone varchar(20) not null unique,

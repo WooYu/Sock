@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
+import '../account/session.dart';
 import 'admin_service.dart';
 import 'remote_admin_service.dart';
 import 'settings_data_service.dart';
 
 class SettingsAdminWorkspace extends StatefulWidget {
-  const SettingsAdminWorkspace({super.key, this.remote});
+  const SettingsAdminWorkspace({
+    super.key,
+    this.remote,
+    this.sessionController,
+  });
 
   final RemoteAdminService? remote;
+  final SessionController? sessionController;
 
   @override
   State<SettingsAdminWorkspace> createState() => _SettingsAdminWorkspaceState();
@@ -74,6 +81,9 @@ class _SettingsAdminWorkspaceState extends State<SettingsAdminWorkspace> {
                     onNotifications: (value) =>
                         setState(() => _notifications = value),
                     onBackup: _backup,
+                    onExport: _export,
+                    onImport: _import,
+                    onDeleteAccount: _deleteAccount,
                   ),
                   _AdminPanel(
                     marketStatus: _marketStatus,
@@ -151,6 +161,119 @@ class _SettingsAdminWorkspaceState extends State<SettingsAdminWorkspace> {
       context,
     ).showSnackBar(const SnackBar(content: Text('本地备份已保存')));
   }
+
+  Future<void> _export() async {
+    final archive = await _data.exportArchive();
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('StockCal 数据归档'),
+        content: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 560, maxHeight: 360),
+          child: SingleChildScrollView(child: SelectableText(archive)),
+        ),
+        actions: [
+          TextButton.icon(
+            onPressed: () async {
+              await Clipboard.setData(ClipboardData(text: archive));
+              if (context.mounted) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('归档已复制')));
+              }
+            },
+            icon: const Icon(Icons.copy_outlined),
+            label: const Text('复制'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('关闭'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _import() async {
+    var archive = '';
+    final submitted = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('导入数据归档'),
+        content: SizedBox(
+          width: 520,
+          child: TextFormField(
+            minLines: 8,
+            maxLines: 14,
+            decoration: const InputDecoration(labelText: '归档 JSON'),
+            onChanged: (value) => archive = value,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('恢复数据'),
+          ),
+        ],
+      ),
+    );
+    if (submitted != true) return;
+    try {
+      await _data.restoreArchive(archive);
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('数据已恢复，请重新打开页面')));
+      }
+    } on FormatException catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(error.message)));
+      }
+    }
+  }
+
+  Future<void> _deleteAccount() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('注销账户'),
+        content: const Text('此操作不可撤销。服务端账户、登录设备和本地数据都将被删除。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('确认注销'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      await widget.sessionController?.deleteAccount();
+      await _data.clearAllData();
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('账户与本地数据已删除')));
+      }
+    } on VerificationException catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(error.message)));
+      }
+    }
+  }
 }
 
 class _SettingsPanel extends StatelessWidget {
@@ -160,6 +283,9 @@ class _SettingsPanel extends StatelessWidget {
     required this.onDarkMode,
     required this.onNotifications,
     required this.onBackup,
+    required this.onExport,
+    required this.onImport,
+    required this.onDeleteAccount,
   });
 
   final bool darkMode;
@@ -167,6 +293,9 @@ class _SettingsPanel extends StatelessWidget {
   final ValueChanged<bool> onDarkMode;
   final ValueChanged<bool> onNotifications;
   final VoidCallback onBackup;
+  final VoidCallback onExport;
+  final VoidCallback onImport;
+  final VoidCallback onDeleteAccount;
 
   @override
   Widget build(BuildContext context) {
@@ -202,10 +331,18 @@ class _SettingsPanel extends StatelessWidget {
         ),
         const Divider(height: 32),
         Text('数据与账户', style: Theme.of(context).textTheme.titleMedium),
-        const _ActionTile(icon: Icons.upload_file, title: '导入数据'),
-        const _ActionTile(icon: Icons.download_outlined, title: '导出数据'),
+        _ActionTile(icon: Icons.upload_file, title: '导入数据', onTap: onImport),
+        _ActionTile(
+          icon: Icons.download_outlined,
+          title: '导出数据',
+          onTap: onExport,
+        ),
         _ActionTile(icon: Icons.backup_outlined, title: '备份', onTap: onBackup),
-        const _ActionTile(icon: Icons.person_off_outlined, title: '注销账户'),
+        _ActionTile(
+          icon: Icons.person_off_outlined,
+          title: '注销账户',
+          onTap: onDeleteAccount,
+        ),
       ],
     );
   }

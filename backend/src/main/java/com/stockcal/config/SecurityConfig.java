@@ -15,7 +15,12 @@ public class SecurityConfig {
         return http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/auth/**", "/actuator/health").permitAll()
+                .requestMatchers(
+                    "/api/v1/auth/request-code",
+                    "/api/v1/auth/verify",
+                    "/api/v1/auth/refresh",
+                    "/actuator/health"
+                ).permitAll()
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated())
             .httpBasic(Customizer.withDefaults())

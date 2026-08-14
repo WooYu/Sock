@@ -4,9 +4,10 @@
 Deliver the complete Flutter StockCal product described in the referenced conversation: account and local-first sync, portfolio dashboard, A-share analysis, professional charts and annotations, rules/predictions/backtests, watchlists/trades/import, reviews/AI explanations, settings/admin, and verified mobile/Web builds.
 
 ## Current State
-- Flutter product workspaces and deterministic domain services cover the planned client scope.
-- Local-first queues, editable workflows, account/device state, backend contracts, and administration views exist.
-- Flutter has prior Web release-build evidence; backend dependency verification and repository push remain network-dependent.
+- Flutter product workspaces and deterministic domain services cover the main planned client journeys.
+- Local-first queues, account/device lifecycle, backend contracts, knowledge approval, administration views, archive/restore, and account deletion exist.
+- Production readiness is not complete: external service credentials, real PostgreSQL/Redis migration exercise, multi-portfolio depth, file-based archive UX, mobile release signing, and final accessibility/visual QA remain.
+- The authoritative handoff is `docs/handoff/2026-08-14-stockcal-current-status.md`.
 
 ## Phases
 | Phase | Status | Exit evidence |
@@ -18,8 +19,8 @@ Deliver the complete Flutter StockCal product described in the referenced conver
 | 5. Professional K-line and annotation editor | complete | 19 chart domain/controller/widget/navigation tests, 68-test suite, clean analyze, Web release build |
 | 6. Rules, immutable predictions, and backtesting | complete | 15 domain/widget/navigation tests, 83-test full suite, clean analyze |
 | 7. Review and constrained AI explanation | complete | 9 domain/widget/navigation tests, 92-test full suite, clean analyze |
-| 8. Backend services, auth, sync, and administration | in_progress | API/integration tests, PostgreSQL/Redis deployment verification |
-| 9. Release hardening and delivery | pending | Full test suite, analyze, Android/Web builds, visual/accessibility QA, pushed repository |
+| 8. Backend services, auth, sync, knowledge, and administration | in_progress | Code and contract tests exist; live SMS/Tushare/OpenAI plus PostgreSQL/Redis deployment verification remain |
+| 9. Release hardening and delivery | in_progress | Current source/docs handoff and verification; signed mobile builds and final visual/accessibility QA remain |
 
 ## Decisions
 - Flutter remains the single client codebase for Android, iOS, and Web.

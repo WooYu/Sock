@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stockcal/app/stockcal_app.dart';
 
 void main() {
   testWidgets('main product surface exposes all planned modules', (
     tester,
   ) async {
+    SharedPreferences.setMockInitialValues({});
     await tester.pumpWidget(const StockCalApp());
 
     expect(find.text('总览'), findsWidgets);
@@ -28,6 +30,7 @@ void main() {
   testWidgets(
     'module navigation switches to analysis, backtest, and review workspaces',
     (tester) async {
+      SharedPreferences.setMockInitialValues({});
       await tester.pumpWidget(const StockCalApp());
 
       await tester.tap(find.text('个股分析'));
@@ -41,8 +44,8 @@ void main() {
 
       await tester.tap(find.text('复盘AI'));
       await tester.pumpAndSettle();
-      expect(find.text('复盘摘要'), findsOneWidget);
-      expect(find.text('AI 仅读取确定性计算结果'), findsOneWidget);
+      expect(find.text('暂无复盘记录'), findsOneWidget);
+      expect(find.text('请先在组合交易中记录买卖'), findsOneWidget);
     },
   );
 }

@@ -66,13 +66,15 @@
 
 ### Task 7: Production Backend And Sync
 
-- [ ] Build SMS authentication, refresh tokens, profile, and device management.
-- [ ] Add PostgreSQL migrations, Redis-backed jobs, idempotent incremental sync, retries, and repair.
-- [ ] Add users, roles, rule templates, data-source status, audit logs, and AI call logs.
+- [x] Build authentication contracts, refresh tokens, profile, device management, authorization, and account deletion.
+- [x] Add PostgreSQL migrations, Redis configuration, idempotent incremental sync, retries, and repair APIs.
+- [x] Add users, roles, rule templates, data-source status, audit logs, and AI call-log contracts and views.
+- [ ] Configure and verify the production SMS provider, PostgreSQL/Redis deployment, Tushare token, and OpenAI billing.
 
 ### Task 8: Release Verification
 
-- [ ] Run client and server suites plus static analysis and migration checks.
-- [ ] Build Android and Web release artifacts.
+- [ ] Run fresh client and server suites plus static analysis and migration checks after the final change set.
+- [ ] Build and verify Android, iOS, and Web release artifacts.
 - [ ] Verify phone/tablet/desktop visuals, keyboard/screen-reader semantics, text scaling, offline and delayed-source states.
-- [ ] Audit every requirement against executable or rendered evidence, commit, and push to GitHub.
+- [x] Create a requirement/status handoff, document production gaps, and push the current source and design records to GitHub.
+- [ ] Close the documented production gaps and perform the final requirement-by-requirement acceptance audit.

@@ -219,6 +219,19 @@ class SessionController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> deleteAccount() async {
+    final current = session;
+    if (current == null) return;
+    if (remote != null) {
+      try {
+        await remote!.deleteAccount(current.accessToken);
+      } on RemoteAuthException {
+        throw const VerificationException('账户注销失败，请检查网络后重试');
+      }
+    }
+    await signOut();
+  }
+
   void _registerCurrentDevice() {
     devices = const [
       UserDevice(
