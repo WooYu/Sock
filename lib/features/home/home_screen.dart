@@ -14,6 +14,7 @@ import '../chart/professional_chart_screen.dart';
 import '../chart/persistent_chart_annotation_store.dart';
 import '../market/market_data.dart';
 import '../portfolio/portfolio_controller.dart';
+import '../portfolio/persistent_portfolio_repository.dart';
 import '../portfolio/portfolio_ledger.dart';
 import '../portfolio/portfolio_screen.dart';
 import '../rules/rule_engine.dart';
@@ -48,7 +49,9 @@ class _HomeScreenState extends State<HomeScreen> {
     _portfolioController = PortfolioController(
       ledger: PortfolioLedger(openingCash: 500000),
       marketPrices: const {'600519': 1742, '000001': 14, '300750': 102},
+      repository: PersistentPortfolioRepository(),
     );
+    _portfolioController.load();
     _stockAnalysisController = StockAnalysisController(
       catalog: const MemoryStockCatalog(DemoAshareData.securities),
       market: DemoAshareMarketAdapter(),

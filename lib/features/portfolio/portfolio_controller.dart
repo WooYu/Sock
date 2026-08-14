@@ -1,17 +1,33 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
+import 'persistent_portfolio_repository.dart';
 import 'portfolio_ledger.dart';
 import 'trade_import.dart';
 
 class PortfolioController extends ChangeNotifier {
-  PortfolioController({required this.ledger, required this.marketPrices})
-    : importer = TradeImportService(ledger);
+  PortfolioController({
+    required this.ledger,
+    required this.marketPrices,
+    this.repository,
+  }) : importer = TradeImportService(ledger);
 
   final PortfolioLedger ledger;
   final Map<String, double> marketPrices;
+  final PortfolioRepository? repository;
   final TradeImportService importer;
   var _entrySequence = 0;
   TradeImportBatch? latestImport;
+
+  Future<void> load() async {
+    final source = repository;
+    if (source == null || ledger.entries.isNotEmpty) return;
+    final restored = await source.load();
+    ledger.recordAll(restored.entries);
+    _entrySequence = ledger.entries.length;
+    notifyListeners();
+  }
 
   List<LedgerPosition> get positions => ledger.positions(marketPrices);
   double get marketValue =>
@@ -74,6 +90,7 @@ class PortfolioController extends ChangeNotifier {
     };
     ledger.record(entry);
     notifyListeners();
+    _save();
   }
 
   TradeImportPreview previewSampleImport() {
@@ -122,6 +139,7 @@ class PortfolioController extends ChangeNotifier {
   void commitImport(TradeImportPreview preview) {
     latestImport = importer.commit(preview);
     notifyListeners();
+    _save();
   }
 
   bool undoLatestImport() {
@@ -129,7 +147,13 @@ class PortfolioController extends ChangeNotifier {
     if (undone) {
       latestImport = null;
       notifyListeners();
+      _save();
     }
     return undone;
+  }
+
+  void _save() {
+    final source = repository;
+    if (source != null) unawaited(source.save(ledger));
   }
 }
