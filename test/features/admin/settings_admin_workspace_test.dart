@@ -6,8 +6,25 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:stockcal/features/admin/remote_admin_service.dart';
 import 'package:stockcal/features/admin/settings_admin_workspace.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:stockcal/features/admin/settings_data_service.dart';
 
 void main() {
+  testWidgets('backup action persists an archive and confirms completion', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({'stockcal.watchlist.v1': '[]'});
+    await tester.pumpWidget(
+      const MaterialApp(home: Scaffold(body: SettingsAdminWorkspace())),
+    );
+
+    await tester.tap(find.text('备份'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('本地备份已保存'), findsOneWidget);
+    expect(await SettingsDataService().latestBackup(), isNotNull);
+  });
+
   testWidgets('remote administration renders server state instead of samples', (
     tester,
   ) async {

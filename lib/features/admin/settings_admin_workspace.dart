@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'admin_service.dart';
 import 'remote_admin_service.dart';
+import 'settings_data_service.dart';
 
 class SettingsAdminWorkspace extends StatefulWidget {
   const SettingsAdminWorkspace({super.key, this.remote});
@@ -14,6 +15,7 @@ class SettingsAdminWorkspace extends StatefulWidget {
 
 class _SettingsAdminWorkspaceState extends State<SettingsAdminWorkspace> {
   late final AdminService _admin;
+  final _data = SettingsDataService();
   var _jobs = <SyncJob>[
     const SyncJob(
       id: 'sync-annotation-1',
@@ -71,6 +73,7 @@ class _SettingsAdminWorkspaceState extends State<SettingsAdminWorkspace> {
                     onDarkMode: (value) => setState(() => _darkMode = value),
                     onNotifications: (value) =>
                         setState(() => _notifications = value),
+                    onBackup: _backup,
                   ),
                   _AdminPanel(
                     marketStatus: _marketStatus,
@@ -140,6 +143,14 @@ class _SettingsAdminWorkspaceState extends State<SettingsAdminWorkspace> {
     }
     setState(() => _repairSubmitted = true);
   }
+
+  Future<void> _backup() async {
+    await _data.backup();
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('本地备份已保存')));
+  }
 }
 
 class _SettingsPanel extends StatelessWidget {
@@ -148,12 +159,14 @@ class _SettingsPanel extends StatelessWidget {
     required this.notifications,
     required this.onDarkMode,
     required this.onNotifications,
+    required this.onBackup,
   });
 
   final bool darkMode;
   final bool notifications;
   final ValueChanged<bool> onDarkMode;
   final ValueChanged<bool> onNotifications;
+  final VoidCallback onBackup;
 
   @override
   Widget build(BuildContext context) {
@@ -191,7 +204,7 @@ class _SettingsPanel extends StatelessWidget {
         Text('数据与账户', style: Theme.of(context).textTheme.titleMedium),
         const _ActionTile(icon: Icons.upload_file, title: '导入数据'),
         const _ActionTile(icon: Icons.download_outlined, title: '导出数据'),
-        const _ActionTile(icon: Icons.backup_outlined, title: '备份'),
+        _ActionTile(icon: Icons.backup_outlined, title: '备份', onTap: onBackup),
         const _ActionTile(icon: Icons.person_off_outlined, title: '注销账户'),
       ],
     );
@@ -367,9 +380,10 @@ class _Section extends StatelessWidget {
 }
 
 class _ActionTile extends StatelessWidget {
-  const _ActionTile({required this.icon, required this.title});
+  const _ActionTile({required this.icon, required this.title, this.onTap});
   final IconData icon;
   final String title;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -378,7 +392,7 @@ class _ActionTile extends StatelessWidget {
       leading: Icon(icon),
       title: Text(title),
       trailing: const Icon(Icons.chevron_right),
-      onTap: () {},
+      onTap: onTap,
     );
   }
 }
