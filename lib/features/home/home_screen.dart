@@ -21,8 +21,8 @@ import '../knowledge/knowledge_workspace.dart';
 import '../knowledge/remote_knowledge_repository.dart';
 import '../portfolio/portfolio_controller.dart';
 import '../portfolio/persistent_portfolio_repository.dart';
-import '../portfolio/portfolio_ledger.dart';
 import '../portfolio/portfolio_screen.dart';
+import '../preferences/preferences_controller.dart';
 import '../rules/rule_engine.dart';
 import '../rules/persistent_rules_repository.dart';
 import '../rules/persistent_prediction_repository.dart';
@@ -36,7 +36,9 @@ import '../watchlist/persistent_watchlist_repository.dart';
 import '../watchlist/watchlist_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, this.preferences});
+
+  final PreferencesController? preferences;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -80,7 +82,6 @@ class _HomeScreenState extends State<HomeScreen> {
       accessToken: () => _sessionController.session?.accessToken,
     );
     _portfolioController = PortfolioController(
-      ledger: PortfolioLedger(),
       marketPrices: const {},
       repository: PersistentPortfolioRepository(),
     );
@@ -214,6 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
               watchlistController: _watchlistController,
               sessionController: _sessionController,
               adminService: _adminService,
+              preferences: widget.preferences,
               onNavigate: (module) => setState(() => _selected = module),
             ),
           ),
@@ -310,6 +312,7 @@ class _Workspace extends StatelessWidget {
     required this.watchlistController,
     required this.sessionController,
     required this.adminService,
+    this.preferences,
     required this.onNavigate,
   });
 
@@ -327,6 +330,7 @@ class _Workspace extends StatelessWidget {
   final WatchlistController watchlistController;
   final SessionController sessionController;
   final RemoteAdminService adminService;
+  final PreferencesController? preferences;
   final ValueChanged<String> onNavigate;
 
   @override
@@ -382,6 +386,7 @@ class _Workspace extends StatelessWidget {
       return SettingsAdminWorkspace(
         remote: adminService,
         sessionController: sessionController,
+        preferences: preferences,
       );
     }
     if (module == '总览') {

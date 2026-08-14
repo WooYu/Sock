@@ -2,21 +2,57 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'portfolio.dart';
 import 'portfolio_ledger.dart';
 
 abstract interface class PortfolioRepository {
-  Future<PortfolioLedger> load();
-  Future<void> save(PortfolioLedger ledger);
+  Future<PortfolioSnapshot> load();
+  Future<void> save(PortfolioSnapshot snapshot);
 }
 
 class PersistentPortfolioRepository implements PortfolioRepository {
-  static const _key = 'stockcal.portfolio.v1';
+  static const _key = 'stockcal.portfolio.v2';
+  static const _legacyKey = 'stockcal.portfolio.v1';
+  static const _defaultName = '默认组合';
 
   @override
-  Future<PortfolioLedger> load() async {
-    final value = (await SharedPreferences.getInstance()).getString(_key);
-    if (value == null) return PortfolioLedger();
-    final json = jsonDecode(value) as Map<String, Object?>;
+  Future<PortfolioSnapshot> load() async {
+    final preferences = await SharedPreferences.getInstance();
+    final raw = preferences.getString(_key);
+    if (raw != null) {
+      return _snapshotFromJson(jsonDecode(raw) as Map<String, Object?>);
+    }
+    final legacy = preferences.getString(_legacyKey);
+    if (legacy != null) {
+      return _migrateLegacy(jsonDecode(legacy) as Map<String, Object?>);
+    }
+    return const PortfolioSnapshot(portfolios: [], activeId: null);
+  }
+
+  @override
+  Future<void> save(PortfolioSnapshot snapshot) async {
+    await (await SharedPreferences.getInstance()).setString(
+      _key,
+      jsonEncode({
+        'activeId': snapshot.activeId,
+        'portfolios': snapshot.portfolios
+            .map(_portfolioToJson)
+            .toList(growable: false),
+      }),
+    );
+  }
+
+  PortfolioSnapshot _snapshotFromJson(Map<String, Object?> json) {
+    final portfolios = (json['portfolios']! as List<Object?>)
+        .map((item) => _portfolioFromJson(item! as Map<String, Object?>))
+        .toList(growable: false);
+    return PortfolioSnapshot(
+      portfolios: portfolios,
+      activeId: json['activeId'] as String?,
+    );
+  }
+
+  PortfolioSnapshot _migrateLegacy(Map<String, Object?> json) {
     final ledger = PortfolioLedger(
       openingCash: (json['openingCash']! as num).toDouble(),
     );
@@ -24,17 +60,35 @@ class PersistentPortfolioRepository implements PortfolioRepository {
       (item) => _entryFromJson(item! as Map<String, Object?>),
     );
     ledger.recordAll(entries);
-    return ledger;
+    final portfolio = Portfolio(
+      id: 'portfolio-default',
+      name: _defaultName,
+      ledger: ledger,
+    );
+    return PortfolioSnapshot(portfolios: [portfolio], activeId: portfolio.id);
   }
 
-  @override
-  Future<void> save(PortfolioLedger ledger) async {
-    await (await SharedPreferences.getInstance()).setString(
-      _key,
-      jsonEncode({
-        'openingCash': ledger.openingCash,
-        'entries': ledger.entries.map(_entryToJson).toList(growable: false),
-      }),
+  Map<String, Object?> _portfolioToJson(Portfolio portfolio) => {
+    'id': portfolio.id,
+    'name': portfolio.name,
+    'openingCash': portfolio.ledger.openingCash,
+    'entries': portfolio.ledger.entries
+        .map(_entryToJson)
+        .toList(growable: false),
+  };
+
+  Portfolio _portfolioFromJson(Map<String, Object?> json) {
+    final ledger = PortfolioLedger(
+      openingCash: (json['openingCash']! as num).toDouble(),
+    );
+    final entries = (json['entries']! as List<Object?>).map(
+      (item) => _entryFromJson(item! as Map<String, Object?>),
+    );
+    ledger.recordAll(entries);
+    return Portfolio(
+      id: json['id']! as String,
+      name: json['name']! as String,
+      ledger: ledger,
     );
   }
 
