@@ -3,12 +3,8 @@ package com.stockcal.auth;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.time.Instant;
-import java.util.HexFormat;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
@@ -47,6 +43,7 @@ public class AuthController {
                 """)
             .param("id", device.id()).param("userId", userId).param("name", device.name())
             .param("hash", hash(refresh)).param("seen", device.lastSeenAt()).update();
+        saveAccessToken(access, request.phone());
         return new SessionResponse(access, refresh, Instant.now().plusSeconds(900),
             new Profile(request.phone(), "StockCal 用户"), device);
     }
@@ -61,7 +58,13 @@ public class AuthController {
         if (count == 0) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "刷新令牌无效");
         }
-        return new TokenResponse(token("access"), Instant.now().plusSeconds(900));
+        var access = token("access");
+        var phone = jdbc.sql("""
+                select u.phone from device_session d join app_user u on u.id = d.user_id
+                where d.refresh_token_hash = :hash
+                """).param("hash", hash(request.refreshToken())).query(String.class).single();
+        saveAccessToken(access, phone);
+        return new TokenResponse(access, Instant.now().plusSeconds(900));
     }
 
     @GetMapping("/devices")
@@ -102,12 +105,13 @@ public class AuthController {
     }
 
     private String hash(String value) {
-        try {
-            return HexFormat.of().formatHex(
-                MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8)));
-        } catch (NoSuchAlgorithmException error) {
-            throw new IllegalStateException(error);
-        }
+        return TokenHash.sha256(value);
+    }
+
+    private void saveAccessToken(String token, String phone) {
+        jdbc.sql("insert into access_token (token_hash, phone, expires_at) values (:hash, :phone, :expires)")
+            .param("hash", hash(token)).param("phone", phone)
+            .param("expires", Instant.now().plusSeconds(900)).update();
     }
 
     record VerifyRequest(

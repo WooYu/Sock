@@ -28,3 +28,9 @@ create table if not exists device_session (
     last_seen_at timestamp with time zone not null,
     revoked_at timestamp with time zone
 );
+
+create table if not exists access_token (
+    token_hash varchar(128) primary key,
+    phone varchar(20) not null,
+    expires_at timestamp with time zone not null
+);

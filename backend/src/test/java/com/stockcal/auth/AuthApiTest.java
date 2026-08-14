@@ -25,6 +25,7 @@ class AuthApiTest {
 
     @org.junit.jupiter.api.BeforeEach
     void reset() {
+        jdbc.sql("delete from access_token").update();
         jdbc.sql("delete from device_session").update();
         jdbc.sql("delete from app_user").update();
     }
@@ -80,5 +81,18 @@ class AuthApiTest {
             .andExpect(status().isNoContent());
         mvc.perform(get("/api/v1/auth/devices").with(user("13800138000")))
             .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void issuedBearerTokenAuthenticatesProtectedRequests() throws Exception {
+        var response = mvc.perform(post("/api/v1/auth/verify")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"phone\":\"13800138000\",\"code\":\"123456\",\"deviceName\":\"Android\"}"))
+            .andReturn().getResponse().getContentAsString();
+        var token = objectMapper.readTree(response).get("accessToken").asText();
+
+        mvc.perform(get("/api/v1/auth/devices").header("Authorization", "Bearer " + token))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].name").value("Android"));
     }
 }
