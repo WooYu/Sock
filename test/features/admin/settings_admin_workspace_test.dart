@@ -6,12 +6,14 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:stockcal/features/admin/remote_admin_service.dart';
 import 'package:stockcal/features/admin/settings_admin_workspace.dart';
+import 'package:stockcal/features/admin/archive_file_gateway.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stockcal/features/admin/settings_data_service.dart';
 import 'package:stockcal/features/account/session.dart';
 import 'package:stockcal/features/preferences/preferences_controller.dart';
 import 'package:stockcal/features/preferences/preferences_repository.dart';
 import 'package:stockcal/features/preferences/user_preferences.dart';
+import 'package:stockcal/features/rules/rule_engine.dart';
 
 void main() {
   testWidgets('exports a copyable archive and imports it after validation', (
@@ -327,4 +329,119 @@ void main() {
     expect(find.text('SET_USER_ROLE'), findsOneWidget);
     expect(find.text('REVIEW_EXPLANATION'), findsOneWidget);
   });
+
+  testWidgets('exports archive to a file through the file gateway', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({'stockcal.watchlist.v1': '[]'});
+    final gateway = _FakeArchiveFileGateway();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(body: SettingsAdminWorkspace(fileGateway: gateway)),
+      ),
+    );
+
+    await tester.tap(find.text('导出数据'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('保存到文件'));
+    await tester.pumpAndSettle();
+
+    expect(gateway.savedContent, contains('stockcal.watchlist.v1'));
+    expect(gateway.savedFileName, startsWith('stockcal-backup-'));
+    expect(find.text('归档已保存到文件'), findsOneWidget);
+  });
+
+  testWidgets('shares archive through the file gateway', (tester) async {
+    SharedPreferences.setMockInitialValues({'stockcal.watchlist.v1': '[]'});
+    final gateway = _FakeArchiveFileGateway();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(body: SettingsAdminWorkspace(fileGateway: gateway)),
+      ),
+    );
+
+    await tester.tap(find.text('导出数据'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('分享'));
+    await tester.pumpAndSettle();
+
+    expect(gateway.sharedContent, contains('stockcal.watchlist.v1'));
+  });
+
+  testWidgets('imports archive from a picked file through the file gateway', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({'stockcal.watchlist.v1': '[]'});
+    final archive = await SettingsDataService().exportArchive();
+    await SettingsDataService().clearLocalData();
+    final gateway = _FakeArchiveFileGateway()..pickedContent = archive;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(body: SettingsAdminWorkspace(fileGateway: gateway)),
+      ),
+    );
+
+    await tester.tap(find.text('导入数据'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('选择文件'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('数据已恢复，请重新打开页面'), findsOneWidget);
+    expect(
+      (await SharedPreferences.getInstance()).getString(
+        'stockcal.watchlist.v1',
+      ),
+      '[]',
+    );
+  });
+
+  testWidgets('rule templates list system rules and toggle enabled state', (
+    tester,
+  ) async {
+    final book = RuleBook.withSystemDefaults(idFactory: () => 'unused');
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SettingsAdminWorkspace(ruleBook: book),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('管理后台'));
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(ListView).last, const Offset(0, -500));
+    await tester.pumpAndSettle();
+
+    expect(find.text('趋势确认'), findsOneWidget);
+    expect(find.text('成交量确认'), findsOneWidget);
+
+    await tester.tap(find.byType(Switch).first);
+    await tester.pumpAndSettle();
+
+    expect(
+      book.latestRules.firstWhere((rule) => rule.name == '趋势确认').enabled,
+      isFalse,
+    );
+  });
+}
+
+class _FakeArchiveFileGateway implements ArchiveFileGateway {
+  String? pickedContent;
+  String? savedFileName;
+  String? savedContent;
+  String? sharedContent;
+
+  @override
+  Future<String?> pickContent() async => pickedContent;
+
+  @override
+  Future<void> save(String fileName, String content) async {
+    savedFileName = fileName;
+    savedContent = content;
+  }
+
+  @override
+  Future<void> share(String content) async {
+    sharedContent = content;
+  }
 }

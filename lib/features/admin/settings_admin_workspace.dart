@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -5,7 +7,10 @@ import '../account/session.dart';
 import '../analysis/technical_analysis.dart';
 import '../preferences/preferences_controller.dart';
 import '../preferences/user_preferences.dart';
+import '../rules/persistent_rules_repository.dart';
+import '../rules/rule_engine.dart';
 import 'admin_service.dart';
+import 'archive_file_gateway.dart';
 import 'remote_admin_service.dart';
 import 'settings_data_service.dart';
 
@@ -26,11 +31,17 @@ class SettingsAdminWorkspace extends StatefulWidget {
     this.remote,
     this.sessionController,
     this.preferences,
+    this.fileGateway,
+    this.ruleBook,
+    this.ruleRepository,
   });
 
   final RemoteAdminService? remote;
   final SessionController? sessionController;
   final PreferencesController? preferences;
+  final ArchiveFileGateway? fileGateway;
+  final RuleBook? ruleBook;
+  final PersistentRuleRepository? ruleRepository;
 
   @override
   State<SettingsAdminWorkspace> createState() => _SettingsAdminWorkspaceState();
@@ -135,6 +146,8 @@ class _SettingsAdminWorkspaceState extends State<SettingsAdminWorkspace> {
                     users: _users,
                     auditLogs: _auditLogs,
                     aiCallLogs: _aiCallLogs,
+                    ruleTemplates: widget.ruleBook?.latestRules ?? const [],
+                    onToggleRule: _toggleRule,
                     loading: _loadingAdmin,
                     error: _adminError,
                     repairSubmitted: _repairSubmitted,
@@ -201,6 +214,17 @@ class _SettingsAdminWorkspaceState extends State<SettingsAdminWorkspace> {
     setState(() => _repairSubmitted = true);
   }
 
+  void _toggleRule(String id, bool enabled) {
+    final book = widget.ruleBook;
+    if (book == null) return;
+    book.setEnabled(id, enabled);
+    final repository = widget.ruleRepository;
+    if (repository != null) {
+      unawaited(repository.save(book));
+    }
+    setState(() {});
+  }
+
   Future<void> _backup() async {
     await _data.backup();
     if (!mounted) return;
@@ -212,6 +236,7 @@ class _SettingsAdminWorkspaceState extends State<SettingsAdminWorkspace> {
   Future<void> _export() async {
     final archive = await _data.exportArchive();
     if (!mounted) return;
+    final gateway = widget.fileGateway ?? FilePickerArchiveGateway();
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
@@ -221,6 +246,30 @@ class _SettingsAdminWorkspaceState extends State<SettingsAdminWorkspace> {
           child: SingleChildScrollView(child: SelectableText(archive)),
         ),
         actions: [
+          TextButton.icon(
+            onPressed: () async {
+              final now = DateTime.now();
+              final fileName =
+                  'stockcal-backup-'
+                  '${now.year}'
+                  '${now.month.toString().padLeft(2, '0')}'
+                  '${now.day.toString().padLeft(2, '0')}.json';
+              await gateway.save(fileName, archive);
+              if (context.mounted) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('归档已保存到文件')));
+                Navigator.pop(context);
+              }
+            },
+            icon: const Icon(Icons.save_alt_outlined),
+            label: const Text('保存到文件'),
+          ),
+          TextButton.icon(
+            onPressed: () => gateway.share(archive),
+            icon: const Icon(Icons.share_outlined),
+            label: const Text('分享'),
+          ),
           TextButton.icon(
             onPressed: () async {
               await Clipboard.setData(ClipboardData(text: archive));
@@ -243,8 +292,9 @@ class _SettingsAdminWorkspaceState extends State<SettingsAdminWorkspace> {
   }
 
   Future<void> _import() async {
+    final gateway = widget.fileGateway ?? FilePickerArchiveGateway();
     var archive = '';
-    final submitted = await showDialog<bool>(
+    final submitted = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('导入数据归档'),
@@ -259,17 +309,30 @@ class _SettingsAdminWorkspaceState extends State<SettingsAdminWorkspace> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () async {
+              final content = await gateway.pickContent();
+              if (content != null && context.mounted) {
+                Navigator.pop(context, content);
+              }
+            },
+            child: const Text('选择文件'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
             child: const Text('取消'),
           ),
           FilledButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(context, archive),
             child: const Text('恢复数据'),
           ),
         ],
       ),
     );
-    if (submitted != true) return;
+    if (submitted == null || submitted.isEmpty) return;
+    await _restoreArchive(submitted);
+  }
+
+  Future<void> _restoreArchive(String archive) async {
     try {
       await _data.restoreArchive(archive);
       if (mounted) {
@@ -532,6 +595,8 @@ class _AdminPanel extends StatelessWidget {
     required this.users,
     required this.auditLogs,
     required this.aiCallLogs,
+    required this.ruleTemplates,
+    required this.onToggleRule,
     required this.loading,
     required this.error,
     required this.repairSubmitted,
@@ -546,6 +611,8 @@ class _AdminPanel extends StatelessWidget {
   final List<ManagedUser> users;
   final List<AdminAuditEvent> auditLogs;
   final List<AiCallLog> aiCallLogs;
+  final List<RuleVersion> ruleTemplates;
+  final void Function(String id, bool enabled) onToggleRule;
   final bool loading;
   final String? error;
   final bool repairSubmitted;
@@ -597,7 +664,34 @@ class _AdminPanel extends StatelessWidget {
                   ),
           ),
         ],
-        const _Section(title: '规则模板', child: Text('系统规则 2 · 用户模板 0')),
+        _Section(
+          title: '规则模板',
+          child: ruleTemplates.isEmpty
+              ? const Text('暂无规则模板')
+              : Column(
+                  children: [
+                    for (final rule in ruleTemplates)
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        dense: true,
+                        leading: Icon(
+                          rule.system
+                              ? Icons.verified_outlined
+                              : Icons.rule_outlined,
+                        ),
+                        title: Text(rule.name),
+                        subtitle: Text(
+                          '优先级 ${rule.priority} · 版本 ${rule.version}'
+                          '${rule.system ? ' · 系统' : ' · 用户'}',
+                        ),
+                        trailing: Switch(
+                          value: rule.enabled,
+                          onChanged: (value) => onToggleRule(rule.id, value),
+                        ),
+                      ),
+                  ],
+                ),
+        ),
         _Section(
           title: '审计日志',
           child: auditLogs.isEmpty

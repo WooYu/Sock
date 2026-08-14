@@ -402,6 +402,8 @@ class _Workspace extends StatelessWidget {
         remote: adminService,
         sessionController: sessionController,
         preferences: preferences,
+        ruleBook: ruleBook,
+        ruleRepository: ruleRepository,
       );
     }
     if (module == '总览') {
