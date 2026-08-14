@@ -29,6 +29,7 @@ import '../rules/persistent_prediction_repository.dart';
 import '../rules/rules_workspace.dart';
 import '../review/review_workspace.dart';
 import '../review/persistent_review_store.dart';
+import '../review/remote_review_explanation_adapter.dart';
 import '../sync/remote_sync_service.dart';
 import '../watchlist/watchlist.dart';
 import '../watchlist/persistent_watchlist_repository.dart';
@@ -52,6 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late final PersistentRuleRepository _ruleRepository;
   late final PersistentPredictionRepository _predictionRepository;
   late final PersistentReviewStore _reviewStore;
+  late final RemoteReviewExplanationAdapter _reviewExplanation;
   late final KnowledgeController _knowledgeController;
   late final WatchlistController _watchlistController;
   late final SessionController _sessionController;
@@ -99,6 +101,10 @@ class _HomeScreenState extends State<HomeScreen> {
     _ruleRepository = PersistentRuleRepository();
     _predictionRepository = PersistentPredictionRepository();
     _reviewStore = PersistentReviewStore();
+    _reviewExplanation = RemoteReviewExplanationAdapter(
+      baseUrl: Uri.parse(apiUrl),
+      accessToken: () => _sessionController.session?.accessToken,
+    );
     _restoreRules();
     _watchlistController = WatchlistController(
       repository: PersistentWatchlistRepository(),
@@ -203,6 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ruleRepository: _ruleRepository,
               predictionRepository: _predictionRepository,
               reviewStore: _reviewStore,
+              reviewExplanation: _reviewExplanation,
               knowledgeController: _knowledgeController,
               watchlistController: _watchlistController,
               sessionController: _sessionController,
@@ -298,6 +305,7 @@ class _Workspace extends StatelessWidget {
     required this.ruleRepository,
     required this.predictionRepository,
     required this.reviewStore,
+    required this.reviewExplanation,
     required this.knowledgeController,
     required this.watchlistController,
     required this.sessionController,
@@ -314,6 +322,7 @@ class _Workspace extends StatelessWidget {
   final PersistentRuleRepository ruleRepository;
   final PersistentPredictionRepository predictionRepository;
   final PersistentReviewStore reviewStore;
+  final RemoteReviewExplanationAdapter reviewExplanation;
   final KnowledgeController knowledgeController;
   final WatchlistController watchlistController;
   final SessionController sessionController;
@@ -357,6 +366,7 @@ class _Workspace extends StatelessWidget {
       return ReviewWorkspace(
         store: reviewStore,
         trades: portfolioController.ledger.entries,
+        explanationAdapter: reviewExplanation,
       );
     }
     if (module == '知识规则') {

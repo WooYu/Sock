@@ -6,10 +6,16 @@ import 'review_ai.dart';
 import 'review_service.dart';
 
 class ReviewWorkspace extends StatefulWidget {
-  const ReviewWorkspace({super.key, this.store, this.trades = const []});
+  const ReviewWorkspace({
+    super.key,
+    this.store,
+    this.trades = const [],
+    this.explanationAdapter,
+  });
 
   final PersistentReviewStore? store;
   final List<TradeEntry> trades;
+  final ReviewExplanationAdapter? explanationAdapter;
 
   @override
   State<ReviewWorkspace> createState() => _ReviewWorkspaceState();
@@ -38,7 +44,8 @@ class _ReviewWorkspaceState extends State<ReviewWorkspace> {
         widget.store ?? MemoryReviewNarrativeRepository();
     final AiAuditLog audit = widget.store ?? MemoryAiAuditLog();
     _ai = ReviewAiService(
-      adapter: const _DeterministicExplanationAdapter(),
+      adapter:
+          widget.explanationAdapter ?? const _DeterministicExplanationAdapter(),
       repository: narrativeRepository,
       audit: audit,
       idFactory: () => 'narrative-${++_narrativeId}',

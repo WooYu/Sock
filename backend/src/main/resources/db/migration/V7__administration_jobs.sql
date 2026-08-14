@@ -11,7 +11,7 @@ create table admin_job (
 
 create table ai_call_log (
     id uuid primary key,
-    actor_id uuid,
+    actor_id varchar(100),
     purpose varchar(80) not null,
     model varchar(100) not null,
     status varchar(20) not null,
