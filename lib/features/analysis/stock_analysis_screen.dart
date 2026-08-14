@@ -120,11 +120,16 @@ class _ErrorBanner extends StatelessWidget {
   final VoidCallback onRetry;
 
   @override
-  Widget build(BuildContext context) => MaterialBanner(
-    content: Text(message),
-    actions: [
-      if (canRetry) TextButton(onPressed: onRetry, child: const Text('重试')),
-    ],
+  Widget build(BuildContext context) => ListTile(
+    contentPadding: EdgeInsets.zero,
+    leading: Icon(
+      Icons.error_outline,
+      color: Theme.of(context).colorScheme.error,
+    ),
+    title: Text(message),
+    trailing: canRetry
+        ? TextButton(onPressed: onRetry, child: const Text('重试'))
+        : null,
   );
 }
 

@@ -9,8 +9,10 @@ void main() {
     await tester.pumpWidget(const StockCalApp());
 
     expect(find.text('StockCal'), findsOneWidget);
+    expect(find.text('贵州茅台接近压力区'), findsNothing);
+    expect(find.text('加载真实行情后显示关键位提醒'), findsOneWidget);
     expect(find.text('持仓与自选'), findsOneWidget);
-    expect(find.textContaining('延迟 15 分钟'), findsOneWidget);
+    expect(find.text('行情待连接'), findsOneWidget);
     for (final label in [
       '关键位提醒',
       '最新预测',
@@ -56,5 +58,17 @@ void main() {
     expect(find.text('待审批 0'), findsOneWidget);
     expect(find.text('经验概念'), findsOneWidget);
     expect(find.text('原文'), findsOneWidget);
+  });
+
+  testWidgets('production market workspace requires backend login', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const StockCalApp());
+
+    await tester.tap(find.text('个股分析'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('请先登录后查看行情'), findsOneWidget);
+    expect(find.text('StockCal 演示行情'), findsNothing);
   });
 }

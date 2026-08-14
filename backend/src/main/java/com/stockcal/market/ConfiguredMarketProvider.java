@@ -4,11 +4,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
-@Component
 public class ConfiguredMarketProvider implements MarketProvider {
     private static final List<Security> SECURITIES = List.of(
         new Security("600519", "贵州茅台", "guizhoumaotai", "gzmt", "SH", "白酒"),
@@ -47,6 +45,6 @@ public class ConfiguredMarketProvider implements MarketProvider {
         return new MarketSnapshot(
             new Quote(security, price, previous, last.open(), last.high(), last.low(),
                 last.volume(), price * last.volume(), limit),
-            candles, new Source("StockCal A股行情适配器", fetchedAt, "DELAYED", true));
+            candles, new Source("StockCal 离线样例", fetchedAt, "OFFLINE_CACHE", false));
     }
 }

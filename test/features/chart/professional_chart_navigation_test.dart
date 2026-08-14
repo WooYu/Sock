@@ -1,10 +1,9 @@
-import 'package:candlesticks/candlesticks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stockcal/app/stockcal_app.dart';
 
 void main() {
-  testWidgets('main workspace opens the chart and preserves annotations', (
+  testWidgets('main workspace does not present demo chart data before login', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(1100, 760);
@@ -16,16 +15,7 @@ void main() {
     await tester.tap(find.text('专业K线'));
     await tester.pumpAndSettle();
 
-    expect(find.byType(Candlesticks), findsOneWidget);
-    expect(find.text('标注管理'), findsOneWidget);
-    await tester.tap(find.byTooltip('趋势线'));
-    await tester.pumpAndSettle();
-    expect(find.text('趋势线 1'), findsOneWidget);
-
-    await tester.tap(find.text('总览'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('专业K线'));
-    await tester.pumpAndSettle();
-    expect(find.text('趋势线 1'), findsOneWidget);
+    expect(find.textContaining('请先登录后查看行情'), findsOneWidget);
+    expect(find.text('标注管理'), findsNothing);
   });
 }

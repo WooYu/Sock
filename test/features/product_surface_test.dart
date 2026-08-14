@@ -33,14 +33,11 @@ void main() {
       await tester.tap(find.text('个股分析'));
       await tester.pumpAndSettle();
       expect(find.text('搜索 A 股'), findsOneWidget);
-      await tester.tap(find.text('贵州茅台'));
-      await tester.pumpAndSettle();
-      expect(find.text('命中规则'), findsOneWidget);
+      expect(find.textContaining('请先登录后查看行情'), findsOneWidget);
 
       await tester.tap(find.text('规则回测'));
       await tester.pumpAndSettle();
-      expect(find.text('回测统计'), findsOneWidget);
-      expect(find.text('最大回撤'), findsOneWidget);
+      expect(find.textContaining('请先登录后查看行情'), findsOneWidget);
 
       await tester.tap(find.text('复盘AI'));
       await tester.pumpAndSettle();

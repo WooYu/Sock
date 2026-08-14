@@ -33,6 +33,8 @@ class MarketApiTest {
             .andExpect(jsonPath("$.dailyCandles.length()").value(40))
             .andExpect(jsonPath("$.source.name").isNotEmpty())
             .andExpect(jsonPath("$.source.fetchedAt").isNotEmpty())
-            .andExpect(jsonPath("$.source.state").value("DELAYED"));
+            .andExpect(jsonPath("$.source.name").value("StockCal 离线样例"))
+            .andExpect(jsonPath("$.source.state").value("OFFLINE_CACHE"))
+            .andExpect(jsonPath("$.source.online").value(false));
     }
 }

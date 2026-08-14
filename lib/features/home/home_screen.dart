@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../domain/stockcal_domain.dart';
 import '../account/account_workspace.dart';
 import '../account/persistent_session_repository.dart';
 import '../account/remote_auth_service.dart';
@@ -15,6 +14,7 @@ import '../chart/chart_annotations.dart';
 import '../chart/professional_chart_screen.dart';
 import '../chart/persistent_chart_annotation_store.dart';
 import '../market/market_data.dart';
+import '../market/remote_market_service.dart';
 import '../knowledge/knowledge.dart';
 import '../knowledge/knowledge_workspace.dart';
 import '../knowledge/remote_knowledge_repository.dart';
@@ -44,6 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
   var _selected = '总览';
   late final PortfolioController _portfolioController;
   late final StockAnalysisController _stockAnalysisController;
+  late final RemoteMarketService _marketService;
   late final ChartAnnotationController _chartAnnotationController;
   late final RuleBook _ruleBook;
   late final PersistentRuleRepository _ruleRepository;
@@ -58,6 +59,18 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    const apiUrl = String.fromEnvironment(
+      'STOCKCAL_API_URL',
+      defaultValue: 'http://localhost:8080',
+    );
+    _sessionController = SessionController(
+      PersistentSessionRepository(),
+      remote: RemoteAuthService(baseUrl: Uri.parse(apiUrl)),
+    );
+    _marketService = RemoteMarketService(
+      baseUrl: Uri.parse(apiUrl),
+      accessToken: () => _sessionController.session?.accessToken,
+    );
     _portfolioController = PortfolioController(
       ledger: PortfolioLedger(openingCash: 500000),
       marketPrices: const {'600519': 1742, '000001': 14, '300750': 102},
@@ -65,8 +78,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
     _portfolioController.load();
     _stockAnalysisController = StockAnalysisController(
-      catalog: const MemoryStockCatalog(DemoAshareData.securities),
-      market: DemoAshareMarketAdapter(),
+      catalog: _marketService,
+      market: _marketService,
       analyzer: StockAnalyzer(),
     );
     _annotationStore = PersistentChartAnnotationStore();
@@ -84,14 +97,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _watchlistController = WatchlistController(
       repository: PersistentWatchlistRepository(),
       outbox: PersistentMutationOutbox(),
-    );
-    const apiUrl = String.fromEnvironment(
-      'STOCKCAL_API_URL',
-      defaultValue: 'http://localhost:8080',
-    );
-    _sessionController = SessionController(
-      PersistentSessionRepository(),
-      remote: RemoteAuthService(baseUrl: Uri.parse(apiUrl)),
     );
     _knowledgeController = KnowledgeController(
       RemoteKnowledgeRepository(
@@ -126,6 +131,9 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_knowledgeController.sources.isEmpty && !_knowledgeController.loading) {
       unawaited(_knowledgeController.load());
     }
+    if (_stockAnalysisController.results.isEmpty) {
+      unawaited(_stockAnalysisController.search(''));
+    }
   }
 
   Future<void> _restoreRules() async {
@@ -158,6 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
               module: _selected,
               portfolioController: _portfolioController,
               stockAnalysisController: _stockAnalysisController,
+              marketService: _marketService,
               chartAnnotationController: _chartAnnotationController,
               ruleBook: _ruleBook,
               ruleRepository: _ruleRepository,
@@ -251,6 +260,7 @@ class _Workspace extends StatelessWidget {
     required this.module,
     required this.portfolioController,
     required this.stockAnalysisController,
+    required this.marketService,
     required this.chartAnnotationController,
     required this.ruleBook,
     required this.ruleRepository,
@@ -265,6 +275,7 @@ class _Workspace extends StatelessWidget {
   final String module;
   final PortfolioController portfolioController;
   final StockAnalysisController stockAnalysisController;
+  final AShareMarketAdapter marketService;
   final ChartAnnotationController chartAnnotationController;
   final RuleBook ruleBook;
   final PersistentRuleRepository ruleRepository;
@@ -287,19 +298,25 @@ class _Workspace extends StatelessWidget {
       );
     }
     if (module == '专业K线') {
-      return ProfessionalChartScreen(
-        stockCode: '600519',
-        candles: DemoAshareData.candlesFor('600519'),
-        annotationController: chartAnnotationController,
+      return _MarketSnapshotLoader(
+        market: marketService,
+        builder: (snapshot) => ProfessionalChartScreen(
+          stockCode: '600519',
+          candles: snapshot.dailyCandles,
+          annotationController: chartAnnotationController,
+        ),
       );
     }
     if (module == '规则回测') {
-      return RulesWorkspace(
-        ruleBook: ruleBook,
-        ruleRepository: ruleRepository,
-        predictionRepository: predictionRepository,
-        knowledgeController: knowledgeController,
-        candles: DemoAshareData.candlesFor('600519'),
+      return _MarketSnapshotLoader(
+        market: marketService,
+        builder: (snapshot) => RulesWorkspace(
+          ruleBook: ruleBook,
+          ruleRepository: ruleRepository,
+          predictionRepository: predictionRepository,
+          knowledgeController: knowledgeController,
+          candles: snapshot.dailyCandles,
+        ),
       );
     }
     if (module == '复盘AI') {
@@ -318,7 +335,10 @@ class _Workspace extends StatelessWidget {
       return const SettingsAdminWorkspace();
     }
     if (module == '总览') {
-      return const _Dashboard();
+      return _Dashboard(
+        portfolioController: portfolioController,
+        stockAnalysisController: stockAnalysisController,
+      );
     }
     return ListView(
       padding: const EdgeInsets.all(20),
@@ -374,15 +394,84 @@ class _Workspace extends StatelessWidget {
   }
 }
 
-class _Dashboard extends StatelessWidget {
-  const _Dashboard();
+class _MarketSnapshotLoader extends StatefulWidget {
+  const _MarketSnapshotLoader({required this.market, required this.builder});
+
+  final AShareMarketAdapter market;
+  final Widget Function(MarketSnapshot snapshot) builder;
 
   @override
-  Widget build(BuildContext context) {
-    final portfolio = DemoMarketData.portfolio;
-    final prediction = PredictionEngine().predict(
-      DemoMarketData.candlesFor('600519'),
-    );
+  State<_MarketSnapshotLoader> createState() => _MarketSnapshotLoaderState();
+}
+
+class _MarketSnapshotLoaderState extends State<_MarketSnapshotLoader> {
+  late Future<MarketSnapshot> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  void _load() {
+    _future = widget.market.snapshot('600519');
+  }
+
+  void _retry() => setState(_load);
+
+  @override
+  Widget build(BuildContext context) => FutureBuilder<MarketSnapshot>(
+    future: _future,
+    builder: (context, snapshot) {
+      if (snapshot.hasData) return widget.builder(snapshot.data!);
+      if (snapshot.hasError) {
+        return Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.cloud_off_outlined),
+              const SizedBox(height: 8),
+              Text(snapshot.error.toString()),
+              const SizedBox(height: 8),
+              IconButton(
+                tooltip: '重试行情',
+                onPressed: _retry,
+                icon: const Icon(Icons.refresh),
+              ),
+            ],
+          ),
+        );
+      }
+      return const Center(child: CircularProgressIndicator());
+    },
+  );
+}
+
+class _Dashboard extends StatelessWidget {
+  const _Dashboard({
+    required this.portfolioController,
+    required this.stockAnalysisController,
+  });
+
+  final PortfolioController portfolioController;
+  final StockAnalysisController stockAnalysisController;
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+    listenable: portfolioController,
+    builder: (context, _) => ListenableBuilder(
+      listenable: stockAnalysisController,
+      builder: (context, _) => _content(context),
+    ),
+  );
+
+  Widget _content(BuildContext context) {
+    final positions = portfolioController.positions;
+    final analysis = stockAnalysisController.analysis;
+    final source = stockAnalysisController.snapshot?.source;
+    final totalAssets =
+        portfolioController.ledger.cashBalance +
+        portfolioController.marketValue;
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
@@ -394,9 +483,12 @@ class _Dashboard extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
             ),
-            const Chip(
-              avatar: Icon(Icons.schedule, size: 16),
-              label: Text('延迟 15 分钟'),
+            Chip(
+              avatar: Icon(
+                source == null ? Icons.cloud_off_outlined : Icons.schedule,
+                size: 16,
+              ),
+              label: Text(source == null ? '行情待连接' : source.name),
             ),
           ],
         ),
@@ -405,45 +497,67 @@ class _Dashboard extends StatelessWidget {
           spacing: 24,
           runSpacing: 12,
           children: [
-            _Metric(label: '总资产', value: portfolio.marketValue),
-            _Metric(label: '累计盈亏', value: portfolio.totalProfit),
-            _Metric(label: '今日盈亏', value: portfolio.dayProfit),
+            _Metric(label: '总资产', value: totalAssets),
+            _Metric(label: '累计盈亏', value: portfolioController.totalProfit),
+            const _Metric(label: '今日盈亏', value: 0),
           ],
         ),
         const Divider(height: 32),
         const _SectionTitle(title: '持仓与自选'),
-        for (final position in portfolio.positions)
+        if (positions.isEmpty)
+          const ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(Icons.account_balance_wallet_outlined),
+            title: Text('暂无持仓'),
+            subtitle: Text('交易记录保存后将在这里汇总'),
+          ),
+        for (final position in positions)
           ListTile(
             contentPadding: EdgeInsets.zero,
             title: Text('${position.name} ${position.code}'),
             subtitle: Text(
-              '持仓 ${position.quantity} · 成本 ${position.costPrice}',
+              '持仓 ${position.quantity} · 成本 ${position.averageCost.toStringAsFixed(2)}',
             ),
-            trailing: Text(position.lastPrice.toStringAsFixed(2)),
+            trailing: Text(position.marketPrice.toStringAsFixed(2)),
           ),
         const Divider(height: 32),
         const _SectionTitle(title: '关键位提醒'),
-        ListTile(
-          contentPadding: EdgeInsets.zero,
-          leading: const Icon(Icons.notifications_active_outlined),
-          title: const Text('贵州茅台接近压力区'),
-          subtitle: Text('压力 ${prediction.resistance.toStringAsFixed(2)}'),
-        ),
-        const _SectionTitle(title: '最新预测'),
-        ListTile(
-          contentPadding: EdgeInsets.zero,
-          leading: const Icon(Icons.insights_outlined),
-          title: Text('目标 ${prediction.target.toStringAsFixed(2)}'),
-          subtitle: Text(
-            '置信度 ${(prediction.confidence * 100).round()}% · 3 条规则命中',
+        if (analysis == null)
+          const ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(Icons.notifications_none_outlined),
+            title: Text('加载真实行情后显示关键位提醒'),
+          )
+        else
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.notifications_active_outlined),
+            title: const Text('当前股票关键位'),
+            subtitle: Text('压力 ${analysis.resistance.toStringAsFixed(2)}'),
           ),
-        ),
+        const _SectionTitle(title: '最新预测'),
+        if (analysis == null)
+          const ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(Icons.insights_outlined),
+            title: Text('暂无预测'),
+            subtitle: Text('请先加载行情并生成不可变预测版本'),
+          )
+        else
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.insights_outlined),
+            title: Text('目标 ${analysis.target.toStringAsFixed(2)}'),
+            subtitle: Text(
+              '置信度 ${(analysis.confidence * 100).round()}% · ${analysis.matchedRules.length} 条规则命中',
+            ),
+          ),
         const _SectionTitle(title: '待复盘'),
         const ListTile(
           contentPadding: EdgeInsets.zero,
           leading: Icon(Icons.fact_check_outlined),
           title: Text('本周交易复盘'),
-          subtitle: Text('1 项待完成'),
+          subtitle: Text('暂无待完成项目'),
         ),
         const SizedBox(height: 8),
         const Wrap(
