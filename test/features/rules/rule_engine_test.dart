@@ -124,6 +124,59 @@ void main() {
       expect(ruleBook.activeRules, isEmpty);
       expect(ruleBook.versions(first.id).first.enabled, isTrue);
     });
+
+    test('latestRules exposes one entry per rule at its highest version', () {
+      final first = ruleBook.create(
+        name: '趋势放量',
+        priority: 20,
+        conditions: const [
+          RuleCondition(
+            field: RuleField.volumeRatio,
+            operator: RuleOperator.greaterThan,
+            value: 1,
+          ),
+        ],
+      );
+      ruleBook.publishVersion(
+        first.id,
+        name: '趋势放量二',
+        priority: 18,
+        conditions: const [
+          RuleCondition(
+            field: RuleField.volumeRatio,
+            operator: RuleOperator.greaterThan,
+            value: 1.2,
+          ),
+        ],
+      );
+      final second = ruleBook.create(
+        name: '接近支撑',
+        priority: 10,
+        conditions: const [
+          RuleCondition(
+            field: RuleField.supportDistance,
+            operator: RuleOperator.lessThan,
+            value: 0.05,
+          ),
+        ],
+      );
+
+      final latest = ruleBook.latestRules;
+
+      expect(latest.map((rule) => rule.id), containsAll([first.id, second.id]));
+      expect(latest, hasLength(2));
+      expect(
+        latest.firstWhere((rule) => rule.id == first.id).version,
+        2,
+      );
+    });
+
+    test('system defaults expose two rule templates', () {
+      final latest = RuleBook.withSystemDefaults().latestRules;
+
+      expect(latest, hasLength(2));
+      expect(latest, everyElement(predicate<RuleVersion>((rule) => rule.system)));
+    });
   });
 }
 

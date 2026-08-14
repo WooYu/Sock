@@ -114,6 +114,19 @@ class RuleBook {
   List<RuleVersion> get allVersions =>
       List.unmodifiable(_history.values.expand((versions) => versions));
 
+  List<RuleVersion> get latestRules {
+    final latest = <String, RuleVersion>{};
+    for (final rule in allVersions) {
+      final existing = latest[rule.id];
+      if (existing == null || rule.version > existing.version) {
+        latest[rule.id] = rule;
+      }
+    }
+    final result = latest.values.toList()
+      ..sort((a, b) => a.priority.compareTo(b.priority));
+    return List.unmodifiable(result);
+  }
+
   void restoreUserVersions(Iterable<RuleVersion> versions) {
     final grouped = <String, List<RuleVersion>>{};
     for (final rule in versions.where((item) => !item.system)) {
