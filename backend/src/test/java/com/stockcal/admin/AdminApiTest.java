@@ -108,4 +108,34 @@ class AdminApiTest {
         var role = jdbc.sql("select role from app_user where id='user-1'").query(String.class).single();
         org.junit.jupiter.api.Assertions.assertEquals("ANALYST", role);
     }
+
+    @Test
+    void adminListsAuditEventsWithActorActionAndTime() throws Exception {
+        jdbc.sql("""
+                insert into audit_event(id,actor_id,action,target,evidence,created_at)
+                values('audit-1','owner','RETRY_ADMIN_JOB','job-1','{}',current_timestamp)
+                """).update();
+
+        mvc.perform(get("/api/v1/admin/audit-logs").with(user("owner").roles("ADMIN")))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].actor").value("owner"))
+            .andExpect(jsonPath("$[0].action").value("RETRY_ADMIN_JOB"))
+            .andExpect(jsonPath("$[0].target").value("job-1"))
+            .andExpect(jsonPath("$[0].createdAt").exists());
+    }
+
+    @Test
+    void adminListsAiCallLogsWithPurposeModelAndStatus() throws Exception {
+        jdbc.sql("""
+                insert into ai_call_log(id,actor_id,purpose,model,status,created_at)
+                values('call-1','user-1','REVIEW_EXPLANATION','gpt-4o-mini','SUCCEEDED',current_timestamp)
+                """).update();
+
+        mvc.perform(get("/api/v1/admin/ai-call-logs").with(user("owner").roles("ADMIN")))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].purpose").value("REVIEW_EXPLANATION"))
+            .andExpect(jsonPath("$[0].model").value("gpt-4o-mini"))
+            .andExpect(jsonPath("$[0].status").value("SUCCEEDED"))
+            .andExpect(jsonPath("$[0].createdAt").exists());
+    }
 }

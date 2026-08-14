@@ -2,19 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../account/session.dart';
+import '../preferences/preferences_controller.dart';
+import '../preferences/user_preferences.dart';
 import 'admin_service.dart';
 import 'remote_admin_service.dart';
 import 'settings_data_service.dart';
+
+String _themeLabel(ThemePreference theme) => switch (theme) {
+  ThemePreference.system => '跟随系统',
+  ThemePreference.light => '浅色',
+  ThemePreference.dark => '深色',
+};
 
 class SettingsAdminWorkspace extends StatefulWidget {
   const SettingsAdminWorkspace({
     super.key,
     this.remote,
     this.sessionController,
+    this.preferences,
   });
 
   final RemoteAdminService? remote;
   final SessionController? sessionController;
+  final PreferencesController? preferences;
 
   @override
   State<SettingsAdminWorkspace> createState() => _SettingsAdminWorkspaceState();
@@ -39,7 +49,9 @@ class _SettingsAdminWorkspaceState extends State<SettingsAdminWorkspace> {
     SecretStatus(name: 'AI 服务', configured: true),
   ];
   var _users = const <ManagedUser>[];
-  var _darkMode = false;
+  var _auditLogs = const <AdminAuditEvent>[];
+  var _aiCallLogs = const <AiCallLog>[];
+  var _theme = ThemePreference.system;
   var _notifications = true;
   var _repairSubmitted = false;
   var _loadingAdmin = false;
@@ -55,6 +67,35 @@ class _SettingsAdminWorkspaceState extends State<SettingsAdminWorkspace> {
       _loadingAdmin = true;
       _loadRemote();
     }
+  }
+
+  Widget _buildSettingsPanel() {
+    final preferences = widget.preferences;
+    if (preferences == null) {
+      return _SettingsPanel(
+        theme: _theme,
+        notifications: _notifications,
+        onTheme: (value) => setState(() => _theme = value),
+        onNotifications: (value) => setState(() => _notifications = value),
+        onBackup: _backup,
+        onExport: _export,
+        onImport: _import,
+        onDeleteAccount: _deleteAccount,
+      );
+    }
+    return ListenableBuilder(
+      listenable: preferences,
+      builder: (context, _) => _SettingsPanel(
+        theme: preferences.preferences.theme,
+        notifications: preferences.preferences.notificationsEnabled,
+        onTheme: preferences.setTheme,
+        onNotifications: preferences.setNotificationsEnabled,
+        onBackup: _backup,
+        onExport: _export,
+        onImport: _import,
+        onDeleteAccount: _deleteAccount,
+      ),
+    );
   }
 
   @override
@@ -74,22 +115,14 @@ class _SettingsAdminWorkspaceState extends State<SettingsAdminWorkspace> {
             Expanded(
               child: TabBarView(
                 children: [
-                  _SettingsPanel(
-                    darkMode: _darkMode,
-                    notifications: _notifications,
-                    onDarkMode: (value) => setState(() => _darkMode = value),
-                    onNotifications: (value) =>
-                        setState(() => _notifications = value),
-                    onBackup: _backup,
-                    onExport: _export,
-                    onImport: _import,
-                    onDeleteAccount: _deleteAccount,
-                  ),
+                  _buildSettingsPanel(),
                   _AdminPanel(
                     marketStatus: _marketStatus,
                     secrets: _secrets,
                     jobs: _jobs,
                     users: _users,
+                    auditLogs: _auditLogs,
+                    aiCallLogs: _aiCallLogs,
                     loading: _loadingAdmin,
                     error: _adminError,
                     repairSubmitted: _repairSubmitted,
@@ -121,6 +154,8 @@ class _SettingsAdminWorkspaceState extends State<SettingsAdminWorkspace> {
         _secrets = snapshot.secrets;
         _jobs = snapshot.jobs;
         _users = snapshot.users;
+        _auditLogs = snapshot.auditLogs;
+        _aiCallLogs = snapshot.aiCallLogs;
         _loadingAdmin = false;
       });
     } on Object catch (error) {
@@ -278,9 +313,9 @@ class _SettingsAdminWorkspaceState extends State<SettingsAdminWorkspace> {
 
 class _SettingsPanel extends StatelessWidget {
   const _SettingsPanel({
-    required this.darkMode,
+    required this.theme,
     required this.notifications,
-    required this.onDarkMode,
+    required this.onTheme,
     required this.onNotifications,
     required this.onBackup,
     required this.onExport,
@@ -288,9 +323,9 @@ class _SettingsPanel extends StatelessWidget {
     required this.onDeleteAccount,
   });
 
-  final bool darkMode;
+  final ThemePreference theme;
   final bool notifications;
-  final ValueChanged<bool> onDarkMode;
+  final ValueChanged<ThemePreference> onTheme;
   final ValueChanged<bool> onNotifications;
   final VoidCallback onBackup;
   final VoidCallback onExport;
@@ -315,12 +350,26 @@ class _SettingsPanel extends StatelessWidget {
           subtitle: Text('不复权'),
           trailing: Icon(Icons.chevron_right),
         ),
-        SwitchListTile(
+        ListTile(
           contentPadding: EdgeInsets.zero,
           title: const Text('主题'),
-          subtitle: Text(darkMode ? '深色' : '浅色'),
-          value: darkMode,
-          onChanged: onDarkMode,
+          subtitle: Text(_themeLabel(theme)),
+          trailing: DropdownButton<ThemePreference>(
+            key: const Key('theme-selector'),
+            value: theme,
+            underline: const SizedBox.shrink(),
+            items: const [
+              DropdownMenuItem(
+                value: ThemePreference.system,
+                child: Text('跟随系统'),
+              ),
+              DropdownMenuItem(value: ThemePreference.light, child: Text('浅色')),
+              DropdownMenuItem(value: ThemePreference.dark, child: Text('深色')),
+            ],
+            onChanged: (value) {
+              if (value != null) onTheme(value);
+            },
+          ),
         ),
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
@@ -354,6 +403,8 @@ class _AdminPanel extends StatelessWidget {
     required this.secrets,
     required this.jobs,
     required this.users,
+    required this.auditLogs,
+    required this.aiCallLogs,
     required this.loading,
     required this.error,
     required this.repairSubmitted,
@@ -366,6 +417,8 @@ class _AdminPanel extends StatelessWidget {
   final List<SecretStatus> secrets;
   final List<SyncJob> jobs;
   final List<ManagedUser> users;
+  final List<AdminAuditEvent> auditLogs;
+  final List<AiCallLog> aiCallLogs;
   final bool loading;
   final String? error;
   final bool repairSubmitted;
@@ -418,8 +471,38 @@ class _AdminPanel extends StatelessWidget {
           ),
         ],
         const _Section(title: '规则模板', child: Text('系统规则 2 · 用户模板 0')),
-        const _Section(title: '审计日志', child: Text('管理操作均保留操作者、目标与时间')),
-        const _Section(title: 'AI 调用记录', child: Text('只读输入快照 · 文案版本 · 调用状态')),
+        _Section(
+          title: '审计日志',
+          child: auditLogs.isEmpty
+              ? const Text('暂无管理操作记录')
+              : Column(
+                  children: [
+                    for (final entry in auditLogs)
+                      _LogTile(
+                        badge: entry.action,
+                        title: entry.target,
+                        subtitle: '${entry.actor} · ${entry.createdAt.toLocal()}',
+                      ),
+                  ],
+                ),
+        ),
+        _Section(
+          title: 'AI 调用记录',
+          child: aiCallLogs.isEmpty
+              ? const Text('暂无 AI 调用记录')
+              : Column(
+                  children: [
+                    for (final entry in aiCallLogs)
+                      _LogTile(
+                        badge: entry.status,
+                        title: entry.purpose,
+                        subtitle:
+                            '${entry.model} · ${entry.actor ?? '匿名'} · '
+                            '${entry.createdAt.toLocal()}',
+                      ),
+                  ],
+                ),
+        ),
         if (!loading && error == null)
           _Section(
             title: '服务端密钥',
@@ -492,6 +575,27 @@ class _UserTile extends StatelessWidget {
     title: Text(user.phoneMasked),
     subtitle: Text(user.role.name.toUpperCase()),
     trailing: Icon(user.enabled ? Icons.check_circle_outline : Icons.block),
+  );
+}
+
+class _LogTile extends StatelessWidget {
+  const _LogTile({
+    required this.badge,
+    required this.title,
+    required this.subtitle,
+  });
+
+  final String badge;
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) => ListTile(
+    contentPadding: EdgeInsets.zero,
+    dense: true,
+    title: Text(title),
+    subtitle: Text(subtitle, overflow: TextOverflow.ellipsis),
+    trailing: Text(badge, style: Theme.of(context).textTheme.labelSmall),
   );
 }
 

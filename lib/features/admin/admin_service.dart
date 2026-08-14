@@ -55,6 +55,22 @@ class AdminAuditEvent {
   final DateTime createdAt;
 }
 
+class AiCallLog {
+  const AiCallLog({
+    required this.actor,
+    required this.purpose,
+    required this.model,
+    required this.status,
+    required this.createdAt,
+  });
+
+  final String? actor;
+  final String purpose;
+  final String model;
+  final String status;
+  final DateTime createdAt;
+}
+
 abstract interface class AdminAuditRepository {
   Future<void> add(AdminAuditEvent event);
 }

@@ -10,12 +10,16 @@ class RemoteAdminSnapshot {
     required this.secrets,
     required this.jobs,
     required this.users,
+    required this.auditLogs,
+    required this.aiCallLogs,
   });
 
   final String marketStatus;
   final List<SecretStatus> secrets;
   final List<SyncJob> jobs;
   final List<ManagedUser> users;
+  final List<AdminAuditEvent> auditLogs;
+  final List<AiCallLog> aiCallLogs;
 }
 
 class RemoteAdminService {
@@ -33,6 +37,8 @@ class RemoteAdminService {
     final overviewResponse = await _get('/api/v1/admin/overview');
     final jobsResponse = await _get('/api/v1/admin/jobs');
     final usersResponse = await _get('/api/v1/admin/users');
+    final auditResponse = await _get('/api/v1/admin/audit-logs');
+    final aiResponse = await _get('/api/v1/admin/ai-call-logs');
     final overview = jsonDecode(overviewResponse.body) as Map<String, Object?>;
     return RemoteAdminSnapshot(
       marketStatus: overview['marketStatus']! as String,
@@ -58,6 +64,29 @@ class RemoteAdminService {
                 (value['role']! as String).toLowerCase(),
               ),
               enabled: value['enabled']! as bool,
+            );
+          })
+          .toList(growable: false),
+      auditLogs: (jsonDecode(auditResponse.body) as List<Object?>)
+          .map((item) {
+            final value = item! as Map<String, Object?>;
+            return AdminAuditEvent(
+              actor: value['actor']! as String,
+              action: value['action']! as String,
+              target: value['target']! as String,
+              createdAt: DateTime.parse(value['createdAt']! as String),
+            );
+          })
+          .toList(growable: false),
+      aiCallLogs: (jsonDecode(aiResponse.body) as List<Object?>)
+          .map((item) {
+            final value = item! as Map<String, Object?>;
+            return AiCallLog(
+              actor: value['actor'] as String?,
+              purpose: value['purpose']! as String,
+              model: value['model']! as String,
+              status: value['status']! as String,
+              createdAt: DateTime.parse(value['createdAt']! as String),
             );
           })
           .toList(growable: false),

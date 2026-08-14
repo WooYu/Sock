@@ -114,6 +114,26 @@ public class AdminController {
                 row.getBoolean("enabled"))).single();
     }
 
+    @GetMapping("/audit-logs")
+    List<AuditLogEntry> auditLogs() {
+        return jdbc.sql("""
+                select actor_id,action,target,created_at from audit_event order by created_at desc
+                """).query((row, ignored) -> new AuditLogEntry(
+                    row.getString("actor_id"), row.getString("action"),
+                    row.getString("target"), row.getTimestamp("created_at").toInstant())).list();
+    }
+
+    @GetMapping("/ai-call-logs")
+    List<AiCallLogEntry> aiCallLogs() {
+        return jdbc.sql("""
+                select actor_id,purpose,model,status,created_at
+                from ai_call_log order by created_at desc
+                """).query((row, ignored) -> new AiCallLogEntry(
+                    row.getString("actor_id"), row.getString("purpose"),
+                    row.getString("model"), row.getString("status"),
+                    row.getTimestamp("created_at").toInstant())).list();
+    }
+
     private AdminJob job(String id) {
         return jdbc.sql("""
                 select id,type,target,status,attempts,error,updated_at from admin_job where id=:id
@@ -143,4 +163,7 @@ public class AdminController {
                        boolean enabled) {}
     record RepairRequest(@Pattern(regexp = "^\\d{6}$") String stockCode) {}
     record RoleRequest(@Pattern(regexp = "^(USER|ANALYST|ADMIN)$") String role) {}
+    record AuditLogEntry(String actor, String action, String target, Instant createdAt) {}
+    record AiCallLogEntry(String actor, String purpose, String model, String status,
+                          Instant createdAt) {}
 }

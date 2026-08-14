@@ -9,6 +9,9 @@ import 'package:stockcal/features/admin/settings_admin_workspace.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stockcal/features/admin/settings_data_service.dart';
 import 'package:stockcal/features/account/session.dart';
+import 'package:stockcal/features/preferences/preferences_controller.dart';
+import 'package:stockcal/features/preferences/preferences_repository.dart';
+import 'package:stockcal/features/preferences/user_preferences.dart';
 
 void main() {
   testWidgets('exports a copyable archive and imports it after validation', (
@@ -115,6 +118,20 @@ void main() {
             200,
           );
         }
+        if (request.url.path.endsWith('/audit-logs')) {
+          return http.Response(
+            '[{"actor":"owner","action":"RETRY_ADMIN_JOB","target":"job-9","createdAt":"2026-08-14T00:00:00Z"}]',
+            200,
+            headers: {'content-type': 'application/json; charset=utf-8'},
+          );
+        }
+        if (request.url.path.endsWith('/ai-call-logs')) {
+          return http.Response(
+            '[{"actor":"user-1","purpose":"REVIEW_EXPLANATION","model":"gpt-4o-mini","status":"SUCCEEDED","createdAt":"2026-08-14T00:00:00Z"}]',
+            200,
+            headers: {'content-type': 'application/json; charset=utf-8'},
+          );
+        }
         return http.Response(
           '[{"id":"u9","phoneMasked":"139****9000","displayName":"管理员","role":"ADMIN","enabled":true}]',
           200,
@@ -206,5 +223,82 @@ void main() {
     expect(find.text('设置'), findsOneWidget);
     expect(find.text('管理后台'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('theme and notification changes persist through preferences', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    final controller = PreferencesController(
+      repository: PersistentPreferencesRepository(),
+    );
+    await controller.load();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(body: SettingsAdminWorkspace(preferences: controller)),
+      ),
+    );
+
+    await tester.tap(find.byKey(const Key('theme-selector')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('深色').last);
+    await tester.pumpAndSettle();
+    expect(controller.preferences.theme, ThemePreference.dark);
+
+    await tester.tap(find.byType(SwitchListTile));
+    await tester.pumpAndSettle();
+    expect(controller.preferences.notificationsEnabled, isFalse);
+  });
+
+  testWidgets('admin panel renders audit and AI call logs from the server', (
+    tester,
+  ) async {
+    final remote = RemoteAdminService(
+      baseUrl: Uri.parse('https://api.stockcal.test'),
+      accessToken: () => 'admin-token',
+      client: MockClient((request) async {
+        final headers = {'content-type': 'application/json; charset=utf-8'};
+        if (request.url.path.endsWith('/overview')) {
+          return http.Response(
+            jsonEncode({'marketStatus': '已连接', 'secrets': <Object>[]}),
+            200,
+            headers: headers,
+          );
+        }
+        if (request.url.path.endsWith('/jobs')) return http.Response('[]', 200);
+        if (request.url.path.endsWith('/users')) {
+          return http.Response('[]', 200);
+        }
+        if (request.url.path.endsWith('/audit-logs')) {
+          return http.Response(
+            '[{"actor":"owner","action":"SET_USER_ROLE","target":"u1","createdAt":"2026-08-14T00:00:00Z"}]',
+            200,
+            headers: headers,
+          );
+        }
+        if (request.url.path.endsWith('/ai-call-logs')) {
+          return http.Response(
+            '[{"actor":"user-1","purpose":"REVIEW_EXPLANATION","model":"gpt-4o-mini","status":"SUCCEEDED","createdAt":"2026-08-14T00:00:00Z"}]',
+            200,
+            headers: headers,
+          );
+        }
+        return http.Response('[]', 200);
+      }),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(body: SettingsAdminWorkspace(remote: remote)),
+      ),
+    );
+
+    await tester.tap(find.text('管理后台'));
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(ListView).last, const Offset(0, -400));
+    await tester.pumpAndSettle();
+
+    expect(find.text('SET_USER_ROLE'), findsOneWidget);
+    expect(find.text('REVIEW_EXPLANATION'), findsOneWidget);
   });
 }

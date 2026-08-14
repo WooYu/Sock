@@ -36,6 +36,16 @@ void main() {
             200,
             headers: {'content-type': 'application/json; charset=utf-8'},
           ),
+          '/api/v1/admin/audit-logs' => http.Response(
+            '[{"actor":"owner","action":"RETRY_ADMIN_JOB","target":"job-1","createdAt":"2026-08-14T00:00:00Z"}]',
+            200,
+            headers: {'content-type': 'application/json; charset=utf-8'},
+          ),
+          '/api/v1/admin/ai-call-logs' => http.Response(
+            '[{"actor":"user-1","purpose":"REVIEW_EXPLANATION","model":"gpt-4o-mini","status":"SUCCEEDED","createdAt":"2026-08-14T00:00:00Z"}]',
+            200,
+            headers: {'content-type': 'application/json; charset=utf-8'},
+          ),
           _ => http.Response('', 404),
         };
       }),
@@ -47,11 +57,15 @@ void main() {
       '/api/v1/admin/overview',
       '/api/v1/admin/jobs',
       '/api/v1/admin/users',
+      '/api/v1/admin/audit-logs',
+      '/api/v1/admin/ai-call-logs',
     ]);
     expect(snapshot.marketStatus, 'A 股行情服务已配置');
     expect(snapshot.secrets.first.configured, isFalse);
     expect(snapshot.jobs.single.status, SyncJobStatus.failed);
     expect(snapshot.users.single.role, UserRole.analyst);
+    expect(snapshot.auditLogs.single.action, 'RETRY_ADMIN_JOB');
+    expect(snapshot.aiCallLogs.single.status, 'SUCCEEDED');
   });
 
   test('retries jobs and submits market repair through admin API', () async {
