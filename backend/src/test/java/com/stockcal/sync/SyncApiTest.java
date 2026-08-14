@@ -8,16 +8,24 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.hamcrest.Matchers.hasItem;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.jdbc.core.simple.JdbcClient;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 class SyncApiTest {
     @Autowired MockMvc mvc;
+    @Autowired JdbcClient jdbc;
+
+    @BeforeEach
+    void reset() {
+        jdbc.sql("delete from sync_change").update();
+    }
 
     @Test
     void duplicateIdempotencyKeyIsAppliedOnce() throws Exception {
