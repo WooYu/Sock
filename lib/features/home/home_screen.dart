@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../domain/stockcal_domain.dart';
 import '../account/account_workspace.dart';
+import '../account/persistent_session_repository.dart';
 import '../account/session.dart';
 import '../analysis/stock_analysis_controller.dart';
 import '../analysis/stock_analysis_screen.dart';
@@ -17,6 +18,7 @@ import '../rules/rule_engine.dart';
 import '../rules/rules_workspace.dart';
 import '../review/review_workspace.dart';
 import '../watchlist/watchlist.dart';
+import '../watchlist/persistent_watchlist_repository.dart';
 import '../watchlist/watchlist_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -55,10 +57,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
     _ruleBook = RuleBook.withSystemDefaults();
     _watchlistController = WatchlistController(
-      repository: MemoryWatchlistRepository(),
+      repository: PersistentWatchlistRepository(),
       outbox: MemoryMutationOutbox(),
     );
-    _sessionController = SessionController(MemorySessionRepository());
+    _sessionController = SessionController(PersistentSessionRepository());
+    _sessionController.restore();
   }
 
   @override

@@ -48,21 +48,21 @@
 
 ### Task 4: Professional Chart And Annotations
 
-- [ ] Integrate a proven charting foundation and test timeframe/adjustment transformations.
-- [ ] Add zoom, pan, crosshair, indicators, real/forecast separation, and landscape mode.
-- [ ] Add trend, horizontal, rectangle, and point annotation create/edit/hide/delete plus sync persistence.
+- [x] Integrate a proven charting foundation and test timeframe/adjustment transformations.
+- [x] Add zoom, pan, crosshair, indicators, real/forecast separation, and landscape mode.
+- [x] Add trend, horizontal, rectangle, and point annotation create/edit/hide/delete plus sync persistence.
 
 ### Task 5: Rules, Predictions, And Backtests
 
-- [ ] Implement versioned structured rules and immutable calculation snapshots.
-- [ ] Implement prediction generation and new-version-only persistence.
-- [ ] Implement backtests with hit rate, error, drawdown, and sample count.
+- [x] Implement versioned structured rules and immutable calculation snapshots.
+- [x] Implement prediction generation and new-version-only persistence.
+- [x] Implement backtests with hit rate, error, drawdown, and sample count.
 
 ### Task 6: Reviews And Constrained AI
 
-- [ ] Build daily, weekly, and trade review comparisons.
-- [ ] Enforce deterministic read-only AI input and audited output storage.
-- [ ] Add edit and regenerate flows without mutating source facts.
+- [x] Build daily, weekly, and trade review comparisons.
+- [x] Enforce deterministic read-only AI input and audited output storage.
+- [x] Add edit and regenerate flows without mutating source facts.
 
 ### Task 7: Production Backend And Sync
 
