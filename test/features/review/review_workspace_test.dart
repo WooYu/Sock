@@ -1,8 +1,69 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:stockcal/features/review/persistent_review_store.dart';
 import 'package:stockcal/features/review/review_workspace.dart';
+import 'package:stockcal/features/portfolio/portfolio_ledger.dart';
 
 void main() {
+  testWidgets('persistent workspace stays empty when no reviews exist', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    final store = PersistentReviewStore();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(body: ReviewWorkspace(store: store)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('暂无复盘记录'), findsOneWidget);
+    expect(await store.tradeReviews(), isEmpty);
+    expect(find.text('600519'), findsNothing);
+  });
+
+  testWidgets('creates a review from an immutable trade record', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    final store = PersistentReviewStore();
+    final trade = TradeEntry.buy(
+      id: 'trade-1',
+      occurredAt: DateTime(2026, 8, 14, 10),
+      code: '000001',
+      name: '平安银行',
+      quantity: 100,
+      price: 12.5,
+      fee: 5,
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ReviewWorkspace(store: store, trades: [trade]),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('从交易创建复盘'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.widgetWithText(TextFormField, '计划价'), '12.20');
+    await tester.enterText(find.widgetWithText(TextFormField, '实际收盘'), '12.80');
+    await tester.enterText(find.widgetWithText(TextFormField, '预测版本'), '1');
+    await tester.enterText(find.widgetWithText(TextFormField, '预测目标'), '13.00');
+    await tester.enterText(
+      find.widgetWithText(TextFormField, '执行理由'),
+      '突破后回踩确认',
+    );
+    await tester.tap(find.text('保存复盘'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('计划与执行'), findsOneWidget);
+    expect(find.text('12.20'), findsOneWidget);
+    expect((await store.tradeReviews()).single.tradeId, 'trade-1');
+  });
+
   testWidgets('shows trade comparison and daily weekly summaries', (
     tester,
   ) async {

@@ -354,7 +354,10 @@ class _Workspace extends StatelessWidget {
       );
     }
     if (module == '复盘AI') {
-      return ReviewWorkspace(store: reviewStore);
+      return ReviewWorkspace(
+        store: reviewStore,
+        trades: portfolioController.ledger.entries,
+      );
     }
     if (module == '知识规则') {
       return KnowledgeWorkspace(controller: knowledgeController);
