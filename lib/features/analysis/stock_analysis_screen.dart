@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 
 import '../market/market_data.dart';
+import '../knowledge/knowledge.dart';
 import 'stock_analysis_controller.dart';
 import 'technical_analysis.dart';
 
 class StockAnalysisScreen extends StatefulWidget {
-  const StockAnalysisScreen({super.key, required this.controller});
+  const StockAnalysisScreen({
+    super.key,
+    required this.controller,
+    this.knowledgeController,
+  });
 
   final StockAnalysisController controller;
+  final KnowledgeController? knowledgeController;
 
   @override
   State<StockAnalysisScreen> createState() => _StockAnalysisScreenState();
@@ -18,6 +24,7 @@ class _StockAnalysisScreenState extends State<StockAnalysisScreen> {
   void initState() {
     super.initState();
     widget.controller.addListener(_refresh);
+    widget.knowledgeController?.addListener(_refresh);
     if (widget.controller.results.isEmpty &&
         widget.controller.selected == null) {
       widget.controller.initialize();
@@ -27,6 +34,7 @@ class _StockAnalysisScreenState extends State<StockAnalysisScreen> {
   @override
   void dispose() {
     widget.controller.removeListener(_refresh);
+    widget.knowledgeController?.removeListener(_refresh);
     super.dispose();
   }
 
@@ -85,6 +93,12 @@ class _StockAnalysisScreenState extends State<StockAnalysisScreen> {
                   snapshot: controller.snapshot!,
                   analysis: controller.analysis!,
                   onRefresh: controller.refresh,
+                  knowledge:
+                      widget.knowledgeController?.approved
+                          .where((draft) => draft.kind != KnowledgeKind.rule)
+                          .toList(growable: false) ??
+                      const [],
+                  knowledgeController: widget.knowledgeController,
                 ),
             ],
           ),
@@ -119,11 +133,15 @@ class _AnalysisContent extends StatelessWidget {
     required this.snapshot,
     required this.analysis,
     required this.onRefresh,
+    required this.knowledge,
+    required this.knowledgeController,
   });
 
   final MarketSnapshot snapshot;
   final StockAnalysis analysis;
   final VoidCallback onRefresh;
+  final List<KnowledgeDraft> knowledge;
+  final KnowledgeController? knowledgeController;
 
   @override
   Widget build(BuildContext context) {
@@ -226,6 +244,24 @@ class _AnalysisContent extends StatelessWidget {
             title: Text(rule),
           ),
         ),
+        if (knowledge.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Text('相关经验与概念', style: Theme.of(context).textTheme.titleMedium),
+          ...knowledge.map((draft) {
+            final source = knowledgeController!.sourceFor(draft.sourceId);
+            return ListTile(
+              dense: true,
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(
+                draft.kind == KnowledgeKind.experience
+                    ? Icons.psychology_alt_outlined
+                    : Icons.menu_book_outlined,
+              ),
+              title: Text(draft.summary),
+              subtitle: Text('${source.title} · 第 ${draft.sourceLine} 行'),
+            );
+          }),
+        ],
         const SizedBox(height: 12),
         Text('未来三日指标延伸', style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),

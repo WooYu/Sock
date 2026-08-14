@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../domain/stockcal_domain.dart';
@@ -13,6 +15,9 @@ import '../chart/chart_annotations.dart';
 import '../chart/professional_chart_screen.dart';
 import '../chart/persistent_chart_annotation_store.dart';
 import '../market/market_data.dart';
+import '../knowledge/knowledge.dart';
+import '../knowledge/knowledge_workspace.dart';
+import '../knowledge/remote_knowledge_repository.dart';
 import '../portfolio/portfolio_controller.dart';
 import '../portfolio/persistent_portfolio_repository.dart';
 import '../portfolio/portfolio_ledger.dart';
@@ -44,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late final PersistentRuleRepository _ruleRepository;
   late final PersistentPredictionRepository _predictionRepository;
   late final PersistentReviewStore _reviewStore;
+  late final KnowledgeController _knowledgeController;
   late final WatchlistController _watchlistController;
   late final SessionController _sessionController;
   late final PersistentChartAnnotationStore _annotationStore;
@@ -87,6 +93,12 @@ class _HomeScreenState extends State<HomeScreen> {
       PersistentSessionRepository(),
       remote: RemoteAuthService(baseUrl: Uri.parse(apiUrl)),
     );
+    _knowledgeController = KnowledgeController(
+      RemoteKnowledgeRepository(
+        baseUrl: Uri.parse(apiUrl),
+        accessToken: () => _sessionController.session?.accessToken,
+      ),
+    );
     _annotationSyncWorker = AnnotationSyncWorker(
       store: _annotationStore,
       remote: RemoteSyncService(baseUrl: Uri.parse(apiUrl)),
@@ -103,6 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _watchlistController.dispose();
     _sessionController.removeListener(_syncPending);
     _sessionController.dispose();
+    _knowledgeController.dispose();
     super.dispose();
   }
 
@@ -110,6 +123,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final token = _sessionController.session?.accessToken;
     if (token == null || token.isEmpty) return;
     _annotationSyncWorker.drain(token);
+    if (_knowledgeController.sources.isEmpty && !_knowledgeController.loading) {
+      unawaited(_knowledgeController.load());
+    }
   }
 
   Future<void> _restoreRules() async {
@@ -147,6 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ruleRepository: _ruleRepository,
               predictionRepository: _predictionRepository,
               reviewStore: _reviewStore,
+              knowledgeController: _knowledgeController,
               watchlistController: _watchlistController,
               sessionController: _sessionController,
               onNavigate: (module) => setState(() => _selected = module),
@@ -197,6 +214,7 @@ class _DesktopNavigation extends StatelessWidget {
     ('个股分析', Icons.search),
     ('专业K线', Icons.candlestick_chart_outlined),
     ('规则回测', Icons.rule_outlined),
+    ('知识规则', Icons.library_books_outlined),
     ('组合交易', Icons.account_balance_wallet_outlined),
     ('自选股', Icons.bookmark_outline),
     ('复盘AI', Icons.rate_review_outlined),
@@ -238,6 +256,7 @@ class _Workspace extends StatelessWidget {
     required this.ruleRepository,
     required this.predictionRepository,
     required this.reviewStore,
+    required this.knowledgeController,
     required this.watchlistController,
     required this.sessionController,
     required this.onNavigate,
@@ -251,6 +270,7 @@ class _Workspace extends StatelessWidget {
   final PersistentRuleRepository ruleRepository;
   final PersistentPredictionRepository predictionRepository;
   final PersistentReviewStore reviewStore;
+  final KnowledgeController knowledgeController;
   final WatchlistController watchlistController;
   final SessionController sessionController;
   final ValueChanged<String> onNavigate;
@@ -261,7 +281,10 @@ class _Workspace extends StatelessWidget {
       return PortfolioScreen(controller: portfolioController);
     }
     if (module == '个股分析') {
-      return StockAnalysisScreen(controller: stockAnalysisController);
+      return StockAnalysisScreen(
+        controller: stockAnalysisController,
+        knowledgeController: knowledgeController,
+      );
     }
     if (module == '专业K线') {
       return ProfessionalChartScreen(
@@ -275,11 +298,15 @@ class _Workspace extends StatelessWidget {
         ruleBook: ruleBook,
         ruleRepository: ruleRepository,
         predictionRepository: predictionRepository,
+        knowledgeController: knowledgeController,
         candles: DemoAshareData.candlesFor('600519'),
       );
     }
     if (module == '复盘AI') {
       return ReviewWorkspace(store: reviewStore);
+    }
+    if (module == '知识规则') {
+      return KnowledgeWorkspace(controller: knowledgeController);
     }
     if (module == '自选股') {
       return WatchlistScreen(controller: watchlistController);
@@ -309,6 +336,12 @@ class _Workspace extends StatelessWidget {
             icon: Icons.rule_outlined,
             title: '规则与回测',
             target: '规则回测',
+            onNavigate: onNavigate,
+          ),
+          _MoreDestination(
+            icon: Icons.library_books_outlined,
+            title: '知识规则',
+            target: '知识规则',
             onNavigate: onNavigate,
           ),
           _MoreDestination(

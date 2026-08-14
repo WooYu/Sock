@@ -4,6 +4,7 @@ import 'package:stockcal/features/analysis/stock_analysis_controller.dart';
 import 'package:stockcal/features/analysis/stock_analysis_screen.dart';
 import 'package:stockcal/features/analysis/technical_analysis.dart';
 import 'package:stockcal/features/market/market_data.dart';
+import 'package:stockcal/features/knowledge/knowledge.dart';
 
 void main() {
   testWidgets(
@@ -67,5 +68,58 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.text('未来三日指标延伸'), findsOneWidget);
+  });
+
+  testWidgets('shows only approved experience and concept knowledge', (
+    tester,
+  ) async {
+    final knowledge = KnowledgeController(
+      MemoryKnowledgeRepository(
+        sources: const [
+          KnowledgeSource(
+            id: 's1',
+            title: '海龟',
+            path: '股票/海龟.md',
+            originalContent: '海龟只做两天。',
+          ),
+        ],
+        drafts: const [
+          KnowledgeDraft(
+            id: 'k1',
+            sourceId: 's1',
+            kind: KnowledgeKind.experience,
+            title: '持有周期',
+            summary: '海龟通常只做两天',
+            excerpt: '海龟只做两天。',
+            sourceLine: 1,
+            status: ApprovalStatus.approved,
+            extractionMethod: ExtractionMethod.ai,
+          ),
+        ],
+      ),
+    );
+    await knowledge.load();
+    final controller = StockAnalysisController(
+      catalog: MemoryStockCatalog(DemoAshareData.securities),
+      market: DemoAshareMarketAdapter(
+        clock: () => DateTime(2026, 8, 14, 15, 15),
+      ),
+      analyzer: StockAnalyzer(),
+    );
+    await controller.select(DemoAshareData.securities.first);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: StockAnalysisScreen(
+          controller: controller,
+          knowledgeController: knowledge,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('相关经验与概念'), findsOneWidget);
+    expect(find.text('海龟通常只做两天'), findsOneWidget);
+    expect(find.textContaining('海龟 · 第 1 行'), findsOneWidget);
   });
 }

@@ -12,3 +12,6 @@ spring:
   sql:
     init:
       mode: always
+stockcal:
+  ai:
+    enabled: false

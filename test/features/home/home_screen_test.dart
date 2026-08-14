@@ -44,4 +44,17 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('手机验证码登录'), findsOneWidget);
   });
+
+  testWidgets('desktop navigation opens the knowledge approval workspace', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const StockCalApp());
+
+    await tester.tap(find.text('知识规则'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('待审批 0'), findsOneWidget);
+    expect(find.text('经验概念'), findsOneWidget);
+    expect(find.text('原文'), findsOneWidget);
+  });
 }

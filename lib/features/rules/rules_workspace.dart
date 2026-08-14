@@ -7,6 +7,7 @@ import 'backtest_engine.dart';
 import 'prediction_store.dart';
 import 'persistent_rules_repository.dart';
 import 'rule_engine.dart';
+import '../knowledge/knowledge.dart';
 
 class RulesWorkspace extends StatefulWidget {
   const RulesWorkspace({
@@ -16,6 +17,7 @@ class RulesWorkspace extends StatefulWidget {
     this.stockCode = '600519',
     this.ruleRepository,
     this.predictionRepository,
+    this.knowledgeController,
   });
 
   final RuleBook ruleBook;
@@ -23,6 +25,7 @@ class RulesWorkspace extends StatefulWidget {
   final String stockCode;
   final PersistentRuleRepository? ruleRepository;
   final PredictionRepository? predictionRepository;
+  final KnowledgeController? knowledgeController;
 
   @override
   State<RulesWorkspace> createState() => _RulesWorkspaceState();
@@ -46,6 +49,17 @@ class _RulesWorkspaceState extends State<RulesWorkspace> {
     if (widget.ruleBook.activeRules.isNotEmpty) {
       _selected = widget.ruleBook.activeRules.first;
     }
+    widget.knowledgeController?.addListener(_refreshKnowledge);
+  }
+
+  @override
+  void dispose() {
+    widget.knowledgeController?.removeListener(_refreshKnowledge);
+    super.dispose();
+  }
+
+  void _refreshKnowledge() {
+    if (mounted) setState(() {});
   }
 
   @override
@@ -57,6 +71,7 @@ class _RulesWorkspaceState extends State<RulesWorkspace> {
       onSelected: (rule) => setState(() => _selected = rule),
       onCreate: _createRule,
       onToggle: _toggleRule,
+      knowledgeController: widget.knowledgeController,
     );
     final prediction = _PredictionPanel(
       prediction: _prediction,
@@ -217,6 +232,7 @@ class _RulesPanel extends StatelessWidget {
     required this.onSelected,
     required this.onCreate,
     required this.onToggle,
+    required this.knowledgeController,
   });
 
   final RuleBook ruleBook;
@@ -224,6 +240,7 @@ class _RulesPanel extends StatelessWidget {
   final ValueChanged<RuleVersion> onSelected;
   final VoidCallback onCreate;
   final void Function(RuleVersion rule, bool enabled) onToggle;
+  final KnowledgeController? knowledgeController;
 
   @override
   Widget build(BuildContext context) {
@@ -231,6 +248,11 @@ class _RulesPanel extends StatelessWidget {
       for (final rule in ruleBook.activeRules) rule,
       if (selected != null && !selected!.enabled) selected!,
     ];
+    final noteRules =
+        knowledgeController?.approved
+            .where((draft) => draft.kind == KnowledgeKind.rule)
+            .toList(growable: false) ??
+        const <KnowledgeDraft>[];
     return Column(
       children: [
         ListTile(
@@ -243,29 +265,43 @@ class _RulesPanel extends StatelessWidget {
         ),
         const Divider(height: 1),
         Expanded(
-          child: latest.isEmpty
+          child: latest.isEmpty && noteRules.isEmpty
               ? const Center(child: Text('暂无规则'))
-              : ListView.builder(
-                  itemCount: latest.length,
-                  itemBuilder: (context, index) {
-                    final rule = latest[index];
-                    return ListTile(
-                      selected: selected?.id == rule.id,
-                      onTap: () => onSelected(rule),
-                      title: Text(rule.name),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('版本 ${rule.version}'),
-                          Text('优先级 ${rule.priority}'),
-                        ],
+              : ListView(
+                  children: [
+                    for (final rule in latest)
+                      ListTile(
+                        selected: selected?.id == rule.id,
+                        onTap: () => onSelected(rule),
+                        title: Text(rule.name),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('版本 ${rule.version}'),
+                            Text('优先级 ${rule.priority}'),
+                          ],
+                        ),
+                        trailing: Switch(
+                          value: rule.enabled,
+                          onChanged: (value) => onToggle(rule, value),
+                        ),
                       ),
-                      trailing: Switch(
-                        value: rule.enabled,
-                        onChanged: (value) => onToggle(rule, value),
+                    if (noteRules.isNotEmpty) ...[
+                      const Divider(),
+                      const ListTile(
+                        leading: Icon(Icons.source_outlined),
+                        title: Text('笔记规则来源'),
                       ),
-                    );
-                  },
+                      for (final draft in noteRules)
+                        ListTile(
+                          dense: true,
+                          title: Text(draft.title),
+                          subtitle: Text(
+                            '${knowledgeController!.sourceFor(draft.sourceId).title} · 第 ${draft.sourceLine} 行',
+                          ),
+                        ),
+                    ],
+                  ],
                 ),
         ),
       ],

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:stockcal/features/market/market_data.dart';
 import 'package:stockcal/features/rules/rule_engine.dart';
 import 'package:stockcal/features/rules/rules_workspace.dart';
+import 'package:stockcal/features/knowledge/knowledge.dart';
 
 void main() {
   testWidgets('creates a structured rule and publishes enable versions', (
@@ -110,5 +111,50 @@ void main() {
     expect(find.text('预测'), findsOneWidget);
     expect(find.text('回测'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('shows approved note rules with source evidence', (tester) async {
+    final knowledge = KnowledgeController(
+      MemoryKnowledgeRepository(
+        sources: const [
+          KnowledgeSource(
+            id: 's1',
+            title: '关键点',
+            path: '股票/关键点.md',
+            originalContent: '触达目标位减仓。',
+          ),
+        ],
+        drafts: const [
+          KnowledgeDraft(
+            id: 'd1',
+            sourceId: 's1',
+            kind: KnowledgeKind.rule,
+            title: '目标位减仓',
+            summary: '触达目标位时减仓',
+            excerpt: '触达目标位减仓。',
+            sourceLine: 1,
+            status: ApprovalStatus.approved,
+            extractionMethod: ExtractionMethod.ai,
+          ),
+        ],
+      ),
+    );
+    await knowledge.load();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: RulesWorkspace(
+            ruleBook: RuleBook.withSystemDefaults(),
+            candles: DemoAshareData.candlesFor('600519'),
+            knowledgeController: knowledge,
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('笔记规则来源'), findsOneWidget);
+    expect(find.text('目标位减仓'), findsOneWidget);
+    expect(find.textContaining('关键点 · 第 1 行'), findsOneWidget);
   });
 }
