@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:stockcal/features/account/remote_auth_service.dart';
+import 'package:stockcal/features/account/session.dart';
 
 void main() {
   test('verifies phone and maps tokens profile and device', () async {
@@ -64,5 +65,36 @@ void main() {
       ),
       isTrue,
     );
+  });
+
+  test('session controller persists the complete remote session', () async {
+    final repository = MemorySessionRepository();
+    final service = RemoteAuthService(
+      baseUrl: Uri.parse('https://api.stockcal.test'),
+      client: MockClient(
+        (request) async => http.Response(
+          jsonEncode({
+            'accessToken': 'access-1',
+            'refreshToken': 'refresh-1',
+            'expiresAt': '2026-08-14T01:00:00Z',
+            'profile': {'phone': '13800138000'},
+            'device': {
+              'id': 'd1',
+              'name': 'Flutter',
+              'lastSeenAt': '2026-08-14T00:00:00Z',
+            },
+          }),
+          200,
+        ),
+      ),
+    );
+    final controller = SessionController(repository, remote: service);
+
+    await controller.verifyPhone(phone: '13800138000', code: '123456');
+
+    final stored = await repository.restore();
+    expect(stored?.refreshToken, 'refresh-1');
+    expect(stored?.expiresAt, DateTime.parse('2026-08-14T01:00:00Z'));
+    expect(controller.devices.single.id, 'd1');
   });
 }

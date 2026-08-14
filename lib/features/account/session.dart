@@ -1,10 +1,19 @@
 import 'package:flutter/foundation.dart';
 
+import 'remote_auth_service.dart';
+
 class UserSession {
-  const UserSession({required this.phone, required this.accessToken});
+  const UserSession({
+    required this.phone,
+    required this.accessToken,
+    this.refreshToken = '',
+    this.expiresAt,
+  });
 
   final String phone;
   final String accessToken;
+  final String refreshToken;
+  final DateTime? expiresAt;
 
   bool get isSignedIn => accessToken.isNotEmpty;
 }
@@ -54,9 +63,11 @@ class VerificationException implements Exception {
 }
 
 class SessionController extends ChangeNotifier {
-  SessionController(this._repository);
+  SessionController(this._repository, {RemoteAuthService? remote})
+    : _remote = remote;
 
   final SessionRepository _repository;
+  final RemoteAuthService? _remote;
   UserSession? session;
   List<UserDevice> devices = const [];
   var _tokenVersion = 0;
@@ -74,13 +85,34 @@ class SessionController extends ChangeNotifier {
     if (!RegExp(r'^1\d{10}$').hasMatch(phone) || code.length != 6) {
       throw const VerificationException('请输入有效手机号和六位验证码');
     }
-    final verified = UserSession(
-      phone: phone,
-      accessToken: 'local-session-$phone',
-    );
+    final remote = _remote == null
+        ? null
+        : await _remote.verify(
+            phone: phone,
+            code: code,
+            deviceName: 'StockCal Flutter',
+          );
+    final verified = remote == null
+        ? UserSession(phone: phone, accessToken: 'local-session-$phone')
+        : UserSession(
+            phone: remote.phone,
+            accessToken: remote.accessToken,
+            refreshToken: remote.refreshToken,
+            expiresAt: remote.expiresAt,
+          );
     await _repository.save(verified);
     session = verified;
-    _registerCurrentDevice();
+    if (remote == null) {
+      _registerCurrentDevice();
+    } else {
+      devices = [
+        UserDevice(
+          id: remote.device.id,
+          name: remote.device.name,
+          isCurrent: true,
+        ),
+      ];
+    }
     notifyListeners();
   }
 

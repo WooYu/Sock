@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../domain/stockcal_domain.dart';
 import '../account/account_workspace.dart';
 import '../account/persistent_session_repository.dart';
+import '../account/remote_auth_service.dart';
 import '../account/session.dart';
 import '../analysis/stock_analysis_controller.dart';
 import '../analysis/stock_analysis_screen.dart';
@@ -62,7 +63,14 @@ class _HomeScreenState extends State<HomeScreen> {
       repository: PersistentWatchlistRepository(),
       outbox: MemoryMutationOutbox(),
     );
-    _sessionController = SessionController(PersistentSessionRepository());
+    const apiUrl = String.fromEnvironment(
+      'STOCKCAL_API_URL',
+      defaultValue: 'http://localhost:8080',
+    );
+    _sessionController = SessionController(
+      PersistentSessionRepository(),
+      remote: RemoteAuthService(baseUrl: Uri.parse(apiUrl)),
+    );
     _sessionController.restore();
   }
 

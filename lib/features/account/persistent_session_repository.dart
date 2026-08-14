@@ -15,6 +15,10 @@ class PersistentSessionRepository implements SessionRepository {
     return UserSession(
       phone: json['phone']! as String,
       accessToken: json['accessToken']! as String,
+      refreshToken: json['refreshToken'] as String? ?? '',
+      expiresAt: json['expiresAt'] == null
+          ? null
+          : DateTime.parse(json['expiresAt']! as String),
     );
   }
 
@@ -23,6 +27,8 @@ class PersistentSessionRepository implements SessionRepository {
     final value = jsonEncode({
       'phone': session.phone,
       'accessToken': session.accessToken,
+      'refreshToken': session.refreshToken,
+      'expiresAt': session.expiresAt?.toIso8601String(),
     });
     await (await SharedPreferences.getInstance()).setString(_key, value);
   }
