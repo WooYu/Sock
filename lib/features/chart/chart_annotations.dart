@@ -95,6 +95,7 @@ class PendingAnnotationMutation {
 abstract interface class ChartAnnotationOutbox {
   Future<void> add(PendingAnnotationMutation mutation);
   Future<List<PendingAnnotationMutation>> loadPending();
+  Future<void> acknowledge(String idempotencyKey);
 }
 
 class MemoryChartAnnotationOutbox implements ChartAnnotationOutbox {
@@ -104,6 +105,11 @@ class MemoryChartAnnotationOutbox implements ChartAnnotationOutbox {
 
   @override
   Future<List<PendingAnnotationMutation>> loadPending() async => pending;
+
+  @override
+  Future<void> acknowledge(String idempotencyKey) async {
+    _pending.removeWhere((item) => item.idempotencyKey == idempotencyKey);
+  }
 
   @override
   Future<void> add(PendingAnnotationMutation mutation) async {

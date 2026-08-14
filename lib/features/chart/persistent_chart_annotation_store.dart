@@ -48,6 +48,18 @@ class PersistentChartAnnotationStore
     )).map(_mutationFromJson).toList(growable: false);
   }
 
+  @override
+  Future<void> acknowledge(String idempotencyKey) async {
+    final current = await loadPending();
+    await _writeList(
+      _outboxKey,
+      current
+          .where((item) => item.idempotencyKey != idempotencyKey)
+          .map(_mutationToJson)
+          .toList(growable: false),
+    );
+  }
+
   Future<List<Map<String, Object?>>> _readList(String key) async {
     final value = (await SharedPreferences.getInstance()).getString(key);
     if (value == null) return [];

@@ -46,6 +46,8 @@ class PendingMutation {
 
 abstract interface class MutationOutbox {
   Future<void> add(PendingMutation mutation);
+  Future<List<PendingMutation>> loadPending();
+  Future<void> acknowledge(String idempotencyKey);
 }
 
 class MemoryMutationOutbox implements MutationOutbox {
@@ -61,6 +63,14 @@ class MemoryMutationOutbox implements MutationOutbox {
       return;
     }
     _pending.add(mutation);
+  }
+
+  @override
+  Future<List<PendingMutation>> loadPending() async => pending;
+
+  @override
+  Future<void> acknowledge(String idempotencyKey) async {
+    _pending.removeWhere((item) => item.idempotencyKey == idempotencyKey);
   }
 }
 

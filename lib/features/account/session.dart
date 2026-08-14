@@ -63,11 +63,10 @@ class VerificationException implements Exception {
 }
 
 class SessionController extends ChangeNotifier {
-  SessionController(this._repository, {RemoteAuthService? remote})
-    : _remote = remote;
+  SessionController(this._repository, {this.remote});
 
   final SessionRepository _repository;
-  final RemoteAuthService? _remote;
+  final RemoteAuthService? remote;
   UserSession? session;
   List<UserDevice> devices = const [];
   var _tokenVersion = 0;
@@ -85,30 +84,30 @@ class SessionController extends ChangeNotifier {
     if (!RegExp(r'^1\d{10}$').hasMatch(phone) || code.length != 6) {
       throw const VerificationException('请输入有效手机号和六位验证码');
     }
-    final remote = _remote == null
+    final verifiedRemote = remote == null
         ? null
-        : await _remote.verify(
+        : await remote!.verify(
             phone: phone,
             code: code,
             deviceName: 'StockCal Flutter',
           );
-    final verified = remote == null
+    final verified = verifiedRemote == null
         ? UserSession(phone: phone, accessToken: 'local-session-$phone')
         : UserSession(
-            phone: remote.phone,
-            accessToken: remote.accessToken,
-            refreshToken: remote.refreshToken,
-            expiresAt: remote.expiresAt,
+            phone: verifiedRemote.phone,
+            accessToken: verifiedRemote.accessToken,
+            refreshToken: verifiedRemote.refreshToken,
+            expiresAt: verifiedRemote.expiresAt,
           );
     await _repository.save(verified);
     session = verified;
-    if (remote == null) {
+    if (verifiedRemote == null) {
       _registerCurrentDevice();
     } else {
       devices = [
         UserDevice(
-          id: remote.device.id,
-          name: remote.device.name,
+          id: verifiedRemote.device.id,
+          name: verifiedRemote.device.name,
           isCurrent: true,
         ),
       ];

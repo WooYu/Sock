@@ -28,4 +28,27 @@ void main() {
       ]);
     },
   );
+
+  test(
+    'pending mutations survive recreation and can be acknowledged',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      final first = PersistentMutationOutbox();
+      await first.add(
+        const PendingMutation(
+          type: MutationType.addWatchStock,
+          idempotencyKey: 'watch:add:1',
+          payload: {'groupId': 'focus', 'code': '600519'},
+        ),
+      );
+
+      final restored = PersistentMutationOutbox();
+      expect(
+        (await restored.loadPending()).single.idempotencyKey,
+        'watch:add:1',
+      );
+      await restored.acknowledge('watch:add:1');
+      expect(await PersistentMutationOutbox().loadPending(), isEmpty);
+    },
+  );
 }

@@ -19,6 +19,7 @@ import '../portfolio/portfolio_screen.dart';
 import '../rules/rule_engine.dart';
 import '../rules/rules_workspace.dart';
 import '../review/review_workspace.dart';
+import '../sync/remote_sync_service.dart';
 import '../watchlist/watchlist.dart';
 import '../watchlist/persistent_watchlist_repository.dart';
 import '../watchlist/watchlist_screen.dart';
@@ -38,6 +39,8 @@ class _HomeScreenState extends State<HomeScreen> {
   late final RuleBook _ruleBook;
   late final WatchlistController _watchlistController;
   late final SessionController _sessionController;
+  late final PersistentChartAnnotationStore _annotationStore;
+  late final AnnotationSyncWorker _annotationSyncWorker;
 
   @override
   void initState() {
@@ -51,17 +54,17 @@ class _HomeScreenState extends State<HomeScreen> {
       market: DemoAshareMarketAdapter(),
       analyzer: StockAnalyzer(),
     );
-    final annotationStore = PersistentChartAnnotationStore();
+    _annotationStore = PersistentChartAnnotationStore();
     _chartAnnotationController = ChartAnnotationController(
       stockCode: '600519',
-      repository: annotationStore,
-      outbox: annotationStore,
+      repository: _annotationStore,
+      outbox: _annotationStore,
       idFactory: () => 'annotation-${DateTime.now().microsecondsSinceEpoch}',
     );
     _ruleBook = RuleBook.withSystemDefaults();
     _watchlistController = WatchlistController(
       repository: PersistentWatchlistRepository(),
-      outbox: MemoryMutationOutbox(),
+      outbox: PersistentMutationOutbox(),
     );
     const apiUrl = String.fromEnvironment(
       'STOCKCAL_API_URL',
@@ -71,6 +74,11 @@ class _HomeScreenState extends State<HomeScreen> {
       PersistentSessionRepository(),
       remote: RemoteAuthService(baseUrl: Uri.parse(apiUrl)),
     );
+    _annotationSyncWorker = AnnotationSyncWorker(
+      store: _annotationStore,
+      remote: RemoteSyncService(baseUrl: Uri.parse(apiUrl)),
+    );
+    _sessionController.addListener(_syncPending);
     _sessionController.restore();
   }
 
@@ -80,8 +88,15 @@ class _HomeScreenState extends State<HomeScreen> {
     _stockAnalysisController.dispose();
     _chartAnnotationController.dispose();
     _watchlistController.dispose();
+    _sessionController.removeListener(_syncPending);
     _sessionController.dispose();
     super.dispose();
+  }
+
+  void _syncPending() {
+    final token = _sessionController.session?.accessToken;
+    if (token == null || token.isEmpty) return;
+    _annotationSyncWorker.drain(token);
   }
 
   @override
