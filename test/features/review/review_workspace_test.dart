@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stockcal/features/review/persistent_review_store.dart';
 import 'package:stockcal/features/review/review_workspace.dart';
 import 'package:stockcal/features/portfolio/portfolio_ledger.dart';
+import 'package:stockcal/features/review/review_ai.dart';
 
 void main() {
   testWidgets('persistent workspace stays empty when no reviews exist', (
@@ -112,6 +113,25 @@ void main() {
     expect(find.text('严格执行止损，等待量能确认。'), findsOneWidget);
   });
 
+  testWidgets('shows an actionable error when AI service is unavailable', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: ReviewWorkspace(explanationAdapter: _FailingExplanation()),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('生成摘要'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('AI 复盘暂不可用，请稍后重试'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('phone layout has no horizontal overflow', (tester) async {
     tester.view.physicalSize = const Size(375, 700);
     tester.view.devicePixelRatio = 1;
@@ -126,4 +146,13 @@ void main() {
     expect(find.text('AI 仅读取确定性计算结果'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+}
+
+class _FailingExplanation implements ReviewExplanationAdapter {
+  const _FailingExplanation();
+
+  @override
+  Future<String> explain(ReviewSnapshot snapshot) async {
+    throw StateError('quota exhausted');
+  }
 }

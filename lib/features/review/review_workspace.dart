@@ -27,6 +27,7 @@ class _ReviewWorkspaceState extends State<ReviewWorkspace> {
   late final ReviewAiService _ai;
   ReviewSummary? _summary;
   ReviewNarrative? _narrative;
+  String? _aiError;
   var _weekly = false;
   var _narrativeId = 0;
   var _initialized = false;
@@ -202,6 +203,13 @@ class _ReviewWorkspaceState extends State<ReviewWorkspace> {
             ],
           ),
           const Text('AI 仅读取确定性计算结果'),
+          if (_aiError != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              _aiError!,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+          ],
           const SizedBox(height: 8),
           if (_narrative == null)
             Align(
@@ -262,8 +270,17 @@ class _ReviewWorkspaceState extends State<ReviewWorkspace> {
   );
 
   Future<void> _generate() async {
-    final narrative = await _ai.generate(_review!);
-    setState(() => _narrative = narrative);
+    try {
+      final narrative = await _ai.generate(_review!);
+      if (mounted) {
+        setState(() {
+          _narrative = narrative;
+          _aiError = null;
+        });
+      }
+    } on Object {
+      if (mounted) setState(() => _aiError = 'AI 复盘暂不可用，请稍后重试');
+    }
   }
 
   List<TradeEntry> get _reviewableTrades => widget.trades
@@ -405,8 +422,17 @@ class _ReviewWorkspaceState extends State<ReviewWorkspace> {
       );
 
   Future<void> _regenerate() async {
-    final narrative = await _ai.regenerate(_review!);
-    setState(() => _narrative = narrative);
+    try {
+      final narrative = await _ai.regenerate(_review!);
+      if (mounted) {
+        setState(() {
+          _narrative = narrative;
+          _aiError = null;
+        });
+      }
+    } on Object {
+      if (mounted) setState(() => _aiError = 'AI 复盘暂不可用，请稍后重试');
+    }
   }
 
   Future<void> _editNarrative() async {
