@@ -112,6 +112,8 @@ class SessionController extends ChangeNotifier {
         throw const VerificationException('短信服务暂不可用，请稍后再试');
       }
       throw const VerificationException('验证码发送失败，请检查网络后重试');
+    } catch (_) {
+      throw const VerificationException('无法连接服务器，请检查网络后重试');
     }
   }
 
@@ -122,13 +124,7 @@ class SessionController extends ChangeNotifier {
     if (!RegExp(r'^1\d{10}$').hasMatch(phone) || code.length != 6) {
       throw const VerificationException('请输入有效手机号和六位验证码');
     }
-    final verifiedRemote = remote == null
-        ? null
-        : await remote!.verify(
-            phone: phone,
-            code: code,
-            deviceName: 'StockCal Flutter',
-          );
+    final verifiedRemote = remote == null ? null : await _verifyRemote(phone, code);
     final verified = verifiedRemote == null
         ? UserSession(phone: phone, accessToken: 'local-session-$phone')
         : UserSession(
@@ -151,6 +147,23 @@ class SessionController extends ChangeNotifier {
       ];
     }
     notifyListeners();
+  }
+
+  Future<RemoteSession> _verifyRemote(String phone, String code) async {
+    try {
+      return await remote!.verify(
+        phone: phone,
+        code: code,
+        deviceName: 'StockCal Flutter',
+      );
+    } on RemoteAuthException catch (error) {
+      if (error.statusCode == 401) {
+        throw const VerificationException('验证码无效或已过期');
+      }
+      throw const VerificationException('登录失败，请稍后重试');
+    } catch (_) {
+      throw const VerificationException('无法连接服务器，请检查网络后重试');
+    }
   }
 
   Future<void> refreshAccessToken() async {

@@ -3,8 +3,11 @@ package com.stockcal.auth;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.hamcrest.Matchers.containsString;
 
 import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -73,8 +76,22 @@ class AuthApiTest {
         requestCode("13800138000");
         mvc.perform(post("/api/v1/auth/verify")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"phone\":\"13800138000\",\"code\":\"000000\",\"deviceName\":\"Web\"}"))
+                .content("{\"phone\":\"13800138000\",\"code\":\"111111\",\"deviceName\":\"Web\"}"))
             .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void devModeUsesFixedCodeZeroes() throws Exception {
+        mvc.perform(post("/api/v1/auth/request-code")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"phone\":\"13800138000\"}"))
+            .andExpect(status().isAccepted());
+        org.junit.jupiter.api.Assertions.assertEquals("000000", sms.lastCode);
+
+        mvc.perform(post("/api/v1/auth/verify")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"phone\":\"13800138000\",\"code\":\"000000\",\"deviceName\":\"Web\"}"))
+            .andExpect(status().isOk());
     }
 
     @Test
@@ -108,6 +125,17 @@ class AuthApiTest {
         mvc.perform(get("/api/v1/auth/devices").header("Authorization", "Bearer " + token))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].name").value("Android"));
+    }
+
+    @Test
+    void corsPreflightAllowsFlutterWebOrigin() throws Exception {
+        mvc.perform(options("/api/v1/auth/verify")
+                .header("Origin", "http://localhost:50000")
+                .header("Access-Control-Request-Method", "POST")
+                .header("Access-Control-Request-Headers", "content-type"))
+            .andExpect(status().isOk())
+            .andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:50000"))
+            .andExpect(header().string("Access-Control-Allow-Methods", containsString("POST")));
     }
 
     @Test

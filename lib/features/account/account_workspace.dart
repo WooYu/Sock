@@ -218,7 +218,7 @@ class _AccountWorkspaceState extends State<AccountWorkspace> {
       setState(() {
         _isRequesting = false;
         _secondsUntilResend = 60;
-        _notice = '验证码已发送';
+        _notice = '验证码已发送（开发模式验证码：000000）';
       });
       _resendTimer?.cancel();
       _resendTimer = Timer.periodic(const Duration(seconds: 1), (timer) {

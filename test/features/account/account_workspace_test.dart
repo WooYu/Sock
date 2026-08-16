@@ -35,7 +35,7 @@ void main() {
     await tester.pump();
 
     expect(requests, 1);
-    expect(find.text('验证码已发送'), findsOneWidget);
+    expect(find.text('验证码已发送（开发模式验证码：000000）'), findsOneWidget);
     expect(find.text('60 秒后重发'), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
   });
@@ -99,6 +99,36 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Chrome Web'), findsNothing);
+  });
+
+  testWidgets('shows an error message when the login request fails', (
+    tester,
+  ) async {
+    final controller = SessionController(
+      MemorySessionRepository(),
+      remote: RemoteAuthService(
+        baseUrl: Uri.parse('https://api.stockcal.test'),
+        client: MockClient((request) async {
+          throw http.ClientException('Failed to fetch');
+        }),
+      ),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(body: AccountWorkspace(controller: controller)),
+      ),
+    );
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, '手机号'),
+      '13800138000',
+    );
+    await tester.enterText(find.widgetWithText(TextFormField, '验证码'), '123456');
+    await tester.tap(find.text('登录'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('无法连接服务器，请检查网络后重试'), findsOneWidget);
+    expect(controller.session, isNull);
   });
 
   testWidgets('phone layout does not overflow', (tester) async {

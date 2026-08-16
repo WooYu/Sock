@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import java.security.Principal;
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
@@ -50,7 +52,7 @@ public class AuthController {
                 values (:id, :userId, :name, :hash, :seen)
                 """)
             .param("id", device.id()).param("userId", userId).param("name", device.name())
-            .param("hash", hash(refresh)).param("seen", device.lastSeenAt()).update();
+            .param("hash", hash(refresh)).param("seen", device.lastSeenAt().atOffset(ZoneOffset.UTC)).update();
         saveAccessToken(access, request.phone());
         return new SessionResponse(access, refresh, Instant.now().plusSeconds(900),
             new Profile(request.phone(), "StockCal 用户"), device);
@@ -62,7 +64,7 @@ public class AuthController {
                 update device_session set last_seen_at = :seen
                 where refresh_token_hash = :hash and revoked_at is null
                 """)
-            .param("seen", Instant.now()).param("hash", hash(request.refreshToken())).update();
+            .param("seen", OffsetDateTime.now(ZoneOffset.UTC)).param("hash", hash(request.refreshToken())).update();
         if (count == 0) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "刷新令牌无效");
         }
@@ -94,7 +96,7 @@ public class AuthController {
                 update device_session d set revoked_at = :revoked
                 where d.id = :id and d.user_id in (select id from app_user where phone = :phone)
                 """)
-            .param("revoked", Instant.now()).param("id", id)
+            .param("revoked", OffsetDateTime.now(ZoneOffset.UTC)).param("id", id)
             .param("phone", principal.getName()).update();
     }
 
@@ -119,7 +121,7 @@ public class AuthController {
     private void saveAccessToken(String token, String phone) {
         jdbc.sql("insert into access_token (token_hash, phone, expires_at) values (:hash, :phone, :expires)")
             .param("hash", hash(token)).param("phone", phone)
-            .param("expires", Instant.now().plusSeconds(900)).update();
+            .param("expires", OffsetDateTime.now(ZoneOffset.UTC).plusSeconds(900)).update();
     }
 
     record VerifyRequest(

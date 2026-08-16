@@ -1,16 +1,17 @@
 package com.stockcal.auth;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 @Configuration
 class SmsConfiguration {
+    private static final Logger log = LoggerFactory.getLogger(SmsConfiguration.class);
+
     @Bean
     SmsGateway smsGateway() {
-        return (phone, code) -> {
-            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "短信服务尚未配置");
-        };
+        return (phone, code) ->
+            log.info("开发模式短信验证码 phone={} code={}", phone, code);
     }
 }

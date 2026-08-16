@@ -5,7 +5,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,7 +34,7 @@ public class BearerTokenFilter extends OncePerRequestFilter {
                     where t.token_hash = :hash and t.expires_at > :now and u.enabled=true
                     """)
                 .param("hash", TokenHash.sha256(header.substring(7)))
-                .param("now", Instant.now()).query((row, ignored) ->
+                .param("now", OffsetDateTime.now(ZoneOffset.UTC)).query((row, ignored) ->
                     new Identity(row.getString("phone"), row.getString("role"))).optional();
             identity.ifPresent(value -> SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(value.phone(), null,

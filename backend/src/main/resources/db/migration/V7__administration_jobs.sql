@@ -1,5 +1,5 @@
 create table admin_job (
-    id uuid primary key,
+    id varchar(36) primary key,
     type varchar(40) not null,
     target varchar(180) not null,
     status varchar(20) not null,
@@ -10,7 +10,7 @@ create table admin_job (
 );
 
 create table ai_call_log (
-    id uuid primary key,
+    id varchar(36) primary key,
     actor_id varchar(100),
     purpose varchar(80) not null,
     model varchar(100) not null,
