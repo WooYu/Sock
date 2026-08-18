@@ -2,15 +2,15 @@ services:
   postgres:
     image: postgres:17-alpine
     environment:
-      POSTGRES_DB: stockcal
-      POSTGRES_USER: stockcal
-      POSTGRES_PASSWORD: stockcal
+      POSTGRES_DB: ${POSTGRES_DB:-stockcal}
+      POSTGRES_USER: ${POSTGRES_USER:-stockcal}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-stockcal}
     ports:
       - "5432:5432"
     volumes:
       - stockcal_postgres:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U stockcal"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-stockcal}"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -26,6 +26,36 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-stockcal}
+      DATABASE_USER: ${POSTGRES_USER:-stockcal}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-stockcal}
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      PORT: "8080"
+      STOCKCAL_AI_ENABLED: ${STOCKCAL_AI_ENABLED:-true}
+      STOCKCAL_AI_BASE_URL: ${STOCKCAL_AI_BASE_URL:-https://api.deepseek.com}
+      STOCKCAL_AI_MODEL: ${STOCKCAL_AI_MODEL:-deepseek-chat}
+      AI_API_KEY: ${AI_API_KEY:-}
+      TUSHARE_TOKEN: ${TUSHARE_TOKEN:-}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 45s
 
 volumes:
   stockcal_postgres:
