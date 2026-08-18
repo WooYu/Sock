@@ -15,11 +15,12 @@ class KnowledgeConfiguration {
         JdbcKnowledgeRepository repository,
         @Value("${stockcal.ai.enabled:true}") boolean aiEnabled,
         @Value("${stockcal.ai-api-key:}") String apiKey,
-        @Value("${stockcal.ai.model:gpt-4o-mini}") String model
+        @Value("${stockcal.ai.base-url:https://api.deepseek.com}") String baseUrl,
+        @Value("${stockcal.ai.model:deepseek-chat}") String model
     ) {
         KnowledgeExtractor extractor = aiEnabled && !apiKey.isBlank()
-            ? new OpenAiKnowledgeExtractor(new OpenAiResponsesKnowledgeClient(
-                RestClient.builder().build(), apiKey, model))
+            ? new OpenAiKnowledgeExtractor(new ChatCompletionsKnowledgeClient(
+                RestClient.builder().build(), baseUrl, apiKey, model))
             : new NoteExtractor();
         return new KnowledgeWorkflow(repository, extractor, Instant::now);
     }

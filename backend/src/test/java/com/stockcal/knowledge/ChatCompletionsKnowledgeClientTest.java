@@ -12,20 +12,20 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 
-class OpenAiResponsesKnowledgeClientTest {
+class ChatCompletionsKnowledgeClientTest {
     @Test
-    void requestsStrictStructuredOutputAndReturnsOutputText() {
+    void postsChatCompletionAndReturnsMessageContent() {
         var builder = RestClient.builder();
         var server = MockRestServiceServer.bindTo(builder).build();
-        server.expect(once(), requestTo("https://api.openai.com/v1/responses"))
+        server.expect(once(), requestTo("https://api.deepseek.com/chat/completions"))
             .andExpect(header("Authorization", "Bearer test-key"))
-            .andExpect(jsonPath("$.model").value("gpt-4o-mini"))
-            .andExpect(jsonPath("$.text.format.type").value("json_schema"))
-            .andExpect(jsonPath("$.text.format.strict").value(true))
+            .andExpect(jsonPath("$.model").value("deepseek-chat"))
+            .andExpect(jsonPath("$.response_format.type").value("json_object"))
             .andRespond(withSuccess("""
-                {"output":[{"type":"message","content":[{"type":"output_text","text":"{\\"items\\":[]}"}]}]}
+                {"choices":[{"message":{"content":"{\\"items\\":[]}"}}]}
                 """, MediaType.APPLICATION_JSON));
-        var client = new OpenAiResponsesKnowledgeClient(builder.build(), "test-key", "gpt-4o-mini");
+        var client = new ChatCompletionsKnowledgeClient(
+            builder.build(), "https://api.deepseek.com", "test-key", "deepseek-chat");
 
         var result = client.extract("1 | 海龟是筑底形态。");
 

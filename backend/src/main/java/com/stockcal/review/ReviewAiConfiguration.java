@@ -13,12 +13,14 @@ class ReviewAiConfiguration {
     ReviewExplanationClient reviewExplanationClient(
         @Value("${stockcal.ai.enabled:true}") boolean enabled,
         @Value("${stockcal.ai-api-key:}") String apiKey,
-        @Value("${stockcal.ai.model:gpt-4o-mini}") String model
+        @Value("${stockcal.ai.base-url:https://api.deepseek.com}") String baseUrl,
+        @Value("${stockcal.ai.model:deepseek-chat}") String model
     ) {
         if (!enabled || apiKey.isBlank()) {
             return snapshot -> { throw new ResponseStatusException(
                 HttpStatus.SERVICE_UNAVAILABLE, "AI 服务尚未配置"); };
         }
-        return new OpenAiReviewExplanationClient(RestClient.builder().build(), apiKey, model);
+        return new ChatCompletionsReviewClient(
+            RestClient.builder().build(), baseUrl, apiKey, model);
     }
 }

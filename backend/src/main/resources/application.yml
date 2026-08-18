@@ -20,7 +20,8 @@ server:
 stockcal:
   ai:
     enabled: ${STOCKCAL_AI_ENABLED:true}
-    model: ${OPENAI_MODEL:gpt-4o-mini}
+    model: ${STOCKCAL_AI_MODEL:${OPENAI_MODEL:deepseek-chat}}
+    base-url: ${STOCKCAL_AI_BASE_URL:https://api.deepseek.com}
   knowledge:
     notes-path: ${STOCKCAL_NOTES_PATH:}
   sms-api-key: ${SMS_API_KEY:}
