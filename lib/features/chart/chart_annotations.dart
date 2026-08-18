@@ -131,7 +131,7 @@ class ChartAnnotationController extends ChangeNotifier {
     DateTime Function()? clock,
   }) : _clock = clock ?? DateTime.now;
 
-  final String stockCode;
+  String stockCode;
   final ChartAnnotationRepository repository;
   final ChartAnnotationOutbox outbox;
   final String Function() idFactory;
@@ -147,6 +147,15 @@ class ChartAnnotationController extends ChangeNotifier {
     final restored = await repository.load(stockCode);
     if (_localWrites == writesAtStart) annotations = restored;
     _loaded = true;
+    notifyListeners();
+  }
+
+  /// Points the controller at a different stock and reloads its annotations.
+  void switchStock(String code) {
+    if (code == stockCode) return;
+    stockCode = code;
+    annotations = [];
+    _loaded = false;
     notifyListeners();
   }
 

@@ -34,6 +34,7 @@ class SettingsAdminWorkspace extends StatefulWidget {
     this.fileGateway,
     this.ruleBook,
     this.ruleRepository,
+    this.initialTabIndex = 0,
   });
 
   final RemoteAdminService? remote;
@@ -42,6 +43,7 @@ class SettingsAdminWorkspace extends StatefulWidget {
   final ArchiveFileGateway? fileGateway;
   final RuleBook? ruleBook;
   final PersistentRuleRepository? ruleRepository;
+  final int initialTabIndex;
 
   @override
   State<SettingsAdminWorkspace> createState() => _SettingsAdminWorkspaceState();
@@ -125,6 +127,7 @@ class _SettingsAdminWorkspaceState extends State<SettingsAdminWorkspace> {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
+      initialIndex: widget.initialTabIndex.clamp(0, 1),
       child: Material(
         color: Theme.of(context).colorScheme.surface,
         child: Column(

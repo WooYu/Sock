@@ -12,7 +12,9 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(const StockCalApp());
-    await tester.tap(find.text('规则回测'));
+    await tester.tap(find.text('更多'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('规则与回测'));
     await tester.pumpAndSettle();
 
     expect(find.textContaining('请先登录后查看行情'), findsOneWidget);

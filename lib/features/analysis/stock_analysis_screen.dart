@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/display.dart';
 import '../market/market_data.dart';
 import '../knowledge/knowledge.dart';
 import 'stock_analysis_controller.dart';
@@ -176,14 +177,19 @@ class _AnalysisContent extends StatelessWidget {
               children: [
                 Text(
                   quote.price.toStringAsFixed(2),
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: positive
-                        ? Colors.red.shade700
-                        : Colors.green.shade700,
+                  style: withTabular(
+                    Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: pnlColor(context, quote.change),
+                    ),
                   ),
                 ),
                 Text(
                   '${positive ? '+' : ''}${quote.changePercent.toStringAsFixed(2)}%',
+                  style: withTabular(
+                    Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: pnlColor(context, quote.change),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -289,7 +295,10 @@ class _AnalysisContent extends StatelessWidget {
               'MA${analysis.settings.maLongPeriod} '
               '${point.maLong.toStringAsFixed(2)}',
             ),
-            trailing: Text('BOLL ${point.bollUpper.toStringAsFixed(2)}'),
+            trailing: Text(
+              'BOLL ${point.bollUpper.toStringAsFixed(2)}',
+              style: withTabular(null),
+            ),
           ),
         ),
       ],
@@ -346,7 +355,10 @@ class _ValueTile extends StatelessWidget {
           children: [
             Text(label, style: Theme.of(context).textTheme.labelMedium),
             const SizedBox(height: 4),
-            Text('${value.toStringAsFixed(suffix.isEmpty ? 2 : 0)}$suffix'),
+            Text(
+              '${value.toStringAsFixed(suffix.isEmpty ? 2 : 0)}$suffix',
+              style: withTabular(Theme.of(context).textTheme.titleMedium),
+            ),
           ],
         ),
       ),

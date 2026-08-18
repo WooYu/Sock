@@ -34,56 +34,75 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
     final outbox = widget.controller.outbox;
     final pending = outbox is MemoryMutationOutbox ? outbox.pending.length : 0;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('自选股'),
-        actions: [
-          IconButton(
-            tooltip: '新建自选分组',
-            onPressed: _createGroup,
-            icon: const Icon(Icons.create_new_folder_outlined),
+    return Material(
+      color: Colors.transparent,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 8, 0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '自选股',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                ),
+                IconButton(
+                  tooltip: '新建自选分组',
+                  onPressed: _createGroup,
+                  icon: const Icon(Icons.create_new_folder_outlined),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: widget.controller.groups.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.bookmark_border, size: 40),
+                        const SizedBox(height: 12),
+                        const Text('还没有自选分组'),
+                        const SizedBox(height: 12),
+                        FilledButton.icon(
+                          onPressed: _createGroup,
+                          icon: const Icon(Icons.add),
+                          label: const Text('新建分组'),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Chip(
+                          avatar: const Icon(
+                            Icons.cloud_upload_outlined,
+                            size: 18,
+                          ),
+                          label: Text('待同步 $pending 项'),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      for (final group in widget.controller.groups)
+                        _GroupSection(
+                          group: group,
+                          onAdd: () => _addStock(group.id),
+                          onRemove: (code) => widget.controller.removeStock(
+                            groupId: group.id,
+                            code: code,
+                          ),
+                        ),
+                    ],
+                  ),
           ),
         ],
       ),
-      body: widget.controller.groups.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.bookmark_border, size: 40),
-                  const SizedBox(height: 12),
-                  const Text('还没有自选分组'),
-                  const SizedBox(height: 12),
-                  FilledButton.icon(
-                    onPressed: _createGroup,
-                    icon: const Icon(Icons.add),
-                    label: const Text('新建分组'),
-                  ),
-                ],
-              ),
-            )
-          : ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Chip(
-                    avatar: const Icon(Icons.cloud_upload_outlined, size: 18),
-                    label: Text('待同步 $pending 项'),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                for (final group in widget.controller.groups)
-                  _GroupSection(
-                    group: group,
-                    onAdd: () => _addStock(group.id),
-                    onRemove: (code) => widget.controller.removeStock(
-                      groupId: group.id,
-                      code: code,
-                    ),
-                  ),
-              ],
-            ),
     );
   }
 

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../core/display.dart';
 import '../account/account_workspace.dart';
 import '../account/persistent_session_repository.dart';
 import '../account/remote_auth_service.dart';
@@ -46,6 +47,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   var _selected = '总览';
+  var _chartStockCode = '600519';
   late final PortfolioController _portfolioController;
   late final StockAnalysisController _stockAnalysisController;
   late final RemoteMarketService _marketService;
@@ -91,11 +93,12 @@ class _HomeScreenState extends State<HomeScreen> {
       market: _marketService,
       analyzer: StockAnalyzer(),
     );
+    _stockAnalysisController.addListener(_onAnalysisSelectionChanged);
     widget.preferences?.addListener(_applyIndicatorSettings);
     _applyIndicatorSettings();
     _annotationStore = PersistentChartAnnotationStore();
     _chartAnnotationController = ChartAnnotationController(
-      stockCode: '600519',
+      stockCode: _chartStockCode,
       repository: _annotationStore,
       outbox: _annotationStore,
       idFactory: () => 'annotation-${DateTime.now().microsecondsSinceEpoch}',
@@ -131,6 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void dispose() {
     widget.preferences?.removeListener(_applyIndicatorSettings);
     _portfolioController.dispose();
+    _stockAnalysisController.removeListener(_onAnalysisSelectionChanged);
     _stockAnalysisController.dispose();
     _chartAnnotationController.dispose();
     _watchlistController.dispose();
@@ -162,6 +166,14 @@ class _HomeScreenState extends State<HomeScreen> {
     analyzer.settings = settings;
     if (_stockAnalysisController.analysis != null) {
       unawaited(_stockAnalysisController.refresh());
+    }
+  }
+
+  void _onAnalysisSelectionChanged() {
+    final selected = _stockAnalysisController.selected;
+    if (selected != null && selected.code != _chartStockCode) {
+      _chartStockCode = selected.code;
+      _chartAnnotationController.switchStock(_chartStockCode);
     }
   }
 
@@ -201,7 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
       '总览' => 0,
       '个股分析' => 1,
       '专业K线' => 2,
-      '组合交易' => 3,
+      '组合' => 3,
       _ => 4,
     };
 
@@ -221,6 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
               stockAnalysisController: _stockAnalysisController,
               marketService: _marketService,
               chartAnnotationController: _chartAnnotationController,
+              chartStockCode: _chartStockCode,
               ruleBook: _ruleBook,
               ruleRepository: _ruleRepository,
               predictionRepository: _predictionRepository,
@@ -241,7 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
           : NavigationBar(
               selectedIndex: mobileIndex,
               onDestinationSelected: (index) {
-                const destinations = ['总览', '个股分析', '专业K线', '组合交易', '更多'];
+                const destinations = ['总览', '个股分析', '专业K线', '组合', '更多'];
                 setState(() => _selected = destinations[index]);
               },
               destinations: const [
@@ -278,19 +291,16 @@ class _DesktopNavigation extends StatelessWidget {
     ('总览', Icons.dashboard_outlined),
     ('个股分析', Icons.search),
     ('专业K线', Icons.candlestick_chart_outlined),
-    ('规则回测', Icons.rule_outlined),
-    ('知识规则', Icons.library_books_outlined),
-    ('组合交易', Icons.account_balance_wallet_outlined),
-    ('自选股', Icons.bookmark_outline),
-    ('复盘AI', Icons.rate_review_outlined),
-    ('账户同步', Icons.person_outline),
-    ('设置后台', Icons.settings_outlined),
+    ('组合', Icons.account_balance_wallet_outlined),
+    ('更多', Icons.more_horiz),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final isPrimary = _items.any((item) => item.$1 == selected);
+    final effectiveSelected = isPrimary ? selected : '更多';
     return SizedBox(
-      width: 152,
+      width: 168,
       child: Material(
         color: Theme.of(context).colorScheme.surfaceContainerLow,
         child: ListView(
@@ -299,7 +309,7 @@ class _DesktopNavigation extends StatelessWidget {
             for (final item in _items)
               ListTile(
                 dense: true,
-                selected: selected == item.$1,
+                selected: effectiveSelected == item.$1,
                 leading: Icon(item.$2, size: 21),
                 title: Text(item.$1),
                 onTap: () => onSelected(item.$1),
@@ -318,6 +328,7 @@ class _Workspace extends StatelessWidget {
     required this.stockAnalysisController,
     required this.marketService,
     required this.chartAnnotationController,
+    required this.chartStockCode,
     required this.ruleBook,
     required this.ruleRepository,
     required this.predictionRepository,
@@ -336,6 +347,7 @@ class _Workspace extends StatelessWidget {
   final StockAnalysisController stockAnalysisController;
   final AShareMarketAdapter marketService;
   final ChartAnnotationController chartAnnotationController;
+  final String chartStockCode;
   final RuleBook ruleBook;
   final PersistentRuleRepository ruleRepository;
   final PersistentPredictionRepository predictionRepository;
@@ -350,7 +362,7 @@ class _Workspace extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (module == '组合交易') {
+    if (module == '组合') {
       return PortfolioScreen(controller: portfolioController);
     }
     if (module == '个股分析') {
@@ -362,8 +374,9 @@ class _Workspace extends StatelessWidget {
     if (module == '专业K线') {
       return _MarketSnapshotLoader(
         market: marketService,
+        stockCode: chartStockCode,
         builder: (snapshot) => ProfessionalChartScreen(
-          stockCode: '600519',
+          stockCode: chartStockCode,
           candles: snapshot.dailyCandles,
           annotationController: chartAnnotationController,
         ),
@@ -372,12 +385,14 @@ class _Workspace extends StatelessWidget {
     if (module == '规则回测') {
       return _MarketSnapshotLoader(
         market: marketService,
+        stockCode: chartStockCode,
         builder: (snapshot) => RulesWorkspace(
           ruleBook: ruleBook,
           ruleRepository: ruleRepository,
           predictionRepository: predictionRepository,
           knowledgeController: knowledgeController,
           candles: snapshot.dailyCandles,
+          stockCode: chartStockCode,
         ),
       );
     }
@@ -397,13 +412,14 @@ class _Workspace extends StatelessWidget {
     if (module == '账户同步') {
       return AccountWorkspace(controller: sessionController);
     }
-    if (module == '设置后台') {
+    if (module == '设置后台' || module == '管理后台') {
       return SettingsAdminWorkspace(
         remote: adminService,
         sessionController: sessionController,
         preferences: preferences,
         ruleBook: ruleBook,
         ruleRepository: ruleRepository,
+        initialTabIndex: module == '管理后台' ? 1 : 0,
       );
     }
     if (module == '总览') {
@@ -415,7 +431,7 @@ class _Workspace extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        Text(module, style: Theme.of(context).textTheme.headlineMedium),
+        Text('更多功能', style: Theme.of(context).textTheme.headlineMedium),
         const SizedBox(height: 12),
         if (module == '更多') ...[
           _MoreDestination(
@@ -457,7 +473,7 @@ class _Workspace extends StatelessWidget {
           _MoreDestination(
             icon: Icons.admin_panel_settings_outlined,
             title: '管理后台',
-            target: '设置后台',
+            target: '管理后台',
             onNavigate: onNavigate,
           ),
         ],
@@ -467,9 +483,14 @@ class _Workspace extends StatelessWidget {
 }
 
 class _MarketSnapshotLoader extends StatefulWidget {
-  const _MarketSnapshotLoader({required this.market, required this.builder});
+  const _MarketSnapshotLoader({
+    required this.market,
+    required this.stockCode,
+    required this.builder,
+  });
 
   final AShareMarketAdapter market;
+  final String stockCode;
   final Widget Function(MarketSnapshot snapshot) builder;
 
   @override
@@ -486,7 +507,7 @@ class _MarketSnapshotLoaderState extends State<_MarketSnapshotLoader> {
   }
 
   void _load() {
-    _future = widget.market.snapshot('600519');
+    _future = widget.market.snapshot(widget.stockCode);
   }
 
   void _retry() => setState(_load);
@@ -570,8 +591,16 @@ class _Dashboard extends StatelessWidget {
           runSpacing: 12,
           children: [
             _Metric(label: '总资产', value: totalAssets),
-            _Metric(label: '累计盈亏', value: portfolioController.totalProfit),
-            const _Metric(label: '今日盈亏', value: 0),
+            _Metric(
+              label: '累计盈亏',
+              value: portfolioController.totalProfit,
+              color: pnlColor(context, portfolioController.totalProfit),
+            ),
+            _Metric(
+              label: '浮动盈亏',
+              value: portfolioController.floatingProfit,
+              color: pnlColor(context, portfolioController.floatingProfit),
+            ),
           ],
         ),
         const Divider(height: 32),
@@ -631,27 +660,16 @@ class _Dashboard extends StatelessWidget {
           title: Text('本周交易复盘'),
           subtitle: Text('暂无待完成项目'),
         ),
-        const SizedBox(height: 8),
-        const Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: [
-            _ModuleChip(label: 'Trade Calendar'),
-            _ModuleChip(label: 'Position Calculator'),
-            _ModuleChip(label: 'Risk Dashboard'),
-            _ModuleChip(label: '离线可用'),
-            _ModuleChip(label: '真实行情适配层'),
-          ],
-        ),
       ],
     );
   }
 }
 
 class _Metric extends StatelessWidget {
-  const _Metric({required this.label, required this.value});
+  const _Metric({required this.label, required this.value, this.color});
   final String label;
   final double value;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -663,7 +681,9 @@ class _Metric extends StatelessWidget {
           Text(label, style: Theme.of(context).textTheme.bodySmall),
           Text(
             value.toStringAsFixed(0),
-            style: Theme.of(context).textTheme.titleLarge,
+            style: withTabular(
+              Theme.of(context).textTheme.titleLarge?.copyWith(color: color),
+            ),
           ),
         ],
       ),
@@ -704,16 +724,5 @@ class _MoreDestination extends StatelessWidget {
       trailing: const Icon(Icons.chevron_right),
       onTap: () => onNavigate(target),
     );
-  }
-}
-
-class _ModuleChip extends StatelessWidget {
-  const _ModuleChip({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Chip(label: Text(label));
   }
 }

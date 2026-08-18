@@ -12,7 +12,7 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(const StockCalApp());
-    await tester.tap(find.text('组合交易'));
+    await tester.tap(find.text('组合'));
     await tester.pumpAndSettle();
 
     expect(find.byTooltip('记一笔交易'), findsOneWidget);

@@ -12,7 +12,9 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(const StockCalApp());
-    await tester.tap(find.text('设置后台'));
+    await tester.tap(find.text('更多'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('设置'));
     await tester.pumpAndSettle();
 
     expect(find.text('指标参数'), findsOneWidget);

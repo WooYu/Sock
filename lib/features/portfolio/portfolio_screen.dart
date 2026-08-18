@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/display.dart';
 import 'portfolio_controller.dart';
 import 'portfolio_ledger.dart';
 
@@ -100,8 +101,16 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           children: [
             _Metric(label: '现金', value: _money(controller.ledger.cashBalance)),
             _Metric(label: '持仓市值', value: _money(controller.marketValue)),
-            _Metric(label: '累计盈亏', value: _money(controller.totalProfit)),
-            _Metric(label: '浮动盈亏', value: _money(controller.floatingProfit)),
+            _Metric(
+              label: '累计盈亏',
+              value: _money(controller.totalProfit),
+              color: pnlColor(context, controller.totalProfit),
+            ),
+            _Metric(
+              label: '浮动盈亏',
+              value: _money(controller.floatingProfit),
+              color: pnlColor(context, controller.floatingProfit),
+            ),
           ],
         ),
         if (controller.portfolios.length > 1) ...[
@@ -125,7 +134,14 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               contentPadding: EdgeInsets.zero,
               title: Text(position.name),
               subtitle: Text('${position.code}  ${position.quantity} 股'),
-              trailing: Text('浮动盈亏 ${_money(position.floatingProfit)}'),
+              trailing: Text(
+                '浮动盈亏 ${_money(position.floatingProfit)}',
+                style: withTabular(
+                  Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: pnlColor(context, position.floatingProfit),
+                  ),
+                ),
+              ),
             ),
         const Divider(),
         Row(
@@ -325,10 +341,11 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
 }
 
 class _Metric extends StatelessWidget {
-  const _Metric({required this.label, required this.value});
+  const _Metric({required this.label, required this.value, this.color});
 
   final String label;
   final String value;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -346,7 +363,14 @@ class _Metric extends StatelessWidget {
             children: [
               Text(label, style: Theme.of(context).textTheme.labelMedium),
               const SizedBox(height: 4),
-              Text(value, style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                value,
+                style: withTabular(
+                  Theme.of(
+                    context,
+                  ).textTheme.titleMedium?.copyWith(color: color),
+                ),
+              ),
             ],
           ),
         ),
