@@ -345,7 +345,7 @@ class _Workspace extends StatelessWidget {
   final String module;
   final PortfolioController portfolioController;
   final StockAnalysisController stockAnalysisController;
-  final AShareMarketAdapter marketService;
+  final RemoteMarketService marketService;
   final ChartAnnotationController chartAnnotationController;
   final String chartStockCode;
   final RuleBook ruleBook;
@@ -407,7 +407,10 @@ class _Workspace extends StatelessWidget {
       return KnowledgeWorkspace(controller: knowledgeController);
     }
     if (module == '自选股') {
-      return WatchlistScreen(controller: watchlistController);
+      return WatchlistScreen(
+        controller: watchlistController,
+        catalog: marketService,
+      );
     }
     if (module == '账户同步') {
       return AccountWorkspace(controller: sessionController);

@@ -1,11 +1,20 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
+import '../../widgets/skeleton.dart';
+import '../market/market_data.dart';
 import 'watchlist.dart';
 
 class WatchlistScreen extends StatefulWidget {
-  const WatchlistScreen({super.key, required this.controller});
+  const WatchlistScreen({
+    super.key,
+    required this.controller,
+    required this.catalog,
+  });
 
   final WatchlistController controller;
+  final StockCatalog catalog;
 
   @override
   State<WatchlistScreen> createState() => _WatchlistScreenState();
@@ -136,15 +145,10 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
   }
 
   Future<void> _addStock(String groupId) async {
-    const candidates = [
-      WatchStock(code: '600519', name: '贵州茅台'),
-      WatchStock(code: '000001', name: '平安银行'),
-      WatchStock(code: '300750', name: '宁德时代'),
-    ];
     final selected = await showModalBottomSheet<WatchStock>(
       context: context,
       isScrollControlled: true,
-      builder: (context) => const _StockPicker(candidates: candidates),
+      builder: (context) => _StockPicker(catalog: widget.catalog),
     );
     if (selected != null) {
       await widget.controller.addStock(groupId: groupId, stock: selected);
@@ -207,9 +211,9 @@ class _GroupSection extends StatelessWidget {
 }
 
 class _StockPicker extends StatefulWidget {
-  const _StockPicker({required this.candidates});
+  const _StockPicker({required this.catalog});
 
-  final List<WatchStock> candidates;
+  final StockCatalog catalog;
 
   @override
   State<_StockPicker> createState() => _StockPickerState();
@@ -217,16 +221,27 @@ class _StockPicker extends StatefulWidget {
 
 class _StockPickerState extends State<_StockPicker> {
   var query = '';
+  Timer? _debounce;
+  late Future<List<Security>> _results = Future.value(const []);
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void _onChanged(String value) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      setState(() {
+        query = value.trim();
+        _results = widget.catalog.search(query);
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final matches = widget.candidates.where((stock) {
-      final normalized = query.trim().toLowerCase();
-      return normalized.isEmpty ||
-          stock.code.contains(normalized) ||
-          stock.name.toLowerCase().contains(normalized);
-    }).toList();
-
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.fromLTRB(
@@ -244,7 +259,7 @@ class _StockPickerState extends State<_StockPicker> {
             TextField(
               key: const Key('stock-search-field'),
               autofocus: true,
-              onChanged: (value) => setState(() => query = value),
+              onChanged: _onChanged,
               decoration: const InputDecoration(
                 labelText: '代码、名称或拼音',
                 prefixIcon: Icon(Icons.search),
@@ -252,13 +267,46 @@ class _StockPickerState extends State<_StockPicker> {
               ),
             ),
             const SizedBox(height: 8),
-            for (final stock in matches)
-              ListTile(
-                minTileHeight: 56,
-                title: Text(stock.name),
-                subtitle: Text(stock.code),
-                onTap: () => Navigator.pop(context, stock),
+            Flexible(
+              child: FutureBuilder<List<Security>>(
+                future: _results,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState != ConnectionState.done) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24),
+                      child: Center(child: Skeleton(height: 40)),
+                    );
+                  }
+                  final results = snapshot.data ?? const <Security>[];
+                  if (results.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24),
+                      child: Center(child: Text('未找到匹配股票')),
+                    );
+                  }
+                  return ListView(
+                    shrinkWrap: true,
+                    children: [
+                      for (final security in results)
+                        ListTile(
+                          minTileHeight: 56,
+                          title: Text(security.name),
+                          subtitle: Text(
+                            '${security.code} · ${security.exchange}',
+                          ),
+                          onTap: () => Navigator.pop(
+                            context,
+                            WatchStock(
+                              code: security.code,
+                              name: security.name,
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                },
               ),
+            ),
           ],
         ),
       ),

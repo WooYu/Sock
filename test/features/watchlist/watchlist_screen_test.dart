@@ -1,7 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:stockcal/features/market/market_data.dart';
 import 'package:stockcal/features/watchlist/watchlist.dart';
 import 'package:stockcal/features/watchlist/watchlist_screen.dart';
+
+class _FakeCatalog implements StockCatalog {
+  @override
+  Future<List<Security>> search(String query, {int limit = 20}) async {
+    return const [
+      Security(
+        code: '600519',
+        name: '贵州茅台',
+        pinyin: 'gzmt',
+        initials: 'gzmt',
+        exchange: 'SH',
+        industry: '白酒',
+      ),
+    ];
+  }
+}
 
 void main() {
   testWidgets('user creates a group and adds a searched stock', (tester) async {
@@ -11,7 +28,12 @@ void main() {
     );
 
     await tester.pumpWidget(
-      MaterialApp(home: WatchlistScreen(controller: controller)),
+      MaterialApp(
+        home: WatchlistScreen(
+          controller: controller,
+          catalog: _FakeCatalog(),
+        ),
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -29,7 +51,8 @@ void main() {
       find.byKey(const Key('stock-search-field')),
       '600519',
     );
-    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('贵州茅台'));
     await tester.pumpAndSettle();
 
