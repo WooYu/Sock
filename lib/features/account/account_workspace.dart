@@ -59,15 +59,23 @@ class _AccountWorkspaceState extends State<AccountWorkspace> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Icon(
-                  Icons.lock_person_outlined,
-                  size: 40,
+                  Icons.candlestick_chart_outlined,
+                  size: 44,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 Text(
-                  '手机验证码登录',
+                  'StockCal',
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.headlineSmall,
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'A 股决策日志 · 手机号登录',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
                 const SizedBox(height: 24),
                 TextFormField(

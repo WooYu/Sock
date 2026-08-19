@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/stockcal_theme.dart';
+
 /// Tabular figures keep numeric columns aligned.
 /// Production design requires: "Numbers use tabular alignment."
 const FontFeature tabularFigures = FontFeature.tabularFigures();
@@ -8,13 +10,13 @@ const FontFeature tabularFigures = FontFeature.tabularFigures();
 /// Applied consistently so gain/loss never relies on color alone.
 Color gainColor(BuildContext context) =>
     Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFFFF6B6B)
-        : Colors.red.shade700;
+        ? StockCalColors.gain
+        : StockCalColors.lightGain;
 
 Color lossColor(BuildContext context) =>
     Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF2ECC71)
-        : Colors.green.shade700;
+        ? StockCalColors.loss
+        : StockCalColors.lightLoss;
 
 /// Semantic color for a signed profit/loss value; null (neutral) when flat.
 Color? pnlColor(BuildContext context, double value) {
