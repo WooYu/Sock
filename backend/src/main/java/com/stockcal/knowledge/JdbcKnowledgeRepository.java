@@ -34,7 +34,7 @@ public class JdbcKnowledgeRepository implements KnowledgeRepository {
     public void saveDraft(KnowledgeDraft value) {
         var updated = jdbc.sql("update knowledge_draft set status=:status,approved_by=:by,reviewed_at=:at where id=:id")
             .param("id", value.id()).param("status", value.status().name()).param("by", value.approvedBy())
-            .param("at", value.reviewedAt()).update();
+            .param("at", toOffset(value.reviewedAt())).update();
         if (updated > 0) return;
         jdbc.sql("insert into knowledge_draft(id,source_document_id,kind,title,summary,source_excerpt,source_line_start,source_line_end,extraction_method,status,approved_by,reviewed_at) values(:id,:source,:kind,:title,:summary,:excerpt,:start,:end,:method,:status,:by,:at)")
             .param("id", value.id()).param("source", value.sourceDocumentId()).param("kind", value.kind().name())
