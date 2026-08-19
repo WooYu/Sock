@@ -12,9 +12,10 @@ void main() {
     ));
     final context = tester.element(find.byType(Scaffold));
     expect(Theme.of(context).brightness, Brightness.dark);
-    expect(Theme.of(context).scaffoldBackgroundColor, StockCalColors.bg);
-    expect(gainColor(context), StockCalColors.gain);
-    expect(lossColor(context), StockCalColors.loss);
+    expect(Theme.of(context).scaffoldBackgroundColor, const Color(0xFF0F1219));
+    expect(Theme.of(context).colorScheme.primary, const Color(0xFF3B6FE0));
+    expect(gainColor(context), const Color(0xFFF23645));
+    expect(lossColor(context), const Color(0xFF089981));
   });
 
   testWidgets('light theme keeps A-share red-up green-down convention',

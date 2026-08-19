@@ -6,17 +6,17 @@ import 'package:flutter/material.dart';
 class StockCalColors {
   StockCalColors._();
 
-  // —— 深色（主打）——
-  static const Color bg = Color(0xFF131722); // 页面背景（深蓝灰）
-  static const Color surface = Color(0xFF1E222D); // 卡片 / 面板
-  static const Color surfaceHigh = Color(0xFF2A2E39); // 浮层 / 选中
-  static const Color primary = Color(0xFF2962FF); // 主色蓝
-  static const Color accent = Color(0xFFF0B90B); // 点缀黄
+  // —— 深色（主打，2026 Midnight Blue）——
+  static const Color bg = Color(0xFF0F1219); // 页面背景（午夜海军蓝）
+  static const Color surface = Color(0xFF1A1E27); // 卡片 / 面板
+  static const Color surfaceHigh = Color(0xFF262B36); // 浮层 / 选中
+  static const Color primary = Color(0xFF3B6FE0); // 主色蓝
+  static const Color accent = Color(0xFFE8A23C); // 暖金点缀
   static const Color gain = Color(0xFFF23645); // 涨（红）
   static const Color loss = Color(0xFF089981); // 跌（绿）
-  static const Color textPrimary = Color(0xFFD1D4DC);
-  static const Color textSecondary = Color(0xFF787B86);
-  static const Color border = Color(0xFF2A2E39);
+  static const Color textPrimary = Color(0xFFE3E6EB);
+  static const Color textSecondary = Color(0xFF8A90A0);
+  static const Color border = Color(0xFF262B36);
 
   // —— 浅色 ——
   static const Color lightBg = Color(0xFFF4F6F9);
