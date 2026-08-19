@@ -3,6 +3,8 @@ package com.stockcal.knowledge;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -24,7 +26,7 @@ public class JdbcKnowledgeRepository implements KnowledgeRepository {
     public void saveSource(SourceDocument value) {
         jdbc.sql("insert into knowledge_source(id,source_path,title,content_hash,original_content,imported_at) values(:id,:path,:title,:hash,:content,:at)")
             .param("id", value.id()).param("path", value.path()).param("title", value.title())
-            .param("hash", value.contentHash()).param("content", value.originalContent()).param("at", value.importedAt()).update();
+            .param("hash", value.contentHash()).param("content", value.originalContent()).param("at", toOffset(value.importedAt())).update();
     }
     public List<SourceDocument> sources() {
         return jdbc.sql("select * from knowledge_source order by imported_at desc").query((rs, row) -> mapSource(rs)).list();
@@ -39,7 +41,7 @@ public class JdbcKnowledgeRepository implements KnowledgeRepository {
             .param("title", value.title()).param("summary", value.summary()).param("excerpt", value.sourceExcerpt())
             .param("start", value.sourceLineStart()).param("end", value.sourceLineEnd())
             .param("method", value.extractionMethod().name()).param("status", value.status().name())
-            .param("by", value.approvedBy()).param("at", value.reviewedAt()).update();
+            .param("by", value.approvedBy()).param("at", toOffset(value.reviewedAt())).update();
     }
     public Optional<KnowledgeDraft> draft(String id) {
         return jdbc.sql("select * from knowledge_draft where id=:id").param("id", id).query((rs, row) -> mapDraft(rs)).optional();
@@ -58,12 +60,12 @@ public class JdbcKnowledgeRepository implements KnowledgeRepository {
             .param("id", value.id()).param("source", value.sourceDocumentId()).param("name", value.name())
             .param("description", value.description()).param("excerpt", value.sourceExcerpt())
             .param("start", value.sourceLineStart()).param("end", value.sourceLineEnd())
-            .param("by", value.approvedBy()).param("at", value.publishedAt()).update();
+            .param("by", value.approvedBy()).param("at", toOffset(value.publishedAt())).update();
     }
 
     private SourceDocument mapSource(ResultSet rs) throws SQLException {
         return new SourceDocument(rs.getString("id"), rs.getString("source_path"), rs.getString("title"),
-            rs.getString("content_hash"), rs.getString("original_content"), rs.getObject("imported_at", Instant.class));
+            rs.getString("content_hash"), rs.getString("original_content"), rs.getObject("imported_at", OffsetDateTime.class).toInstant());
     }
     private KnowledgeDraft mapDraft(ResultSet rs) throws SQLException {
         var reviewed = rs.getObject("reviewed_at");
@@ -72,6 +74,10 @@ public class JdbcKnowledgeRepository implements KnowledgeRepository {
             rs.getString("source_excerpt"), rs.getInt("source_line_start"), rs.getInt("source_line_end"),
             ExtractionMethod.valueOf(rs.getString("extraction_method")),
             ApprovalStatus.valueOf(rs.getString("status")), rs.getString("approved_by"),
-            reviewed == null ? null : rs.getObject("reviewed_at", Instant.class));
+            reviewed == null ? null : rs.getObject("reviewed_at", OffsetDateTime.class).toInstant());
+    }
+
+    private static OffsetDateTime toOffset(Instant instant) {
+        return instant == null ? null : instant.atOffset(ZoneOffset.UTC);
     }
 }

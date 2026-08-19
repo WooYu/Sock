@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import java.security.Principal;
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,7 +69,7 @@ public class AdminController {
         var updated = jdbc.sql("""
                 update admin_job set status='QUEUED',attempts=attempts+1,error=null,updated_at=:now
                 where id=:id and status='FAILED'
-                """).param("now", Instant.now()).param("id", id).update();
+                """).param("now", OffsetDateTime.now(ZoneOffset.UTC)).param("id", id).update();
         if (updated == 0) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "任务不存在或不可重试");
         }
@@ -79,7 +81,7 @@ public class AdminController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     @Transactional
     AdminJob repair(Principal principal, @Valid @RequestBody RepairRequest request) {
-        var now = Instant.now();
+        var now = OffsetDateTime.now(ZoneOffset.UTC);
         var id = UUID.randomUUID().toString();
         jdbc.sql("""
                 insert into admin_job(id,type,target,status,attempts,error,created_at,updated_at)
@@ -148,7 +150,7 @@ public class AdminController {
                 insert into audit_event(id,actor_id,action,target,evidence,created_at)
                 values(:id,:actor,:action,:target,'{}',:now)
                 """).param("id", UUID.randomUUID().toString()).param("actor", actor)
-            .param("action", action).param("target", target).param("now", Instant.now()).update();
+            .param("action", action).param("target", target).param("now", OffsetDateTime.now(ZoneOffset.UTC)).update();
     }
 
     private String mask(String phone) {

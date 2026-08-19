@@ -2,7 +2,8 @@ package com.stockcal.review;
 
 import jakarta.validation.Valid;
 import java.security.Principal;
-import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -42,7 +43,7 @@ public class ReviewAiController {
                 insert into ai_call_log(id,actor_id,purpose,model,status,created_at)
                 values(:id,:actor,'REVIEW_EXPLANATION',:model,:status,:now)
                 """).param("id", UUID.randomUUID().toString()).param("actor", actor)
-            .param("model", model).param("status", status).param("now", Instant.now()).update();
+            .param("model", model).param("status", status).param("now", OffsetDateTime.now(ZoneOffset.UTC)).update();
     }
 
     record Explanation(String text) {}
