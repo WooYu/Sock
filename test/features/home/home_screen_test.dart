@@ -41,7 +41,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('账户与同步'));
     await tester.pumpAndSettle();
-    expect(find.text('手机验证码登录'), findsOneWidget);
+    expect(find.text('A 股决策日志 · 手机号登录'), findsOneWidget);
   });
 
   testWidgets('desktop navigation opens the knowledge approval workspace', (

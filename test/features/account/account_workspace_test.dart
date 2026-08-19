@@ -50,7 +50,7 @@ void main() {
       ),
     );
 
-    expect(find.text('手机验证码登录'), findsOneWidget);
+    expect(find.text('A 股决策日志 · 手机号登录'), findsOneWidget);
     await tester.enterText(
       find.widgetWithText(TextFormField, '手机号'),
       '13800138000',
@@ -78,7 +78,7 @@ void main() {
 
     await tester.tap(find.text('退出登录'));
     await tester.pumpAndSettle();
-    expect(find.text('手机验证码登录'), findsOneWidget);
+    expect(find.text('A 股决策日志 · 手机号登录'), findsOneWidget);
     expect(controller.session, isNull);
   });
 

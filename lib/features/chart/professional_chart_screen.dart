@@ -6,6 +6,7 @@ import '../../domain/stockcal_domain.dart';
 import '../analysis/technical_analysis.dart';
 import 'chart_annotations.dart';
 import 'chart_data.dart';
+import '../../theme/stockcal_theme.dart';
 
 class ProfessionalChartScreen extends StatefulWidget {
   const ProfessionalChartScreen({
@@ -117,12 +118,12 @@ class _ProfessionalChartScreenState extends State<ProfessionalChartScreen> {
                       children: [
                         const _RegionLabel(
                           label: '真实行情',
-                          color: Color(0xFF147D64),
+                          color: StockCalColors.loss,
                         ),
                         Expanded(child: Divider(color: colors.outlineVariant)),
                         const _RegionLabel(
                           label: '预测区',
-                          color: Color(0xFFB57900),
+                          color: StockCalColors.accent,
                         ),
                       ],
                     ),
@@ -142,10 +143,14 @@ class _ProfessionalChartScreenState extends State<ProfessionalChartScreen> {
                                   alpha: 0.5,
                                 ),
                                 axisTextColor: colors.onSurfaceVariant,
-                                candleBullColor: const Color(0xFFC53A43),
-                                candleBearColor: const Color(0xFF16856B),
-                                volumeBullColor: const Color(0x66C53A43),
-                                volumeBearColor: const Color(0x6616856B),
+                                candleBullColor: StockCalColors.gain,
+                                candleBearColor: StockCalColors.loss,
+                                volumeBullColor: StockCalColors.gain.withValues(
+                                  alpha: 0.4,
+                                ),
+                                volumeBearColor: StockCalColors.loss.withValues(
+                                  alpha: 0.4,
+                                ),
                               ),
                             ),
                             IgnorePointer(
@@ -451,27 +456,27 @@ class _IndicatorPainter extends CustomPainter {
     }
 
     if (layers.contains(_IndicatorLayer.ma5)) {
-      drawSeries(calculator.sma(candles, period: 5), const Color(0xFFB57900));
+      drawSeries(calculator.sma(candles, period: 5), StockCalColors.accent);
     }
     if (layers.contains(_IndicatorLayer.ma20)) {
-      drawSeries(calculator.sma(candles, period: 20), const Color(0xFF2667A8));
+      drawSeries(calculator.sma(candles, period: 20), StockCalColors.primary);
     }
     if (layers.contains(_IndicatorLayer.ema12)) {
-      drawSeries(calculator.ema(candles, period: 12), const Color(0xFF7B4FA3));
+      drawSeries(calculator.ema(candles, period: 12), StockCalColors.textSecondary);
     }
     if (layers.contains(_IndicatorLayer.boll)) {
       final bands = calculator.bollinger(candles, period: 20);
       drawSeries(
         bands.map((item) => item?.upper).toList(),
-        const Color(0xFF65717E),
+        StockCalColors.border,
       );
       drawSeries(
         bands.map((item) => item?.middle).toList(),
-        const Color(0xFF8A949E),
+        StockCalColors.textPrimary,
       );
       drawSeries(
         bands.map((item) => item?.lower).toList(),
-        const Color(0xFF65717E),
+        StockCalColors.border,
       );
     }
   }
@@ -695,7 +700,7 @@ class _AnnotationPainter extends CustomPainter {
     final low = candles.map((item) => item.low).reduce((a, b) => a < b ? a : b);
     final range = high - low == 0 ? 1.0 : high - low;
     final paint = Paint()
-      ..color = const Color(0xFFD18B00)
+      ..color = StockCalColors.accent
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
     Offset offset(ChartPoint point) => Offset(
