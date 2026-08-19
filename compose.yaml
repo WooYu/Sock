@@ -43,8 +43,11 @@ services:
       STOCKCAL_AI_MODEL: ${STOCKCAL_AI_MODEL:-deepseek-chat}
       AI_API_KEY: ${AI_API_KEY:-}
       TUSHARE_TOKEN: ${TUSHARE_TOKEN:-}
+      STOCKCAL_NOTES_PATH: ${STOCKCAL_NOTES_PATH:-/notes}
     ports:
       - "8080:8080"
+    volumes:
+      - ./notes:/notes:ro
     depends_on:
       postgres:
         condition: service_healthy
