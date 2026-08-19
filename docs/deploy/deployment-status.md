@@ -14,6 +14,15 @@
 | 后端 | 三容器 healthy，Flyway 迁移 8 个版本，健康检查 `{"status":"UP"}` | |
 | 测试 | 后端 35 用例 ✅ / Flutter 180 用例 ✅（本地） | |
 
+## 功能审计与修复（2026-08-20）✅
+
+全接口审计发现并修复两类 PostgreSQL JDBC 类型绑定 bug（H2 测试库测不出，生产 PG 才暴露）：
+
+1. **`Instant` 无法绑定 `timestamptz`** → 知识库导入/抽取、AI 复盘、后台接口 500。改为 `OffsetDateTime`。
+2. **`String` 无法绑定 `jsonb`** → 同步接口 500。`sync_change.payload` 迁到 `text`（V9，它本就是整体读写的 JSON 字符串）。
+
+修复后全链路实测通过：行情搜索/快照（Tushare）、同步提交/拉取、知识库导入→AI 抽取规则→草稿、AI 复盘（DeepSeek 真实生成）。
+
 ## 待办 / 配置问题（仅剩后续项）⚠️
 
 > ✅ 已解决并验证：防火墙放行 8080、DeepSeek key、Tushare token、公网访问 + 登录冒烟测试（`/auth/request-code` → 202，`/auth/verify` → 200 返回 token）。
