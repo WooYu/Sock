@@ -95,6 +95,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    await tester.scrollUntilVisible(find.text('生成摘要'), 200);
     await tester.tap(find.text('生成摘要'));
     await tester.pumpAndSettle();
     expect(find.text('文案版本 1'), findsOneWidget);
@@ -125,6 +126,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    await tester.scrollUntilVisible(find.text('生成摘要'), 200);
     await tester.tap(find.text('生成摘要'));
     await tester.pumpAndSettle();
 
@@ -143,6 +145,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    await tester.scrollUntilVisible(find.text('AI 仅读取确定性计算结果'), 200);
     expect(find.text('AI 仅读取确定性计算结果'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

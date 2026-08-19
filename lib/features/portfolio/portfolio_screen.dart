@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../core/display.dart';
+import '../../widgets/empty_state.dart';
+import '../../widgets/metric_card.dart';
 import 'portfolio_controller.dart';
 import 'portfolio_ledger.dart';
 
@@ -124,9 +126,14 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         const SizedBox(height: 20),
         Text('持仓', style: Theme.of(context).textTheme.titleMedium),
         if (controller.positions.isEmpty)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 24),
-            child: Text('暂无持仓'),
+          EmptyState(
+            icon: Icons.account_balance_wallet_outlined,
+            title: '暂无持仓',
+            message: '记录一笔交易后在这里汇总',
+            actionLabel: '记一笔',
+            onAction: () {
+              _showTradeEditor();
+            },
           )
         else
           for (final position in controller.positions)
@@ -348,35 +355,12 @@ class _Metric extends StatelessWidget {
   final Color? color;
 
   @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 136,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerLow,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label, style: Theme.of(context).textTheme.labelMedium),
-              const SizedBox(height: 4),
-              Text(
-                value,
-                style: withTabular(
-                  Theme.of(
-                    context,
-                  ).textTheme.titleMedium?.copyWith(color: color),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => MetricCard(
+    label: label,
+    value: value,
+    color: color,
+    width: 136,
+  );
 }
 
 class _TradeEditor extends StatefulWidget {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../widgets/metric_card.dart';
 import '../portfolio/portfolio_ledger.dart';
 import 'persistent_review_store.dart';
 import 'review_ai.dart';
@@ -508,18 +509,8 @@ class _Value extends StatelessWidget {
   final String value;
 
   @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 130,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: Theme.of(context).textTheme.labelMedium),
-          Text(value, style: Theme.of(context).textTheme.titleMedium),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) =>
+      MetricCard(label: label, value: value, width: 130);
 }
 
 class _DeterministicExplanationAdapter implements ReviewExplanationAdapter {

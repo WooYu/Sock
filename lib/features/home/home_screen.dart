@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../core/display.dart';
+import '../../widgets/error_state.dart';
 import '../account/account_workspace.dart';
 import '../account/persistent_session_repository.dart';
 import '../account/remote_auth_service.dart';
@@ -523,22 +524,13 @@ class _MarketSnapshotLoaderState extends State<_MarketSnapshotLoader> {
     builder: (context, snapshot) {
       if (snapshot.hasData) return widget.builder(snapshot.data!);
       if (snapshot.hasError) {
-        return Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.cloud_off_outlined),
-              const SizedBox(height: 8),
-              Text(snapshot.error.toString()),
-              const SizedBox(height: 8),
-              IconButton(
-                tooltip: '重试行情',
-                onPressed: _retry,
-                icon: const Icon(Icons.refresh),
-              ),
-            ],
-          ),
-        );
+        final error = snapshot.error;
+        final message = switch (error) {
+          MarketLoadException e => e.message,
+          StateError e => e.message.toString(),
+          _ => '行情加载失败，请稍后重试',
+        };
+        return ErrorState(message: message, onRetry: _retry);
       }
       return const Center(child: CircularProgressIndicator());
     },

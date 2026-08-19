@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/display.dart';
+import '../../widgets/metric_card.dart';
 import '../market/market_data.dart';
 import '../knowledge/knowledge.dart';
 import 'stock_analysis_controller.dart';
@@ -341,28 +342,10 @@ class _ValueTile extends StatelessWidget {
   final String suffix;
 
   @override
-  Widget build(BuildContext context) => SizedBox(
+  Widget build(BuildContext context) => MetricCard(
+    label: label,
+    value: '${value.toStringAsFixed(suffix.isEmpty ? 2 : 0)}$suffix',
     width: 144,
-    child: DecoratedBox(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label, style: Theme.of(context).textTheme.labelMedium),
-            const SizedBox(height: 4),
-            Text(
-              '${value.toStringAsFixed(suffix.isEmpty ? 2 : 0)}$suffix',
-              style: withTabular(Theme.of(context).textTheme.titleMedium),
-            ),
-          ],
-        ),
-      ),
-    ),
   );
 }
 
