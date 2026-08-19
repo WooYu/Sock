@@ -429,6 +429,8 @@ class _Workspace extends StatelessWidget {
       return _Dashboard(
         portfolioController: portfolioController,
         stockAnalysisController: stockAnalysisController,
+        signedIn: sessionController.session?.isSignedIn == true,
+        onLogin: () => onNavigate('账户同步'),
       );
     }
     return ListView(
@@ -547,10 +549,14 @@ class _Dashboard extends StatelessWidget {
   const _Dashboard({
     required this.portfolioController,
     required this.stockAnalysisController,
+    required this.signedIn,
+    required this.onLogin,
   });
 
   final PortfolioController portfolioController;
   final StockAnalysisController stockAnalysisController;
+  final bool signedIn;
+  final VoidCallback onLogin;
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
@@ -571,6 +577,41 @@ class _Dashboard extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
+        if (!signedIn) ...[
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  const Icon(Icons.login, size: 28),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '登录以获取行情与 AI 分析',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '登录后同步自选、组合，获取实时行情与 AI 复盘',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  FilledButton(
+                    onPressed: onLogin,
+                    child: const Text('去登录'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
         Row(
           children: [
             Expanded(

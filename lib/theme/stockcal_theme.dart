@@ -124,7 +124,7 @@ ThemeData buildStockCalTheme(Brightness brightness) {
       style: FilledButton.styleFrom(
         backgroundColor: scheme.primary,
         foregroundColor: Colors.white,
-        minimumSize: const Size.fromHeight(44),
+        minimumSize: const Size(48, 44),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         textStyle: const TextStyle(fontWeight: FontWeight.w600),
       ),
