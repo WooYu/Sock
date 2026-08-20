@@ -49,6 +49,6 @@ void main() {
     expect(analysis.maShort, closeTo(expectedShort, 0.0001));
     expect(analysis.maLong, closeTo(expectedLong, 0.0001));
     expect(analysis.settings.maLongPeriod, 10);
-    expect(analysis.matchedRules.any((rule) => rule.contains('MA10')), isTrue);
+    expect(analysis.matchedRules.any((rule) => rule.name.contains('MA10')), isTrue);
   });
 }

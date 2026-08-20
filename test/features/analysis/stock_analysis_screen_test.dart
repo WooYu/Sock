@@ -40,7 +40,7 @@ void main() {
         ),
         findsOneWidget,
       );
-      expect(find.text('命中规则'), findsOneWidget);
+      expect(find.text('盈利模式识别'), findsOneWidget);
       expect(find.text('未来三日指标延伸'), findsOneWidget);
     },
   );

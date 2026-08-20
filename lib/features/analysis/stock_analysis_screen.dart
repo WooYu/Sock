@@ -322,13 +322,28 @@ class _AnalysisContent extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 20),
-        Text('命中规则', style: Theme.of(context).textTheme.titleMedium),
+        Text('盈利模式识别', style: Theme.of(context).textTheme.titleMedium),
         ...analysis.matchedRules.map(
           (rule) => ListTile(
             dense: true,
             contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.check_circle_outline),
-            title: Text(rule),
+            leading: Icon(
+              rule.score >= 80 ? Icons.star : Icons.check_circle_outline,
+              color: rule.score >= 80
+                  ? Theme.of(context).colorScheme.primary
+                  : null,
+            ),
+            title: Text(rule.name),
+            trailing: Text(
+              '${rule.score}',
+              style: withTabular(
+                Theme.of(context).textTheme.titleSmall?.copyWith(
+                  color: rule.score >= 80
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
           ),
         ),
         if (knowledge.isNotEmpty) ...[

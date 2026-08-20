@@ -216,6 +216,13 @@ class FutureIndicatorPoint {
   final double bollLower;
 }
 
+class MatchedRule {
+  const MatchedRule({required this.name, required this.score});
+
+  final String name;
+  final int score;
+}
+
 class StockAnalysis {
   const StockAnalysis({
     required this.lastClose,
@@ -244,7 +251,7 @@ class StockAnalysis {
   final RiskLevel riskLevel;
   final Direction direction;
   final double directionStrength;
-  final List<String> matchedRules;
+  final List<MatchedRule> matchedRules;
   final double maShort;
   final double maLong;
   final double ema;
@@ -288,14 +295,16 @@ class StockAnalyzer {
         .latestRatio;
     final trendPositive = lastClose >= maLong && maShort >= maLong;
     final nearSupport = lastClose - support <= range * 0.35;
-    final matchedRules = <String>[
+    final matchedRules = <MatchedRule>[
       if (trendPositive)
-        'MA${settings.maShortPeriod} 上穿并站稳 MA${settings.maLongPeriod}',
-      if (lastClose >= ema) '收盘价位于 EMA${settings.emaPeriod} 上方',
-      if (volumeRatio >= 1) '成交量不低于${settings.volumePeriod}日均量',
-      if (nearSupport) '价格接近二十日支撑区',
-      if (lastClose < boll.upper) '仍处于 BOLL 上轨以内',
-    ];
+        MatchedRule(name: 'MA${settings.maShortPeriod} 上穿并站稳 MA${settings.maLongPeriod}', score: 86),
+      if (lastClose >= ema)
+        MatchedRule(name: '收盘价位于 EMA${settings.emaPeriod} 上方', score: 74),
+      if (volumeRatio >= 1)
+        MatchedRule(name: '成交量不低于${settings.volumePeriod}日均量', score: 61),
+      if (nearSupport) MatchedRule(name: '价格接近二十日支撑区', score: 48),
+      if (lastClose < boll.upper) MatchedRule(name: '仍处于 BOLL 上轨以内', score: 39),
+    ]..sort((a, b) => b.score.compareTo(a.score));
     final confidence = (0.5 + matchedRules.length * 0.08).clamp(0.5, 0.9);
     final direction = trendPositive
         ? Direction.bullish
