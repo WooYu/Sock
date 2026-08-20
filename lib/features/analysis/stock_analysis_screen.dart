@@ -316,6 +316,8 @@ class _AnalysisContent extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 20),
+        _PipelineCard(analysis: analysis),
+        const SizedBox(height: 20),
         Text('技术指标', style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),
         Wrap(
@@ -465,6 +467,98 @@ class _ValueTile extends StatelessWidget {
     value: '${value.toStringAsFixed(suffix.isEmpty ? 2 : 0)}$suffix',
     width: 144,
   );
+}
+
+class _PipelineCard extends StatelessWidget {
+  const _PipelineCard({required this.analysis});
+
+  final StockAnalysis analysis;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.account_tree_outlined, size: 18),
+                const SizedBox(width: 6),
+                Text(
+                  '模型编排 · 可解释分析',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _Stage(
+                    number: '01',
+                    label: '数值计算层',
+                    detail: 'MA·EMA·BOLL·量比',
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward,
+                  size: 16,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+                Expanded(
+                  child: _Stage(
+                    number: '02',
+                    label: '规则引擎层',
+                    detail: '${analysis.matchedRules.length} 条命中',
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward,
+                  size: 16,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+                Expanded(
+                  child: _Stage(
+                    number: '03',
+                    label: 'AI解释层',
+                    detail: '${(analysis.confidence * 100).round()}% 置信',
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Stage extends StatelessWidget {
+  const _Stage({required this.number, required this.label, required this.detail});
+
+  final String number;
+  final String label;
+  final String detail;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          number,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(label, style: Theme.of(context).textTheme.bodySmall),
+        const SizedBox(height: 2),
+        Text(detail, style: Theme.of(context).textTheme.labelSmall),
+      ],
+    );
+  }
 }
 
 class _PlanRow extends StatelessWidget {
