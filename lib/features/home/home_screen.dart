@@ -47,7 +47,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  var _selected = '总览';
+  var _selected = '行情';
   var _chartStockCode = '600519';
   late final PortfolioController _portfolioController;
   late final StockAnalysisController _stockAnalysisController;
@@ -211,11 +211,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final wide = MediaQuery.sizeOf(context).width >= 600;
     final mobileIndex = switch (_selected) {
-      '总览' => 0,
-      '个股分析' => 1,
-      '专业K线' => 2,
-      '组合' => 3,
-      _ => 4,
+      '行情' => 0,
+      '自选' => 1,
+      '组合' => 2,
+      _ => 3,
     };
 
     return Scaffold(
@@ -255,26 +254,25 @@ class _HomeScreenState extends State<HomeScreen> {
           : NavigationBar(
               selectedIndex: mobileIndex,
               onDestinationSelected: (index) {
-                const destinations = ['总览', '个股分析', '专业K线', '组合', '更多'];
+                const destinations = ['行情', '自选', '组合', '我的'];
                 setState(() => _selected = destinations[index]);
               },
               destinations: const [
                 NavigationDestination(
-                  icon: Icon(Icons.dashboard_outlined),
-                  label: '总览',
-                ),
-                NavigationDestination(icon: Icon(Icons.search), label: '个股分析'),
-                NavigationDestination(
                   icon: Icon(Icons.candlestick_chart_outlined),
-                  label: '专业K线',
+                  label: '行情',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.bookmark_outline),
+                  label: '自选',
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.account_balance_wallet_outlined),
                   label: '组合',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.more_horiz),
-                  label: '更多',
+                  icon: Icon(Icons.person_outline),
+                  label: '我的',
                 ),
               ],
             ),
@@ -289,17 +287,16 @@ class _DesktopNavigation extends StatelessWidget {
   final ValueChanged<String> onSelected;
 
   static const _items = <(String, IconData)>[
-    ('总览', Icons.dashboard_outlined),
-    ('个股分析', Icons.search),
-    ('专业K线', Icons.candlestick_chart_outlined),
+    ('行情', Icons.candlestick_chart_outlined),
+    ('自选', Icons.bookmark_outline),
     ('组合', Icons.account_balance_wallet_outlined),
-    ('更多', Icons.more_horiz),
+    ('我的', Icons.person_outline),
   ];
 
   @override
   Widget build(BuildContext context) {
     final isPrimary = _items.any((item) => item.$1 == selected);
-    final effectiveSelected = isPrimary ? selected : '更多';
+    final effectiveSelected = isPrimary ? selected : '我的';
     return SizedBox(
       width: 168,
       child: Material(
@@ -366,10 +363,42 @@ class _Workspace extends StatelessWidget {
     if (module == '组合') {
       return PortfolioScreen(controller: portfolioController);
     }
-    if (module == '个股分析') {
-      return StockAnalysisScreen(
-        controller: stockAnalysisController,
-        knowledgeController: knowledgeController,
+    if (module == '行情') {
+      return Column(
+        children: [
+          if (sessionController.session?.isSignedIn != true)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.login, size: 26),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          '登录以获取行情与 AI 分析',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      FilledButton(
+                        onPressed: () => onNavigate('账户同步'),
+                        child: const Text('去登录'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          Expanded(
+            child: StockAnalysisScreen(
+              controller: stockAnalysisController,
+              knowledgeController: knowledgeController,
+            ),
+          ),
+        ],
       );
     }
     if (module == '专业K线') {
@@ -407,7 +436,7 @@ class _Workspace extends StatelessWidget {
     if (module == '知识规则') {
       return KnowledgeWorkspace(controller: knowledgeController);
     }
-    if (module == '自选股') {
+    if (module == '自选') {
       return WatchlistScreen(
         controller: watchlistController,
         catalog: marketService,
@@ -426,63 +455,64 @@ class _Workspace extends StatelessWidget {
         initialTabIndex: module == '管理后台' ? 1 : 0,
       );
     }
-    if (module == '总览') {
-      return _Dashboard(
-        portfolioController: portfolioController,
-        stockAnalysisController: stockAnalysisController,
-        signedIn: sessionController.session?.isSignedIn == true,
-        onLogin: () => onNavigate('账户同步'),
-      );
+    if (module == '我的') {
+      return _MyPage(onNavigate: onNavigate);
     }
+    return StockAnalysisScreen(
+      controller: stockAnalysisController,
+      knowledgeController: knowledgeController,
+    );
+  }
+}
+
+class _MyPage extends StatelessWidget {
+  const _MyPage({required this.onNavigate});
+
+  final ValueChanged<String> onNavigate;
+
+  static const _items = <(String, String, IconData)>[
+    ('复盘 AI', '复盘AI', Icons.rate_review_outlined),
+    ('规则回测', '规则回测', Icons.rule_outlined),
+    ('知识规则', '知识规则', Icons.library_books_outlined),
+    ('账户同步', '账户同步', Icons.person_outline),
+    ('设置', '设置后台', Icons.settings_outlined),
+    ('管理后台', '管理后台', Icons.admin_panel_settings_outlined),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        Text('更多功能', style: Theme.of(context).textTheme.headlineMedium),
-        const SizedBox(height: 12),
-        if (module == '更多') ...[
-          _MoreDestination(
-            icon: Icons.bookmark_outline,
-            title: '自选股',
-            target: '自选股',
-            onNavigate: onNavigate,
-          ),
-          _MoreDestination(
-            icon: Icons.rule_outlined,
-            title: '规则与回测',
-            target: '规则回测',
-            onNavigate: onNavigate,
-          ),
-          _MoreDestination(
-            icon: Icons.library_books_outlined,
-            title: '知识规则',
-            target: '知识规则',
-            onNavigate: onNavigate,
-          ),
-          _MoreDestination(
-            icon: Icons.person_outline,
-            title: '账户与同步',
-            target: '账户同步',
-            onNavigate: onNavigate,
-          ),
-          _MoreDestination(
-            icon: Icons.rate_review_outlined,
-            title: '复盘与 AI',
-            target: '复盘AI',
-            onNavigate: onNavigate,
-          ),
-          _MoreDestination(
-            icon: Icons.settings_outlined,
-            title: '设置',
-            target: '设置后台',
-            onNavigate: onNavigate,
-          ),
-          _MoreDestination(
-            icon: Icons.admin_panel_settings_outlined,
-            title: '管理后台',
-            target: '管理后台',
-            onNavigate: onNavigate,
-          ),
-        ],
+        Text('我的', style: Theme.of(context).textTheme.headlineMedium),
+        const SizedBox(height: 16),
+        GridView.count(
+          crossAxisCount: 2,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          mainAxisExtent: 72,
+          children: [
+            for (final item in _items)
+              Card(
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () => onNavigate(item.$2),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      children: [
+                        Icon(item.$3, size: 24),
+                        const SizedBox(width: 12),
+                        Text(item.$1),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ],
     );
   }
@@ -745,29 +775,4 @@ class _SectionTitle extends StatelessWidget {
     padding: const EdgeInsets.only(top: 8, bottom: 4),
     child: Text(title, style: Theme.of(context).textTheme.titleMedium),
   );
-}
-
-class _MoreDestination extends StatelessWidget {
-  const _MoreDestination({
-    required this.icon,
-    required this.title,
-    required this.target,
-    required this.onNavigate,
-  });
-
-  final IconData icon;
-  final String title;
-  final String target;
-  final ValueChanged<String> onNavigate;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      minTileHeight: 56,
-      leading: Icon(icon),
-      title: Text(title),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: () => onNavigate(target),
-    );
-  }
 }

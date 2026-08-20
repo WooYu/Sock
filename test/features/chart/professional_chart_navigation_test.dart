@@ -12,7 +12,6 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(const StockCalApp());
-    await tester.tap(find.text('专业K线'));
     await tester.pumpAndSettle();
 
     expect(find.textContaining('请先登录后查看行情'), findsOneWidget);

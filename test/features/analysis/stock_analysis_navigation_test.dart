@@ -12,7 +12,6 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(const StockCalApp());
-      await tester.tap(find.text('个股分析'));
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('stock-search')), findsOneWidget);
@@ -30,7 +29,6 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(const StockCalApp());
-    await tester.tap(find.text('个股分析'));
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('stock-search')), findsOneWidget);
