@@ -63,6 +63,42 @@ public class JdbcKnowledgeRepository implements KnowledgeRepository {
             .param("by", value.approvedBy()).param("at", toOffset(value.publishedAt())).update();
     }
 
+    public Optional<SourceDocument> updateSource(String id, String content, String hash) {
+        jdbc.sql("update knowledge_source set original_content=:content, content_hash=:hash where id=:id")
+            .param("content", content).param("hash", hash).param("id", id).update();
+        return source(id);
+    }
+
+    public void deleteSource(String id) {
+        jdbc.sql("delete from knowledge_draft where source_document_id=:id").param("id", id).update();
+        jdbc.sql("delete from published_rule_source where source_document_id=:id").param("id", id).update();
+        jdbc.sql("delete from knowledge_source where id=:id").param("id", id).update();
+    }
+
+    public Optional<KnowledgeDraft> updateDraft(String id, String title, String summary) {
+        jdbc.sql("update knowledge_draft set title=:title, summary=:summary where id=:id")
+            .param("title", title).param("summary", summary).param("id", id).update();
+        return draft(id);
+    }
+
+    public List<PublishedRule> publishedRules() {
+        return jdbc.sql("select * from published_rule_source order by published_at desc")
+            .query((rs, row) -> mapPublishedRule(rs)).list();
+    }
+
+    public Optional<PublishedRule> setRuleEnabled(String id, boolean enabled) {
+        jdbc.sql("update published_rule_source set enabled=:enabled where id=:id")
+            .param("enabled", enabled).param("id", id).update();
+        return publishedRules().stream().filter(r -> r.id().equals(id)).findFirst();
+    }
+
+    private PublishedRule mapPublishedRule(ResultSet rs) throws SQLException {
+        return new PublishedRule(rs.getString("id"), rs.getString("source_document_id"),
+            rs.getString("name"), rs.getString("description"), rs.getString("source_excerpt"),
+            rs.getInt("source_line_start"), rs.getInt("source_line_end"), rs.getString("approved_by"),
+            rs.getObject("published_at", OffsetDateTime.class).toInstant(), rs.getBoolean("enabled"));
+    }
+
     private SourceDocument mapSource(ResultSet rs) throws SQLException {
         return new SourceDocument(rs.getString("id"), rs.getString("source_path"), rs.getString("title"),
             rs.getString("content_hash"), rs.getString("original_content"), rs.getObject("imported_at", OffsetDateTime.class).toInstant());
