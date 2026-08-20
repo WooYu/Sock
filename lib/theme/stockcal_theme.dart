@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 
-/// StockCal 金融主题调色板（TradingView 深色专业风）。
+/// StockCal 金融主题调色板（深海军蓝 + 薄荷青）。
 ///
-/// A 股约定：红涨绿跌。主色为蓝，黄作点缀。
+/// A 股约定：红涨绿跌。主色为薄荷青，金作次要点缀。
 class StockCalColors {
   StockCalColors._();
 
-  // —— 深色（主打，2026 Midnight Blue）——
-  static const Color bg = Color(0xFF0F1219); // 页面背景（午夜海军蓝）
-  static const Color surface = Color(0xFF1A1E27); // 卡片 / 面板
-  static const Color surfaceHigh = Color(0xFF262B36); // 浮层 / 选中
-  static const Color primary = Color(0xFF3B6FE0); // 主色蓝
-  static const Color accent = Color(0xFFE8A23C); // 暖金点缀
+  // —— 深色（主打，深海军蓝 + 薄荷青）——
+  static const Color bg = Color(0xFF0B1220); // 页面背景（深海军蓝）
+  static const Color surface = Color(0xFF111B2D); // 卡片 / 面板
+  static const Color surfaceHigh = Color(0xFF17243A); // 浮层 / 选中
+  static const Color primary = Color(0xFF47D7C7); // 主色薄荷青
+  static const Color accent = Color(0xFFE8A23C); // 金点缀
   static const Color gain = Color(0xFFF23645); // 涨（红）
   static const Color loss = Color(0xFF089981); // 跌（绿）
   static const Color textPrimary = Color(0xFFE3E6EB);
   static const Color textSecondary = Color(0xFF8A90A0);
-  static const Color border = Color(0xFF262B36);
+  static const Color border = Color(0xFF17243A);
 
   // —— 浅色 ——
   static const Color lightBg = Color(0xFFF4F6F9);
@@ -36,6 +36,7 @@ ThemeData buildStockCalTheme(Brightness brightness) {
     brightness: brightness,
   ).copyWith(
     primary: StockCalColors.primary,
+    onPrimary: dark ? const Color(0xFF06201B) : Colors.white,
     secondary: dark ? StockCalColors.accent : StockCalColors.primary,
     onSecondary: dark ? const Color(0xFF1C1C1C) : Colors.white,
     surface: dark ? StockCalColors.surface : StockCalColors.lightSurface,
@@ -123,7 +124,7 @@ ThemeData buildStockCalTheme(Brightness brightness) {
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
         backgroundColor: scheme.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: scheme.onPrimary,
         minimumSize: const Size(48, 44),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         textStyle: const TextStyle(fontWeight: FontWeight.w600),

@@ -12,8 +12,8 @@ void main() {
     ));
     final context = tester.element(find.byType(Scaffold));
     expect(Theme.of(context).brightness, Brightness.dark);
-    expect(Theme.of(context).scaffoldBackgroundColor, const Color(0xFF0F1219));
-    expect(Theme.of(context).colorScheme.primary, const Color(0xFF3B6FE0));
+    expect(Theme.of(context).scaffoldBackgroundColor, const Color(0xFF0B1220));
+    expect(Theme.of(context).colorScheme.primary, const Color(0xFF47D7C7));
     expect(gainColor(context), const Color(0xFFF23645));
     expect(lossColor(context), const Color(0xFF089981));
   });
