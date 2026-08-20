@@ -4,6 +4,7 @@ import 'knowledge.dart';
 
 class KnowledgeWorkspace extends StatelessWidget {
   const KnowledgeWorkspace({super.key, required this.controller});
+
   final KnowledgeController controller;
 
   @override
@@ -11,7 +12,7 @@ class KnowledgeWorkspace extends StatelessWidget {
     return ListenableBuilder(
       listenable: controller,
       builder: (context, _) => DefaultTabController(
-        length: 3,
+        length: 2,
         child: Column(
           children: [
             if (controller.error != null)
@@ -27,27 +28,15 @@ class KnowledgeWorkspace extends StatelessWidget {
               ),
             TabBar(
               tabs: [
-                Tab(text: '待审批 ${controller.pending.length}'),
-                const Tab(text: '经验概念'),
-                const Tab(text: '原文'),
+                Tab(text: '笔记 ${controller.sources.length}'),
+                const Tab(text: '规则'),
               ],
             ),
             Expanded(
               child: TabBarView(
                 children: [
-                  _DraftList(
-                    drafts: controller.pending,
-                    controller: controller,
-                    approvable: true,
-                  ),
-                  _DraftList(
-                    drafts: controller.approved
-                        .where((draft) => draft.kind != KnowledgeKind.rule)
-                        .toList(),
-                    controller: controller,
-                    approvable: false,
-                  ),
-                  _SourceList(controller: controller),
+                  _NotesTab(controller: controller),
+                  _RulesTab(controller: controller),
                 ],
               ),
             ),
@@ -58,99 +47,232 @@ class KnowledgeWorkspace extends StatelessWidget {
   }
 }
 
-class _DraftList extends StatelessWidget {
-  const _DraftList({
-    required this.drafts,
-    required this.controller,
-    required this.approvable,
-  });
-  final List<KnowledgeDraft> drafts;
+class _NotesTab extends StatelessWidget {
+  const _NotesTab({required this.controller});
+
   final KnowledgeController controller;
-  final bool approvable;
 
   @override
   Widget build(BuildContext context) {
-    if (drafts.isEmpty) return const Center(child: Text('暂无内容'));
-    return ListView.separated(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: drafts.length,
-      separatorBuilder: (_, _) => const Divider(height: 1),
-      itemBuilder: (context, index) {
-        final draft = drafts[index];
-        final source = controller.sourceFor(draft.sourceId);
-        return ListTile(
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 8,
-          ),
-          leading: Icon(switch (draft.kind) {
-            KnowledgeKind.rule => Icons.rule_outlined,
-            KnowledgeKind.experience => Icons.psychology_alt_outlined,
-            KnowledgeKind.concept => Icons.menu_book_outlined,
-          }),
-          title: Text(draft.title),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    if (controller.sources.isEmpty) {
+      return const Center(child: Text('暂无笔记'));
+    }
+    return ListView(
+      children: [
+        for (final source in controller.sources)
+          ExpansionTile(
+            leading: const Icon(Icons.description_outlined),
+            title: Text(source.title),
+            subtitle: Text(source.path),
+            trailing: _sourceStatus(context, source),
+            childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 4),
-              Text(draft.summary),
-              const SizedBox(height: 6),
-              Text('来源：${source.title} · 第 ${draft.sourceLine} 行'),
-              const SizedBox(height: 4),
-              Text(
-                draft.extractionMethod == ExtractionMethod.ai
-                    ? 'AI 提炼'
-                    : '本地初筛',
-                style: Theme.of(context).textTheme.labelMedium,
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      source.originalContent,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ),
+                  PopupMenuButton<String>(
+                    onSelected: (action) => _sourceAction(context, action, source),
+                    itemBuilder: (context) => const [
+                      PopupMenuItem(value: 'edit', child: Text('编辑原文')),
+                      PopupMenuItem(value: 'reextract', child: Text('重新识别')),
+                      PopupMenuItem(value: 'delete', child: Text('删除')),
+                    ],
+                  ),
+                ],
+              ),
+              const Divider(height: 20),
+              for (final draft
+                  in controller.drafts.where((d) => d.sourceId == source.id))
+                ListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(
+                    draft.kind == KnowledgeKind.rule
+                        ? Icons.rule_outlined
+                        : Icons.menu_book_outlined,
+                  ),
+                  title: Text(draft.title),
+                  subtitle: Text(draft.summary),
+                  trailing: Wrap(
+                    spacing: 4,
+                    children: [
+                      IconButton(
+                        tooltip: '编辑',
+                        onPressed: () => _editDraft(context, draft),
+                        icon: const Icon(Icons.edit_outlined, size: 18),
+                      ),
+                      if (draft.status == ApprovalStatus.pending)
+                        IconButton(
+                          tooltip: '批准',
+                          onPressed: () => controller.approveAndPublish(draft.id),
+                          icon: const Icon(Icons.check_circle_outline, size: 18),
+                        ),
+                    ],
+                  ),
+                ),
+              if (controller.drafts.where((d) => d.sourceId == source.id).isEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(
+                    '尚未识别，点「重新识别」用 AI 抽取规则',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ),
+            ],
+          ),
+      ],
+    );
+  }
+
+  Widget _sourceStatus(BuildContext context, KnowledgeSource source) {
+    final count = controller.drafts
+        .where((d) => d.sourceId == source.id)
+        .length;
+    return Chip(
+      label: Text(count == 0 ? '未识别' : '已识别 $count 条'),
+      visualDensity: VisualDensity.compact,
+    );
+  }
+
+  Future<void> _sourceAction(
+    BuildContext context,
+    String action,
+    KnowledgeSource source,
+  ) async {
+    switch (action) {
+      case 'edit':
+        await _editSource(context, source);
+      case 'reextract':
+        await controller.extract(source.id);
+      case 'delete':
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('删除笔记'),
+            content: const Text('删除后连同草稿和已发布规则一并移除，不可恢复。'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('取消'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('删除'),
               ),
             ],
           ),
-          trailing: approvable
-              ? FilledButton.tonal(
-                  onPressed: () => controller.approveAndPublish(draft.id),
-                  child: const Text('批准'),
-                )
-              : null,
         );
-      },
+        if (confirmed == true) await controller.deleteSource(source.id);
+    }
+  }
+
+  Future<void> _editSource(BuildContext context, KnowledgeSource source) async {
+    var content = source.originalContent;
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('编辑原文'),
+        content: TextField(
+          maxLines: 6,
+          controller: TextEditingController(text: content),
+          onChanged: (value) => content = value,
+          decoration: const InputDecoration(border: OutlineInputBorder()),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('保存'),
+          ),
+        ],
+      ),
     );
+    if (saved == true) await controller.updateSource(source.id, content);
+  }
+
+  Future<void> _editDraft(BuildContext context, KnowledgeDraft draft) async {
+    var title = draft.title;
+    var summary = draft.summary;
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('编辑规则草稿'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: TextEditingController(text: title),
+              onChanged: (value) => title = value,
+              decoration: const InputDecoration(labelText: '标题'),
+            ),
+            TextField(
+              controller: TextEditingController(text: summary),
+              onChanged: (value) => summary = value,
+              decoration: const InputDecoration(labelText: '摘要'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('保存'),
+          ),
+        ],
+      ),
+    );
+    if (saved == true) await controller.updateDraft(draft.id, title, summary);
   }
 }
 
-class _SourceList extends StatelessWidget {
-  const _SourceList({required this.controller});
+class _RulesTab extends StatelessWidget {
+  const _RulesTab({required this.controller});
+
   final KnowledgeController controller;
 
   @override
-  Widget build(BuildContext context) => ListView.separated(
-    itemCount: controller.sources.length,
-    separatorBuilder: (_, _) => const Divider(height: 1),
-    itemBuilder: (context, index) {
-      final source = controller.sources[index];
-      return ListTile(
-        leading: const Icon(Icons.description_outlined),
-        title: Text(source.title),
-        subtitle: Text(source.path),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: () => showDialog<void>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text(source.title),
-            content: SizedBox(
-              width: 620,
-              child: SingleChildScrollView(
-                child: SelectableText(source.originalContent),
+  Widget build(BuildContext context) {
+    if (controller.rules.isEmpty) {
+      return const Center(child: Text('暂无规则'));
+    }
+    return ListView(
+      children: [
+        for (final rule in controller.rules)
+          Opacity(
+            opacity: rule.enabled ? 1 : 0.45,
+            child: ListTile(
+              leading: const Icon(Icons.rule_outlined),
+              title: Text(rule.name),
+              subtitle: Text(rule.description),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (!rule.enabled)
+                    Text(
+                      '已停用',
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                  Switch(
+                    value: rule.enabled,
+                    onChanged: (value) => controller.toggleRule(rule.id, value),
+                  ),
+                ],
               ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('关闭'),
-              ),
-            ],
           ),
-        ),
-      );
-    },
-  );
+      ],
+    );
+  }
 }

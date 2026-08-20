@@ -70,6 +70,7 @@ class PublishedRule {
 abstract interface class KnowledgeRepository {
   Future<List<KnowledgeSource>> loadSources();
   Future<List<KnowledgeDraft>> loadDrafts();
+  Future<List<KnowledgeDraft>> extract(String sourceId);
   Future<KnowledgeDraft> approve(String id);
   Future<void> publishRule(String id);
   Future<void> updateSource(String id, String content);
@@ -96,6 +97,9 @@ class MemoryKnowledgeRepository implements KnowledgeRepository {
       List.unmodifiable(_sources);
   @override
   Future<List<KnowledgeDraft>> loadDrafts() async => List.unmodifiable(_drafts);
+  @override
+  Future<List<KnowledgeDraft>> extract(String sourceId) async =>
+      List.unmodifiable(_drafts.where((d) => d.sourceId == sourceId));
   @override
   Future<KnowledgeDraft> approve(String id) async {
     final index = _drafts.indexWhere((draft) => draft.id == id);
@@ -223,6 +227,11 @@ class KnowledgeController extends ChangeNotifier {
 
   Future<void> updateDraft(String id, String title, String summary) async {
     await repository.updateDraft(id, title, summary);
+    await load();
+  }
+
+  Future<void> extract(String sourceId) async {
+    await repository.extract(sourceId);
     await load();
   }
 

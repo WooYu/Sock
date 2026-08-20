@@ -30,9 +30,8 @@ void main() {
     await tester.tap(find.text('知识规则'));
     await tester.pumpAndSettle();
 
-    expect(find.text('待审批 0'), findsOneWidget);
-    expect(find.text('经验概念'), findsOneWidget);
-    expect(find.text('原文'), findsOneWidget);
+    expect(find.text('笔记 0'), findsOneWidget);
+    expect(find.text('规则'), findsOneWidget);
   });
 
   testWidgets('production market workspace requires backend login', (

@@ -42,6 +42,19 @@ class RemoteKnowledgeRepository implements KnowledgeRepository {
   }
 
   @override
+  Future<List<KnowledgeDraft>> extract(String sourceId) async {
+    final response = await _client.post(
+      _uri('/api/v1/knowledge/sources/$sourceId/extract'),
+      headers: _headers(),
+    );
+    _ensureSuccess(response);
+    return (jsonDecode(response.body) as List<Object?>)
+        .cast<Map<String, Object?>>()
+        .map(_draft)
+        .toList(growable: false);
+  }
+
+  @override
   Future<KnowledgeDraft> approve(String id) async {
     final response = await _client.post(
       _uri('/api/v1/knowledge/drafts/$id/approve'),
