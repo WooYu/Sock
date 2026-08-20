@@ -36,15 +36,15 @@
 
 - `KnowledgeRepository` 接口新增：`updateSource` / `deleteSource` / `updateDraft` / `loadRules` / `toggleRule`；`RemoteKnowledgeRepository` 与 `MemoryKnowledgeRepository` 同步实现。
 - `KnowledgeController` 新增：`rules` 列表、`updateSource` / `deleteSource` / `updateDraft` / `toggleRule`。
-- `KnowledgeWorkspace` 三个 tab 升级：
-  - **原文**：每篇源文件可「编辑原文 / 重新识别 / 删除」。
-  - **待审批**：草稿可「编辑标题摘要」再批准。
-  - **规则**（新）：已发布规则列表 + `Switch` 开关，关闭的置灰。
+- `KnowledgeWorkspace` 重构为两个 tab（笔记 / 规则）：
+  - **笔记**：源文件列表（标题 + 状态 Chip「未识别 / 已识别 N 条」+ 溢出菜单「编辑 / 删除」）。点笔记展开详情：原文（可编辑）+ 草稿列表（每条可「编辑 / 批准 / 删除」）+「重新识别」按钮。
+  - **规则**：已发布规则列表 + `Switch` 开关，关闭的置灰 +「已停用」。
 
 ## 交互
 
-- 删除：二次确认弹窗「删除后连同草稿和已发布规则一并移除，不可恢复」。
+- 删除（笔记/规则）：二次确认弹窗「删除后连同草稿和已发布规则一并移除，不可恢复」。
 - 开关：`Switch` 切换；关闭的规则保留在列表但置灰、标记「已停用」。
+- 渐进披露：笔记列表 → 详情（原文 + 草稿就近处理）。
 
 ## 测试
 
