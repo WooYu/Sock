@@ -198,6 +198,22 @@ enum RiskLevel { low, medium, high }
 
 enum Direction { bullish, neutral, bearish }
 
+enum OperationCycle { short, swing, long }
+
+extension OperationCycleX on OperationCycle {
+  String get label => switch (this) {
+    OperationCycle.short => '短线',
+    OperationCycle.swing => '波段',
+    OperationCycle.long => '中长线',
+  };
+
+  int get lookback => switch (this) {
+    OperationCycle.short => 10,
+    OperationCycle.swing => 20,
+    OperationCycle.long => 60,
+  };
+}
+
 class FutureIndicatorPoint {
   const FutureIndicatorPoint({
     required this.day,
@@ -270,12 +286,12 @@ class StockAnalyzer {
   final IndicatorCalculator _calculator;
   IndicatorSettings settings;
 
-  StockAnalysis analyze(List<Candle> source) {
+  StockAnalysis analyze(List<Candle> source, {int lookback = 20}) {
     if (source.length < 20) {
       throw const AnalysisException('个股分析至少需要 20 根日 K 线');
     }
     final candles = List<Candle>.of(source);
-    final recent = candles.sublist(candles.length - 20);
+    final recent = candles.sublist(math.max(0, candles.length - lookback));
     final support = recent.map((item) => item.low).reduce(math.min);
     final resistance = recent.map((item) => item.high).reduce(math.max);
     final range = resistance - support;

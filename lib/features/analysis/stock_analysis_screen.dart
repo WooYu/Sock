@@ -95,6 +95,8 @@ class _StockAnalysisScreenState extends State<StockAnalysisScreen> {
                   snapshot: controller.snapshot!,
                   analysis: controller.analysis!,
                   onRefresh: controller.refresh,
+                  cycle: controller.cycle,
+                  onCycleChanged: controller.setCycle,
                   knowledge:
                       widget.knowledgeController?.approved
                           .where((draft) => draft.kind != KnowledgeKind.rule)
@@ -140,6 +142,8 @@ class _AnalysisContent extends StatelessWidget {
     required this.snapshot,
     required this.analysis,
     required this.onRefresh,
+    required this.cycle,
+    required this.onCycleChanged,
     required this.knowledge,
     required this.knowledgeController,
   });
@@ -147,6 +151,8 @@ class _AnalysisContent extends StatelessWidget {
   final MarketSnapshot snapshot;
   final StockAnalysis analysis;
   final VoidCallback onRefresh;
+  final OperationCycle cycle;
+  final ValueChanged<OperationCycle> onCycleChanged;
   final List<KnowledgeDraft> knowledge;
   final KnowledgeController? knowledgeController;
 
@@ -246,6 +252,18 @@ class _AnalysisContent extends StatelessWidget {
               style: withTabular(Theme.of(context).textTheme.bodyMedium),
             ),
           ],
+        ),
+        const SizedBox(height: 12),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: SegmentedButton<OperationCycle>(
+            segments: OperationCycle.values
+                .map((c) => ButtonSegment(value: c, label: Text(c.label)))
+                .toList(),
+            selected: {cycle},
+            showSelectedIcon: false,
+            onSelectionChanged: (values) => onCycleChanged(values.first),
+          ),
         ),
         const SizedBox(height: 16),
         Wrap(

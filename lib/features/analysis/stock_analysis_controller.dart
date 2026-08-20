@@ -17,6 +17,7 @@ class StockAnalysisController extends ChangeNotifier {
   final StockAnalyzer analyzer;
 
   StockAnalysisStatus status = StockAnalysisStatus.idle;
+  OperationCycle cycle = OperationCycle.swing;
   List<Security> results = [];
   Security? selected;
   MarketSnapshot? snapshot;
@@ -24,6 +25,12 @@ class StockAnalysisController extends ChangeNotifier {
   String? errorMessage;
 
   bool get canRetry => selected != null && status == StockAnalysisStatus.error;
+
+  Future<void> setCycle(OperationCycle value) async {
+    if (value == cycle) return;
+    cycle = value;
+    if (selected != null) await _load();
+  }
 
   Future<void> initialize() => search('');
 
@@ -59,7 +66,7 @@ class StockAnalysisController extends ChangeNotifier {
     notifyListeners();
     try {
       final loaded = await market.snapshot(selected!.code);
-      final calculated = analyzer.analyze(loaded.dailyCandles);
+      final calculated = analyzer.analyze(loaded.dailyCandles, lookback: cycle.lookback);
       snapshot = loaded;
       analysis = calculated;
       status = StockAnalysisStatus.ready;
