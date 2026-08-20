@@ -64,6 +64,25 @@ final class KnowledgeWorkflow {
         return rule;
     }
 
+    SourceDocument updateSource(String id, String content) {
+        return repository.updateSource(id, content, sha256(content))
+            .orElseThrow(() -> new IllegalArgumentException("来源不存在"));
+    }
+
+    void deleteSource(String id) { repository.deleteSource(id); }
+
+    KnowledgeDraft updateDraft(String id, String title, String summary) {
+        return repository.updateDraft(id, title, summary)
+            .orElseThrow(() -> new IllegalArgumentException("知识条目不存在"));
+    }
+
+    List<PublishedRule> rules() { return repository.publishedRules(); }
+
+    PublishedRule toggleRule(String id, boolean enabled) {
+        return repository.setRuleEnabled(id, enabled)
+            .orElseThrow(() -> new IllegalArgumentException("规则不存在"));
+    }
+
     private String sha256(String value) {
         try {
             return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256")

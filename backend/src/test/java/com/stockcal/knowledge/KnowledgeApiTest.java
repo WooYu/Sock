@@ -1,7 +1,9 @@
 package com.stockcal.knowledge;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -62,5 +64,50 @@ class KnowledgeApiTest {
     @Test
     void knowledgeEndpointsRequireAuthentication() throws Exception {
         mvc.perform(get("/api/v1/knowledge/sources")).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void managesSourcesDraftsAndRules() throws Exception {
+        var body = json.writeValueAsString(Map.of("path", "股票/均线.md", "content",
+            "均线金叉规则：5日线上穿20日线时买入。"));
+        var sourceJson = mvc.perform(post("/api/v1/knowledge/sources").with(user("user-1"))
+                .contentType(MediaType.APPLICATION_JSON).content(body))
+            .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+        var sourceId = json.readTree(sourceJson).get("id").asText();
+
+        var draftsJson = mvc.perform(post("/api/v1/knowledge/sources/{id}/extract", sourceId).with(user("user-1")))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        var draftId = json.readTree(draftsJson).get(0).get("id").asText();
+
+        mvc.perform(post("/api/v1/knowledge/drafts/{id}/approve", draftId).with(user("user-1")))
+            .andExpect(status().isOk());
+        var ruleJson = mvc.perform(post("/api/v1/knowledge/drafts/{id}/publish", draftId).with(user("user-1")))
+            .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+        var ruleId = json.readTree(ruleJson).get("id").asText();
+
+        mvc.perform(get("/api/v1/knowledge/rules").with(user("user-1")))
+            .andExpect(status().isOk()).andExpect(jsonPath("$[0].enabled").value(true));
+
+        var toggleBody = json.writeValueAsString(Map.of("enabled", false));
+        mvc.perform(patch("/api/v1/knowledge/rules/{id}/enabled", ruleId).with(user("user-1"))
+                .contentType(MediaType.APPLICATION_JSON).content(toggleBody))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.enabled").value(false));
+
+        var srcBody = json.writeValueAsString(Map.of("content", "均线金叉买入，放量确认。"));
+        mvc.perform(patch("/api/v1/knowledge/sources/{id}", sourceId).with(user("user-1"))
+                .contentType(MediaType.APPLICATION_JSON).content(srcBody))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.originalContent").value("均线金叉买入，放量确认。"));
+
+        var draftBody = json.writeValueAsString(Map.of("title", "新标题", "summary", "新摘要"));
+        mvc.perform(patch("/api/v1/knowledge/drafts/{id}", draftId).with(user("user-1"))
+                .contentType(MediaType.APPLICATION_JSON).content(draftBody))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.title").value("新标题"));
+
+        mvc.perform(delete("/api/v1/knowledge/sources/{id}", sourceId).with(user("user-1")))
+            .andExpect(status().isNoContent());
+        mvc.perform(get("/api/v1/knowledge/sources").with(user("user-1")))
+            .andExpect(status().isOk()).andExpect(jsonPath("$").isEmpty());
+        mvc.perform(get("/api/v1/knowledge/rules").with(user("user-1")))
+            .andExpect(status().isOk()).andExpect(jsonPath("$").isEmpty());
     }
 }

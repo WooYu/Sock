@@ -65,7 +65,8 @@ create table if not exists published_rule_source (
     id varchar(36) primary key, source_document_id varchar(36) not null references knowledge_source(id),
     name varchar(500) not null, description clob not null, source_excerpt clob not null,
     source_line_start integer not null, source_line_end integer not null, approved_by varchar(100) not null,
-    published_at timestamp with time zone not null
+    published_at timestamp with time zone not null,
+    enabled boolean not null default true
 );
 
 create table if not exists admin_job (
