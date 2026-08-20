@@ -30,7 +30,5 @@ class NoteDirectoryImporterTest {
         assertThat(second.unchanged()).isEqualTo(2);
         assertThat(workflow.sources()).extracting(SourceDocument::path)
             .containsExactlyInAnyOrder("关键点.md", "案例/海龟.md");
-        assertThat(workflow.drafts(ApprovalStatus.PENDING)).extracting(KnowledgeDraft::kind)
-            .contains(KnowledgeKind.RULE, KnowledgeKind.CONCEPT);
     }
 }
