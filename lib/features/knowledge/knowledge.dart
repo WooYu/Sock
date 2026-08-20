@@ -54,11 +54,29 @@ class KnowledgeDraft {
   );
 }
 
+class PublishedRule {
+  const PublishedRule({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.enabled,
+  });
+  final String id;
+  final String name;
+  final String description;
+  final bool enabled;
+}
+
 abstract interface class KnowledgeRepository {
   Future<List<KnowledgeSource>> loadSources();
   Future<List<KnowledgeDraft>> loadDrafts();
   Future<KnowledgeDraft> approve(String id);
   Future<void> publishRule(String id);
+  Future<void> updateSource(String id, String content);
+  Future<void> deleteSource(String id);
+  Future<void> updateDraft(String id, String title, String summary);
+  Future<List<PublishedRule>> loadRules();
+  Future<void> toggleRule(String id, bool enabled);
 }
 
 class MemoryKnowledgeRepository implements KnowledgeRepository {
@@ -71,6 +89,7 @@ class MemoryKnowledgeRepository implements KnowledgeRepository {
   final List<KnowledgeSource> _sources;
   final List<KnowledgeDraft> _drafts;
   final List<String> publishedRuleIds = [];
+  final List<PublishedRule> rules = [];
 
   @override
   Future<List<KnowledgeSource>> loadSources() async =>
@@ -86,7 +105,67 @@ class MemoryKnowledgeRepository implements KnowledgeRepository {
   }
 
   @override
-  Future<void> publishRule(String id) async => publishedRuleIds.add(id);
+  Future<void> publishRule(String id) async {
+    publishedRuleIds.add(id);
+    final d = _drafts.firstWhere((d) => d.id == id);
+    rules.add(PublishedRule(id: id, name: d.title, description: d.summary, enabled: true));
+  }
+
+  @override
+  Future<void> updateSource(String id, String content) async {
+    final i = _sources.indexWhere((s) => s.id == id);
+    if (i >= 0) {
+      final s = _sources[i];
+      _sources[i] = KnowledgeSource(
+        id: s.id,
+        title: s.title,
+        path: s.path,
+        originalContent: content,
+      );
+    }
+  }
+
+  @override
+  Future<void> deleteSource(String id) async {
+    _sources.removeWhere((s) => s.id == id);
+    _drafts.removeWhere((d) => d.sourceId == id);
+  }
+
+  @override
+  Future<void> updateDraft(String id, String title, String summary) async {
+    final i = _drafts.indexWhere((d) => d.id == id);
+    if (i >= 0) {
+      final d = _drafts[i];
+      _drafts[i] = KnowledgeDraft(
+        id: d.id,
+        sourceId: d.sourceId,
+        kind: d.kind,
+        title: title,
+        summary: summary,
+        excerpt: d.excerpt,
+        sourceLine: d.sourceLine,
+        status: d.status,
+        extractionMethod: d.extractionMethod,
+      );
+    }
+  }
+
+  @override
+  Future<List<PublishedRule>> loadRules() async => List.unmodifiable(rules);
+
+  @override
+  Future<void> toggleRule(String id, bool enabled) async {
+    final i = rules.indexWhere((r) => r.id == id);
+    if (i >= 0) {
+      final r = rules[i];
+      rules[i] = PublishedRule(
+        id: r.id,
+        name: r.name,
+        description: r.description,
+        enabled: enabled,
+      );
+    }
+  }
 }
 
 class KnowledgeController extends ChangeNotifier {

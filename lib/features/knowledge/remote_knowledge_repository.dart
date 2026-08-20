@@ -60,6 +60,58 @@ class RemoteKnowledgeRepository implements KnowledgeRepository {
     _ensureSuccess(response);
   }
 
+  @override
+  Future<void> updateSource(String id, String content) async {
+    final response = await _client.patch(
+      _uri('/api/v1/knowledge/sources/$id'),
+      headers: _headers(),
+      body: jsonEncode({'content': content}),
+    );
+    _ensureSuccess(response);
+  }
+
+  @override
+  Future<void> deleteSource(String id) async {
+    final response = await _client.delete(
+      _uri('/api/v1/knowledge/sources/$id'),
+      headers: _headers(),
+    );
+    _ensureSuccess(response);
+  }
+
+  @override
+  Future<void> updateDraft(String id, String title, String summary) async {
+    final response = await _client.patch(
+      _uri('/api/v1/knowledge/drafts/$id'),
+      headers: _headers(),
+      body: jsonEncode({'title': title, 'summary': summary}),
+    );
+    _ensureSuccess(response);
+  }
+
+  @override
+  Future<List<PublishedRule>> loadRules() async {
+    final response = await _client.get(
+      _uri('/api/v1/knowledge/rules'),
+      headers: _headers(),
+    );
+    _ensureSuccess(response);
+    return (jsonDecode(response.body) as List<Object?>)
+        .cast<Map<String, Object?>>()
+        .map(_rule)
+        .toList(growable: false);
+  }
+
+  @override
+  Future<void> toggleRule(String id, bool enabled) async {
+    final response = await _client.patch(
+      _uri('/api/v1/knowledge/rules/$id/enabled'),
+      headers: _headers(),
+      body: jsonEncode({'enabled': enabled}),
+    );
+    _ensureSuccess(response);
+  }
+
   Uri _uri(String path) => baseUrl.resolve(path);
   Map<String, String> _headers() {
     final token = accessToken();
@@ -81,6 +133,13 @@ class RemoteKnowledgeRepository implements KnowledgeRepository {
     title: value['title']! as String,
     path: value['path']! as String,
     originalContent: value['originalContent']! as String,
+  );
+
+  PublishedRule _rule(Map<String, Object?> value) => PublishedRule(
+    id: value['id']! as String,
+    name: value['name']! as String,
+    description: value['description']! as String,
+    enabled: value['enabled']! as bool,
   );
 
   KnowledgeDraft _draft(Map<String, Object?> value) => KnowledgeDraft(
