@@ -217,6 +217,37 @@ class _AnalysisContent extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
+        Row(
+          children: [
+            Icon(
+              _directionIcon(analysis.direction),
+              size: 20,
+              color: _directionColor(context, analysis.direction),
+            ),
+            const SizedBox(width: 6),
+            Text(_directionLabel(analysis.direction)),
+            const SizedBox(width: 10),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: (analysis.directionStrength / 100).clamp(0.0, 1.0),
+                  minHeight: 8,
+                  backgroundColor: Theme.of(
+                    context,
+                  ).colorScheme.surfaceContainerHigh,
+                  color: _directionColor(context, analysis.direction),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              '${analysis.directionStrength.round()}/100',
+              style: withTabular(Theme.of(context).textTheme.bodyMedium),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
         Wrap(
           spacing: 8,
           runSpacing: 8,
@@ -328,6 +359,25 @@ class _AnalysisContent extends StatelessWidget {
     RiskLevel.medium => '中',
     RiskLevel.high => '高',
   };
+
+  static String _directionLabel(Direction direction) => switch (direction) {
+    Direction.bullish => '多头',
+    Direction.neutral => '中性',
+    Direction.bearish => '空头',
+  };
+
+  static IconData _directionIcon(Direction direction) => switch (direction) {
+    Direction.bullish => Icons.trending_up,
+    Direction.neutral => Icons.trending_flat,
+    Direction.bearish => Icons.trending_down,
+  };
+
+  static Color _directionColor(BuildContext context, Direction direction) =>
+      switch (direction) {
+        Direction.bullish => gainColor(context),
+        Direction.neutral => Theme.of(context).colorScheme.onSurfaceVariant,
+        Direction.bearish => lossColor(context),
+      };
 }
 
 class _ValueTile extends StatelessWidget {

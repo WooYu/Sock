@@ -196,6 +196,8 @@ class IndicatorCalculator {
 
 enum RiskLevel { low, medium, high }
 
+enum Direction { bullish, neutral, bearish }
+
 class FutureIndicatorPoint {
   const FutureIndicatorPoint({
     required this.day,
@@ -222,6 +224,8 @@ class StockAnalysis {
     required this.target,
     required this.confidence,
     required this.riskLevel,
+    required this.direction,
+    required this.directionStrength,
     required this.matchedRules,
     required this.maShort,
     required this.maLong,
@@ -238,6 +242,8 @@ class StockAnalysis {
   final double target;
   final double confidence;
   final RiskLevel riskLevel;
+  final Direction direction;
+  final double directionStrength;
   final List<String> matchedRules;
   final double maShort;
   final double maLong;
@@ -291,6 +297,12 @@ class StockAnalyzer {
       if (lastClose < boll.upper) '仍处于 BOLL 上轨以内',
     ];
     final confidence = (0.5 + matchedRules.length * 0.08).clamp(0.5, 0.9);
+    final direction = trendPositive
+        ? Direction.bullish
+        : maShort >= maLong
+        ? Direction.neutral
+        : Direction.bearish;
+    final directionStrength = (confidence * 100).round().toDouble();
     final supportDistance = lastClose == 0
         ? 1
         : (lastClose - support) / lastClose;
@@ -307,6 +319,8 @@ class StockAnalyzer {
       target: resistance + range * 0.382,
       confidence: confidence,
       riskLevel: risk,
+      direction: direction,
+      directionStrength: directionStrength,
       matchedRules: List.unmodifiable(matchedRules),
       maShort: maShort,
       maLong: maLong,
