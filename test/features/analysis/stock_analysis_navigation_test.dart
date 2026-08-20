@@ -15,7 +15,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('stock-search')), findsOneWidget);
-      expect(find.textContaining('请先登录后查看行情'), findsOneWidget);
+      expect(find.text('登录以获取行情与 AI 分析'), findsOneWidget);
       expect(find.text('平安银行'), findsNothing);
     },
   );

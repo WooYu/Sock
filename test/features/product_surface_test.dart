@@ -22,9 +22,9 @@ void main() {
     await tester.pumpWidget(const StockCalApp());
     await tester.pumpAndSettle();
 
-    // 默认「行情」tab 显示搜索框与未登录提示
+    // 默认「行情」tab 显示搜索框与登录引导
     expect(find.text('搜索 A 股'), findsOneWidget);
-    expect(find.textContaining('请先登录后查看行情'), findsOneWidget);
+    expect(find.text('登录以获取行情与 AI 分析'), findsOneWidget);
 
     await tester.tap(find.text('我的'));
     await tester.pumpAndSettle();

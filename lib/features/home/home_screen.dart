@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/display.dart';
 import '../../widgets/error_state.dart';
+import '../../widgets/metric_card.dart';
 import '../account/account_workspace.dart';
 import '../account/persistent_session_repository.dart';
 import '../account/remote_auth_service.dart';
@@ -364,41 +365,12 @@ class _Workspace extends StatelessWidget {
       return PortfolioScreen(controller: portfolioController);
     }
     if (module == '行情') {
-      return Column(
-        children: [
-          if (sessionController.session?.isSignedIn != true)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.login, size: 26),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          '登录以获取行情与 AI 分析',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      FilledButton(
-                        onPressed: () => onNavigate('账户同步'),
-                        child: const Text('去登录'),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          Expanded(
-            child: StockAnalysisScreen(
-              controller: stockAnalysisController,
-              knowledgeController: knowledgeController,
-            ),
-          ),
-        ],
+      return _MarketWorkspace(
+        portfolioController: portfolioController,
+        stockAnalysisController: stockAnalysisController,
+        knowledgeController: knowledgeController,
+        sessionController: sessionController,
+        onNavigate: onNavigate,
       );
     }
     if (module == '专业K线') {
@@ -518,6 +490,76 @@ class _MyPage extends StatelessWidget {
   }
 }
 
+class _MarketWorkspace extends StatelessWidget {
+  const _MarketWorkspace({
+    required this.portfolioController,
+    required this.stockAnalysisController,
+    required this.knowledgeController,
+    required this.sessionController,
+    required this.onNavigate,
+  });
+
+  final PortfolioController portfolioController;
+  final StockAnalysisController stockAnalysisController;
+  final KnowledgeController knowledgeController;
+  final SessionController sessionController;
+  final ValueChanged<String> onNavigate;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: Listenable.merge([stockAnalysisController, sessionController]),
+      builder: (context, _) {
+        final signedIn = sessionController.session?.isSignedIn == true;
+        final idle =
+            stockAnalysisController.selected == null &&
+            stockAnalysisController.results.isEmpty;
+        return Column(
+          children: [
+            if (!signedIn)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.login, size: 26),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            '登录以获取行情与 AI 分析',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        FilledButton(
+                          onPressed: () => onNavigate('账户同步'),
+                          child: const Text('去登录'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            Expanded(
+              child: idle
+                  ? _Dashboard(
+                      portfolioController: portfolioController,
+                      stockAnalysisController: stockAnalysisController,
+                    )
+                  : StockAnalysisScreen(
+                      controller: stockAnalysisController,
+                      knowledgeController: knowledgeController,
+                    ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
 class _MarketSnapshotLoader extends StatefulWidget {
   const _MarketSnapshotLoader({
     required this.market,
@@ -571,14 +613,10 @@ class _Dashboard extends StatelessWidget {
   const _Dashboard({
     required this.portfolioController,
     required this.stockAnalysisController,
-    required this.signedIn,
-    required this.onLogin,
   });
 
   final PortfolioController portfolioController;
   final StockAnalysisController stockAnalysisController;
-  final bool signedIn;
-  final VoidCallback onLogin;
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
@@ -599,41 +637,17 @@ class _Dashboard extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        if (!signedIn) ...[
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  const Icon(Icons.login, size: 28),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '登录以获取行情与 AI 分析',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '登录后同步自选、组合，获取实时行情与 AI 复盘',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  FilledButton(
-                    onPressed: onLogin,
-                    child: const Text('去登录'),
-                  ),
-                ],
-              ),
-            ),
+        TextField(
+          key: const Key('stock-search'),
+          onChanged: stockAnalysisController.search,
+          decoration: const InputDecoration(
+            labelText: '搜索 A 股',
+            hintText: '代码、名称或拼音',
+            prefixIcon: Icon(Icons.search),
+            border: OutlineInputBorder(),
           ),
-          const SizedBox(height: 12),
-        ],
+        ),
+        const SizedBox(height: 16),
         Row(
           children: [
             Expanded(
@@ -653,18 +667,18 @@ class _Dashboard extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Wrap(
-          spacing: 24,
+          spacing: 12,
           runSpacing: 12,
           children: [
-            _Metric(label: '总资产', value: totalAssets),
-            _Metric(
+            MetricCard(label: '总资产', value: totalAssets.toStringAsFixed(0)),
+            MetricCard(
               label: '累计盈亏',
-              value: portfolioController.totalProfit,
+              value: portfolioController.totalProfit.toStringAsFixed(0),
               color: pnlColor(context, portfolioController.totalProfit),
             ),
-            _Metric(
+            MetricCard(
               label: '浮动盈亏',
-              value: portfolioController.floatingProfit,
+              value: portfolioController.floatingProfit.toStringAsFixed(0),
               color: pnlColor(context, portfolioController.floatingProfit),
             ),
           ],
@@ -727,41 +741,6 @@ class _Dashboard extends StatelessWidget {
           subtitle: Text('暂无待完成项目'),
         ),
       ],
-    );
-  }
-}
-
-class _Metric extends StatelessWidget {
-  const _Metric({required this.label, required this.value, this.color});
-  final String label;
-  final double value;
-  final Color? color;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 168,
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label, style: Theme.of(context).textTheme.bodySmall),
-              const SizedBox(height: 6),
-              Text(
-                value.toStringAsFixed(0),
-                style: withTabular(
-                  Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: color,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

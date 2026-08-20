@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stockcal/app/stockcal_app.dart';
 
@@ -42,7 +41,7 @@ void main() {
     await tester.pumpWidget(const StockCalApp());
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('请先登录后查看行情'), findsOneWidget);
+    expect(find.text('登录以获取行情与 AI 分析'), findsOneWidget);
     expect(find.text('StockCal 演示行情'), findsNothing);
   });
 }
