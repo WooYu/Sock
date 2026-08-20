@@ -173,6 +173,7 @@ class KnowledgeController extends ChangeNotifier {
   final KnowledgeRepository repository;
   List<KnowledgeSource> sources = const [];
   List<KnowledgeDraft> drafts = const [];
+  List<PublishedRule> rules = const [];
   bool loading = false;
   String? error;
 
@@ -193,6 +194,7 @@ class KnowledgeController extends ChangeNotifier {
     try {
       sources = await repository.loadSources();
       drafts = await repository.loadDrafts();
+      rules = await repository.loadRules();
     } catch (failure) {
       error = failure.toString().replaceFirst('Bad state: ', '');
     } finally {
@@ -207,5 +209,25 @@ class KnowledgeController extends ChangeNotifier {
     final index = drafts.indexWhere((draft) => draft.id == id);
     drafts = [...drafts]..[index] = approved;
     notifyListeners();
+  }
+
+  Future<void> updateSource(String id, String content) async {
+    await repository.updateSource(id, content);
+    await load();
+  }
+
+  Future<void> deleteSource(String id) async {
+    await repository.deleteSource(id);
+    await load();
+  }
+
+  Future<void> updateDraft(String id, String title, String summary) async {
+    await repository.updateDraft(id, title, summary);
+    await load();
+  }
+
+  Future<void> toggleRule(String id, bool enabled) async {
+    await repository.toggleRule(id, enabled);
+    await load();
   }
 }
