@@ -263,6 +263,41 @@ class _AnalysisContent extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 20),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.auto_graph, size: 18),
+                    const SizedBox(width: 6),
+                    Text(
+                      '策略建议',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _PlanRow(
+                  label: '买入关注',
+                  value:
+                      '${analysis.support.toStringAsFixed(2)} ~ ${((analysis.support + analysis.resistance) / 2).toStringAsFixed(2)}',
+                ),
+                _PlanRow(
+                  label: '卖出 / 止盈',
+                  value: analysis.target.toStringAsFixed(2),
+                ),
+                _PlanRow(
+                  label: '失效条件',
+                  value: '收盘跌破 ${analysis.support.toStringAsFixed(2)}',
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
         Text('技术指标', style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),
         Wrap(
@@ -397,6 +432,38 @@ class _ValueTile extends StatelessWidget {
     value: '${value.toStringAsFixed(suffix.isEmpty ? 2 : 0)}$suffix',
     width: 144,
   );
+}
+
+class _PlanRow extends StatelessWidget {
+  const _PlanRow({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 88,
+            child: Text(label, style: Theme.of(context).textTheme.bodySmall),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: withTabular(
+                Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _Indicator extends StatelessWidget {
