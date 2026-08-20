@@ -46,5 +46,6 @@ record PublishedRule(
     int sourceLineStart,
     int sourceLineEnd,
     String approvedBy,
-    Instant publishedAt
+    Instant publishedAt,
+    boolean enabled
 ) {}
