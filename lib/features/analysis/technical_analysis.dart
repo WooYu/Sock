@@ -257,25 +257,24 @@ extension OperationCycleX on OperationCycle {
 }
 
 class FutureIndicatorPoint {
+  /// 完整 MA 周期（5/10/20/30/60/90/120/250）。
+  static const maPeriods = [5, 10, 20, 30, 60, 90, 120, 250];
+
   const FutureIndicatorPoint({
     required this.day,
-    required this.maShort,
-    required this.ma10,
-    required this.maLong,
-    required this.ma60,
+    required this.maValues,
     required this.bollUpper,
     required this.bollMiddle,
     required this.bollLower,
   });
 
   final DateTime day;
-  final double maShort;
-  final double ma10;
-  final double maLong;
-  final double ma60;
+  final Map<int, double> maValues;
   final double bollUpper;
   final double bollMiddle;
   final double bollLower;
+
+  double ma(int period) => maValues[period] ?? double.nan;
 }
 
 class MatchedRule {
@@ -541,12 +540,12 @@ class StockAnalyzer {
       result.add(
         FutureIndicatorPoint(
           day: day,
-          maShort: _calculator.sma(slice, period: settings.maShortPeriod).last!,
-          ma10: _calculator.sma(slice, period: 10).last!,
-          maLong: _calculator.sma(slice, period: settings.maLongPeriod).last!,
-          ma60: slice.length >= 60
-              ? _calculator.sma(slice, period: 60).last!
-              : double.nan,
+          maValues: {
+            for (final period in FutureIndicatorPoint.maPeriods)
+              period: slice.length >= period
+                  ? _calculator.sma(slice, period: period).last!
+                  : double.nan,
+          },
           bollUpper: boll.upper,
           bollMiddle: boll.middle,
           bollLower: boll.lower,

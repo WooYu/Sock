@@ -14,12 +14,9 @@ class FutureWorkspace extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const headers = [
+    final headers = [
       '日期',
-      'MA5',
-      'MA10',
-      'MA20',
-      'MA60',
+      ...FutureIndicatorPoint.maPeriods.map((period) => 'MA$period'),
       'BOLL上',
       'BOLL中',
       'BOLL下',
@@ -55,10 +52,8 @@ class FutureWorkspace extends StatelessWidget {
                         context,
                         '${point.day.month.toString().padLeft(2, '0')}-${point.day.day.toString().padLeft(2, '0')}',
                       ),
-                      _cell(context, _fmt(point.maShort)),
-                      _cell(context, _fmt(point.ma10)),
-                      _cell(context, _fmt(point.maLong)),
-                      _cell(context, _fmt(point.ma60)),
+                      for (final period in FutureIndicatorPoint.maPeriods)
+                        _cell(context, _fmt(point.ma(period))),
                       _cell(context, _fmt(point.bollUpper)),
                       _cell(context, _fmt(point.bollMiddle)),
                       _cell(context, _fmt(point.bollLower)),

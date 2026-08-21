@@ -427,9 +427,9 @@ class _AnalysisContent extends StatelessWidget {
             title: Text(_date(point.day)),
             subtitle: Text(
               'MA${analysis.settings.maShortPeriod} '
-              '${point.maShort.toStringAsFixed(2)}  ·  '
+              '${point.ma(analysis.settings.maShortPeriod).toStringAsFixed(2)}  ·  '
               'MA${analysis.settings.maLongPeriod} '
-              '${point.maLong.toStringAsFixed(2)}',
+              '${point.ma(analysis.settings.maLongPeriod).toStringAsFixed(2)}',
             ),
             trailing: Text(
               'BOLL ${point.bollUpper.toStringAsFixed(2)}',
