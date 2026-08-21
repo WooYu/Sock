@@ -5,7 +5,7 @@ import 'package:stockcal/features/future/future_workspace.dart';
 import 'package:stockcal/features/market/market_data.dart';
 
 void main() {
-  testWidgets('FutureWorkspace lists three future sessions', (tester) async {
+  testWidgets('FutureWorkspace lists all MA and BOLL periods', (tester) async {
     final analysis = StockAnalyzer().analyze(
       DemoAshareData.candlesFor('600519'),
     );
@@ -13,6 +13,11 @@ void main() {
       MaterialApp(home: Scaffold(body: FutureWorkspace(analysis: analysis))),
     );
     expect(find.text('未来指标'), findsOneWidget);
-    expect(find.byType(ListTile), findsNWidgets(3));
+    expect(find.text('MA5'), findsOneWidget);
+    expect(find.text('MA10'), findsOneWidget);
+    expect(find.text('MA20'), findsOneWidget);
+    expect(find.text('MA60'), findsOneWidget);
+    expect(find.text('BOLL上'), findsOneWidget);
+    expect(find.text('BOLL下'), findsOneWidget);
   });
 }

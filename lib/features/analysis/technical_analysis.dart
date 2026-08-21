@@ -260,7 +260,9 @@ class FutureIndicatorPoint {
   const FutureIndicatorPoint({
     required this.day,
     required this.maShort,
+    required this.ma10,
     required this.maLong,
+    required this.ma60,
     required this.bollUpper,
     required this.bollMiddle,
     required this.bollLower,
@@ -268,7 +270,9 @@ class FutureIndicatorPoint {
 
   final DateTime day;
   final double maShort;
+  final double ma10;
   final double maLong;
+  final double ma60;
   final double bollUpper;
   final double bollMiddle;
   final double bollLower;
@@ -528,7 +532,11 @@ class StockAnalyzer {
         FutureIndicatorPoint(
           day: day,
           maShort: _calculator.sma(rolling, period: settings.maShortPeriod).last!,
+          ma10: _calculator.sma(rolling, period: 10).last!,
           maLong: _calculator.sma(rolling, period: settings.maLongPeriod).last!,
+          ma60: rolling.length >= 60
+              ? _calculator.sma(rolling, period: 60).last!
+              : double.nan,
           bollUpper: boll.upper,
           bollMiddle: boll.middle,
           bollLower: boll.lower,
