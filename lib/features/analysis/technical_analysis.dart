@@ -501,15 +501,11 @@ class StockAnalyzer {
     );
   }
 
-  List<FutureIndicatorPoint> _extend(
-    List<Candle> source, {
-    required int sessions,
-  }) {
+  /// 用线性外推补齐未来 N 天蜡烛，返回「历史 + 未来」完整序列。
+  List<Candle> extendCandles(List<Candle> source, {int sessions = 3}) {
     final rolling = List<Candle>.of(source);
-    final result = <FutureIndicatorPoint>[];
-    var day = source.last.day;
     for (var index = 0; index < sessions; index++) {
-      day = _nextTradingDay(day);
+      final day = _nextTradingDay(rolling.last.day);
       final projectedClose = _linearProjection(rolling);
       rolling.add(
         Candle(
@@ -521,9 +517,23 @@ class StockAnalyzer {
           volume: rolling.last.volume,
         ),
       );
+    }
+    return rolling;
+  }
+
+  List<FutureIndicatorPoint> _extend(
+    List<Candle> source, {
+    required int sessions,
+  }) {
+    final rolling = extendCandles(source, sessions: sessions);
+    final result = <FutureIndicatorPoint>[];
+    for (var index = 0; index < sessions; index++) {
+      final upto = source.length + index + 1;
+      final slice = rolling.sublist(0, upto);
+      final day = rolling[upto - 1].day;
       final boll = _calculator
           .bollinger(
-            rolling,
+            slice,
             period: settings.bollPeriod,
             multiplier: settings.bollMultiplier,
           )
@@ -531,11 +541,11 @@ class StockAnalyzer {
       result.add(
         FutureIndicatorPoint(
           day: day,
-          maShort: _calculator.sma(rolling, period: settings.maShortPeriod).last!,
-          ma10: _calculator.sma(rolling, period: 10).last!,
-          maLong: _calculator.sma(rolling, period: settings.maLongPeriod).last!,
-          ma60: rolling.length >= 60
-              ? _calculator.sma(rolling, period: 60).last!
+          maShort: _calculator.sma(slice, period: settings.maShortPeriod).last!,
+          ma10: _calculator.sma(slice, period: 10).last!,
+          maLong: _calculator.sma(slice, period: settings.maLongPeriod).last!,
+          ma60: slice.length >= 60
+              ? _calculator.sma(slice, period: 60).last!
               : double.nan,
           bollUpper: boll.upper,
           bollMiddle: boll.middle,

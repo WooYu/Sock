@@ -411,7 +411,9 @@ class _Workspace extends StatelessWidget {
           final analysis = stockAnalysisController.analysis;
           return ProfessionalChartScreen(
             stockCode: chartStockCode,
-            candles: snapshot.dailyCandles,
+            candles: stockAnalysisController.analyzer.extendCandles(
+              snapshot.dailyCandles,
+            ),
             annotationController: chartAnnotationController,
             keyLevels: analysis == null
                 ? const []
