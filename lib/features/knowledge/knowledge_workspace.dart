@@ -64,7 +64,17 @@ class _NotesTab extends StatelessWidget {
             leading: const Icon(Icons.description_outlined),
             title: Text(source.title),
             subtitle: Text(source.path),
-            trailing: _sourceStatus(context, source),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  tooltip: '预览原文',
+                  onPressed: () => _previewSource(context, source),
+                  icon: const Icon(Icons.visibility_outlined, size: 20),
+                ),
+                _sourceStatus(context, source),
+              ],
+            ),
             childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
             expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -137,6 +147,30 @@ class _NotesTab extends StatelessWidget {
     return Chip(
       label: Text(count == 0 ? '未识别' : '已识别 $count 条'),
       visualDensity: VisualDensity.compact,
+    );
+  }
+
+  Future<void> _previewSource(
+    BuildContext context,
+    KnowledgeSource source,
+  ) {
+    return showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(source.title),
+        content: SizedBox(
+          width: 560,
+          child: SingleChildScrollView(
+            child: SelectableText(source.originalContent),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('关闭'),
+          ),
+        ],
+      ),
     );
   }
 
