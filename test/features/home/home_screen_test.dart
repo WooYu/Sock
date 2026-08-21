@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stockcal/app/stockcal_app.dart';
 
@@ -8,11 +9,13 @@ void main() {
     await tester.pumpWidget(const StockCalApp());
     await tester.pumpAndSettle();
 
+    await tester.tap(find.byIcon(Icons.account_circle_outlined));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('自选'));
     await tester.pumpAndSettle();
     expect(find.text('还没有自选分组'), findsOneWidget);
 
-    await tester.tap(find.text('我的'));
+    await tester.tap(find.byIcon(Icons.account_circle_outlined));
     await tester.pumpAndSettle();
     await tester.tap(find.text('账户同步'));
     await tester.pumpAndSettle();
@@ -25,9 +28,7 @@ void main() {
     await tester.pumpWidget(const StockCalApp());
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('我的'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('知识规则'));
+    await tester.tap(find.text('经验规则'));
     await tester.pumpAndSettle();
 
     expect(find.text('笔记 0'), findsOneWidget);
@@ -48,7 +49,7 @@ void main() {
     await tester.pumpWidget(const StockCalApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('组合总览'), findsOneWidget);
+    expect(find.text('组合总览'), findsWidgets);
     expect(find.text('持仓股票'), findsOneWidget);
     expect(find.text('总投入'), findsOneWidget);
     expect(find.text('当前市值'), findsOneWidget);

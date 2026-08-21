@@ -14,9 +14,9 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(const StockCalApp());
-    await tester.tap(find.text('我的'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('复盘 AI'));
+
+    await tester.tap(find.text('当日复盘'));
     await tester.pumpAndSettle();
     await tester.pump(const Duration(milliseconds: 100));
 

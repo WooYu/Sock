@@ -244,13 +244,11 @@ class _HomeScreenState extends State<HomeScreen> {
             const PopupMenuItem(value: 'watchlist', child: Text('自选')),
             const PopupMenuItem(value: 'chart', child: Text('专业 K 线')),
             const PopupMenuItem(value: 'backtest', child: Text('规则回测')),
-            if (signedIn) ...[
-              const PopupMenuItem(value: 'account', child: Text('账户同步')),
-              const PopupMenuItem(value: 'settings', child: Text('设置')),
-              const PopupMenuItem(value: 'admin', child: Text('管理后台')),
+            const PopupMenuItem(value: 'account', child: Text('账户同步')),
+            const PopupMenuItem(value: 'settings', child: Text('设置')),
+            const PopupMenuItem(value: 'admin', child: Text('管理后台')),
+            if (signedIn)
               const PopupMenuItem(value: 'logout', child: Text('退出登录')),
-            ] else
-              const PopupMenuItem(value: 'account', child: Text('登录')),
           ],
         );
       },
