@@ -547,6 +547,7 @@ class _MarketWorkspace extends StatelessWidget {
                   ? _Dashboard(
                       portfolioController: portfolioController,
                       stockAnalysisController: stockAnalysisController,
+                      onNavigate: onNavigate,
                     )
                   : StockAnalysisScreen(
                       controller: stockAnalysisController,
@@ -613,10 +614,12 @@ class _Dashboard extends StatelessWidget {
   const _Dashboard({
     required this.portfolioController,
     required this.stockAnalysisController,
+    required this.onNavigate,
   });
 
   final PortfolioController portfolioController;
   final StockAnalysisController stockAnalysisController;
+  final ValueChanged<String> onNavigate;
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
@@ -631,9 +634,14 @@ class _Dashboard extends StatelessWidget {
     final positions = portfolioController.positions;
     final analysis = stockAnalysisController.analysis;
     final source = stockAnalysisController.snapshot?.source;
-    final totalAssets =
-        portfolioController.ledger.cashBalance +
-        portfolioController.marketValue;
+    final invested = positions.fold<double>(
+      0,
+      (sum, p) => sum + p.averageCost * p.quantity,
+    );
+    final realized = portfolioController.ledger.realizedProfit;
+    final rate = invested == 0
+        ? 0.0
+        : portfolioController.totalProfit / invested;
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
@@ -670,16 +678,26 @@ class _Dashboard extends StatelessWidget {
           spacing: 12,
           runSpacing: 12,
           children: [
-            MetricCard(label: '总资产', value: totalAssets.toStringAsFixed(0)),
+            MetricCard(label: '持仓股票', value: '${positions.length} 只'),
+            MetricCard(label: '总投入', value: invested.toStringAsFixed(0)),
             MetricCard(
-              label: '累计盈亏',
-              value: portfolioController.totalProfit.toStringAsFixed(0),
-              color: pnlColor(context, portfolioController.totalProfit),
+              label: '当前市值',
+              value: portfolioController.marketValue.toStringAsFixed(0),
             ),
             MetricCard(
-              label: '浮动盈亏',
+              label: '总浮动盈亏',
               value: portfolioController.floatingProfit.toStringAsFixed(0),
               color: pnlColor(context, portfolioController.floatingProfit),
+            ),
+            MetricCard(
+              label: '已实现盈亏',
+              value: realized.toStringAsFixed(0),
+              color: pnlColor(context, realized),
+            ),
+            MetricCard(
+              label: '组合收益率',
+              value: '${(rate * 100).toStringAsFixed(2)}%',
+              color: pnlColor(context, rate),
             ),
           ],
         ),
@@ -697,9 +715,12 @@ class _Dashboard extends StatelessWidget {
             contentPadding: EdgeInsets.zero,
             title: Text('${position.name} ${position.code}'),
             subtitle: Text(
-              '持仓 ${position.quantity} · 成本 ${position.averageCost.toStringAsFixed(2)}',
+              '持仓 ${position.quantity} · 成本 ${position.averageCost.toStringAsFixed(2)} · 现价 ${position.marketPrice.toStringAsFixed(2)}',
             ),
-            trailing: Text(position.marketPrice.toStringAsFixed(2)),
+            trailing: TextButton(
+              onPressed: () => onNavigate('trades'),
+              child: const Text('查看详情 →'),
+            ),
           ),
         const Divider(height: 32),
         const _SectionTitle(title: '关键位提醒'),

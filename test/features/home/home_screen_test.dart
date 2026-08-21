@@ -43,4 +43,17 @@ void main() {
     expect(find.text('登录以获取行情与 AI 分析'), findsOneWidget);
     expect(find.text('StockCal 演示行情'), findsNothing);
   });
+
+  testWidgets('dashboard shows portfolio overview metrics', (tester) async {
+    await tester.pumpWidget(const StockCalApp());
+    await tester.pumpAndSettle();
+
+    expect(find.text('组合总览'), findsOneWidget);
+    expect(find.text('持仓股票'), findsOneWidget);
+    expect(find.text('总投入'), findsOneWidget);
+    expect(find.text('当前市值'), findsOneWidget);
+    expect(find.text('总浮动盈亏'), findsOneWidget);
+    expect(find.text('已实现盈亏'), findsOneWidget);
+    expect(find.text('组合收益率'), findsOneWidget);
+  });
 }
