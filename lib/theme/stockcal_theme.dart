@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
-/// StockCal X 风格调色板（纯黑底 + X 蓝主色）。
+/// StockCal 调色板。
 ///
-/// A 股约定：红涨绿跌。整体黑白灰极简，主色为 X 蓝。
+/// 深色 = X 风格（纯黑 + X 蓝）；浅色 = 新野兽派（奶油纸底 + 墨色粗边框 + 明黄主色）。
+/// A 股约定：红涨绿跌。
 class StockCalColors {
   StockCalColors._();
 
-  // —— 深色（主打，X 纯黑）——
+  // —— 深色（X 纯黑）——
   static const Color bg = Color(0xFF000000); // 页面背景（纯黑）
   static const Color surface = Color(0xFF16181C); // 卡片 / 面板
   static const Color surfaceHigh = Color(0xFF1D1F23); // 浮层 / 选中
@@ -18,27 +19,36 @@ class StockCalColors {
   static const Color textSecondary = Color(0xFF71767B);
   static const Color border = Color(0xFF2F3336);
 
-  // —— 浅色（X 白）——
-  static const Color lightBg = Color(0xFFFFFFFF);
+  // —— 浅色（新野兽派）——
+  static const Color lightBg = Color(0xFFF4EFE1); // 奶油纸底
   static const Color lightSurface = Color(0xFFFFFFFF);
-  static const Color lightTextPrimary = Color(0xFF0F1419);
-  static const Color lightTextSecondary = Color(0xFF536471);
-  static const Color lightBorder = Color(0xFFEFF3F4);
-  static const Color lightGain = Color(0xFFF91880);
-  static const Color lightLoss = Color(0xFF00BA7C);
+  static const Color lightPrimary = Color(0xFFF9C80E); // 明黄主色
+  static const Color lightTextPrimary = Color(0xFF141414); // 墨色
+  static const Color lightTextSecondary = Color(0xFF57534E);
+  static const Color lightBorder = Color(0xFF141414); // 粗边框墨色
+  static const Color lightGain = Color(0xFFE53E2D); // 涨（红）
+  static const Color lightLoss = Color(0xFF0BA968); // 跌（绿）
 }
 
 /// 构建 StockCal 主题（深色 / 浅色）。
 ThemeData buildStockCalTheme(Brightness brightness) {
   final dark = brightness == Brightness.dark;
+  final primary = dark ? StockCalColors.primary : StockCalColors.lightPrimary;
+  final onPrimary = dark ? Colors.white : const Color(0xFF141414);
+  final radius = dark ? 7.0 : 0.0;
+  final borderWidth = dark ? 1.0 : 2.0;
+  final cardBorder = dark
+      ? StockCalColors.border
+      : StockCalColors.lightBorder;
+
   final scheme = ColorScheme.fromSeed(
-    seedColor: StockCalColors.primary,
+    seedColor: primary,
     brightness: brightness,
   ).copyWith(
-    primary: StockCalColors.primary,
-    onPrimary: Colors.white,
-    secondary: dark ? StockCalColors.accent : StockCalColors.primary,
-    onSecondary: Colors.white,
+    primary: primary,
+    onPrimary: onPrimary,
+    secondary: dark ? StockCalColors.accent : StockCalColors.lightPrimary,
+    onSecondary: onPrimary,
     surface: dark ? StockCalColors.surface : StockCalColors.lightSurface,
     onSurface: dark
         ? StockCalColors.textPrimary
@@ -70,7 +80,7 @@ ThemeData buildStockCalTheme(Brightness brightness) {
       centerTitle: false,
       titleTextStyle: TextStyle(
         fontSize: 18,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w700,
         color: onSurface,
       ),
     ),
@@ -81,52 +91,73 @@ ThemeData buildStockCalTheme(Brightness brightness) {
       elevation: 0,
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-        side: BorderSide(color: divider),
+        borderRadius: BorderRadius.circular(radius),
+        side: BorderSide(color: cardBorder, width: borderWidth),
       ),
     ),
 
     dividerTheme: DividerThemeData(color: divider, thickness: 1, space: 1),
 
     navigationBarTheme: NavigationBarThemeData(
-      backgroundColor: dark ? StockCalColors.surface : StockCalColors.lightSurface,
-      indicatorColor: scheme.primary.withValues(alpha: 0.16),
+      backgroundColor: dark
+          ? StockCalColors.surface
+          : StockCalColors.lightSurface,
+      indicatorColor: primary.withValues(alpha: 0.2),
       height: 64,
       labelTextStyle: WidgetStateProperty.resolveWith(
         (states) => TextStyle(
           fontSize: 12,
           fontWeight: states.contains(WidgetState.selected)
-              ? FontWeight.w600
+              ? FontWeight.w700
               : FontWeight.w500,
-          color: states.contains(WidgetState.selected) ? scheme.primary : muted,
+          color: states.contains(WidgetState.selected) ? primary : muted,
         ),
       ),
     ),
 
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: dark ? StockCalColors.surfaceHigh : const Color(0xFFF0F2F5),
+      fillColor: dark
+          ? StockCalColors.surfaceHigh
+          : StockCalColors.lightSurface,
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: divider),
+        borderRadius: BorderRadius.circular(radius),
+        borderSide: BorderSide(color: cardBorder, width: borderWidth),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: divider),
+        borderRadius: BorderRadius.circular(radius),
+        borderSide: BorderSide(color: cardBorder, width: borderWidth),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: StockCalColors.primary, width: 1.4),
+        borderRadius: BorderRadius.circular(radius),
+        borderSide: BorderSide(color: primary, width: borderWidth + 0.4),
       ),
     ),
 
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        backgroundColor: scheme.primary,
-        foregroundColor: scheme.onPrimary,
+        backgroundColor: primary,
+        foregroundColor: onPrimary,
         minimumSize: const Size(48, 44),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radius),
+          side: dark
+              ? BorderSide.none
+              : BorderSide(color: StockCalColors.lightBorder, width: 2),
+        ),
+        textStyle: const TextStyle(fontWeight: FontWeight.w700),
+      ),
+    ),
+
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: onSurface,
+        minimumSize: const Size(48, 44),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radius),
+          side: BorderSide(color: cardBorder, width: borderWidth),
+        ),
         textStyle: const TextStyle(fontWeight: FontWeight.w600),
       ),
     ),
@@ -138,9 +169,11 @@ ThemeData buildStockCalTheme(Brightness brightness) {
     ),
 
     chipTheme: ChipThemeData(
-      backgroundColor: dark ? StockCalColors.surfaceHigh : const Color(0xFFF0F2F5),
-      side: BorderSide(color: divider),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+      backgroundColor: dark
+          ? StockCalColors.surfaceHigh
+          : StockCalColors.lightSurface,
+      side: BorderSide(color: cardBorder, width: dark ? 1 : 2),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius)),
       labelStyle: TextStyle(color: onSurface, fontSize: 12),
     ),
   );

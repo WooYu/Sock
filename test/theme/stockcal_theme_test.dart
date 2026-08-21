@@ -18,14 +18,17 @@ void main() {
     expect(lossColor(context), const Color(0xFF00BA7C));
   });
 
-  testWidgets('light theme keeps A-share red-up green-down convention',
-      (tester) async {
+  testWidgets('light theme is neo-brutalist with red-up green-down', (
+    tester,
+  ) async {
     await tester.pumpWidget(MaterialApp(
       theme: buildStockCalTheme(Brightness.light),
       home: const Scaffold(body: SizedBox()),
     ));
     final context = tester.element(find.byType(Scaffold));
-    expect(gainColor(context), StockCalColors.lightGain);
-    expect(lossColor(context), StockCalColors.lightLoss);
+    expect(Theme.of(context).scaffoldBackgroundColor, const Color(0xFFF4EFE1));
+    expect(Theme.of(context).colorScheme.primary, const Color(0xFFF9C80E));
+    expect(gainColor(context), const Color(0xFFE53E2D));
+    expect(lossColor(context), const Color(0xFF0BA968));
   });
 }
