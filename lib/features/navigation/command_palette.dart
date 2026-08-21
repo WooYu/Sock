@@ -9,10 +9,12 @@ class CommandPalette extends StatefulWidget {
     super.key,
     required this.onNavigate,
     required this.catalog,
+    this.onSelectStock,
   });
 
   final ValueChanged<String> onNavigate;
   final StockCatalog catalog;
+  final ValueChanged<Security>? onSelectStock;
 
   @override
   State<CommandPalette> createState() => _CommandPaletteState();
@@ -86,7 +88,12 @@ class _CommandPaletteState extends State<CommandPalette> {
                               subtitle: Text(s.code),
                               onTap: () {
                                 Navigator.of(context).pop();
-                                widget.onNavigate('key-levels');
+                                final cb = widget.onSelectStock;
+                                if (cb != null) {
+                                  cb(s);
+                                } else {
+                                  widget.onNavigate('key-levels');
+                                }
                               },
                             ),
                         ],

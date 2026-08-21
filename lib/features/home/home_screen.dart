@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../core/display.dart';
 import '../../theme/stockcal_theme.dart';
@@ -223,6 +224,10 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (_) => CommandPalette(
         onNavigate: (key) => setState(() => _selected = key),
         catalog: _marketService,
+        onSelectStock: (security) {
+          setState(() => _selected = 'key-levels');
+          unawaited(_stockAnalysisController.select(security));
+        },
       ),
     );
   }
@@ -258,12 +263,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return AppShell(
-      destinations: navDestinations,
-      selected: _selected,
-      onSelected: (key) => setState(() => _selected = key),
-      accountMenu: _buildAccountMenu(),
-      onOpenPalette: _openPalette,
+    return CallbackShortcuts(
+      bindings: {
+        const SingleActivator(LogicalKeyboardKey.keyK, meta: true):
+            _openPalette,
+        const SingleActivator(LogicalKeyboardKey.keyK, control: true):
+            _openPalette,
+      },
+      child: Focus(
+        autofocus: true,
+        child: AppShell(
+          destinations: navDestinations,
+          selected: _selected,
+          onSelected: (key) => setState(() => _selected = key),
+          accountMenu: _buildAccountMenu(),
+          onOpenPalette: _openPalette,
       content: _Workspace(
         module: _selected,
         portfolioController: _portfolioController,
@@ -282,6 +296,8 @@ class _HomeScreenState extends State<HomeScreen> {
         adminService: _adminService,
         preferences: widget.preferences,
         onNavigate: (key) => setState(() => _selected = key),
+          ),
+        ),
       ),
     );
   }
