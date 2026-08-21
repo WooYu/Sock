@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:stockcal/domain/stockcal_domain.dart';
 import 'package:stockcal/features/analysis/technical_analysis.dart';
 import 'package:stockcal/features/market/market_data.dart';
+import 'package:stockcal/features/rules/rule_engine.dart';
 
 void main() {
   List<Candle> candles(List<double> closes) => List.generate(
@@ -109,6 +110,39 @@ void main() {
 
       expect(source, hasLength(originalLength));
       expect(source.last.day, originalLastDay);
+    });
+  });
+
+  group('model extensions', () {
+    final rising = candles(
+      List.generate(30, (i) => 10.0 + i * 0.1),
+    );
+
+    test('analyze exposes amplitude, atr and parameter snapshot', () {
+      final analysis = StockAnalyzer().analyze(rising);
+      expect(analysis.amplitude, greaterThan(0));
+      expect(analysis.atr, greaterThan(0));
+      expect(analysis.parameters, isNotEmpty);
+      expect(analysis.parameters.every((p) => p.label.isNotEmpty), isTrue);
+      expect(analysis.modelName, isNotEmpty);
+      expect(analysis.conditions, hasLength(3));
+    });
+
+    test('matched rules carry a band and hit counts fall back to heuristics', () {
+      final analysis = StockAnalyzer().analyze(rising);
+      expect(analysis.matchedRules, isNotEmpty);
+      expect(analysis.matchedRules.first.band, isNotNull);
+      expect(
+        analysis.ruleTotalCount,
+        greaterThanOrEqualTo(analysis.ruleHitCount),
+      );
+    });
+
+    test('analyzer uses RuleBook for hit counts when provided', () {
+      final book = RuleBook.withSystemDefaults();
+      final analysis = StockAnalyzer(ruleBook: book).analyze(rising);
+      expect(analysis.ruleTotalCount, book.activeRules.length);
+      expect(analysis.ruleHitCount, greaterThan(0));
     });
   });
 }

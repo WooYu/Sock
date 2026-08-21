@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import '../../domain/stockcal_domain.dart';
+import '../rules/rule_engine.dart';
 
 class AnalysisException implements Exception {
   const AnalysisException(this.message);
@@ -9,6 +10,27 @@ class AnalysisException implements Exception {
 
   @override
   String toString() => message;
+}
+
+enum RuleBand { primary, alternate, risk, caution }
+
+class ParameterItem {
+  const ParameterItem({
+    required this.label,
+    required this.value,
+    required this.unit,
+  });
+
+  final String label;
+  final double value;
+  final String unit;
+}
+
+class ConditionCheck {
+  const ConditionCheck({required this.label, required this.met});
+
+  final String label;
+  final bool met;
 }
 
 class IndicatorSettings {
@@ -189,6 +211,26 @@ class IndicatorCalculator {
     );
   }
 
+  double atr(List<Candle> candles, {required int period}) {
+    _validatePeriod(period);
+    if (candles.length < period + 1) {
+      throw AnalysisException('计算 ATR$period 至少需要 ${period + 1} 根 K 线');
+    }
+    var sum = 0.0;
+    for (var i = 1; i <= period; i++) {
+      final c = candles[i];
+      final tr = math.max(
+        c.high - c.low,
+        math.max(
+          (c.high - candles[i - 1].close).abs(),
+          (c.low - candles[i - 1].close).abs(),
+        ),
+      );
+      sum += tr;
+    }
+    return sum / period;
+  }
+
   void _validatePeriod(int period) {
     if (period <= 0) throw ArgumentError.value(period, 'period', '必须大于零');
   }
@@ -233,10 +275,15 @@ class FutureIndicatorPoint {
 }
 
 class MatchedRule {
-  const MatchedRule({required this.name, required this.score});
+  const MatchedRule({
+    required this.name,
+    required this.score,
+    required this.band,
+  });
 
   final String name;
   final int score;
+  final RuleBand band;
 }
 
 class StockAnalysis {
@@ -257,6 +304,14 @@ class StockAnalysis {
     required this.volumeRatio,
     required this.future,
     required this.settings,
+    required this.amplitude,
+    required this.atr,
+    required this.parameters,
+    required this.ruleHitCount,
+    required this.ruleTotalCount,
+    required this.conditions,
+    required this.ruleCredibility,
+    required this.modelName,
   });
 
   final double lastClose;
@@ -275,16 +330,26 @@ class StockAnalysis {
   final double volumeRatio;
   final List<FutureIndicatorPoint> future;
   final IndicatorSettings settings;
+  final double amplitude;
+  final double atr;
+  final List<ParameterItem> parameters;
+  final int ruleHitCount;
+  final int ruleTotalCount;
+  final List<ConditionCheck> conditions;
+  final double ruleCredibility;
+  final String modelName;
 }
 
 class StockAnalyzer {
   StockAnalyzer({
     IndicatorCalculator? calculator,
     this.settings = const IndicatorSettings(),
+    this.ruleBook,
   }) : _calculator = calculator ?? IndicatorCalculator();
 
   final IndicatorCalculator _calculator;
   IndicatorSettings settings;
+  final RuleBook? ruleBook;
 
   StockAnalysis analyze(List<Candle> source, {int lookback = 20}) {
     if (source.length < 20) {
@@ -313,13 +378,35 @@ class StockAnalyzer {
     final nearSupport = lastClose - support <= range * 0.35;
     final matchedRules = <MatchedRule>[
       if (trendPositive)
-        MatchedRule(name: 'MA${settings.maShortPeriod} 上穿并站稳 MA${settings.maLongPeriod}', score: 86),
+        MatchedRule(
+          name: 'MA${settings.maShortPeriod} 上穿并站稳 MA${settings.maLongPeriod}',
+          score: 86,
+          band: RuleBand.primary,
+        ),
       if (lastClose >= ema)
-        MatchedRule(name: '收盘价位于 EMA${settings.emaPeriod} 上方', score: 74),
+        MatchedRule(
+          name: '收盘价位于 EMA${settings.emaPeriod} 上方',
+          score: 74,
+          band: RuleBand.alternate,
+        ),
       if (volumeRatio >= 1)
-        MatchedRule(name: '成交量不低于${settings.volumePeriod}日均量', score: 61),
-      if (nearSupport) MatchedRule(name: '价格接近二十日支撑区', score: 48),
-      if (lastClose < boll.upper) MatchedRule(name: '仍处于 BOLL 上轨以内', score: 39),
+        MatchedRule(
+          name: '成交量不低于${settings.volumePeriod}日均量',
+          score: 61,
+          band: RuleBand.risk,
+        ),
+      if (nearSupport)
+        MatchedRule(
+          name: '价格接近二十日支撑区',
+          score: 48,
+          band: RuleBand.risk,
+        ),
+      if (lastClose < boll.upper)
+        MatchedRule(
+          name: '仍处于 BOLL 上轨以内',
+          score: 39,
+          band: RuleBand.caution,
+        ),
     ]..sort((a, b) => b.score.compareTo(a.score));
     final confidence = (0.5 + matchedRules.length * 0.08).clamp(0.5, 0.9);
     final direction = trendPositive
@@ -336,6 +423,51 @@ class StockAnalyzer {
         : volumeRatio > 1.5
         ? RiskLevel.medium
         : RiskLevel.low;
+
+    final prevClose = candles.length > 1
+        ? candles[candles.length - 2].close
+        : lastClose;
+    final amplitude = prevClose == 0
+        ? 0.0
+        : (candles.last.high - candles.last.low) / prevClose * 100;
+    final atr = _calculator.atr(candles, period: 14);
+    final parameters = <ParameterItem>[
+      ParameterItem(label: 'MA${settings.maShortPeriod}', value: maShort, unit: ''),
+      ParameterItem(label: 'MA${settings.maLongPeriod}', value: maLong, unit: ''),
+      ParameterItem(label: 'EMA${settings.emaPeriod}', value: ema, unit: ''),
+      ParameterItem(label: 'BOLL 上轨', value: boll.upper, unit: ''),
+      ParameterItem(label: 'BOLL 中轨', value: boll.middle, unit: ''),
+      ParameterItem(label: 'BOLL 下轨', value: boll.lower, unit: ''),
+      ParameterItem(label: 'ATR', value: atr, unit: ''),
+      ParameterItem(label: '振幅', value: amplitude, unit: '%'),
+      ParameterItem(label: '量比', value: volumeRatio, unit: ''),
+      ParameterItem(label: '昨收', value: prevClose, unit: ''),
+      ParameterItem(label: '今开', value: candles.last.open, unit: ''),
+      ParameterItem(label: '最高', value: candles.last.high, unit: ''),
+    ];
+    final conditions = <ConditionCheck>[
+      ConditionCheck(
+        label: 'MA${settings.maShortPeriod} 上移',
+        met: maShort >= maLong,
+      ),
+      ConditionCheck(label: 'BOLL 抬升', met: lastClose >= boll.middle),
+      ConditionCheck(label: '振幅达标', met: amplitude >= 3),
+    ];
+    var hit = 0;
+    var total = matchedRules.length;
+    if (ruleBook != null) {
+      final facts = RuleFacts(
+        closeAboveMa20: trendPositive,
+        volumeRatio: volumeRatio,
+        supportDistance: supportDistance.toDouble(),
+      );
+      total = ruleBook!.activeRules.length;
+      hit = ruleBook!.activeRules
+          .where((rule) => ruleBook!.evaluate(rule, facts))
+          .length;
+    }
+    final ruleCredibility =
+        (0.4 + hit / (total == 0 ? 1 : total) * 0.5).clamp(0.4, 0.9) * 100;
 
     return StockAnalysis(
       lastClose: lastClose,
@@ -354,6 +486,14 @@ class StockAnalyzer {
       volumeRatio: volumeRatio,
       future: _extend(candles, sessions: 3),
       settings: settings,
+      amplitude: amplitude,
+      atr: atr,
+      parameters: parameters,
+      ruleHitCount: hit,
+      ruleTotalCount: total,
+      conditions: conditions,
+      ruleCredibility: ruleCredibility,
+      modelName: 'GPT-5 轻量分类模型',
     );
   }
 
