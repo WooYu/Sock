@@ -137,10 +137,10 @@ class _ProfessionalChartScreenState extends State<ProfessionalChartScreen> {
                             chart.Candlesticks(
                               candles: rendered,
                               controller: _controller,
-                              style: chart.CandleSticksStyle.light(
-                                chartBackgroundColor: colors.surface,
+                              style: chart.CandleSticksStyle.dark(
+                                chartBackgroundColor: StockCalColors.bg,
                                 gridLineColor: colors.outlineVariant.withValues(
-                                  alpha: 0.5,
+                                  alpha: 0.4,
                                 ),
                                 axisTextColor: colors.onSurfaceVariant,
                                 candleBullColor: StockCalColors.gain,
@@ -456,28 +456,22 @@ class _IndicatorPainter extends CustomPainter {
     }
 
     if (layers.contains(_IndicatorLayer.ma5)) {
-      drawSeries(calculator.sma(candles, period: 5), StockCalColors.accent);
+      drawSeries(calculator.sma(candles, period: 5), const Color(0xFFE7ECF5));
     }
     if (layers.contains(_IndicatorLayer.ma20)) {
-      drawSeries(calculator.sma(candles, period: 20), StockCalColors.primary);
+      drawSeries(calculator.sma(candles, period: 20), const Color(0xFFF0B90B));
     }
     if (layers.contains(_IndicatorLayer.ema12)) {
-      drawSeries(calculator.ema(candles, period: 12), StockCalColors.textSecondary);
+      drawSeries(calculator.ema(candles, period: 12), const Color(0xFFC678DD));
     }
     if (layers.contains(_IndicatorLayer.boll)) {
       final bands = calculator.bollinger(candles, period: 20);
-      drawSeries(
-        bands.map((item) => item?.upper).toList(),
-        StockCalColors.border,
-      );
+      drawSeries(bands.map((item) => item?.upper).toList(), StockCalColors.primary);
       drawSeries(
         bands.map((item) => item?.middle).toList(),
-        StockCalColors.textPrimary,
+        StockCalColors.textSecondary,
       );
-      drawSeries(
-        bands.map((item) => item?.lower).toList(),
-        StockCalColors.border,
-      );
+      drawSeries(bands.map((item) => item?.lower).toList(), StockCalColors.primary);
     }
   }
 
