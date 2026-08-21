@@ -5,6 +5,7 @@ import '../../widgets/metric_card.dart';
 import '../market/market_data.dart';
 import '../knowledge/knowledge.dart';
 import 'stock_analysis_controller.dart';
+import 'direction_gauge.dart';
 import 'technical_analysis.dart';
 
 class StockAnalysisScreen extends StatefulWidget {
@@ -223,35 +224,11 @@ class _AnalysisContent extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        Row(
-          children: [
-            Icon(
-              _directionIcon(analysis.direction),
-              size: 20,
-              color: _directionColor(context, analysis.direction),
-            ),
-            const SizedBox(width: 6),
-            Text(_directionLabel(analysis.direction)),
-            const SizedBox(width: 10),
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: (analysis.directionStrength / 100).clamp(0.0, 1.0),
-                  minHeight: 8,
-                  backgroundColor: Theme.of(
-                    context,
-                  ).colorScheme.surfaceContainerHigh,
-                  color: _directionColor(context, analysis.direction),
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              '${analysis.directionStrength.round()}/100',
-              style: withTabular(Theme.of(context).textTheme.bodyMedium),
-            ),
-          ],
+        Center(
+          child: DirectionGauge(
+            strength: analysis.directionStrength,
+            direction: analysis.direction,
+          ),
         ),
         const SizedBox(height: 12),
         Align(
@@ -311,6 +288,25 @@ class _AnalysisContent extends StatelessWidget {
                   label: '失效条件',
                   value: '收盘跌破 ${analysis.support.toStringAsFixed(2)}',
                 ),
+                const SizedBox(height: 8),
+                ...analysis.conditions.map(
+                  (c) => Row(
+                    children: [
+                      Icon(
+                        c.met ? Icons.check_circle : Icons.circle_outlined,
+                        size: 18,
+                        color: c.met
+                            ? Theme.of(context).colorScheme.primary
+                            : null,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        c.label,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -343,6 +339,23 @@ class _AnalysisContent extends StatelessWidget {
         ),
         const SizedBox(height: 20),
         Text('盈利模式识别', style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                '今日参数 ${analysis.parameters.length} 项 · 振幅 ${analysis.amplitude.toStringAsFixed(2)}%',
+                style: Theme.of(context).textTheme.bodySmall,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '规则命中 ${analysis.ruleHitCount}/${analysis.ruleTotalCount}',
+              style: withTabular(Theme.of(context).textTheme.bodySmall),
+            ),
+          ],
+        ),
         ...analysis.matchedRules.map(
           (rule) => ListTile(
             dense: true,
@@ -353,7 +366,17 @@ class _AnalysisContent extends StatelessWidget {
                   ? Theme.of(context).colorScheme.primary
                   : null,
             ),
-            title: Text(rule.name),
+            title: Row(
+              children: [
+                Chip(
+                  label: Text(_bandLabel(rule.band)),
+                  visualDensity: VisualDensity.compact,
+                  side: BorderSide.none,
+                ),
+                const SizedBox(width: 8),
+                Expanded(child: Text(rule.name)),
+              ],
+            ),
             trailing: Text(
               '${rule.score}',
               style: withTabular(
@@ -430,24 +453,12 @@ class _AnalysisContent extends StatelessWidget {
     RiskLevel.high => '高',
   };
 
-  static String _directionLabel(Direction direction) => switch (direction) {
-    Direction.bullish => '多头',
-    Direction.neutral => '中性',
-    Direction.bearish => '空头',
+  static String _bandLabel(RuleBand band) => switch (band) {
+    RuleBand.primary => '主策略',
+    RuleBand.alternate => '备选',
+    RuleBand.risk => '风控',
+    RuleBand.caution => '警戒',
   };
-
-  static IconData _directionIcon(Direction direction) => switch (direction) {
-    Direction.bullish => Icons.trending_up,
-    Direction.neutral => Icons.trending_flat,
-    Direction.bearish => Icons.trending_down,
-  };
-
-  static Color _directionColor(BuildContext context, Direction direction) =>
-      switch (direction) {
-        Direction.bullish => gainColor(context),
-        Direction.neutral => Theme.of(context).colorScheme.onSurfaceVariant,
-        Direction.bearish => lossColor(context),
-      };
 }
 
 class _ValueTile extends StatelessWidget {
@@ -527,6 +538,50 @@ class _PipelineCard extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              switch (analysis.direction) {
+                Direction.bullish => '策略结论：偏多，关注买入区间',
+                Direction.bearish => '策略结论：偏空，注意失效条件',
+                Direction.neutral => '策略结论：中性，等待方向确认',
+              },
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '解释依据：命中 ${analysis.ruleHitCount}/${analysis.ruleTotalCount} 条规则，置信 ${(analysis.confidence * 100).round()}%',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '待确认经验：复核目标位与失效条件',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                Chip(
+                  label: Text('策略匹配度 ${(analysis.confidence * 100).round()}'),
+                ),
+                Chip(label: Text('规则可信度 ${analysis.ruleCredibility.round()}')),
+                Chip(
+                  label: Text(
+                    '风险等级 ${switch (analysis.riskLevel) {
+                      RiskLevel.low => '低',
+                      RiskLevel.medium => '中',
+                      RiskLevel.high => '高',
+                    }}',
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '当前模型：${analysis.modelName}',
+              style: Theme.of(context).textTheme.labelSmall,
             ),
           ],
         ),
