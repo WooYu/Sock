@@ -144,5 +144,12 @@ void main() {
       expect(analysis.ruleTotalCount, book.activeRules.length);
       expect(analysis.ruleHitCount, greaterThan(0));
     });
+
+    test('recognizes climbing pattern for a strongly rising series', () {
+      final risingStrong = candles(List.generate(30, (i) => 10.0 + i * 0.5));
+      final signal = StockAnalyzer().recognizeTrend(risingStrong);
+      expect(signal.pattern, TrendPattern.climbing);
+      expect(signal.reason, isNotEmpty);
+    });
   });
 }

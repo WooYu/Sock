@@ -285,6 +285,23 @@ class _AnalysisContent extends StatelessWidget {
                     ),
                   ],
                 ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Chip(
+                      label: Text(analysis.trendPattern.label),
+                      visualDensity: VisualDensity.compact,
+                      side: BorderSide.none,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        analysis.trendReason,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 12),
                 _PlanRow(
                   label: '买入关注',
