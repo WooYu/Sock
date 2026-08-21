@@ -37,6 +37,14 @@ import '../sync/remote_sync_service.dart';
 import '../watchlist/watchlist.dart';
 import '../watchlist/persistent_watchlist_repository.dart';
 import '../watchlist/watchlist_screen.dart';
+import '../../widgets/empty_state.dart';
+import '../charts/statistics_workspace.dart';
+import '../future/future_workspace.dart';
+import '../navigation/app_shell.dart';
+import '../navigation/command_palette.dart';
+import '../navigation/nav_destination.dart';
+import '../patterns/patterns_workspace.dart';
+import '../predictions/predictions_workspace.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, this.preferences});
@@ -48,7 +56,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  var _selected = '行情';
+  var _selected = 'overview';
   var _chartStockCode = '600519';
   late final PortfolioController _portfolioController;
   late final StockAnalysisController _stockAnalysisController;
@@ -208,113 +216,57 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted) setState(() {});
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final wide = MediaQuery.sizeOf(context).width >= 600;
-    final mobileIndex = switch (_selected) {
-      '行情' => 0,
-      '自选' => 1,
-      '组合' => 2,
-      _ => 3,
-    };
-
-    return Scaffold(
-      appBar: AppBar(title: const Text('StockCal')),
-      body: Row(
-        children: [
-          if (wide)
-            _DesktopNavigation(
-              selected: _selected,
-              onSelected: (module) => setState(() => _selected = module),
-            ),
-          Expanded(
-            child: _Workspace(
-              module: _selected,
-              portfolioController: _portfolioController,
-              stockAnalysisController: _stockAnalysisController,
-              marketService: _marketService,
-              chartAnnotationController: _chartAnnotationController,
-              chartStockCode: _chartStockCode,
-              ruleBook: _ruleBook,
-              ruleRepository: _ruleRepository,
-              predictionRepository: _predictionRepository,
-              reviewStore: _reviewStore,
-              reviewExplanation: _reviewExplanation,
-              knowledgeController: _knowledgeController,
-              watchlistController: _watchlistController,
-              sessionController: _sessionController,
-              adminService: _adminService,
-              preferences: widget.preferences,
-              onNavigate: (module) => setState(() => _selected = module),
-            ),
-          ),
-        ],
+  void _openPalette() {
+    showDialog<void>(
+      context: context,
+      builder: (_) => CommandPalette(
+        onNavigate: (key) => setState(() => _selected = key),
+        catalog: _marketService,
       ),
-      bottomNavigationBar: wide
-          ? null
-          : NavigationBar(
-              selectedIndex: mobileIndex,
-              onDestinationSelected: (index) {
-                const destinations = ['行情', '自选', '组合', '我的'];
-                setState(() => _selected = destinations[index]);
-              },
-              destinations: const [
-                NavigationDestination(
-                  icon: Icon(Icons.candlestick_chart_outlined),
-                  label: '行情',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.bookmark_outline),
-                  label: '自选',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.account_balance_wallet_outlined),
-                  label: '组合',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.person_outline),
-                  label: '我的',
-                ),
-              ],
-            ),
     );
   }
-}
 
-class _DesktopNavigation extends StatelessWidget {
-  const _DesktopNavigation({required this.selected, required this.onSelected});
-
-  final String selected;
-  final ValueChanged<String> onSelected;
-
-  static const _items = <(String, IconData)>[
-    ('行情', Icons.candlestick_chart_outlined),
-    ('自选', Icons.bookmark_outline),
-    ('组合', Icons.account_balance_wallet_outlined),
-    ('我的', Icons.person_outline),
-  ];
+  Widget _buildAccountMenu() {
+    return PopupMenuButton<String>(
+      icon: const Icon(Icons.account_circle_outlined),
+      onSelected: (key) => setState(() => _selected = key),
+      itemBuilder: (context) => const [
+        PopupMenuItem(value: 'watchlist', child: Text('自选')),
+        PopupMenuItem(value: 'chart', child: Text('专业 K 线')),
+        PopupMenuItem(value: 'backtest', child: Text('规则回测')),
+        PopupMenuItem(value: 'account', child: Text('账户同步')),
+        PopupMenuItem(value: 'settings', child: Text('设置')),
+        PopupMenuItem(value: 'admin', child: Text('管理后台')),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final isPrimary = _items.any((item) => item.$1 == selected);
-    final effectiveSelected = isPrimary ? selected : '我的';
-    return SizedBox(
-      width: 168,
-      child: Material(
-        color: Theme.of(context).colorScheme.surfaceContainerLow,
-        child: ListView(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          children: [
-            for (final item in _items)
-              ListTile(
-                dense: true,
-                selected: effectiveSelected == item.$1,
-                leading: Icon(item.$2, size: 21),
-                title: Text(item.$1),
-                onTap: () => onSelected(item.$1),
-              ),
-          ],
-        ),
+    return AppShell(
+      destinations: navDestinations,
+      selected: _selected,
+      onSelected: (key) => setState(() => _selected = key),
+      accountMenu: _buildAccountMenu(),
+      onOpenPalette: _openPalette,
+      content: _Workspace(
+        module: _selected,
+        portfolioController: _portfolioController,
+        stockAnalysisController: _stockAnalysisController,
+        marketService: _marketService,
+        chartAnnotationController: _chartAnnotationController,
+        chartStockCode: _chartStockCode,
+        ruleBook: _ruleBook,
+        ruleRepository: _ruleRepository,
+        predictionRepository: _predictionRepository,
+        reviewStore: _reviewStore,
+        reviewExplanation: _reviewExplanation,
+        knowledgeController: _knowledgeController,
+        watchlistController: _watchlistController,
+        sessionController: _sessionController,
+        adminService: _adminService,
+        preferences: widget.preferences,
+        onNavigate: (key) => setState(() => _selected = key),
       ),
     );
   }
@@ -361,19 +313,65 @@ class _Workspace extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (module == '组合') {
-      return PortfolioScreen(controller: portfolioController);
-    }
-    if (module == '行情') {
-      return _MarketWorkspace(
+    if (module == 'overview') {
+      return _OverviewWorkspace(
         portfolioController: portfolioController,
         stockAnalysisController: stockAnalysisController,
-        knowledgeController: knowledgeController,
         sessionController: sessionController,
         onNavigate: onNavigate,
       );
     }
-    if (module == '专业K线') {
+    if (module == 'key-levels' || module == 'ai-strategy') {
+      return StockAnalysisScreen(
+        controller: stockAnalysisController,
+        knowledgeController: knowledgeController,
+      );
+    }
+    if (module == 'patterns') {
+      return PatternsWorkspace(
+        ruleBook: ruleBook,
+        analysis: stockAnalysisController.analysis,
+      );
+    }
+    if (module == 'future') {
+      final analysis = stockAnalysisController.analysis;
+      if (analysis == null) {
+        return const EmptyState(
+          icon: Icons.insights_outlined,
+          title: '请先加载行情',
+        );
+      }
+      return FutureWorkspace(analysis: analysis);
+    }
+    if (module == 'predictions') {
+      return PredictionsWorkspace(
+        repository: predictionRepository,
+        stockCode: chartStockCode,
+      );
+    }
+    if (module == 'trades') {
+      return PortfolioScreen(controller: portfolioController);
+    }
+    if (module == 'charts') {
+      return StatisticsWorkspace(portfolio: portfolioController);
+    }
+    if (module == 'review') {
+      return ReviewWorkspace(
+        store: reviewStore,
+        trades: portfolioController.ledger.entries,
+        explanationAdapter: reviewExplanation,
+      );
+    }
+    if (module == 'rules') {
+      return KnowledgeWorkspace(controller: knowledgeController);
+    }
+    if (module == 'watchlist') {
+      return WatchlistScreen(
+        controller: watchlistController,
+        catalog: marketService,
+      );
+    }
+    if (module == 'chart') {
       return _MarketSnapshotLoader(
         market: marketService,
         stockCode: chartStockCode,
@@ -384,7 +382,7 @@ class _Workspace extends StatelessWidget {
         ),
       );
     }
-    if (module == '规则回测') {
+    if (module == 'backtest') {
       return _MarketSnapshotLoader(
         market: marketService,
         stockCode: chartStockCode,
@@ -398,37 +396,18 @@ class _Workspace extends StatelessWidget {
         ),
       );
     }
-    if (module == '复盘AI') {
-      return ReviewWorkspace(
-        store: reviewStore,
-        trades: portfolioController.ledger.entries,
-        explanationAdapter: reviewExplanation,
-      );
-    }
-    if (module == '知识规则') {
-      return KnowledgeWorkspace(controller: knowledgeController);
-    }
-    if (module == '自选') {
-      return WatchlistScreen(
-        controller: watchlistController,
-        catalog: marketService,
-      );
-    }
-    if (module == '账户同步') {
+    if (module == 'account') {
       return AccountWorkspace(controller: sessionController);
     }
-    if (module == '设置后台' || module == '管理后台') {
+    if (module == 'settings' || module == 'admin') {
       return SettingsAdminWorkspace(
         remote: adminService,
         sessionController: sessionController,
         preferences: preferences,
         ruleBook: ruleBook,
         ruleRepository: ruleRepository,
-        initialTabIndex: module == '管理后台' ? 1 : 0,
+        initialTabIndex: module == 'admin' ? 1 : 0,
       );
-    }
-    if (module == '我的') {
-      return _MyPage(onNavigate: onNavigate);
     }
     return StockAnalysisScreen(
       controller: stockAnalysisController,
@@ -437,83 +416,25 @@ class _Workspace extends StatelessWidget {
   }
 }
 
-class _MyPage extends StatelessWidget {
-  const _MyPage({required this.onNavigate});
-
-  final ValueChanged<String> onNavigate;
-
-  static const _items = <(String, String, IconData)>[
-    ('复盘 AI', '复盘AI', Icons.rate_review_outlined),
-    ('规则回测', '规则回测', Icons.rule_outlined),
-    ('知识规则', '知识规则', Icons.library_books_outlined),
-    ('账户同步', '账户同步', Icons.person_outline),
-    ('设置', '设置后台', Icons.settings_outlined),
-    ('管理后台', '管理后台', Icons.admin_panel_settings_outlined),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        Text('我的', style: Theme.of(context).textTheme.headlineMedium),
-        const SizedBox(height: 16),
-        GridView.count(
-          crossAxisCount: 2,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: 12,
-          crossAxisSpacing: 12,
-          mainAxisExtent: 72,
-          children: [
-            for (final item in _items)
-              Card(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(8),
-                  onTap: () => onNavigate(item.$2),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      children: [
-                        Icon(item.$3, size: 24),
-                        const SizedBox(width: 12),
-                        Text(item.$1),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-class _MarketWorkspace extends StatelessWidget {
-  const _MarketWorkspace({
+class _OverviewWorkspace extends StatelessWidget {
+  const _OverviewWorkspace({
     required this.portfolioController,
     required this.stockAnalysisController,
-    required this.knowledgeController,
     required this.sessionController,
     required this.onNavigate,
   });
 
   final PortfolioController portfolioController;
   final StockAnalysisController stockAnalysisController;
-  final KnowledgeController knowledgeController;
   final SessionController sessionController;
   final ValueChanged<String> onNavigate;
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([stockAnalysisController, sessionController]),
+      listenable: sessionController,
       builder: (context, _) {
         final signedIn = sessionController.session?.isSignedIn == true;
-        final idle =
-            stockAnalysisController.selected == null &&
-            stockAnalysisController.results.isEmpty;
         return Column(
           children: [
             if (!signedIn)
@@ -534,7 +455,7 @@ class _MarketWorkspace extends StatelessWidget {
                         ),
                         const SizedBox(width: 12),
                         FilledButton(
-                          onPressed: () => onNavigate('账户同步'),
+                          onPressed: () => onNavigate('account'),
                           child: const Text('去登录'),
                         ),
                       ],
@@ -543,16 +464,11 @@ class _MarketWorkspace extends StatelessWidget {
                 ),
               ),
             Expanded(
-              child: idle
-                  ? _Dashboard(
-                      portfolioController: portfolioController,
-                      stockAnalysisController: stockAnalysisController,
-                      onNavigate: onNavigate,
-                    )
-                  : StockAnalysisScreen(
-                      controller: stockAnalysisController,
-                      knowledgeController: knowledgeController,
-                    ),
+              child: _Dashboard(
+                portfolioController: portfolioController,
+                stockAnalysisController: stockAnalysisController,
+                onNavigate: onNavigate,
+              ),
             ),
           ],
         );
