@@ -98,12 +98,11 @@
    - 摘要行：今日参数（折叠为「12 项」芯片）· 振幅匹配 · 规则命中 `N/总数`。
    - 策略列表按分数排序，每组带 `band` 徽标：主策略(86 攀升) / 备选(74 照镜子止盈) / 风控(61 反弹止损) / 警戒(39 弱势处理)。
 4. **主策略详情**：买入关注区间 / 卖出·止盈区间 / 失效条件 + **条件勾选**（MA5 上移 / BOLL 抬升 / 振幅达标，`Checkbox` + 打勾色）。
-5. **历史数据校准 · 公司行为**：除权除息（分红/拆分）自动纳入指标计算 + 复权参考价。用确定性演示字段展示（无真实数据源，标注「校准」）。
-6. **模型编排 · 可解释分析（AI 策略分析中心）**：三层流水线可视化（数值计算层 12 项 → 规则引擎层 N/总数 命中 → AI 解释层 分数）已存在，**补**：
+5. **模型编排 · 可解释分析（AI 策略分析中心）**：三层流水线可视化（数值计算层 12 项 → 规则引擎层 N/总数 命中 → AI 解释层 分数）已存在，**补**：
    - 策略结论 / 解释依据 / 待确认经验 三行文本；
    - 底部三个指标：策略匹配度（= confidence×100）/ 规则可信度（= ruleCredibility）/ 风险等级（已有）；
    - 当前模型行：`modelName`。
-7. 保留现有「技术指标」「未来三日指标延伸」「相关经验与概念」区块（参考站无但属现有能力，按「用现在项目中的」保留）。
+6. 保留现有「技术指标」「未来三日指标延伸」「相关经验与概念」区块（参考站无但属现有能力，按「用现在项目中的」保留）。
 
 ## 四、组合总览 1:1（首页仪表盘）
 
@@ -155,7 +154,7 @@
 1. `feat: extend analysis model with amplitude/ATR/params/rule-bands/conditions`（数据模型 + 测试）
 2. `feat: add navigation shell with left rail, top bar, command palette`（导航 shell）
 3. `feat: semicircular direction gauge + profit-pattern strategy bands`（关键位分析前半）
-4. `feat: strategy conditions + corporate-action calibration + model detail`（关键位分析后半）
+4. `feat: strategy conditions + model detail`（关键位分析后半）
 5. `feat: portfolio overview 1:1 with holdings table`
 6. `feat: map remaining pages (patterns/future/predictions/charts/ai-strategy)`（其余页 + 统计图表）
 7. `feat: wire login-gated shell account menu`（账户菜单 + 收尾）
