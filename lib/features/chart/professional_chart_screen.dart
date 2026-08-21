@@ -8,6 +8,18 @@ import 'chart_annotations.dart';
 import 'chart_data.dart';
 import '../../theme/stockcal_theme.dart';
 
+class ChartLevel {
+  const ChartLevel({
+    required this.price,
+    required this.label,
+    required this.color,
+  });
+
+  final double price;
+  final String label;
+  final Color color;
+}
+
 class ProfessionalChartScreen extends StatefulWidget {
   const ProfessionalChartScreen({
     super.key,
@@ -15,12 +27,14 @@ class ProfessionalChartScreen extends StatefulWidget {
     this.stockCode = '600519',
     this.annotationController,
     this.adjustmentFactors = const [],
+    this.keyLevels = const [],
   });
 
   final List<Candle> candles;
   final String stockCode;
   final ChartAnnotationController? annotationController;
   final List<AdjustmentFactor> adjustmentFactors;
+  final List<ChartLevel> keyLevels;
 
   @override
   State<ProfessionalChartScreen> createState() =>
@@ -167,6 +181,15 @@ class _ProfessionalChartScreenState extends State<ProfessionalChartScreen> {
                                 key: const Key('annotation-canvas'),
                                 painter: _AnnotationPainter(
                                   annotations: _annotations.annotations,
+                                  candles: candles,
+                                ),
+                              ),
+                            ),
+                            IgnorePointer(
+                              child: CustomPaint(
+                                key: const Key('key-level-canvas'),
+                                painter: _KeyLevelPainter(
+                                  levels: widget.keyLevels,
                                   candles: candles,
                                 ),
                               ),
@@ -726,6 +749,46 @@ class _AnnotationPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _AnnotationPainter oldDelegate) =>
       oldDelegate.annotations != annotations || oldDelegate.candles != candles;
+}
+
+class _KeyLevelPainter extends CustomPainter {
+  _KeyLevelPainter({required this.levels, required this.candles});
+
+  final List<ChartLevel> levels;
+  final List<Candle> candles;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (candles.isEmpty || levels.isEmpty) return;
+    final high = candles
+        .map((item) => item.high)
+        .reduce((a, b) => a > b ? a : b);
+    final low = candles.map((item) => item.low).reduce((a, b) => a < b ? a : b);
+    final range = high - low == 0 ? 1.0 : high - low;
+    for (final level in levels) {
+      final y = size.height * 0.8 * (high - level.price) / range;
+      canvas.drawLine(
+        Offset(0, y),
+        Offset(size.width, y),
+        Paint()
+          ..color = level.color
+          ..strokeWidth = 1.2
+          ..style = PaintingStyle.stroke,
+      );
+      final tp = TextPainter(
+        text: TextSpan(
+          text: '${level.label} ${level.price.toStringAsFixed(2)}',
+          style: TextStyle(color: level.color, fontSize: 11),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      tp.paint(canvas, Offset(size.width - tp.width - 4, y - tp.height - 2));
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _KeyLevelPainter oldDelegate) =>
+      oldDelegate.levels != levels || oldDelegate.candles != candles;
 }
 
 class _RegionLabel extends StatelessWidget {

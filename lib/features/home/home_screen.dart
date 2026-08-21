@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../core/display.dart';
+import '../../theme/stockcal_theme.dart';
 import '../../widgets/error_state.dart';
 import '../../widgets/metric_card.dart';
 import '../account/account_workspace.dart';
@@ -339,6 +340,7 @@ class _Workspace extends StatelessWidget {
       return StockAnalysisScreen(
         controller: stockAnalysisController,
         knowledgeController: knowledgeController,
+        onOpenChart: () => onNavigate('chart'),
       );
     }
     if (module == 'patterns') {
@@ -389,11 +391,33 @@ class _Workspace extends StatelessWidget {
       return _MarketSnapshotLoader(
         market: marketService,
         stockCode: chartStockCode,
-        builder: (snapshot) => ProfessionalChartScreen(
-          stockCode: chartStockCode,
-          candles: snapshot.dailyCandles,
-          annotationController: chartAnnotationController,
-        ),
+        builder: (snapshot) {
+          final analysis = stockAnalysisController.analysis;
+          return ProfessionalChartScreen(
+            stockCode: chartStockCode,
+            candles: snapshot.dailyCandles,
+            annotationController: chartAnnotationController,
+            keyLevels: analysis == null
+                ? const []
+                : [
+                    ChartLevel(
+                      price: analysis.support,
+                      label: '支撑',
+                      color: StockCalColors.loss,
+                    ),
+                    ChartLevel(
+                      price: analysis.resistance,
+                      label: '压力',
+                      color: StockCalColors.gain,
+                    ),
+                    ChartLevel(
+                      price: analysis.target,
+                      label: '目标',
+                      color: StockCalColors.primary,
+                    ),
+                  ],
+          );
+        },
       );
     }
     if (module == 'backtest') {

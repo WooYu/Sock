@@ -13,10 +13,12 @@ class StockAnalysisScreen extends StatefulWidget {
     super.key,
     required this.controller,
     this.knowledgeController,
+    this.onOpenChart,
   });
 
   final StockAnalysisController controller;
   final KnowledgeController? knowledgeController;
+  final VoidCallback? onOpenChart;
 
   @override
   State<StockAnalysisScreen> createState() => _StockAnalysisScreenState();
@@ -96,6 +98,7 @@ class _StockAnalysisScreenState extends State<StockAnalysisScreen> {
                   snapshot: controller.snapshot!,
                   analysis: controller.analysis!,
                   onRefresh: controller.refresh,
+                  onOpenChart: widget.onOpenChart,
                   cycle: controller.cycle,
                   onCycleChanged: controller.setCycle,
                   knowledge:
@@ -147,11 +150,13 @@ class _AnalysisContent extends StatelessWidget {
     required this.onCycleChanged,
     required this.knowledge,
     required this.knowledgeController,
+    this.onOpenChart,
   });
 
   final MarketSnapshot snapshot;
   final StockAnalysis analysis;
   final VoidCallback onRefresh;
+  final VoidCallback? onOpenChart;
   final OperationCycle cycle;
   final ValueChanged<OperationCycle> onCycleChanged;
   final List<KnowledgeDraft> knowledge;
@@ -206,6 +211,12 @@ class _AnalysisContent extends StatelessWidget {
               onPressed: onRefresh,
               icon: const Icon(Icons.refresh),
             ),
+            if (onOpenChart != null)
+              OutlinedButton.icon(
+                onPressed: onOpenChart,
+                icon: const Icon(Icons.candlestick_chart_outlined, size: 18),
+                label: const Text('专业 K 线'),
+              ),
           ],
         ),
         const SizedBox(height: 8),
