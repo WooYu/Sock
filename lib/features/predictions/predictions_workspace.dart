@@ -46,8 +46,18 @@ class _PredictionsWorkspaceState extends State<PredictionsWorkspace> {
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.history),
                 title: Text('${record.stockCode} · v${record.version}'),
-                subtitle: Text(
-                  '支撑 ${record.output.support.toStringAsFixed(2)} · 目标 ${record.output.target.toStringAsFixed(2)}',
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '支撑 ${record.output.support.toStringAsFixed(2)} · 目标 ${record.output.target.toStringAsFixed(2)}',
+                    ),
+                    if (record.matchedRules.isNotEmpty)
+                      Text(
+                        '命中 ${record.matchedRules.map((r) => r.name).join('、')}',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                  ],
                 ),
                 trailing: Text(
                   '${(record.output.confidence * 100).round()}%',

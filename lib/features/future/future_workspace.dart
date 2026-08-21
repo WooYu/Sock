@@ -26,9 +26,23 @@ class FutureWorkspace extends StatelessWidget {
               'MA${analysis.settings.maShortPeriod} ${point.maShort.toStringAsFixed(2)} · '
               'MA${analysis.settings.maLongPeriod} ${point.maLong.toStringAsFixed(2)}',
             ),
-            trailing: Text(
-              'BOLL ${point.bollUpper.toStringAsFixed(2)}',
-              style: withTabular(null),
+            trailing: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'BOLL 上 ${point.bollUpper.toStringAsFixed(2)}',
+                  style: withTabular(null),
+                ),
+                Text(
+                  '中 ${point.bollMiddle.toStringAsFixed(2)}',
+                  style: withTabular(Theme.of(context).textTheme.bodySmall),
+                ),
+                Text(
+                  '下 ${point.bollLower.toStringAsFixed(2)}',
+                  style: withTabular(Theme.of(context).textTheme.bodySmall),
+                ),
+              ],
             ),
           ),
       ],
