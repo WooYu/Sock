@@ -6,9 +6,9 @@ import 'package:stockcal/theme/stockcal_theme.dart';
 
 void main() {
   test('chart palette constants match the 2026 theme', () {
-    expect(StockCalColors.gain, const Color(0xFFF0525D));
-    expect(StockCalColors.loss, const Color(0xFF2BB673));
-    expect(StockCalColors.accent, const Color(0xFF5AA9F0));
+    expect(StockCalColors.gain, const Color(0xFFF91880));
+    expect(StockCalColors.loss, const Color(0xFF00BA7C));
+    expect(StockCalColors.accent, const Color(0xFF1D9BF0));
   });
 
   testWidgets('chart renders with theme colors', (tester) async {

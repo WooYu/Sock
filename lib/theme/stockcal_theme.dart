@@ -1,31 +1,31 @@
 import 'package:flutter/material.dart';
 
-/// StockCal 深空科技调色板（蓝黑底 + 青色主色）。
+/// StockCal X 风格调色板（纯黑底 + X 蓝主色）。
 ///
-/// A 股约定：红涨绿跌。主色为青，蓝作次要点缀。
+/// A 股约定：红涨绿跌。整体黑白灰极简，主色为 X 蓝。
 class StockCalColors {
   StockCalColors._();
 
-  // —— 深色（主打，深空科技）——
-  static const Color bg = Color(0xFF0A0E15); // 页面背景（深空蓝黑）
-  static const Color surface = Color(0xFF111623); // 卡片 / 面板
-  static const Color surfaceHigh = Color(0xFF1A2130); // 浮层 / 选中
-  static const Color primary = Color(0xFF38C3E0); // 主色青
-  static const Color accent = Color(0xFF5AA9F0); // 次色蓝
-  static const Color gain = Color(0xFFF0525D); // 涨（红）
-  static const Color loss = Color(0xFF2BB673); // 跌（绿）
-  static const Color textPrimary = Color(0xFFE7ECF5);
-  static const Color textSecondary = Color(0xFF8B94A8);
-  static const Color border = Color(0xFF1E2636);
+  // —— 深色（主打，X 纯黑）——
+  static const Color bg = Color(0xFF000000); // 页面背景（纯黑）
+  static const Color surface = Color(0xFF16181C); // 卡片 / 面板
+  static const Color surfaceHigh = Color(0xFF1D1F23); // 浮层 / 选中
+  static const Color primary = Color(0xFF1D9BF0); // 主色 X 蓝
+  static const Color accent = Color(0xFF1D9BF0); // 次色（同 X 蓝）
+  static const Color gain = Color(0xFFF91880); // 涨（X 红）
+  static const Color loss = Color(0xFF00BA7C); // 跌（X 绿）
+  static const Color textPrimary = Color(0xFFE7E9EA);
+  static const Color textSecondary = Color(0xFF71767B);
+  static const Color border = Color(0xFF2F3336);
 
-  // —— 浅色（冷灰科技）——
-  static const Color lightBg = Color(0xFFEEF1F6);
+  // —— 浅色（X 白）——
+  static const Color lightBg = Color(0xFFFFFFFF);
   static const Color lightSurface = Color(0xFFFFFFFF);
-  static const Color lightTextPrimary = Color(0xFF1A1F27);
-  static const Color lightTextSecondary = Color(0xFF5C6573);
-  static const Color lightBorder = Color(0xFFE2E7EE);
-  static const Color lightGain = Color(0xFFD63A48);
-  static const Color lightLoss = Color(0xFF1E9E63);
+  static const Color lightTextPrimary = Color(0xFF0F1419);
+  static const Color lightTextSecondary = Color(0xFF536471);
+  static const Color lightBorder = Color(0xFFEFF3F4);
+  static const Color lightGain = Color(0xFFF91880);
+  static const Color lightLoss = Color(0xFF00BA7C);
 }
 
 /// 构建 StockCal 主题（深色 / 浅色）。
@@ -36,9 +36,9 @@ ThemeData buildStockCalTheme(Brightness brightness) {
     brightness: brightness,
   ).copyWith(
     primary: StockCalColors.primary,
-    onPrimary: dark ? const Color(0xFF04222E) : Colors.white,
+    onPrimary: Colors.white,
     secondary: dark ? StockCalColors.accent : StockCalColors.primary,
-    onSecondary: dark ? const Color(0xFF1C1C1C) : Colors.white,
+    onSecondary: Colors.white,
     surface: dark ? StockCalColors.surface : StockCalColors.lightSurface,
     onSurface: dark
         ? StockCalColors.textPrimary
