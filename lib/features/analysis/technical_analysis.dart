@@ -304,6 +304,7 @@ class StockAnalysis {
     required this.maLong,
     required this.ema,
     required this.bollinger,
+    required this.maValues,
     required this.volumeRatio,
     required this.future,
     required this.settings,
@@ -330,6 +331,7 @@ class StockAnalysis {
   final double maLong;
   final double ema;
   final BollingerBand bollinger;
+  final Map<int, double> maValues;
   final double volumeRatio;
   final List<FutureIndicatorPoint> future;
   final IndicatorSettings settings;
@@ -377,6 +379,37 @@ class StockAnalyzer {
     final volumeRatio = _calculator
         .volume(candles, period: settings.volumePeriod)
         .latestRatio;
+    final maValues = {
+      for (final period in FutureIndicatorPoint.maPeriods)
+        period: candles.length >= period
+            ? _calculator.sma(candles, period: period).last!
+            : double.nan,
+    };
+    // 支撑 / 压力 / 目标：高低点 + MA/BOLL 位结合。
+    final supportLevels = <double>[support];
+    for (final value in maValues.values) {
+      if (!value.isNaN && value <= lastClose) supportLevels.add(value);
+    }
+    if (boll.lower <= lastClose) supportLevels.add(boll.lower);
+    final combinedSupport = supportLevels.reduce((a, b) => a > b ? a : b);
+
+    final resistanceLevels = <double>[resistance];
+    for (final value in maValues.values) {
+      if (!value.isNaN && value >= lastClose) resistanceLevels.add(value);
+    }
+    if (boll.upper >= lastClose) resistanceLevels.add(boll.upper);
+    final combinedResistance = resistanceLevels.reduce((a, b) => a < b ? a : b);
+
+    final aboveResistance = <double>[];
+    for (final value in maValues.values) {
+      if (!value.isNaN && value > combinedResistance) {
+        aboveResistance.add(value);
+      }
+    }
+    if (boll.upper > combinedResistance) aboveResistance.add(boll.upper);
+    final combinedTarget = aboveResistance.isEmpty
+        ? combinedResistance + (combinedResistance - combinedSupport)
+        : aboveResistance.reduce((a, b) => a < b ? a : b);
     final trendPositive = lastClose >= maLong && maShort >= maLong;
     final nearSupport = lastClose - support <= range * 0.35;
     final matchedRules = <MatchedRule>[
@@ -474,9 +507,9 @@ class StockAnalyzer {
 
     return StockAnalysis(
       lastClose: lastClose,
-      support: support,
-      resistance: resistance,
-      target: resistance + range * 0.382,
+      support: combinedSupport,
+      resistance: combinedResistance,
+      target: combinedTarget,
       confidence: confidence,
       riskLevel: risk,
       direction: direction,
@@ -486,6 +519,7 @@ class StockAnalyzer {
       maLong: maLong,
       ema: ema,
       bollinger: boll,
+      maValues: maValues,
       volumeRatio: volumeRatio,
       future: _extend(candles, sessions: 3),
       settings: settings,
