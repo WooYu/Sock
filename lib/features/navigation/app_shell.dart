@@ -44,7 +44,12 @@ class AppShell extends StatelessWidget {
                   selected: selected,
                   onSelected: onSelected,
                 ),
-                Expanded(child: content),
+                Expanded(
+                  child: Material(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    child: content,
+                  ),
+                ),
               ],
             ),
           ),

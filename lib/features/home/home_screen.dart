@@ -227,17 +227,33 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildAccountMenu() {
-    return PopupMenuButton<String>(
-      icon: const Icon(Icons.account_circle_outlined),
-      onSelected: (key) => setState(() => _selected = key),
-      itemBuilder: (context) => const [
-        PopupMenuItem(value: 'watchlist', child: Text('自选')),
-        PopupMenuItem(value: 'chart', child: Text('专业 K 线')),
-        PopupMenuItem(value: 'backtest', child: Text('规则回测')),
-        PopupMenuItem(value: 'account', child: Text('账户同步')),
-        PopupMenuItem(value: 'settings', child: Text('设置')),
-        PopupMenuItem(value: 'admin', child: Text('管理后台')),
-      ],
+    return ListenableBuilder(
+      listenable: _sessionController,
+      builder: (context, _) {
+        final signedIn = _sessionController.session?.isSignedIn == true;
+        return PopupMenuButton<String>(
+          icon: const Icon(Icons.account_circle_outlined),
+          onSelected: (key) {
+            if (key == 'logout') {
+              unawaited(_sessionController.signOut());
+              return;
+            }
+            setState(() => _selected = key);
+          },
+          itemBuilder: (context) => [
+            const PopupMenuItem(value: 'watchlist', child: Text('自选')),
+            const PopupMenuItem(value: 'chart', child: Text('专业 K 线')),
+            const PopupMenuItem(value: 'backtest', child: Text('规则回测')),
+            if (signedIn) ...[
+              const PopupMenuItem(value: 'account', child: Text('账户同步')),
+              const PopupMenuItem(value: 'settings', child: Text('设置')),
+              const PopupMenuItem(value: 'admin', child: Text('管理后台')),
+              const PopupMenuItem(value: 'logout', child: Text('退出登录')),
+            ] else
+              const PopupMenuItem(value: 'account', child: Text('登录')),
+          ],
+        );
+      },
     );
   }
 
