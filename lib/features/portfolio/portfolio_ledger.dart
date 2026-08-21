@@ -155,6 +155,16 @@ class LedgerPosition {
   double get floatingProfit => marketValue - totalCost;
 }
 
+class RealizedProfitPoint {
+  const RealizedProfitPoint({
+    required this.occurredAt,
+    required this.cumulativeProfit,
+  });
+
+  final DateTime occurredAt;
+  final double cumulativeProfit;
+}
+
 class LedgerValidationException implements Exception {
   const LedgerValidationException(this.message);
 
@@ -265,38 +275,94 @@ class PortfolioLedger {
         .toList();
   }
 
-  _PositionState _stateFor(String code) {
-    var quantity = 0;
-    var totalCost = 0.0;
-    var realizedProfit = 0.0;
-    var name = code;
-    for (final entry in _entries.where((item) => item.code == code)) {
-      name = entry.name ?? name;
-      switch (entry.type) {
-        case TradeEntryType.buy:
-          quantity += entry.quantity;
-          totalCost += entry.quantity * entry.price + entry.feeAmount;
-        case TradeEntryType.sell:
-          final averageCost = quantity == 0 ? 0 : totalCost / quantity;
-          final releasedCost = averageCost * entry.quantity;
-          quantity -= entry.quantity;
-          totalCost -= releasedCost;
-          realizedProfit +=
-              entry.quantity * entry.price - entry.feeAmount - releasedCost;
-        case TradeEntryType.dividend:
-          realizedProfit += entry.cashAmount;
-        case TradeEntryType.bonus:
-          quantity += entry.quantity;
-        case TradeEntryType.fee:
-          break;
+  /// 按时间顺序重放交易，得到累计已实现盈亏曲线。
+  List<RealizedProfitPoint> realizedProfitSeries() {
+    final sorted = List<TradeEntry>.of(_entries)
+      ..sort((a, b) => a.occurredAt.compareTo(b.occurredAt));
+    final states = <String, _PositionState>{};
+    var cumulative = 0.0;
+    final points = <RealizedProfitPoint>[];
+    for (final entry in sorted) {
+      if (entry.type == TradeEntryType.fee) {
+        cumulative -= entry.feeAmount;
+        points.add(
+          RealizedProfitPoint(
+            occurredAt: entry.occurredAt,
+            cumulativeProfit: cumulative,
+          ),
+        );
+        continue;
       }
+      final code = entry.code;
+      if (code == null) continue;
+      final prev = states[code] ??
+          _PositionState(
+            name: entry.name ?? code,
+            quantity: 0,
+            totalCost: 0,
+            realizedProfit: 0,
+          );
+      final next = _applyEntry(prev, entry);
+      cumulative += next.realizedProfit - prev.realizedProfit;
+      states[code] = next;
+      points.add(
+        RealizedProfitPoint(
+          occurredAt: entry.occurredAt,
+          cumulativeProfit: cumulative,
+        ),
+      );
+    }
+    return points;
+  }
+
+  _PositionState _applyEntry(_PositionState state, TradeEntry entry) {
+    var quantity = state.quantity;
+    var totalCost = state.totalCost;
+    var realizedProfit = state.realizedProfit;
+    switch (entry.type) {
+      case TradeEntryType.buy:
+        quantity += entry.quantity;
+        totalCost += entry.quantity * entry.price + entry.feeAmount;
+      case TradeEntryType.sell:
+        final averageCost = quantity == 0 ? 0 : totalCost / quantity;
+        final releasedCost = averageCost * entry.quantity;
+        quantity -= entry.quantity;
+        totalCost -= releasedCost;
+        realizedProfit +=
+            entry.quantity * entry.price - entry.feeAmount - releasedCost;
+      case TradeEntryType.dividend:
+        realizedProfit += entry.cashAmount;
+      case TradeEntryType.bonus:
+        quantity += entry.quantity;
+      case TradeEntryType.fee:
+        break;
     }
     return _PositionState(
-      name: name,
+      name: state.name,
       quantity: quantity,
       totalCost: totalCost,
       realizedProfit: realizedProfit,
     );
+  }
+
+  _PositionState _stateFor(String code) {
+    var state = _PositionState(
+      name: code,
+      quantity: 0,
+      totalCost: 0,
+      realizedProfit: 0,
+    );
+    for (final entry in _entries.where((item) => item.code == code)) {
+      final name = entry.name ?? state.name;
+      final applied = _applyEntry(state, entry);
+      state = _PositionState(
+        name: name,
+        quantity: applied.quantity,
+        totalCost: applied.totalCost,
+        realizedProfit: applied.realizedProfit,
+      );
+    }
+    return state;
   }
 
   void _validateEntry(TradeEntry entry) {

@@ -140,5 +140,36 @@ void main() {
       );
       expect(ledger.entries, hasLength(1));
     });
+
+    test('realizedProfitSeries accumulates realized profit chronologically', () {
+      final ledger = PortfolioLedger();
+      ledger.record(
+        TradeEntry.buy(
+          id: 'buy-1',
+          occurredAt: DateTime(2026, 8, 1),
+          code: '600519',
+          name: '贵州茅台',
+          quantity: 100,
+          price: 10,
+          fee: 0,
+        ),
+      );
+      ledger.record(
+        TradeEntry.sell(
+          id: 'sell-1',
+          occurredAt: DateTime(2026, 8, 10),
+          code: '600519',
+          name: '贵州茅台',
+          quantity: 100,
+          price: 12,
+          fee: 0,
+        ),
+      );
+
+      final series = ledger.realizedProfitSeries();
+      expect(series, hasLength(2));
+      expect(series.first.cumulativeProfit, closeTo(0, 0.001));
+      expect(series.last.cumulativeProfit, closeTo(200, 0.001));
+    });
   });
 }
