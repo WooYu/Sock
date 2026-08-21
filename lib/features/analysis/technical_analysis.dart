@@ -331,6 +331,7 @@ class StockAnalysis {
     required this.parameters,
     required this.ruleHitCount,
     required this.ruleTotalCount,
+    required this.hitRuleNames,
     required this.conditions,
     required this.ruleCredibility,
     required this.modelName,
@@ -360,6 +361,7 @@ class StockAnalysis {
   final List<ParameterItem> parameters;
   final int ruleHitCount;
   final int ruleTotalCount;
+  final List<String> hitRuleNames;
   final List<ConditionCheck> conditions;
   final double ruleCredibility;
   final String modelName;
@@ -513,6 +515,7 @@ class StockAnalyzer {
     ];
     var hit = 0;
     var total = matchedRules.length;
+    final hitRuleNames = <String>[];
     if (ruleBook != null) {
       final facts = RuleFacts(
         closeAboveMa20: trendPositive,
@@ -520,9 +523,12 @@ class StockAnalyzer {
         supportDistance: supportDistance.toDouble(),
       );
       total = ruleBook!.activeRules.length;
-      hit = ruleBook!.activeRules
-          .where((rule) => ruleBook!.evaluate(rule, facts))
-          .length;
+      for (final rule in ruleBook!.activeRules) {
+        if (ruleBook!.evaluate(rule, facts)) {
+          hit++;
+          hitRuleNames.add(rule.name);
+        }
+      }
     }
     final ruleCredibility =
         (0.4 + hit / (total == 0 ? 1 : total) * 0.5).clamp(0.4, 0.9) * 100;
@@ -551,6 +557,7 @@ class StockAnalyzer {
       parameters: parameters,
       ruleHitCount: hit,
       ruleTotalCount: total,
+      hitRuleNames: List.unmodifiable(hitRuleNames),
       conditions: conditions,
       ruleCredibility: ruleCredibility,
       modelName: 'GPT-5 轻量分类模型',

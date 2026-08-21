@@ -578,7 +578,9 @@ class _PipelineCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              '解释依据：命中 ${analysis.ruleHitCount}/${analysis.ruleTotalCount} 条规则，置信 ${(analysis.confidence * 100).round()}%',
+              analysis.hitRuleNames.isEmpty
+                  ? '解释依据：命中 ${analysis.ruleHitCount}/${analysis.ruleTotalCount} 条规则，置信 ${(analysis.confidence * 100).round()}%'
+                  : '解释依据：命中 ${analysis.hitRuleNames.join('、')}，置信 ${(analysis.confidence * 100).round()}%',
               style: Theme.of(context).textTheme.bodySmall,
             ),
             const SizedBox(height: 4),
