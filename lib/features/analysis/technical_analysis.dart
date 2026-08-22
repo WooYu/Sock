@@ -268,10 +268,19 @@ extension TrendPatternX on TrendPattern {
 }
 
 class TrendSignal {
-  const TrendSignal({required this.pattern, required this.reason});
+  const TrendSignal({
+    required this.pattern,
+    required this.reason,
+    this.support,
+    this.resistance,
+    this.target,
+  });
 
   final TrendPattern pattern;
   final String reason;
+  final double? support;
+  final double? resistance;
+  final double? target;
 }
 
 class FutureIndicatorPoint {
@@ -533,12 +542,15 @@ class StockAnalyzer {
     final ruleCredibility =
         (0.4 + hit / (total == 0 ? 1 : total) * 0.5).clamp(0.4, 0.9) * 100;
     final trend = recognizeTrend(candles);
+    final finalSupport = trend.support ?? combinedSupport;
+    final finalResistance = trend.resistance ?? combinedResistance;
+    final finalTarget = trend.target ?? combinedTarget;
 
     return StockAnalysis(
       lastClose: lastClose,
-      support: combinedSupport,
-      resistance: combinedResistance,
-      target: combinedTarget,
+      support: finalSupport,
+      resistance: finalResistance,
+      target: finalTarget,
       confidence: confidence,
       riskLevel: risk,
       direction: direction,
@@ -566,7 +578,7 @@ class StockAnalyzer {
     );
   }
 
-  /// 识别次日走势模式（攀升 / 反抽五日线 / 照镜子 / 震荡）。
+  /// 识别次日走势模式，并给出该模式对应的支撑 / 压力 / 目标位。
   TrendSignal recognizeTrend(List<Candle> candles) {
     final n = candles.length;
     if (n < 22) {
@@ -583,6 +595,10 @@ class StockAnalyzer {
       period: settings.bollPeriod,
       multiplier: settings.bollMultiplier,
     );
+    final atr = _calculator.atr(candles, period: 14);
+    final recent = candles.sublist(math.max(0, n - 20));
+    final recentLow = recent.map((c) => c.low).reduce(math.min);
+    final recentHigh = recent.map((c) => c.high).reduce(math.max);
 
     final close = candles[n - 1].close;
     final prevClose = candles[n - 2].close;
@@ -591,14 +607,20 @@ class StockAnalyzer {
     final prevMa5 = sma5[n - 2]!;
     final ma10 = sma10[n - 1]!;
     final ma20 = sma20[n - 1]!;
+    final bollUpper = bolls[n - 1]!.upper;
     final prevBollUpper = bolls[n - 2]!.upper;
     final prevPrevBollUpper = bolls[n - 3]!.upper;
+    final ma30 = n >= 30 ? _calculator.sma(candles, period: 30).last! : double.nan;
 
     // 攀升：多头排列 + 价格站上 MA5 + MA5 上翘
     if (ma5 > ma10 && ma10 > ma20 && close >= ma5 && ma5 > prevMa5) {
+      final resistance = bollUpper > close ? bollUpper : recentHigh;
       return TrendSignal(
         pattern: TrendPattern.climbing,
         reason: 'MA5/10/20 多头排列且 MA5 上翘，价格站上 MA5',
+        support: ma10,
+        resistance: resistance,
+        target: ma30.isFinite && ma30 > resistance ? ma30 : resistance + atr,
       );
     }
 
@@ -607,6 +629,9 @@ class StockAnalyzer {
       return TrendSignal(
         pattern: TrendPattern.reboundToMa5,
         reason: '昨日收盘跌破 MA5，今日反弹回踩 MA5',
+        support: recentLow,
+        resistance: ma5,
+        target: ma10 > ma5 ? ma10 : ma5 + atr,
       );
     }
 
@@ -615,6 +640,9 @@ class StockAnalyzer {
       return TrendSignal(
         pattern: TrendPattern.mirrorBollUpper,
         reason: '前日突破 BOLL 上轨，昨日跌破上轨，预计反抽上轨',
+        support: prevBollUpper,
+        resistance: recentHigh,
+        target: recentHigh + atr,
       );
     }
 
