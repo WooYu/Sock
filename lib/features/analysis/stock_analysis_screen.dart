@@ -610,7 +610,7 @@ class _PipelineCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              '当前模型：${analysis.modelName}',
+              '分析引擎：${analysis.modelName}',
               style: Theme.of(context).textTheme.labelSmall,
             ),
           ],

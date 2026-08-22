@@ -572,7 +572,7 @@ class StockAnalyzer {
       hitRuleNames: List.unmodifiable(hitRuleNames),
       conditions: conditions,
       ruleCredibility: ruleCredibility,
-      modelName: 'GPT-5 轻量分类模型',
+      modelName: '本地规则引擎（启发式）',
       trendPattern: trend.pattern,
       trendReason: trend.reason,
     );

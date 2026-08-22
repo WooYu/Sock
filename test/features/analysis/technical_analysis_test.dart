@@ -151,5 +151,10 @@ void main() {
       expect(signal.pattern, TrendPattern.climbing);
       expect(signal.reason, isNotEmpty);
     });
+
+    test('model name reflects a local engine, not an unintegrated LLM', () {
+      final analysis = StockAnalyzer().analyze(rising);
+      expect(analysis.modelName, isNot(contains('GPT')));
+    });
   });
 }
