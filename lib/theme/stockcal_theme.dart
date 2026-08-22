@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 /// StockCal 调色板。
 ///
-/// 深色 = X 风格（纯黑 + X 蓝）；浅色 = 新野兽派（奶油纸底 + 墨色粗边框 + 明黄主色）。
+/// 深色 = X 风格（纯黑 + X 蓝）；浅色 = X 浅色（白底 + X 蓝 + 细边框）。
 /// A 股约定：红涨绿跌。
 class StockCalColors {
   StockCalColors._();
@@ -19,15 +19,15 @@ class StockCalColors {
   static const Color textSecondary = Color(0xFF71767B);
   static const Color border = Color(0xFF2F3336);
 
-  // —— 浅色（新野兽派）——
-  static const Color lightBg = Color(0xFFF4EFE1); // 奶油纸底
-  static const Color lightSurface = Color(0xFFFFFFFF);
-  static const Color lightPrimary = Color(0xFFF9C80E); // 明黄主色
-  static const Color lightTextPrimary = Color(0xFF141414); // 墨色
-  static const Color lightTextSecondary = Color(0xFF57534E);
-  static const Color lightBorder = Color(0xFF141414); // 粗边框墨色
-  static const Color lightGain = Color(0xFFE53E2D); // 涨（红）
-  static const Color lightLoss = Color(0xFF0BA968); // 跌（绿）
+  // —— 浅色（X 浅色，白底细边框）——
+  static const Color lightBg = Color(0xFFF7F9FA); // 页面背景
+  static const Color lightSurface = Color(0xFFFFFFFF); // 卡片 / 面板
+  static const Color lightPrimary = Color(0xFF1D9BF0); // 主色 X 蓝
+  static const Color lightTextPrimary = Color(0xFF0F1419); // 主文字
+  static const Color lightTextSecondary = Color(0xFF536471); // 次文字
+  static const Color lightBorder = Color(0xFFDCE3E8); // 细边框
+  static const Color lightGain = Color(0xFFE0245E); // 涨（红）
+  static const Color lightLoss = Color(0xFF0AA063); // 跌（绿）
 }
 
 /// 构建 StockCal 主题（深色 / 浅色）。
@@ -35,8 +35,8 @@ ThemeData buildStockCalTheme(Brightness brightness) {
   final dark = brightness == Brightness.dark;
   final primary = dark ? StockCalColors.primary : StockCalColors.lightPrimary;
   final onPrimary = dark ? Colors.white : const Color(0xFF141414);
-  final radius = dark ? 7.0 : 0.0;
-  final borderWidth = dark ? 1.0 : 2.0;
+  final radius = dark ? 7.0 : 12.0;
+  final borderWidth = 1.0;
   final cardBorder = dark
       ? StockCalColors.border
       : StockCalColors.lightBorder;

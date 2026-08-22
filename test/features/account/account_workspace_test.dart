@@ -23,7 +23,15 @@ void main() {
     );
     await tester.pumpWidget(
       MaterialApp(
-        home: Scaffold(body: AccountWorkspace(controller: controller)),
+        home: Scaffold(body: AccountWorkspace(
+        controller: controller,
+        loadStats: () async => const AccountStats(
+          watchlist: 0,
+          notes: 0,
+          predictions: 0,
+          reviews: 0,
+        ),
+      )),
       ),
     );
 
@@ -46,7 +54,15 @@ void main() {
     final controller = SessionController(MemorySessionRepository());
     await tester.pumpWidget(
       MaterialApp(
-        home: Scaffold(body: AccountWorkspace(controller: controller)),
+        home: Scaffold(body: AccountWorkspace(
+        controller: controller,
+        loadStats: () async => const AccountStats(
+          watchlist: 0,
+          notes: 0,
+          predictions: 0,
+          reviews: 0,
+        ),
+      )),
       ),
     );
 
@@ -72,10 +88,19 @@ void main() {
     await controller.verifyPhone(phone: '13800138000', code: '123456');
     await tester.pumpWidget(
       MaterialApp(
-        home: Scaffold(body: AccountWorkspace(controller: controller)),
+        home: Scaffold(body: AccountWorkspace(
+        controller: controller,
+        loadStats: () async => const AccountStats(
+          watchlist: 0,
+          notes: 0,
+          predictions: 0,
+          reviews: 0,
+        ),
+      )),
       ),
     );
 
+    await tester.scrollUntilVisible(find.text('退出登录'), 200);
     await tester.tap(find.text('退出登录'));
     await tester.pumpAndSettle();
     expect(find.text('A 股决策日志 · 手机号登录'), findsOneWidget);
@@ -90,7 +115,15 @@ void main() {
     );
     await tester.pumpWidget(
       MaterialApp(
-        home: Scaffold(body: AccountWorkspace(controller: controller)),
+        home: Scaffold(body: AccountWorkspace(
+        controller: controller,
+        loadStats: () async => const AccountStats(
+          watchlist: 0,
+          notes: 0,
+          predictions: 0,
+          reviews: 0,
+        ),
+      )),
       ),
     );
 
@@ -115,7 +148,15 @@ void main() {
     );
     await tester.pumpWidget(
       MaterialApp(
-        home: Scaffold(body: AccountWorkspace(controller: controller)),
+        home: Scaffold(body: AccountWorkspace(
+        controller: controller,
+        loadStats: () async => const AccountStats(
+          watchlist: 0,
+          notes: 0,
+          predictions: 0,
+          reviews: 0,
+        ),
+      )),
       ),
     );
 
@@ -140,7 +181,15 @@ void main() {
     await controller.verifyPhone(phone: '13800138000', code: '123456');
     await tester.pumpWidget(
       MaterialApp(
-        home: Scaffold(body: AccountWorkspace(controller: controller)),
+        home: Scaffold(body: AccountWorkspace(
+        controller: controller,
+        loadStats: () async => const AccountStats(
+          watchlist: 0,
+          notes: 0,
+          predictions: 0,
+          reviews: 0,
+        ),
+      )),
       ),
     );
     await tester.pumpAndSettle();

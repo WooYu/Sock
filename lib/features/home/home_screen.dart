@@ -342,6 +342,22 @@ class _Workspace extends StatelessWidget {
   final PreferencesController? preferences;
   final ValueChanged<String> onNavigate;
 
+  Future<AccountStats> _loadAccountStats() async {
+    final watchlist = watchlistController.groups.fold<int>(
+      0,
+      (total, group) => total + group.stocks.length,
+    );
+    final notes = knowledgeController.sources.length;
+    final predictions = await predictionRepository.count();
+    final reviews = (await reviewStore.tradeReviews()).length;
+    return AccountStats(
+      watchlist: watchlist,
+      notes: notes,
+      predictions: predictions,
+      reviews: reviews,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (module == 'overview') {
@@ -453,7 +469,10 @@ class _Workspace extends StatelessWidget {
       );
     }
     if (module == 'account') {
-      return AccountWorkspace(controller: sessionController);
+      return AccountWorkspace(
+        controller: sessionController,
+        loadStats: _loadAccountStats,
+      );
     }
     if (module == 'settings' || module == 'admin') {
       return SettingsAdminWorkspace(

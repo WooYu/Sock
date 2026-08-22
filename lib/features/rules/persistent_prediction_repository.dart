@@ -15,6 +15,9 @@ class PersistentPredictionRepository implements PredictionRepository {
         .toList(growable: false);
   }
 
+  /// 全部预测记录的数量（跨股票）。
+  Future<int> count() async => (await _all()).length;
+
   @override
   Future<void> append(PredictionRecord record) async {
     final all = await _all();

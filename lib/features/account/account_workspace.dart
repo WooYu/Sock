@@ -4,10 +4,32 @@ import 'package:flutter/material.dart';
 
 import 'session.dart';
 
+/// 账户页统计数字。
+class AccountStats {
+  const AccountStats({
+    required this.watchlist,
+    required this.notes,
+    required this.predictions,
+    required this.reviews,
+  });
+
+  final int watchlist;
+  final int notes;
+  final int predictions;
+  final int reviews;
+}
+
 class AccountWorkspace extends StatefulWidget {
-  const AccountWorkspace({super.key, required this.controller});
+  const AccountWorkspace({
+    super.key,
+    required this.controller,
+    required this.loadStats,
+  });
 
   final SessionController controller;
+
+  /// 返回账户页统计数字（自选股 / 笔记 / 预测 / 复盘）。
+  final Future<AccountStats> Function() loadStats;
 
   @override
   State<AccountWorkspace> createState() => _AccountWorkspaceState();
@@ -22,11 +44,13 @@ class _AccountWorkspaceState extends State<AccountWorkspace> {
   var _secondsUntilResend = 0;
   var _isRequesting = false;
   Timer? _resendTimer;
+  Future<AccountStats>? _stats;
 
   @override
   void initState() {
     super.initState();
     widget.controller.addListener(_refresh);
+    _ensureStats();
   }
 
   @override
@@ -36,7 +60,13 @@ class _AccountWorkspaceState extends State<AccountWorkspace> {
     super.dispose();
   }
 
-  void _refresh() => setState(() {});
+  void _ensureStats() {
+    if (_stats == null && widget.controller.session != null) {
+      _stats = widget.loadStats();
+    }
+  }
+
+  void _refresh() => setState(_ensureStats);
 
   @override
   Widget build(BuildContext context) {
@@ -145,63 +175,233 @@ class _AccountWorkspaceState extends State<AccountWorkspace> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        ListTile(
-          contentPadding: EdgeInsets.zero,
-          leading: const CircleAvatar(child: Icon(Icons.person_outline)),
-          title: Text(_maskPhone(session.phone)),
-          subtitle: const Text('个人资料 · StockCal 用户'),
-          trailing: OutlinedButton.icon(
-            onPressed: widget.controller.signOut,
-            icon: const Icon(Icons.logout),
-            label: const Text('退出登录'),
+        _buildProfileCard(session),
+        const SizedBox(height: 12),
+        FutureBuilder<AccountStats>(
+          future: _stats,
+          builder: (context, snapshot) => _buildStatsGrid(snapshot.data),
+        ),
+        const SizedBox(height: 20),
+        _buildSectionTitle('设备管理'),
+        _buildDeviceList(),
+        const SizedBox(height: 20),
+        _buildSectionTitle('同步状态'),
+        _buildSyncList(),
+        const SizedBox(height: 24),
+        _buildSignOut(),
+      ],
+    );
+  }
+
+  Widget _buildProfileCard(UserSession session) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            scheme.primary.withValues(alpha: 0.14),
+            scheme.surface,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: scheme.primary.withValues(alpha: 0.22),
+        ),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 24,
+            backgroundColor: scheme.primary.withValues(alpha: 0.14),
+            child: Icon(Icons.person_outline, color: scheme.primary),
           ),
-        ),
-        const Divider(height: 32),
-        Text('设备管理', style: Theme.of(context).textTheme.titleMedium),
-        if (widget.controller.devices.isEmpty)
-          const ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: Icon(Icons.devices_outlined),
-            title: Text('设备信息暂不可用'),
-            subtitle: Text('网络恢复后将自动更新'),
-          )
-        else
-          for (final device in widget.controller.devices)
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: Icon(
-                device.isCurrent
-                    ? Icons.devices_outlined
-                    : Icons.laptop_outlined,
-              ),
-              title: Text(device.isCurrent ? '当前设备' : device.name),
-              subtitle: Text(
-                device.isCurrent ? '${device.name} · 最近活跃' : '已登录设备',
-              ),
-              trailing: device.isCurrent
-                  ? const Icon(Icons.verified_user_outlined)
-                  : IconButton(
-                      onPressed: () => _revokeDevice(device),
-                      tooltip: '撤销 ${device.name}',
-                      icon: const Icon(Icons.logout),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _maskPhone(session.phone),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 9,
+                    vertical: 3,
+                  ),
+                  decoration: BoxDecoration(
+                    color: scheme.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    '普通用户',
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w700,
+                      color: scheme.primary,
                     ),
+                  ),
+                ),
+              ],
             ),
-        const Divider(height: 32),
-        Text('同步状态', style: Theme.of(context).textTheme.titleMedium),
-        const ListTile(
-          contentPadding: EdgeInsets.zero,
-          leading: Icon(Icons.cloud_done_outlined),
-          title: Text('已同步'),
-          subtitle: Text('自选股、交易、标注、规则与预测记录'),
-          trailing: Icon(Icons.check_circle_outline),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatsGrid(AccountStats? stats) {
+    final cards = [
+      ('自选股', stats?.watchlist ?? 0),
+      ('笔记', stats?.notes ?? 0),
+      ('预测', stats?.predictions ?? 0),
+      ('复盘', stats?.reviews ?? 0),
+    ];
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(child: _buildStatCard(cards[0].$1, cards[0].$2)),
+            const SizedBox(width: 8),
+            Expanded(child: _buildStatCard(cards[1].$1, cards[1].$2)),
+          ],
         ),
-        const ListTile(
-          contentPadding: EdgeInsets.zero,
-          leading: Icon(Icons.key_outlined),
-          title: Text('令牌有效'),
-          subtitle: Text('将在到期前自动续期'),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(child: _buildStatCard(cards[2].$1, cards[2].$2)),
+            const SizedBox(width: 8),
+            Expanded(child: _buildStatCard(cards[3].$1, cards[3].$2)),
+          ],
         ),
       ],
+    );
+  }
+
+  Widget _buildStatCard(String label, int value) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: scheme.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '$value',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(fontSize: 12.5, color: scheme.onSurfaceVariant),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 8),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w700,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDeviceList() {
+    final scheme = Theme.of(context).colorScheme;
+    final devices = widget.controller.devices;
+    return Container(
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: scheme.outlineVariant),
+      ),
+      child: devices.isEmpty
+          ? ListTile(
+              leading: const Icon(Icons.devices_outlined),
+              title: const Text('设备信息暂不可用'),
+              subtitle: const Text('网络恢复后将自动更新'),
+            )
+          : Column(
+              children: [
+                for (final device in devices)
+                  ListTile(
+                    leading: Icon(
+                      device.isCurrent
+                          ? Icons.devices_outlined
+                          : Icons.laptop_outlined,
+                    ),
+                    title: Text(device.isCurrent ? '当前设备' : device.name),
+                    subtitle: Text(
+                      device.isCurrent
+                          ? '${device.name} · 最近活跃'
+                          : '已登录设备',
+                    ),
+                    trailing: device.isCurrent
+                        ? const Icon(Icons.verified_user_outlined)
+                        : IconButton(
+                            onPressed: () => _revokeDevice(device),
+                            tooltip: '撤销 ${device.name}',
+                            icon: const Icon(Icons.logout),
+                          ),
+                  ),
+              ],
+            ),
+    );
+  }
+
+  Widget _buildSyncList() {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: scheme.outlineVariant),
+      ),
+      child: const Column(
+        children: [
+          ListTile(
+            leading: Icon(Icons.cloud_done_outlined),
+            title: Text('已同步'),
+            subtitle: Text('自选股、交易、标注、规则与预测记录'),
+            trailing: Icon(Icons.check_circle_outline),
+          ),
+          Divider(height: 1, indent: 56),
+          ListTile(
+            leading: Icon(Icons.key_outlined),
+            title: Text('令牌有效'),
+            subtitle: Text('将在到期前自动续期'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSignOut() {
+    return OutlinedButton.icon(
+      onPressed: widget.controller.signOut,
+      icon: const Icon(Icons.logout),
+      label: const Text('退出登录'),
     );
   }
 

@@ -18,7 +18,7 @@ void main() {
     expect(lossColor(context), const Color(0xFF00BA7C));
   });
 
-  testWidgets('light theme is neo-brutalist with red-up green-down', (
+  testWidgets('light theme is X-style white with red-up green-down', (
     tester,
   ) async {
     await tester.pumpWidget(MaterialApp(
@@ -26,9 +26,9 @@ void main() {
       home: const Scaffold(body: SizedBox()),
     ));
     final context = tester.element(find.byType(Scaffold));
-    expect(Theme.of(context).scaffoldBackgroundColor, const Color(0xFFF4EFE1));
-    expect(Theme.of(context).colorScheme.primary, const Color(0xFFF9C80E));
-    expect(gainColor(context), const Color(0xFFE53E2D));
-    expect(lossColor(context), const Color(0xFF0BA968));
+    expect(Theme.of(context).scaffoldBackgroundColor, const Color(0xFFF7F9FA));
+    expect(Theme.of(context).colorScheme.primary, const Color(0xFF1D9BF0));
+    expect(gainColor(context), const Color(0xFFE0245E));
+    expect(lossColor(context), const Color(0xFF0AA063));
   });
 }
