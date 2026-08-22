@@ -25,6 +25,18 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
                 .requestMatchers(
+                    "/",
+                    "/index.html",
+                    "/main.dart.js",
+                    "/flutter.js",
+                    "/flutter_bootstrap.js",
+                    "/flutter_service_worker.js",
+                    "/version.json",
+                    "/favicon.png",
+                    "/manifest.json",
+                    "/assets/**",
+                    "/canvaskit/**",
+                    "/icons/**",
                     "/api/v1/auth/request-code",
                     "/api/v1/auth/verify",
                     "/api/v1/auth/refresh",
