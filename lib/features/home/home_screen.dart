@@ -100,10 +100,12 @@ class _HomeScreenState extends State<HomeScreen> {
       repository: PersistentPortfolioRepository(),
     );
     unawaited(_restorePortfolio());
+    _ruleBook = RuleBook.withSystemDefaults();
+    _ruleRepository = PersistentRuleRepository();
     _stockAnalysisController = StockAnalysisController(
       catalog: _marketService,
       market: _marketService,
-      analyzer: StockAnalyzer(),
+      analyzer: StockAnalyzer(ruleBook: _ruleBook),
     );
     _stockAnalysisController.addListener(_onAnalysisSelectionChanged);
     widget.preferences?.addListener(_applyIndicatorSettings);
@@ -115,8 +117,6 @@ class _HomeScreenState extends State<HomeScreen> {
       outbox: _annotationStore,
       idFactory: () => 'annotation-${DateTime.now().microsecondsSinceEpoch}',
     );
-    _ruleBook = RuleBook.withSystemDefaults();
-    _ruleRepository = PersistentRuleRepository();
     _predictionRepository = PersistentPredictionRepository();
     _reviewStore = PersistentReviewStore();
     _reviewExplanation = RemoteReviewExplanationAdapter(
@@ -215,7 +215,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _restoreRules() async {
     await _ruleRepository.restoreInto(_ruleBook);
-    if (mounted) setState(() {});
+    if (!mounted) return;
+    if (_stockAnalysisController.analysis != null) {
+      unawaited(_stockAnalysisController.refresh());
+    }
+    setState(() {});
   }
 
   void _openPalette() {

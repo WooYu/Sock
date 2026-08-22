@@ -550,7 +550,7 @@ class _PipelineCard extends StatelessWidget {
                   child: _Stage(
                     number: '02',
                     label: '规则引擎层',
-                    detail: '${analysis.matchedRules.length} 条命中',
+                    detail: '${analysis.ruleHitCount}/${analysis.ruleTotalCount} 命中',
                   ),
                 ),
                 Icon(

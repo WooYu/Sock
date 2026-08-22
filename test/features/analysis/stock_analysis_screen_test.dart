@@ -5,6 +5,7 @@ import 'package:stockcal/features/analysis/stock_analysis_screen.dart';
 import 'package:stockcal/features/analysis/technical_analysis.dart';
 import 'package:stockcal/features/market/market_data.dart';
 import 'package:stockcal/features/knowledge/knowledge.dart';
+import 'package:stockcal/features/rules/rule_engine.dart';
 
 void main() {
   testWidgets(
@@ -121,5 +122,28 @@ void main() {
     expect(find.text('相关经验与概念'), findsOneWidget);
     expect(find.text('海龟通常只做两天'), findsOneWidget);
     expect(find.textContaining('海龟 · 第 1 行'), findsOneWidget);
+  });
+
+  testWidgets('pipeline card shows real RuleBook hit counts', (tester) async {
+    final book = RuleBook.withSystemDefaults();
+    final controller = StockAnalysisController(
+      catalog: MemoryStockCatalog(DemoAshareData.securities),
+      market: DemoAshareMarketAdapter(
+        clock: () => DateTime(2026, 8, 14, 15, 15),
+      ),
+      analyzer: StockAnalyzer(ruleBook: book),
+    );
+    await controller.select(DemoAshareData.securities.first);
+
+    await tester.pumpWidget(
+      MaterialApp(home: StockAnalysisScreen(controller: controller)),
+    );
+    await tester.pumpAndSettle();
+
+    final analysis = controller.analysis!;
+    expect(
+      find.text('${analysis.ruleHitCount}/${analysis.ruleTotalCount} 命中'),
+      findsOneWidget,
+    );
   });
 }
