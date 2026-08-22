@@ -5,10 +5,10 @@ import 'package:stockcal/features/chart/professional_chart_screen.dart';
 import 'package:stockcal/theme/stockcal_theme.dart';
 
 void main() {
-  test('chart palette constants match the 2026 theme', () {
-    expect(StockCalColors.gain, const Color(0xFFF91880));
-    expect(StockCalColors.loss, const Color(0xFF00BA7C));
-    expect(StockCalColors.accent, const Color(0xFF1D9BF0));
+  test('chart palette constants match the deep-space theme', () {
+    expect(StockCalColors.gain, const Color(0xFFF0525D));
+    expect(StockCalColors.loss, const Color(0xFF2BB673));
+    expect(StockCalColors.accent, const Color(0xFF38C3E0));
   });
 
   testWidgets('chart renders with theme colors', (tester) async {

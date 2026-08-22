@@ -25,8 +25,8 @@ void main() {
       expect(find.text('真实行情'), findsOneWidget);
       expect(find.text('预测区'), findsOneWidget);
       expect(find.text('MA5'), findsOneWidget);
+      expect(find.text('MA10'), findsOneWidget);
       expect(find.text('MA20'), findsOneWidget);
-      expect(find.text('EMA12'), findsOneWidget);
       expect(find.text('BOLL'), findsOneWidget);
       expect(find.byKey(const Key('indicator-canvas')), findsOneWidget);
     },

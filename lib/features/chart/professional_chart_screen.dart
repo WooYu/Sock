@@ -47,7 +47,13 @@ class _ProfessionalChartScreenState extends State<ProfessionalChartScreen> {
   late final bool _ownsAnnotations;
   ChartTimeframe _timeframe = ChartTimeframe.daily;
   AdjustmentMode _adjustment = AdjustmentMode.none;
-  final Set<_IndicatorLayer> _indicatorLayers = {..._IndicatorLayer.values};
+  final Set<_IndicatorLayer> _indicatorLayers = {
+    _IndicatorLayer.ma5,
+    _IndicatorLayer.ma10,
+    _IndicatorLayer.ma20,
+    _IndicatorLayer.ma60,
+    _IndicatorLayer.boll,
+  };
   String? _selectedAnnotationId;
 
   @override
@@ -397,14 +403,43 @@ class _ChartToolbar extends StatelessWidget {
   }
 }
 
-enum _IndicatorLayer { ma5, ma20, ema12, boll }
+enum _IndicatorLayer { ma5, ma10, ma20, ma30, ma60, boll, ma90, ma120, ma250 }
 
 extension on _IndicatorLayer {
   String get label => switch (this) {
     _IndicatorLayer.ma5 => 'MA5',
+    _IndicatorLayer.ma10 => 'MA10',
     _IndicatorLayer.ma20 => 'MA20',
-    _IndicatorLayer.ema12 => 'EMA12',
+    _IndicatorLayer.ma30 => 'MA30',
+    _IndicatorLayer.ma60 => 'MA60',
+    _IndicatorLayer.ma90 => 'MA90',
+    _IndicatorLayer.ma120 => 'MA120',
+    _IndicatorLayer.ma250 => 'MA250',
     _IndicatorLayer.boll => 'BOLL',
+  };
+
+  int get period => switch (this) {
+    _IndicatorLayer.ma5 => 5,
+    _IndicatorLayer.ma10 => 10,
+    _IndicatorLayer.ma20 => 20,
+    _IndicatorLayer.ma30 => 30,
+    _IndicatorLayer.ma60 => 60,
+    _IndicatorLayer.ma90 => 90,
+    _IndicatorLayer.ma120 => 120,
+    _IndicatorLayer.ma250 => 250,
+    _IndicatorLayer.boll => 20,
+  };
+
+  Color get color => switch (this) {
+    _IndicatorLayer.ma5 => const Color(0xFFE7ECF5),
+    _IndicatorLayer.ma10 => const Color(0xFFF0B90B),
+    _IndicatorLayer.ma20 => const Color(0xFFC678DD),
+    _IndicatorLayer.ma30 => const Color(0xFF2BB673),
+    _IndicatorLayer.ma60 => const Color(0xFF5AA9F0),
+    _IndicatorLayer.ma90 => const Color(0xFFF0A03A),
+    _IndicatorLayer.ma120 => const Color(0xFF38C3E0),
+    _IndicatorLayer.ma250 => const Color(0xFFF0525D),
+    _IndicatorLayer.boll => StockCalColors.primary,
   };
 }
 
@@ -478,23 +513,21 @@ class _IndicatorPainter extends CustomPainter {
       );
     }
 
-    if (layers.contains(_IndicatorLayer.ma5)) {
-      drawSeries(calculator.sma(candles, period: 5), const Color(0xFFE7ECF5));
-    }
-    if (layers.contains(_IndicatorLayer.ma20)) {
-      drawSeries(calculator.sma(candles, period: 20), const Color(0xFFF0B90B));
-    }
-    if (layers.contains(_IndicatorLayer.ema12)) {
-      drawSeries(calculator.ema(candles, period: 12), const Color(0xFFC678DD));
-    }
-    if (layers.contains(_IndicatorLayer.boll)) {
-      final bands = calculator.bollinger(candles, period: 20);
-      drawSeries(bands.map((item) => item?.upper).toList(), StockCalColors.primary);
-      drawSeries(
-        bands.map((item) => item?.middle).toList(),
-        StockCalColors.textSecondary,
-      );
-      drawSeries(bands.map((item) => item?.lower).toList(), StockCalColors.primary);
+    for (final layer in _IndicatorLayer.values) {
+      if (!layers.contains(layer)) continue;
+      if (layer == _IndicatorLayer.boll) {
+        if (candles.length < layer.period) continue;
+        final bands = calculator.bollinger(candles, period: layer.period);
+        drawSeries(bands.map((item) => item?.upper).toList(), layer.color);
+        drawSeries(
+          bands.map((item) => item?.middle).toList(),
+          StockCalColors.textSecondary,
+        );
+        drawSeries(bands.map((item) => item?.lower).toList(), layer.color);
+      } else {
+        if (candles.length < layer.period) continue;
+        drawSeries(calculator.sma(candles, period: layer.period), layer.color);
+      }
     }
   }
 
