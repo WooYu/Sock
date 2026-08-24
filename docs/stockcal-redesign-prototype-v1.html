@@ -1,0 +1,2180 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StockCal 决策终端</title>
+<style>
+  /* —— 浅色蓝 · 默认（对齐截图） —— */
+  :root {
+    --paper: #f5f6f8;
+    --surface: #ffffff;
+    --surface-2: #f5f7fa;
+    --surface-3: #e9edf3;
+    --ink: #172033;
+    --muted: #6c7486;
+    --faint: #9aa3ae;
+    --hairline: #e7e9ef;
+    --hairline-strong: #cdd5e0;
+    --accent: #4057e8;
+    --up: #e94052;
+    --down: #0a9f6f;
+    --blue: #4057e8;
+    --amber: #e39b2e;
+    --accent-soft: #edf0ff;
+    --up-soft: #fff1f2;
+    --down-soft: #eaf9f3;
+    --blue-soft: #edf0ff;
+    --amber-soft: #fff8e9;
+    --glow: 0 0 0 1px rgba(64,87,232,0.22), 0 0 10px rgba(64,87,232,0.16);
+    --shadow: 0 1px 2px rgba(26,31,39,0.05), 0 4px 14px rgba(26,31,39,0.06);
+    --radius: 7px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0A0E15;
+      --surface: #111623;
+      --surface-2: #0D111A;
+      --surface-3: #1A2130;
+      --ink: #E7ECF5;
+      --muted: #8B94A8;
+      --faint: #5A6478;
+      --hairline: #1E2636;
+      --hairline-strong: #2A3346;
+      --accent: #5b74ff;
+      --up: #F0525D;
+      --down: #2BB673;
+      --blue: #5b74ff;
+      --amber: #e39b2e;
+      --accent-soft: rgba(91, 116, 255, 0.18);
+      --up-soft: rgba(240, 82, 93, 0.15);
+      --down-soft: rgba(43, 182, 115, 0.15);
+      --blue-soft: rgba(91, 116, 255, 0.18);
+      --amber-soft: rgba(227, 155, 46, 0.16);
+      --glow: 0 0 0 1px rgba(91,116,255,0.28), 0 0 14px rgba(91,116,255,0.22);
+      --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.28);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0A0E15;
+    --surface: #111623;
+    --surface-2: #0D111A;
+    --surface-3: #1A2130;
+    --ink: #E7ECF5;
+    --muted: #8B94A8;
+    --faint: #5A6478;
+    --hairline: #1E2636;
+    --hairline-strong: #2A3346;
+    --accent: #5b74ff;
+    --up: #F0525D;
+    --down: #2BB673;
+    --blue: #5b74ff;
+    --amber: #e39b2e;
+    --accent-soft: rgba(91, 116, 255, 0.18);
+    --up-soft: rgba(240, 82, 93, 0.15);
+    --down-soft: rgba(43, 182, 115, 0.15);
+    --blue-soft: rgba(91, 116, 255, 0.18);
+    --amber-soft: rgba(227, 155, 46, 0.16);
+    --glow: 0 0 0 1px rgba(91,116,255,0.28), 0 0 14px rgba(91,116,255,0.22);
+    --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.28);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", "Segoe UI", sans-serif;
+    font-size: 14px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+  .mono, .num, td.num, th.num {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+  }
+  a { color: var(--blue); text-decoration: none; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+
+  .shell { display: flex; min-height: 100vh; }
+
+  /* ——— Rail ——— */
+  .rail {
+    width: 232px; flex: 0 0 232px; border-right: 1px solid var(--hairline);
+    background: var(--surface-2); display: flex; flex-direction: column;
+    position: sticky; top: 0; height: 100vh;
+  }
+  .brand { padding: 20px 18px 16px; display: flex; align-items: center; gap: 10px; }
+  .brand .mark {
+    width: 26px; height: 26px; border-radius: 7px; background: var(--accent);
+    display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 14px;
+    box-shadow: var(--glow);
+  }
+  .brand .name { font-weight: 700; letter-spacing: -0.01em; font-size: 15px; }
+  .brand .sub { font-size: 11px; color: var(--muted); }
+  .nav { flex: 1; padding: 6px 10px; overflow-y: auto; }
+  .nav .group-label { font-size: 10.5px; color: var(--faint); text-transform: uppercase; letter-spacing: 0.09em; padding: 16px 10px 6px; font-weight: 600; }
+  .nav button {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    padding: 8px 10px; border: 0; background: transparent; color: var(--muted);
+    font: inherit; text-align: left; border-radius: var(--radius); cursor: pointer; margin-bottom: 1px;
+  }
+  .nav button:hover { background: var(--surface); color: var(--ink); }
+  .nav button.active { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: inset 0 0 0 1px var(--hairline); }
+  .nav button .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--hairline-strong); }
+  .nav button.active .dot { background: var(--accent); box-shadow: var(--glow); }
+  .rail .user { border-top: 1px solid var(--hairline); padding: 14px 18px; display: flex; align-items: center; gap: 10px; }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--blue-soft); color: var(--blue); display: grid; place-items: center; font-weight: 650; font-size: 13px; }
+  .rail .user .who { font-size: 13px; font-weight: 600; }
+  .rail .user .who small { display: block; color: var(--muted); font-weight: 400; font-size: 11px; }
+
+  /* ——— Main ——— */
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .topbar {
+    height: 60px; flex: 0 0 60px; border-bottom: 1px solid var(--hairline);
+    background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);
+    display: flex; align-items: center; gap: 14px; padding: 0 20px; position: sticky; top: 0; z-index: 10;
+  }
+  :root[data-theme="dark"] .topbar { background: rgba(17,22,35,0.75); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .topbar { background: rgba(17,22,35,0.75); } }
+  .search { flex: 0 1 460px; display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 12px; border: 1px solid var(--hairline); border-radius: var(--radius); background: var(--surface-2); color: var(--muted); cursor: text; }
+  .search:hover { border-color: var(--hairline-strong); }
+  .search .kbd { margin-left: auto; font-size: 11px; color: var(--faint); border: 1px solid var(--hairline); border-radius: 4px; padding: 1px 6px; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .topbar .spacer { flex: 1; }
+  .topbar .actions { display: flex; align-items: center; gap: 8px; }
+  .icon-btn { width: 34px; height: 34px; border: 1px solid transparent; background: transparent; color: var(--muted); border-radius: var(--radius); cursor: pointer; display: grid; place-items: center; font-size: 16px; }
+  .icon-btn:hover { background: var(--surface-2); color: var(--ink); border-color: var(--hairline); }
+
+  .content { padding: 24px 28px 56px; max-width: 1180px; width: 100%; margin: 0 auto; }
+
+  .page-head { margin-bottom: 20px; }
+  .page-title { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 2px; }
+  .page-sub { color: var(--muted); font-size: 13px; margin: 0; }
+
+  /* ——— Cards ——— */
+  .card { background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .card-head { padding: 13px 16px; border-bottom: 1px solid var(--hairline); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .card-head .t { font-weight: 650; font-size: 13.5px; }
+  .card-head .hint { font-size: 12px; color: var(--muted); }
+  .card-body { padding: 16px; }
+
+  .grid { display: grid; gap: 16px; }
+  .grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 860px) { .grid.cols-2, .grid.cols-3 { grid-template-columns: 1fr; } .rail { display: none; } }
+
+  /* ——— Stock header ——— */
+  .stock-head { display: flex; align-items: flex-end; gap: 18px; flex-wrap: wrap; margin-bottom: 20px; }
+  .stock-head .id h1 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; }
+  .stock-head .meta { color: var(--muted); font-size: 13px; margin-top: 3px; }
+  .tag { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 999px; background: var(--surface); border: 1px solid var(--hairline); font-size: 12px; color: var(--muted); }
+  .stock-head .price { margin-left: auto; text-align: right; }
+  .stock-head .price .v { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; }
+  .stock-head .price .chg { font-size: 14px; font-weight: 600; }
+  .up { color: var(--up); } .down { color: var(--down); } .flat { color: var(--muted); }
+
+  .seg { display: inline-flex; border: 1px solid var(--hairline); border-radius: var(--radius); overflow: hidden; }
+  .seg button { border: 0; background: var(--surface); color: var(--muted); font: inherit; font-size: 13px; padding: 7px 14px; cursor: pointer; }
+  .seg button + button { border-left: 1px solid var(--hairline); }
+  .seg button.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+
+  /* ——— Quote bar ——— */
+  .quote-bar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px 18px; padding: 13px 16px; border: 1px solid var(--hairline); border-radius: var(--radius); background: var(--surface-2); margin-bottom: 18px; }
+  .quote-bar .q { min-width: 0; }
+  .quote-bar .l { font-size: 11.5px; color: var(--muted); }
+  .quote-bar .v { font-size: 14px; font-weight: 650; margin-top: 3px; }
+  @media (max-width: 860px) { .quote-bar { grid-template-columns: repeat(4, 1fr); } }
+
+  /* ——— Gauge ——— */
+  .gauge-wrap { text-align: center; padding: 8px 0 4px; }
+  .gauge { max-width: 300px; margin: 0 auto; }
+  .gauge .read { margin-top: -6px; }
+  .gauge .score { font-size: 34px; font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
+  .gauge .score small { font-size: 16px; color: var(--muted); font-weight: 500; }
+  .gauge .dir { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .gauge .dir b { color: var(--ink); }
+  .legend { display: flex; gap: 16px; justify-content: center; font-size: 12px; color: var(--muted); margin-top: 10px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+
+  /* ——— Stat tiles ——— */
+  .tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .tile { padding: 12px 14px; border: 1px solid var(--hairline); border-radius: var(--radius); background: var(--surface-2); }
+  .tile .l { font-size: 12px; color: var(--muted); }
+  .tile .v { font-size: 18px; font-weight: 650; margin-top: 3px; }
+
+  /* ——— Rule rows ——— */
+  .rule { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--hairline); }
+  .rule:last-child { border-bottom: 0; }
+  .band { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+  .band.primary { background: var(--up-soft); color: var(--up); }
+  .band.alt { background: var(--up-soft); color: var(--up); }
+  .band.risk { background: var(--amber-soft); color: var(--amber); }
+  .band.caution { background: var(--down-soft); color: var(--down); }
+  .rule .name { flex: 1; }
+  .rule .score { font-weight: 650; }
+
+  .summary { display: flex; flex-wrap: wrap; gap: 8px 20px; padding: 10px 0 2px; font-size: 12.5px; color: var(--muted); }
+  .summary b { color: var(--ink); font-weight: 650; }
+
+  /* ——— Conditions ——— */
+  .cond { display: flex; align-items: center; gap: 10px; padding: 8px 0; }
+  .cond .chk { width: 18px; height: 18px; border-radius: 5px; display: grid; place-items: center; font-size: 12px; flex: 0 0 18px; color: #fff; }
+  .cond .chk.on { background: var(--down); box-shadow: 0 0 0 1px rgba(43,182,115,0.4); }
+  .cond .chk.off { background: var(--surface-3); color: var(--faint); }
+  .cond .l { flex: 1; }
+  .cond .st { font-size: 12px; color: var(--muted); }
+
+  /* ——— Pipeline ——— */
+  .pipeline { display: flex; align-items: stretch; gap: 8px; }
+  .stage { flex: 1; text-align: center; padding: 14px 12px; border: 1px solid var(--hairline); border-radius: var(--radius); background: var(--surface-2); }
+  .stage .n { font-size: 11px; color: var(--accent); font-family: ui-monospace, Menlo, Consolas, monospace; font-weight: 600; }
+  .stage .name { font-weight: 650; margin: 4px 0 2px; }
+  .stage .detail { font-size: 12px; color: var(--muted); }
+  .stage .count { margin-top: 8px; font-size: 12.5px; font-weight: 650; color: var(--accent); }
+  .stage { cursor: pointer; }
+  .stage:hover { border-color: var(--hairline-strong); }
+  .stage.active { border-color: var(--accent); background: var(--accent-soft); }
+  .layer-detail { margin-top: 12px; padding: 12px 14px; border: 1px solid var(--hairline); border-radius: var(--radius); background: var(--surface-2); }
+  .layer-detail .hd { font-size: 12px; color: var(--muted); margin-bottom: 8px; font-weight: 650; }
+  .arrow { align-self: center; color: var(--faint); flex: 0 0 auto; }
+  .pipeline-note { border-top: 1px solid var(--hairline); margin-top: 14px; padding-top: 12px; }
+  .pipeline-note .row { display: flex; gap: 10px; padding: 4px 0; font-size: 13px; }
+  .pipeline-note .row .k { color: var(--muted); flex: 0 0 72px; }
+  .metrics { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .metric-pill { font-size: 12px; padding: 5px 11px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--hairline); color: var(--muted); }
+  .metric-pill b { color: var(--ink); }
+  .model-note { margin-top: 10px; font-size: 12px; color: var(--faint); }
+
+  /* ——— AI 解释 tabs ——— */
+  .ai-tabs { margin-top: 14px; }
+  .ai-panel { margin-top: 12px; }
+  .conclusion { display: flex; gap: 12px; align-items: flex-start; }
+  .conclusion-mark { flex: 0 0 auto; width: 34px; height: 34px; border-radius: 8px; background: var(--up-soft); color: var(--up); display: grid; place-items: center; font-size: 18px; font-weight: 700; }
+  .conclusion-body { flex: 1; min-width: 0; }
+  .conclusion .ai-label { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+  .conclusion h3 { margin: 2px 0 4px; font-size: 15px; font-weight: 650; }
+  .conclusion p { margin: 0 0 10px; font-size: 13px; color: var(--muted); }
+  .ai-scores { display: flex; gap: 14px; flex-wrap: wrap; }
+  .ai-scores span { font-size: 12px; color: var(--muted); }
+  .ai-scores b { color: var(--ink); }
+  .ai-scores .risk-low { color: var(--accent); }
+  .explain-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; font-size: 12.5px; }
+  .explain-head { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .explain-item { padding: 2px 0; }
+  .explain-item .ok { color: var(--down); margin-right: 4px; }
+  .explain-item .no { color: var(--faint); margin-right: 4px; }
+  .pending-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--hairline); font-size: 13px; }
+  .pending-item:last-child { border-bottom: 0; }
+  .pending-dot { flex: 0 0 auto; width: 18px; height: 18px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-size: 11px; font-weight: 700; }
+  .pending-item .tag { margin-left: auto; flex: 0 0 auto; }
+
+  /* ——— Chart toolbar ——— */
+  .chart-primary-toolbar { position: relative; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 43px; padding: 7px 12px; border-bottom: 1px solid var(--hairline); background: var(--surface-2); }
+  .chart-primary-actions, .chart-secondary-actions { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+  .chart-primary-toolbar button, .chart-menu summary, .chart-primary-toolbar .import-annotation {
+    color: var(--muted); white-space: nowrap; background: var(--surface); border: 1px solid var(--hairline);
+    border-radius: 6px; min-height: 28px; padding: 5px 9px; font-size: 12px; font-weight: 600; line-height: 16px; cursor: pointer;
+  }
+  .chart-primary-toolbar button.active { color: var(--accent); background: var(--accent-soft); border-color: var(--accent); }
+  .chart-primary-toolbar button:disabled { opacity: 0.45; cursor: not-allowed; }
+  .chart-tool-divider { width: 1px; height: 22px; margin: 0 2px; background: var(--hairline); }
+  .chart-menu { position: relative; }
+  .chart-menu summary { list-style: none; display: inline-flex; align-items: center; }
+  .chart-menu summary::-webkit-details-marker { display: none; }
+  .chart-menu summary::after { content: '▾'; margin-left: 5px; font-size: 9px; opacity: 0.7; }
+  .chart-menu-panel { position: absolute; top: calc(100% + 7px); z-index: 30; background: var(--surface); border: 1px solid var(--hairline-strong); border-radius: 10px; min-width: 184px; padding: 9px; box-shadow: var(--shadow); }
+  .drawing-menu .chart-menu-panel { left: 0; }
+  .chart-secondary-actions .chart-menu-panel { right: 0; }
+  .compact-menu { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
+  .chart-menu-panel button, .chart-menu-panel .import-annotation { text-align: left; width: 100%; }
+  .indicator-menu-panel { display: grid; gap: 8px; width: min(360px, 100vw - 48px); }
+  .indicator-setting-group { display: grid; gap: 6px; padding-bottom: 7px; border-bottom: 1px solid var(--hairline); }
+  .indicator-group-toggle { display: inline-flex; align-items: center; gap: 5px; padding: 4px 7px; font-size: 12px; font-weight: 700; color: var(--muted); background: var(--surface-2); border: 1px solid var(--hairline); border-radius: 5px; }
+  .indicator-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+  .indicator-chips button { position: relative; display: inline-flex; align-items: center; gap: 5px; }
+  .indicator-chips button i { width: 8px; height: 8px; border-radius: 2px; background: var(--indicator-color, var(--muted)); }
+  .indicator-chips button.active { color: var(--accent); background: var(--accent-soft); border-color: var(--accent); }
+  .indicator-chips .boll-switch i { background: transparent; border: 1px solid currentColor; }
+  .indicator-count { color: var(--faint); white-space: nowrap; font-size: 11px; }
+  .indicator-parameter-form { display: flex; flex-wrap: wrap; gap: 8px; }
+  .indicator-parameter-form label { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+  .indicator-parameter-form input { width: 110px; padding: 3px 6px; font-size: 11px; background: var(--surface); border: 1px solid var(--hairline); border-radius: 5px; color: var(--ink); }
+  .chart-menu-panel .save-annotation { color: var(--accent); background: var(--accent-soft); border-color: var(--accent); font-weight: 700; }
+  .chart-menu-panel .import-annotation { cursor: pointer; }
+  .chart-menu-panel .import-annotation input { display: none; }
+
+  /* ——— 预测记录 ——— */
+  .history-toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .history-search { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--hairline); border-radius: var(--radius); padding: 6px 10px; background: var(--surface); color: var(--muted); }
+  .history-search input { border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 13px; width: 200px; outline: none; }
+  .history-toolbar select { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 6px 10px; background: var(--surface); color: var(--ink); font: inherit; font-size: 13px; }
+  .history-count { color: var(--muted); font-size: 12px; white-space: nowrap; margin-left: auto; }
+  .history-list { display: grid; gap: 12px; }
+  .history-card { border: 1px solid var(--hairline); border-radius: var(--radius); background: var(--surface); padding: 14px 16px; }
+  .history-card-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .history-card-top b { font-size: 14px; }
+  .history-card-top .code { color: var(--muted); font-size: 12px; margin-left: 8px; font-weight: 400; }
+  .history-status { border-radius: 4px; padding: 2px 8px; font-size: 11px; font-style: normal; font-weight: 600; }
+  .history-status.pending { background: var(--amber-soft); color: #ae7420; }
+  .history-status.hit { background: var(--down-soft); color: var(--down); }
+  .history-status.miss { background: var(--up-soft); color: var(--up); }
+  .history-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; color: var(--muted); font-size: 12px; margin: 10px 0 12px; }
+  .history-meta strong { color: var(--ink); font-weight: 600; }
+  .history-levels { display: flex; flex-wrap: wrap; gap: 22px; }
+  .history-levels span { display: flex; flex-direction: column; gap: 2px; }
+  .history-levels small { color: var(--muted); font-size: 11px; }
+  .history-levels b { font-size: 14px; font-weight: 650; }
+  .history-levels .target b { color: var(--up); }
+  .history-levels .support b { color: var(--down); }
+  .history-levels .risk b { color: var(--faint); }
+  .history-detail { color: var(--accent); background: none; border: 0; margin-top: 12px; padding: 0; font-size: 12px; cursor: pointer; }
+  .history-detail-panel { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--hairline); display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+  .history-detail-panel label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+  .history-detail-panel input { border: 1px solid var(--hairline); border-radius: 6px; padding: 5px 8px; font-size: 13px; background: var(--surface); color: var(--ink); width: 160px; }
+  .history-detail-panel .review-actions { display: flex; gap: 6px; }
+  .history-detail-panel [data-choice].selected { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+
+  /* ——— 统计图表 ——— */
+  .stats-layout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; }
+  .chart-subhead { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .chart-subhead b { font-size: 12.5px; font-weight: 650; }
+  .chart-subhead span { color: var(--muted); font-size: 11px; }
+  .stats-equity { width: 100%; height: auto; }
+  .daily-bars { display: flex; align-items: flex-end; gap: 12px; height: 128px; padding-top: 10px; }
+  .daily-bar { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; height: 100%; }
+  .daily-bar .v { font-size: 11px; font-weight: 650; }
+  .daily-bar .v.pos { color: var(--up); }
+  .daily-bar .v.neg { color: var(--down); }
+  .daily-bar i { width: 100%; max-width: 34px; border-radius: 4px 4px 0 0; }
+  .daily-bar i.pos { background: var(--up); }
+  .daily-bar i.neg { background: var(--down); }
+  .daily-bar small { color: var(--muted); font-size: 10px; }
+  .stats-metrics { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--hairline); }
+  .stats-metrics > div { display: flex; flex-direction: column; gap: 2px; }
+  .stats-metrics small { color: var(--muted); font-size: 11px; }
+  .stats-metrics strong { font-size: 18px; font-weight: 700; }
+  .stats-metrics strong.up { color: var(--up); }
+  .stats-metrics span { color: var(--muted); font-size: 11px; }
+  @media (max-width: 860px) { .stats-layout { grid-template-columns: 1fr; } .stats-metrics { grid-template-columns: repeat(2, 1fr); } }
+
+  /* ——— Table ——— */
+  .table-wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { text-align: right; padding: 11px 14px; border-bottom: 1px solid var(--hairline); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  th { font-weight: 600; color: var(--muted); font-size: 12px; border-bottom: 1px solid var(--hairline-strong); }
+  tr:last-child td { border-bottom: 0; }
+  tbody tr:hover { background: var(--surface-2); }
+  .look { color: var(--accent); font-size: 12.5px; font-weight: 600; }
+  .status { font-size: 12px; font-weight: 600; }
+  .status.hit { color: var(--down); } .status.miss { color: var(--muted); } .status.off { color: var(--faint); }
+
+  /* ——— Tabs ——— */
+  .tabs { display: inline-flex; border: 1px solid var(--hairline); border-radius: var(--radius); overflow: hidden; }
+  .tabs button { border: 0; background: var(--surface); color: var(--muted); font: inherit; font-size: 13px; padding: 7px 16px; cursor: pointer; }
+  .tabs button + button { border-left: 1px solid var(--hairline); }
+  .tabs button.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+
+  /* ——— Toggle switch ——— */
+  .switch { position: relative; width: 34px; height: 20px; border-radius: 999px; background: var(--surface-3); border: 1px solid var(--hairline-strong); cursor: pointer; flex: 0 0 34px; }
+  .switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: var(--muted); transition: left .15s ease; }
+  .switch.on { background: var(--accent-soft); border-color: var(--accent); }
+  .switch.on::after { left: 16px; background: var(--accent); }
+
+  /* ——— Charts ——— */
+  .chart-grid { stroke: var(--hairline); }
+  .area { opacity: 0.18; }
+  .dist-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; }
+  .dist-row .label { flex: 0 0 130px; font-size: 13px; }
+  .dist-row .bar { flex: 1; height: 18px; background: var(--surface-3); border-radius: 4px; overflow: hidden; }
+  .dist-row .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--blue), #bcc6ff); border-radius: 4px; }
+  .dist-row .val { flex: 0 0 90px; text-align: right; font-size: 13px; }
+
+  .banner { margin-bottom: 18px; padding: 10px 14px; border: 1px solid var(--hairline); border-left: 3px solid var(--accent); border-radius: var(--radius); background: var(--surface); color: var(--muted); font-size: 12.5px; }
+  .banner b { color: var(--ink); }
+
+  .spacer { flex: 1; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+  /* —— 账户 + 专业K线 补充 —— */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: var(--radius); border: 1px solid var(--hairline-strong); background: var(--surface); color: var(--ink); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: #fff; border-color: transparent; }
+  .btn.primary:hover { color: #fff; }
+  .btn.danger { color: var(--up); }
+  .btn.danger:hover { border-color: var(--up); color: var(--up); }
+  .kline-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); align-items: center; }
+  .kline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .kline-legend i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+  .pred-note { margin-top: 10px; font-size: 12px; color: var(--faint); display: flex; align-items: center; gap: 8px; }
+  .pred-note .sw { width: 12px; height: 12px; border-radius: 3px; background: rgba(240,82,93,0.25); border: 1px dashed rgba(240,82,93,0.6); display: inline-block; flex: none; }
+  .kline-toggles { display: flex; gap: 6px; flex-wrap: wrap; }
+  .kline-toggles .chip { font-size: 11.5px; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--hairline-strong); color: var(--muted); cursor: pointer; }
+  .kline-toggles .chip.on { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+  [data-goto] { cursor: pointer; }
+  td.look { cursor: pointer; }
+  td.look:hover { color: var(--accent); }
+  /* ——— 盈利模式 · 策略与计划（三栏） ——— */
+  .mode-layout { display: grid; grid-template-columns: 1fr 1.3fr 1.3fr; gap: 20px; align-items: start; }
+  .mode-intro .mode-q { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 8px; }
+  .mode-intro .mode-desc { font-size: 12.5px; color: var(--muted); line-height: 1.7; margin: 0; }
+  .mode-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mode-card { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 12px; background: var(--surface-2); cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+  .mode-card:hover { border-color: var(--hairline-strong); }
+  .mode-card.selected { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .mode-card-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+  .mode-card-top b { font-size: 13px; font-weight: 650; color: var(--ink); }
+  .mode-card-top .band { font-size: 10px; padding: 1px 7px; }
+  .mode-score { display: flex; align-items: center; gap: 8px; margin: 11px 0 8px; }
+  .mode-score i { position: relative; flex: 1; height: 4px; border-radius: 99px; background: var(--surface-3); overflow: hidden; }
+  .mode-score i::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: var(--w, 0%); background: linear-gradient(90deg, var(--blue), #bcc6ff); border-radius: 99px; }
+  .mode-score strong { font: 650 12px ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: var(--muted); }
+  .mode-card small { display: block; font-size: 11.5px; color: var(--muted); line-height: 1.55; min-height: 34px; }
+  .mode-detail { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 14px; background: var(--surface-2); }
+  .mode-detail-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .mode-detail-head h3 { font-size: 16px; font-weight: 700; margin: 6px 0 0; letter-spacing: -0.01em; }
+  .mode-detail-reason { font-size: 12px; color: var(--muted); line-height: 1.65; margin: 12px 0 14px; }
+  .mode-levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .mode-levels > div { background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 9px 10px; }
+  .mode-levels small { display: block; font-size: 10.5px; color: var(--faint); margin-bottom: 4px; }
+  .mode-levels strong { font: 650 12px ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: var(--ink); }
+  .mode-levels .buy-level strong { color: var(--up); }
+  .mode-levels .sell-level strong { color: #d06638; }
+  .mode-levels .risk-level strong { color: var(--down); }
+  .mode-evidence { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 12px; }
+  .mode-evidence span { font-size: 11px; color: var(--muted); }
+  .mode-evidence span::first-letter { color: var(--down); }
+  @media (max-width: 960px) {
+    .mode-layout { grid-template-columns: 1fr; }
+    .mode-levels { grid-template-columns: 1fr; }
+  }
+  .metric-tab { cursor: pointer; padding: 3px 10px; border-radius: 999px; border: 1px solid transparent; }
+  .metric-tab:hover { border-color: var(--hairline-strong); }
+  .metric-tab.selected { background: var(--accent-soft); color: var(--accent); }
+  .metric-tab.selected b { color: var(--accent); }
+
+  /* ——— 关键区域与目标位 ——— */
+  .legend-pills { gap: 6px; display: flex; }
+  .legend-pills span { border-radius: 6px; padding: 4px 8px; font-size: 10px; }
+  .legend-pills .rise { background: var(--up-soft); color: var(--up); }
+  .legend-pills .fall { background: var(--down-soft); color: var(--down); }
+  .zone-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 12px; display: grid; }
+  .zone-card { border: 1px solid var(--hairline); background: var(--surface); border-top-width: 2px; border-radius: 11px; overflow: hidden; box-shadow: var(--shadow); }
+  .zone-card.rise { border-top-color: var(--up); }
+  .zone-card.fall { border-top-color: var(--down); }
+  .zone-card.is-expanded { border-color: var(--hairline-strong); }
+  .zone-main { text-align: left; background: none; width: 100%; padding: 16px 16px 13px; display: block; border: 0; cursor: pointer; font: inherit; color: inherit; }
+  .zone-kicker, .zone-price-row, .zone-footer { justify-content: space-between; align-items: center; display: flex; }
+  .zone-kicker > span { color: var(--ink); font-size: 12px; font-weight: 700; }
+  .zone-kicker em { color: var(--muted); background: var(--surface-3); border-radius: 5px; padding: 3px 6px; font-size: 9px; font-style: normal; }
+  .zone-card.rise .zone-kicker em { background: var(--up-soft); color: var(--up); }
+  .zone-card.fall .zone-kicker em { background: var(--down-soft); color: var(--down); }
+  .zone-price-row { margin: 11px 0 13px; }
+  .zone-price-row strong { letter-spacing: -0.04em; font-size: 28px; font-weight: 680; }
+  .zone-card.rise .zone-price-row strong { color: var(--up); }
+  .zone-card.fall .zone-price-row strong { color: var(--down); }
+  .zone-range { color: var(--muted); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 10px; }
+  .zone-metrics { border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); grid-template-columns: 1fr .92fr 1.12fr; padding: 10px 0; display: grid; }
+  .zone-metrics > span { min-width: 0; padding-right: 7px; }
+  .zone-metrics > span + span { border-left: 1px solid var(--hairline); padding-left: 9px; }
+  .zone-metrics small, .zone-metrics b { display: block; }
+  .zone-metrics small { color: var(--faint); text-overflow: ellipsis; white-space: nowrap; margin-bottom: 4px; font-size: 8px; overflow: hidden; }
+  .zone-metrics b { color: var(--ink); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 11px; font-weight: 680; }
+  .zone-footer { color: var(--muted); margin-top: 12px; font-size: 9px; }
+  .resonance-label { align-items: center; gap: 6px; display: flex; }
+  .strength { align-items: end; gap: 2px; height: 10px; display: inline-flex; }
+  .strength i { background: var(--surface-3); border-radius: 2px; width: 3px; }
+  .strength i:first-child { height: 4px; }
+  .strength i:nth-child(2) { height: 6px; }
+  .strength i:nth-child(3) { height: 8px; }
+  .strength i:nth-child(4) { height: 10px; }
+  .zone-card.rise .strength i.is-on { background: var(--up); }
+  .zone-card.fall .strength i.is-on { background: var(--down); }
+  .expand-label i { margin-left: 3px; font-size: 12px; font-style: normal; transition: transform .16s; display: inline-block; }
+  .is-expanded .expand-label i { transform: rotate(180deg); }
+  .zone-detail { border-top: 1px solid var(--hairline); background: var(--surface-2); padding: 0 16px 15px; display: none; }
+  .zone-card.is-expanded .zone-detail { display: block; }
+  .zone-detail > p { color: var(--muted); margin: 12px 0 9px; font-size: 10.5px; line-height: 1.65; }
+  .condition-grid { color: var(--muted); gap: 5px; margin-bottom: 11px; font-size: 10px; display: grid; }
+  .condition-dot { vertical-align: 1px; border-radius: 50%; width: 5px; height: 5px; margin-right: 6px; display: inline-block; }
+  .condition-dot.trigger { background: var(--accent); }
+  .condition-dot.invalid { background: var(--amber); }
+  .source-list { border: 1px solid var(--hairline); border-radius: 6px; overflow: hidden; }
+  .source-row { background: var(--surface); grid-template-columns: minmax(0,1fr) 66px 58px 26px; align-items: center; gap: 6px; min-height: 30px; padding: 5px 8px; font-size: 9px; display: grid; }
+  .source-row + .source-row { border-top: 1px solid var(--hairline); }
+  .source-name { color: var(--ink); text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+  .source-origin { color: var(--muted); text-align: right; }
+  .source-origin[data-origin="经验规则"] { color: var(--amber); font-weight: 700; }
+  .source-row .mono { color: var(--ink); text-align: right; }
+  .source-row .weight { color: var(--faint); text-align: right; }
+  @media (max-width: 860px) { .zone-grid { grid-template-columns: 1fr; } }
+
+  /* ——— 未来三日 · 多路径推演 ——— */
+  .forecast-layout { grid-template-columns: 1.55fr 1fr; gap: 20px; display: grid; }
+  .forecast-visual { min-height: 250px; padding: 10px 0 0; display: flex; }
+  .forecast-axis { color: var(--faint); font: 9px ui-monospace, "SF Mono", Menlo, Consolas, monospace; flex-direction: column; flex: 0 0 42px; justify-content: space-between; padding: 4px 0 28px; display: flex; }
+  .forecast-grid { background: linear-gradient(135deg, var(--accent-soft), transparent 60%); border-bottom: 1px solid var(--hairline); border-left: 1px solid var(--hairline); flex: 1; min-height: 220px; position: relative; overflow: hidden; }
+  .forecast-line { background: var(--hairline); height: 1px; position: absolute; left: 0; right: 0; }
+  .forecast-line:first-child { top: 0; }
+  .forecast-line:nth-child(2) { top: 25%; }
+  .forecast-line:nth-child(3) { top: 50%; }
+  .forecast-line:nth-child(4) { top: 75%; }
+  .forecast-current { border-top: 1px dashed var(--accent); position: absolute; top: 36%; left: 0; right: 0; }
+  .forecast-current span { background: var(--accent-soft); color: var(--accent); font: 8px ui-monospace, "SF Mono", Menlo, Consolas, monospace; border-radius: 4px; padding: 3px 5px; position: absolute; top: -17px; right: 4px; }
+  .path-dots { position: absolute; inset: 0; }
+  .path-dots.blue { color: var(--accent); }
+  .path-dots.red { color: var(--up); }
+  .path-dots.green { color: var(--down); }
+  .path-dots span { z-index: 2; place-items: center; width: 16px; height: 16px; display: grid; position: absolute; transform: translate(-50%, -50%); }
+  .path-dots span:before { content: ""; transform-origin: 0; background: currentColor; width: 28px; height: 1px; position: absolute; }
+  .path-dots span:first-child:before { transform: rotate(-8deg); }
+  .path-dots span:nth-child(2):before { transform: rotate(-10deg); }
+  .path-dots i { background: currentColor; border: 2px solid var(--surface); border-radius: 50%; width: 8px; height: 8px; box-shadow: 0 0 0 2px; }
+  .forecast-days { color: var(--faint); text-align: center; grid-template-columns: repeat(3, 1fr); font-size: 9px; display: grid; position: absolute; bottom: -23px; left: 0; right: 0; }
+  .forecast-summary { background: var(--surface-2); border: 1px solid var(--hairline); border-radius: 10px; padding: 16px; }
+  .path-tabs { gap: 5px; margin-bottom: 14px; display: flex; }
+  .path-tabs button { color: var(--muted); background: var(--surface); border: 1px solid var(--hairline); border-radius: 6px; align-items: center; gap: 5px; padding: 6px 8px; font-size: 9px; display: inline-flex; cursor: pointer; }
+  .path-tabs button.active { color: var(--ink); box-shadow: 0 0 0 1px var(--hairline-strong); }
+  .path-tabs i { background: var(--accent); border-radius: 50%; width: 6px; height: 6px; }
+  .path-tabs i.red { background: var(--up); }
+  .path-tabs i.green { background: var(--down); }
+  .forecast-summary h3 { color: var(--ink); margin: 0 0 5px; font-size: 14px; }
+  .forecast-summary > p { color: var(--muted); margin: 0; font-size: 9px; }
+  .forecast-values { grid-template-columns: repeat(3, 1fr); gap: 5px; margin: 14px 0; display: grid; }
+  .forecast-values div { text-align: center; background: var(--surface); border: 1px solid var(--hairline); border-radius: 7px; padding: 9px 7px; }
+  .forecast-values span { color: var(--faint); margin-bottom: 4px; font-size: 8px; display: block; }
+  .forecast-values strong { color: var(--accent); font: 700 13px ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .forecast-decision { gap: 6px; margin-bottom: 14px; display: grid; }
+  .forecast-decision span { color: var(--muted); justify-content: space-between; font-size: 9px; display: flex; }
+  .forecast-decision b { color: var(--ink); font: 600 9px ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .forecast-summary .btn { width: 100%; justify-content: center; }
+  .forecast-table-wrap { border: 1px solid var(--hairline); border-radius: 9px; margin-top: 20px; overflow-x: auto; }
+  .forecast-table { border-collapse: collapse; width: 100%; min-width: 560px; }
+  .forecast-table th, .forecast-table td { border-bottom: 1px solid var(--hairline); color: var(--muted); text-align: left; padding: 11px 12px; font-size: 10px; }
+  .forecast-table tr:last-child th, .forecast-table tr:last-child td { border-bottom: 0; }
+  .forecast-table thead th { color: var(--faint); background: var(--surface-2); font-size: 9px; font-weight: 700; }
+  .forecast-table tbody th { color: var(--ink); font-weight: 700; }
+  .forecast-table td:not(:last-child) { color: var(--ink); font: 600 10px ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .forecast-footnote { color: var(--faint); gap: 7px; margin: 12px 2px 0; font-size: 9px; line-height: 1.5; display: flex; }
+  .forecast-footnote span { background: var(--accent-soft); width: 15px; height: 15px; color: var(--accent); border-radius: 50%; flex: 0 0 15px; place-items: center; font-weight: 700; display: grid; }
+  @media (max-width: 860px) { .forecast-layout { grid-template-columns: 1fr; } .forecast-visual { min-height: 220px; } .forecast-grid { min-height: 190px; } }
+
+  .legend-actual { background: var(--ink); }
+  .legend-prediction { background: transparent; border-top: 1px dashed var(--faint); height: 0; }
+  .legend-zone { background: repeating-linear-gradient(45deg, var(--accent), var(--accent) 2px, transparent 2px, transparent 4px); }
+  .chart-statusbar { display: flex; gap: 16px; align-items: center; margin-top: 12px; font-size: 11px; color: var(--faint); border-top: 1px solid var(--hairline); padding-top: 10px; }
+  .chart-statusbar em { margin-left: auto; font-style: normal; }
+
+  /* ——— 交易与盈亏 ——— */
+  .trading-layout { display: grid; grid-template-columns: 1fr 1.1fr; gap: 20px; }
+  .holding-overview { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .holding-card { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 12px 14px; background: var(--surface-2); }
+  .holding-card small { display: block; font-size: 11px; color: var(--muted); }
+  .holding-card strong { display: block; font-size: 17px; font-weight: 700; margin: 4px 0 2px; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .holding-card span { font-size: 10px; color: var(--faint); }
+  .holding-card.profit strong { color: var(--up); }
+  .trade-entry { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 14px; background: var(--surface-2); }
+  .trade-entry-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .trade-entry-head h3 { margin: 2px 0 0; font-size: 14px; font-weight: 650; }
+  .trade-entry-head .lbl { font-size: 11px; color: var(--accent); letter-spacing: 0.04em; }
+  .trade-date { font-size: 11px; color: var(--muted); }
+  .trade-side-tabs { display: inline-flex; border: 1px solid var(--hairline); border-radius: var(--radius); overflow: hidden; margin: 12px 0; }
+  .trade-side-tabs button { border: 0; background: var(--surface); color: var(--muted); font: inherit; font-size: 12.5px; padding: 6px 16px; cursor: pointer; }
+  .trade-side-tabs button + button { border-left: 1px solid var(--hairline); }
+  .trade-side-tabs button.buy.active { background: var(--up-soft); color: var(--up); font-weight: 600; }
+  .trade-side-tabs button.sell.active { background: var(--down-soft); color: var(--down); font-weight: 600; }
+  .trade-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .trade-fields label { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: var(--muted); }
+  .trade-fields input { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 7px 9px; font: inherit; font-size: 13px; background: var(--surface); color: var(--ink); }
+  .fee-preview { display: flex; gap: 14px; flex-wrap: wrap; margin: 12px 0; font-size: 11.5px; color: var(--muted); }
+  .fee-preview b { color: var(--ink); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .trade-submit { width: 100%; justify-content: center; }
+  .trade-history { border-top: 1px solid var(--hairline); margin-top: 16px; padding-top: 14px; }
+  .trade-history-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+  .trade-history-head h3 { margin: 0; font-size: 14px; font-weight: 650; }
+  .trade-history-head small { display: block; font-size: 11px; color: var(--faint); margin-top: 2px; }
+  .trade-history-head > span { font-size: 11px; color: var(--muted); }
+  .trade-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--hairline); font-size: 12.5px; }
+  .trade-row:last-child { border-bottom: 0; }
+  .trade-row b { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .trade-row > span { color: var(--muted); }
+  .trade-row small { color: var(--faint); }
+  .trade-badge { font-size: 10px; font-weight: 600; padding: 1px 8px; border-radius: 999px; }
+  .trade-badge.buy { background: var(--up-soft); color: var(--up); }
+  .trade-badge.sell { background: var(--down-soft); color: var(--down); }
+  .trade-edit-button { margin-left: auto; border: 1px solid var(--hairline); background: var(--surface); color: var(--muted); font-size: 11px; padding: 4px 10px; border-radius: var(--radius); cursor: pointer; }
+  .trade-edit-button:hover { border-color: var(--accent); color: var(--accent); }
+  /* ——— 交易统计 ——— */
+  .stats-layout { display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; }
+  .chart-subhead { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .chart-subhead b { color: var(--ink); }
+  .stats-chart-card, .daily-bars-card { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 14px; background: var(--surface-2); }
+  .stats-line-chart { width: 100%; height: auto; }
+  .stats-line-chart .chart-axis { stroke: var(--hairline); }
+  .stats-line-chart .stats-equity-line { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+  .stats-line-chart .equity-point { fill: var(--accent); }
+  .stats-line-chart .chart-date { font-size: 9px; fill: var(--faint); }
+  .daily-bars { display: flex; align-items: flex-end; gap: 14px; height: 110px; padding-top: 8px; }
+  .daily-bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; height: 100%; }
+  .daily-bar-item span { font-size: 11px; font-weight: 600; }
+  .daily-bar-item .positive { color: var(--up); }
+  .daily-bar-item .negative { color: var(--down); }
+  .daily-bar-item i { width: 22px; border-radius: 3px 3px 0 0; }
+  .daily-bar-item .profit-bar { background: var(--up); }
+  .daily-bar-item .loss-bar { background: var(--down); }
+  .daily-bar-item small { font-size: 9px; color: var(--faint); }
+  .stats-metrics { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 16px; }
+  .stats-metrics > div { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 12px 14px; background: var(--surface-2); }
+  .stats-metrics small { display: block; font-size: 11px; color: var(--muted); }
+  .stats-metrics strong { display: block; font-size: 19px; font-weight: 700; margin: 3px 0 2px; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .stats-metrics span { font-size: 10px; color: var(--faint); }
+  @media (max-width: 860px) { .trading-layout, .stats-layout { grid-template-columns: 1fr; } .stats-metrics { grid-template-columns: repeat(2, 1fr); } }
+</style>
+
+<div class="shell">
+  <aside class="rail">
+    <div class="brand"><div class="mark">S</div><div><div class="name">StockCal</div><div class="sub">决策终端</div></div></div>
+    <nav class="nav">
+      <div class="group-label">工作台</div>
+      <button data-page="overview"><span class="dot"></span>组合总览</button>
+      <button data-page="key-levels" class="active"><span class="dot"></span>关键位分析</button>
+      <button data-page="chart"><span class="dot"></span>专业 K 线</button>
+      <div class="group-label">研究与复盘</div>
+      <button data-page="patterns"><span class="dot"></span>盈利模式</button>
+      <button data-page="future"><span class="dot"></span>未来指标</button>
+      <button data-page="predictions"><span class="dot"></span>预测记录</button>
+      <button data-page="charts"><span class="dot"></span>统计图表</button>
+      <button data-page="review"><span class="dot"></span>当日复盘</button>
+      <button data-page="ai"><span class="dot"></span>AI 策略</button>
+      <button data-page="rules"><span class="dot"></span>经验规则</button>
+      <div class="group-label">账户</div>
+      <button data-page="trades"><span class="dot"></span>交易与盈亏</button>
+      <button data-page="account"><span class="dot"></span>我的</button>
+    </nav>
+    <div class="user"><div class="avatar">A</div><div class="who">alex<small>138****0000</small></div></div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="search"><span>搜索股票或页面</span><span class="kbd">⌘ K</span></div>
+      <div class="spacer"></div>
+      <div class="actions">
+        <button class="icon-btn" title="通知">⏽</button>
+        <button class="icon-btn" id="themeToggle" title="切换深浅色">◐</button>
+        <div class="avatar">A</div>
+      </div>
+    </header>
+
+    <main class="content">
+      <!-- ============ 关键位分析 ============ -->
+      <section id="page-key-levels" class="page">
+        <div class="banner">演示数据 · 仅作界面示意，不构成投资建议</div>
+        <div class="stock-head">
+          <div class="id"><h1 id="kl-name">贵州茅台</h1><div class="meta"><span id="kl-sub">600519 · 上海 · 白酒</span><span class="tag">已加自选</span><span class="tag">实时行情</span></div></div>
+          <div class="seg" id="cycle-seg"><button data-cycle="short">短线</button><button data-cycle="swing" class="on">波段</button><button data-cycle="long">中长线</button></div>
+                    <div class="price"><div class="v num up">1,742.00</div><div class="chg up">+12.50 &nbsp;+0.72%</div></div>
+        </div>
+        <div class="quote-bar">
+          <div class="q"><div class="l">今开</div><div class="v num">1,731.00</div></div>
+          <div class="q"><div class="l">昨收</div><div class="v num">1,729.00</div></div>
+          <div class="q"><div class="l">最高</div><div class="v num up">1,745.00</div></div>
+          <div class="q"><div class="l">最低</div><div class="v num down">1,695.50</div></div>
+          <div class="q"><div class="l">振幅</div><div class="v num">2.86%</div></div>
+          <div class="q"><div class="l">成交量</div><div class="v num">3.2万手</div></div>
+          <div class="q"><div class="l">成交额</div><div class="v num">55.4亿</div></div>
+          <div class="q"><div class="l">换手率</div><div class="v num">0.26%</div></div>
+          <div class="q"><div class="l">量比</div><div class="v num">1.18</div></div>
+          <div class="q"><div class="l">市盈率</div><div class="v num">22.4</div></div>
+          <div class="q"><div class="l">市净率</div><div class="v num">7.6</div></div>
+          <div class="q"><div class="l">总市值</div><div class="v num">2.19万亿</div></div>
+          <div class="q"><div class="l">流通市值</div><div class="v num">2.19万亿</div></div>
+        </div>
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-head"><span class="t">关键区域与目标位</span><div class="legend-pills"><span class="rise">上涨方向</span><span class="fall">下跌方向</span></div></div>
+          <div class="card-body">
+            <div class="zone-grid">
+              <article class="zone-card rise is-expanded">
+                <button class="zone-main" aria-expanded="true">
+                  <span class="zone-kicker"><span>上涨关键区</span><em>先看这里</em></span>
+                  <span class="zone-price-row"><strong id="zone-key-price">1,786.20</strong><span class="zone-range" id="zone-key-range">1,772.00 ~ 1,800.00</span></span>
+                  <span class="zone-metrics">
+                    <span><small>模型触达概率</small><b>72%</b></span>
+                    <span><small>预计触达</small><b>1.8 次</b></span>
+                    <span><small>观察窗口</small><b>1 ~ 2个交易日</b></span>
+                  </span>
+                  <span class="zone-footer">
+                    <span class="resonance-label">共振 <span class="strength"><i class="is-on"></i><i class="is-on"></i><i class="is-on"></i><i class="is-on"></i></span></span>
+                    <span class="expand-label">收起依据 <i>⌄</i></span>
+                  </span>
+                </button>
+                <div class="zone-detail">
+                  <p>日线 MA5 上移与周线 BOLL 中轨形成近端共振，经验规则将代表价上调至 1,786.20。</p>
+                  <div class="condition-grid">
+                    <span><i class="condition-dot trigger"></i>触发：放量站稳 1,800，确认向上突破</span>
+                    <span><i class="condition-dot invalid"></i>失效：回落并收于 1,742 下方</span>
+                  </div>
+                  <div class="source-list">
+                    <div class="source-row"><span class="source-name">用户规则 R-07 · 周线均线优先</span><span class="source-origin" data-origin="经验规则">经验规则</span><span class="mono">1,786.20</span><span class="weight">×8</span></div>
+                    <div class="source-row"><span class="source-name">日线 MA5</span><span class="source-origin" data-origin="多周期共振">多周期共振</span><span class="mono">1,778.00</span><span class="weight">×4</span></div>
+                    <div class="source-row"><span class="source-name">周线 BOLL 中轨</span><span class="source-origin" data-origin="多周期共振">多周期共振</span><span class="mono">1,792.00</span><span class="weight">×4</span></div>
+                    <div class="source-row"><span class="source-name">路径模型 A/B</span><span class="source-origin" data-origin="双模型一致">双模型一致</span><span class="mono">1,806.00</span><span class="weight">×2</span></div>
+                  </div>
+                </div>
+              </article>
+              <article class="zone-card rise">
+                <button class="zone-main" aria-expanded="false">
+                  <span class="zone-kicker"><span>上涨目标区</span><em>强势延伸</em></span>
+                  <span class="zone-price-row"><strong id="zone-target-price">1,815.60</strong><span class="zone-range" id="zone-target-range">1,806.00 ~ 1,825.00</span></span>
+                  <span class="zone-metrics">
+                    <span><small>模型触达概率</small><b>48%</b></span>
+                    <span><small>预计触达</small><b>1.2 次</b></span>
+                    <span><small>观察窗口</small><b>3 ~ 4个交易日</b></span>
+                  </span>
+                  <span class="zone-footer">
+                    <span class="resonance-label">共振 <span class="strength"><i class="is-on"></i><i class="is-on"></i><i class="is-on"></i><i class=""></i></span></span>
+                    <span class="expand-label">展开依据 <i>⌄</i></span>
+                  </span>
+                </button>
+                <div class="zone-detail">
+                  <p>放量突破 1,800 后看前期密集区上沿，目标随 BOLL 上轨同步上移。</p>
+                  <div class="condition-grid">
+                    <span><i class="condition-dot trigger"></i>触发：站稳 1,800 且量能持续放大</span>
+                    <span><i class="condition-dot invalid"></i>失效：冲高回落收于 1,786 下方</span>
+                  </div>
+                </div>
+              </article>
+              <article class="zone-card fall">
+                <button class="zone-main" aria-expanded="false">
+                  <span class="zone-kicker"><span>下跌支撑区</span><em>首要防守</em></span>
+                  <span class="zone-price-row"><strong id="zone-support-price">1,692.40</strong><span class="zone-range" id="zone-support-range">1,680.00 ~ 1,705.00</span></span>
+                  <span class="zone-metrics">
+                    <span><small>模型触达概率</small><b>68%</b></span>
+                    <span><small>预计触达</small><b>1.6 次</b></span>
+                    <span><small>观察窗口</small><b>1 ~ 3个交易日</b></span>
+                  </span>
+                  <span class="zone-footer">
+                    <span class="resonance-label">共振 <span class="strength"><i class="is-on"></i><i class="is-on"></i><i class="is-on"></i><i class="is-on"></i></span></span>
+                    <span class="expand-label">展开依据 <i>⌄</i></span>
+                  </span>
+                </button>
+                <div class="zone-detail">
+                  <p>回踩 MA20 与近 20 日密集区重叠，构成首要防守，连续停留只计一次触达。</p>
+                  <div class="condition-grid">
+                    <span><i class="condition-dot trigger"></i>触发：回踩 1,705 附近缩量企稳</span>
+                    <span><i class="condition-dot invalid"></i>失效：放量跌破 1,680</span>
+                  </div>
+                </div>
+              </article>
+              <article class="zone-card fall">
+                <button class="zone-main" aria-expanded="false">
+                  <span class="zone-kicker"><span>下跌风险位</span><em>破位确认</em></span>
+                  <span class="zone-price-row"><strong id="zone-risk-price">1,660.00</strong><span class="zone-range" id="zone-risk-range">1,652.00 ~ 1,668.00</span></span>
+                  <span class="zone-metrics">
+                    <span><small>模型触达概率</small><b>34%</b></span>
+                    <span><small>预计触达</small><b>1.1 次</b></span>
+                    <span><small>观察窗口</small><b>2 ~ 4个交易日</b></span>
+                  </span>
+                  <span class="zone-footer">
+                    <span class="resonance-label">共振 <span class="strength"><i class="is-on"></i><i class="is-on"></i><i class=""></i><i class=""></i></span></span>
+                    <span class="expand-label">展开依据 <i>⌄</i></span>
+                  </span>
+                </button>
+                <div class="zone-detail">
+                  <p>跌破支撑后看中长线箱体下沿，破位确认转弱，切换为空头占优并完整重算。</p>
+                  <div class="condition-grid">
+                    <span><i class="condition-dot trigger"></i>触发：收盘跌破 1,680</span>
+                    <span><i class="condition-dot invalid"></i>失效：快速收回 1,692 上方</span>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-head"><span class="t">模型编排 · 可解释分析</span><span class="hint">计算 → 规则 → 解释</span></div>
+          <div class="card-body">
+            <div class="pipeline">
+              <div class="stage" data-layer="params"><div class="n">01</div><div class="name">数值计算层</div><div class="detail">MA · BOLL · ATR</div><div class="count">12 项参数</div></div>
+              <div class="arrow">→</div>
+              <div class="stage" data-layer="rules"><div class="n">02</div><div class="name">规则引擎层</div><div class="detail">经验 · 策略</div><div class="count">命中 8/11</div></div>
+              <div class="arrow">→</div>
+              <div class="stage" data-layer="score"><div class="n">03</div><div class="name">AI 解释层</div><div class="detail">复杂推理</div><div class="count">评分 86</div></div>
+            </div>
+            <div class="layer-detail" data-layer-detail="params" style="display:none">
+              <div class="hd">数值计算层 · 12 项参数</div>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px 14px;font-size:12.5px">
+                <div><span style="color:var(--muted)">MA5</span> <b class="num">1,723.10</b></div>
+                <div><span style="color:var(--muted)">MA20</span> <b class="num">1,698.75</b></div>
+                <div><span style="color:var(--muted)">EMA12</span> <b class="num">1,711.40</b></div>
+                <div><span style="color:var(--muted)">BOLL 上轨</span> <b class="num">1,792.40</b></div>
+                <div><span style="color:var(--muted)">BOLL 中轨</span> <b class="num">1,698.75</b></div>
+                <div><span style="color:var(--muted)">BOLL 下轨</span> <b class="num">1,605.10</b></div>
+                <div><span style="color:var(--muted)">ATR</span> <b class="num">28.40</b></div>
+                <div><span style="color:var(--muted)">振幅</span> <b class="num">2.86%</b></div>
+                <div><span style="color:var(--muted)">量比</span> <b class="num">1.18</b></div>
+                <div><span style="color:var(--muted)">昨收</span> <b class="num">1,729.00</b></div>
+                <div><span style="color:var(--muted)">今开</span> <b class="num">1,731.00</b></div>
+                <div><span style="color:var(--muted)">最高</span> <b class="num">1,745.00</b></div>
+              </div>
+            </div>
+            <div class="layer-detail" data-layer-detail="rules" style="display:none">
+              <div class="hd">规则引擎层 · 命中 8 / 11</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12.5px">
+                <div>
+                  <div style="font-size:12px;color:var(--muted);margin-bottom:6px">命中 8 条</div>
+                  <div style="padding:2px 0"><span style="color:var(--down)">✓</span> 趋势确认</div>
+                  <div style="padding:2px 0"><span style="color:var(--down)">✓</span> 成交量确认</div>
+                  <div style="padding:2px 0"><span style="color:var(--down)">✓</span> 照镜子止盈</div>
+                  <div style="padding:2px 0"><span style="color:var(--down)">✓</span> 反弹止损</div>
+                  <div style="padding:2px 0"><span style="color:var(--down)">✓</span> 海龟战法</div>
+                  <div style="padding:2px 0"><span style="color:var(--down)">✓</span> 摸线八字箴言</div>
+                  <div style="padding:2px 0"><span style="color:var(--down)">✓</span> MA 多头排列</div>
+                  <div style="padding:2px 0"><span style="color:var(--down)">✓</span> BOLL 中轨向上</div>
+                </div>
+                <div>
+                  <div style="font-size:12px;color:var(--muted);margin-bottom:6px">未命中 3 条</div>
+                  <div style="padding:2px 0"><span style="color:var(--faint)">—</span> 五日线破位</div>
+                  <div style="padding:2px 0"><span style="color:var(--faint)">—</span> 弱势处理</div>
+                  <div style="padding:2px 0"><span style="color:var(--faint)">—</span> 振幅达标</div>
+                </div>
+              </div>
+            </div>
+            <div class="layer-detail" data-layer-detail="score" style="display:none">
+              <div class="hd">AI 解释层 · 评分构成</div>
+              <div style="display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px">
+                <span style="color:var(--muted)">策略匹配度 <b class="num" style="color:var(--ink)">86</b></span>
+                <span style="color:var(--muted)">规则可信度 <b class="num" style="color:var(--ink)">78</b></span>
+                <span style="color:var(--muted)">风险等级 <b style="color:var(--accent)">中等</b></span>
+              </div>
+            </div>
+            <div class="tabs ai-tabs" data-ai-tabs>
+              <button class="on" data-ai="conclusion">策略结论</button>
+              <button data-ai="basis">解释依据</button>
+              <button data-ai="pending">待确认经验</button>
+            </div>
+            <div class="ai-panel" data-ai-panel="conclusion">
+              <div class="conclusion">
+                <div class="conclusion-mark">↗</div>
+                <div class="conclusion-body">
+                  <span class="ai-label">当前推荐</span>
+                  <h3>3天5日线买入 → BOLL上轨止盈</h3>
+                  <p>当前价格位于 MA5 上方，BOLL 上轨持续抬升，近期振幅适合短线区间策略。建议下个交易日等待 1,692 ~ 1,730 回踩，不追高；目标位 1,786 ~ 1,815。</p>
+                  <div class="ai-scores">
+                    <span>策略匹配度 <b>86</b></span>
+                    <span>规则可信度 <b>78</b></span>
+                    <span>风险等级 <b class="risk-low">中等</b></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="ai-panel" data-ai-panel="basis" style="display:none">
+              <div class="explain-cols">
+                <div>
+                  <div class="explain-head">命中 8 条</div>
+                  <div class="explain-item"><span class="ok">✓</span>趋势确认</div>
+                  <div class="explain-item"><span class="ok">✓</span>成交量确认</div>
+                  <div class="explain-item"><span class="ok">✓</span>照镜子止盈</div>
+                  <div class="explain-item"><span class="ok">✓</span>反弹止损</div>
+                  <div class="explain-item"><span class="ok">✓</span>海龟战法</div>
+                  <div class="explain-item"><span class="ok">✓</span>摸线八字箴言</div>
+                  <div class="explain-item"><span class="ok">✓</span>MA 多头排列</div>
+                  <div class="explain-item"><span class="ok">✓</span>BOLL 中轨向上</div>
+                </div>
+                <div>
+                  <div class="explain-head">未命中 3 条</div>
+                  <div class="explain-item"><span class="no">—</span>五日线破位</div>
+                  <div class="explain-item"><span class="no">—</span>弱势处理</div>
+                  <div class="explain-item"><span class="no">—</span>振幅达标</div>
+                </div>
+              </div>
+            </div>
+            <div class="ai-panel" data-ai-panel="pending" style="display:none">
+              <div class="pending-item"><span class="pending-dot">!</span><span>R-07 短线关键位优先参考未来四日日线与周线均线 / BOLL</span><span class="tag">待确认</span></div>
+              <div class="pending-item"><span class="pending-dot">!</span><span>R-03 前收密集区与未来 MA10 重叠时，优先作为首要支撑</span><span class="tag">样本不足</span></div>
+            </div>
+            <div class="model-note">当前模型 · GPT-5 轻量分类模型</div>
+          </div>
+        </div>
+<div class="card" style="margin-top:16px">
+          <div class="card-head"><span class="t">盈利模式 · 策略与计划</span><span class="hint">点选策略查看执行计划</span></div>
+          <div class="card-body">
+            <div class="mode-layout">
+              <div class="mode-intro">
+                <h2 class="mode-q">当前更适合哪种盈利方式？</h2>
+                <p class="mode-desc">系统把当天的振幅、MA5、BOLL、量能和趋势状态打成多个参数，再按你的经验规则排序。</p>
+                <div class="summary" id="metric-tabs" style="margin-top:18px">
+                  <span class="metric-tab selected" data-detail="params">今日参数 <b>12</b> 项</span>
+                  <span class="metric-tab" data-detail="amplitude">振幅 <b>2.86%</b></span>
+                  <span class="metric-tab" data-detail="rules">规则命中 <b>8 / 11</b></span>
+                </div>
+              </div>
+              <div class="mode-list" id="pattern-list">
+                <div class="mode-card selected" data-pattern="climbing">
+                  <span class="mode-card-top"><b>攀升</b><em class="band primary">主策略</em></span>
+                  <span class="mode-score"><i style="--w:86%"></i><strong>86</strong></span>
+                  <small>MA5/10/20 多头排列，价格站上 MA5 且上翘</small>
+                </div>
+                <div class="mode-card" data-pattern="mirror">
+                  <span class="mode-card-top"><b>照镜子止盈</b><em class="band alt">备选</em></span>
+                  <span class="mode-score"><i style="--w:74%"></i><strong>74</strong></span>
+                  <small>前日突破 BOLL 上轨、昨日跌破，预计反抽上轨</small>
+                </div>
+                <div class="mode-card" data-pattern="rebound">
+                  <span class="mode-card-top"><b>反弹止损</b><em class="band risk">风控</em></span>
+                  <span class="mode-score"><i style="--w:61%"></i><strong>61</strong></span>
+                  <small>昨日跌破 MA5，今日反弹回踩 MA5</small>
+                </div>
+                <div class="mode-card" data-pattern="weak">
+                  <span class="mode-card-top"><b>弱势处理</b><em class="band caution">警戒</em></span>
+                  <span class="mode-score"><i style="--w:39%"></i><strong>39</strong></span>
+                  <small>破位未收复，弱势整理</small>
+                </div>
+              </div>
+              <div class="mode-detail">
+                <div class="mode-detail-head">
+                  <div><span class="band primary" id="plan-badge">主策略</span><h3 id="plan-name">攀升</h3></div>
+                  <button class="btn" id="promote-btn" style="padding:4px 10px;font-size:12px">设为主策略</button>
+                </div>
+                <p class="mode-detail-reason" id="plan-reason">MA5/10/20 多头排列，价格站上 MA5 且上翘</p>
+                <div class="mode-levels">
+                  <div class="buy-level"><small>买入关注</small><strong id="plan-buy">1,692 ~ 1,730</strong></div>
+                  <div class="sell-level"><small>卖出 / 止盈</small><strong id="plan-sell">1,815.60</strong></div>
+                  <div class="risk-level"><small>失效条件</small><strong id="plan-fail">收盘跌破 1,692</strong></div>
+                </div>
+                <div class="mode-evidence" id="plan-evidence">
+                  <span>✓ MA5/10/20 多头排列</span>
+                  <span>✓ 价格站上 MA5 且上翘</span>
+                  <span>✓ 近 20 日振幅 2.86%</span>
+                </div>
+              </div>
+            </div>
+            <div id="metric-detail" style="margin-top:14px;border:1px solid var(--hairline);border-radius:var(--radius);padding:12px 14px;background:var(--surface-2)">
+              <div class="metric-panel" id="detail-params">
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px 14px;font-size:12.5px">
+                  <div><span style="color:var(--muted)">MA5</span> <b class="num">1,723.10</b></div>
+                  <div><span style="color:var(--muted)">MA20</span> <b class="num">1,698.75</b></div>
+                  <div><span style="color:var(--muted)">EMA12</span> <b class="num">1,711.40</b></div>
+                  <div><span style="color:var(--muted)">BOLL 上轨</span> <b class="num">1,792.40</b></div>
+                  <div><span style="color:var(--muted)">BOLL 中轨</span> <b class="num">1,698.75</b></div>
+                  <div><span style="color:var(--muted)">BOLL 下轨</span> <b class="num">1,605.10</b></div>
+                  <div><span style="color:var(--muted)">ATR</span> <b class="num">28.40</b></div>
+                  <div><span style="color:var(--muted)">振幅</span> <b class="num">2.86%</b></div>
+                  <div><span style="color:var(--muted)">量比</span> <b class="num">1.18</b></div>
+                  <div><span style="color:var(--muted)">昨收</span> <b class="num">1,729.00</b></div>
+                  <div><span style="color:var(--muted)">今开</span> <b class="num">1,731.00</b></div>
+                  <div><span style="color:var(--muted)">最高</span> <b class="num">1,745.00</b></div>
+                </div>
+              </div>
+              <div class="metric-panel" id="detail-amplitude" style="display:none;font-size:12.5px;color:var(--muted);line-height:1.9">
+                振幅 = (最高 − 最低) ÷ 昨收 × 100<br>
+                = (1,745.00 − 1,695.50) ÷ 1,729.00 × 100<br>
+                = <b style="color:var(--ink)">2.86%</b>
+              </div>
+              <div class="metric-panel" id="detail-rules" style="display:none">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12.5px">
+                  <div>
+                    <div style="font-size:12px;color:var(--muted);margin-bottom:6px">命中 8 条</div>
+                    <div style="padding:2px 0"><span style="color:var(--down)">✓</span> 趋势确认</div>
+                    <div style="padding:2px 0"><span style="color:var(--down)">✓</span> 成交量确认</div>
+                    <div style="padding:2px 0"><span style="color:var(--down)">✓</span> 照镜子止盈</div>
+                    <div style="padding:2px 0"><span style="color:var(--down)">✓</span> 反弹止损</div>
+                    <div style="padding:2px 0"><span style="color:var(--down)">✓</span> 海龟战法</div>
+                    <div style="padding:2px 0"><span style="color:var(--down)">✓</span> 摸线八字箴言</div>
+                    <div style="padding:2px 0"><span style="color:var(--down)">✓</span> MA 多头排列</div>
+                    <div style="padding:2px 0"><span style="color:var(--down)">✓</span> BOLL 中轨向上</div>
+                  </div>
+                  <div>
+                    <div style="font-size:12px;color:var(--muted);margin-bottom:6px">未命中 3 条</div>
+                    <div style="padding:2px 0"><span style="color:var(--faint)">—</span> 五日线破位</div>
+                    <div style="padding:2px 0"><span style="color:var(--faint)">—</span> 弱势处理</div>
+                    <div style="padding:2px 0"><span style="color:var(--faint)">—</span> 振幅达标</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<div class="card" style="margin-top:16px">
+          <div class="card-head"><span class="t">未来三日 · 多路径推演</span><span class="hint">演示计算 · 非实时行情</span></div>
+          <div class="card-body">
+            <div class="forecast-layout">
+              <div class="forecast-visual">
+                <div class="forecast-axis"><span>1,800</span><span>1,760</span><span>1,720</span><span>1,680</span><span>1,640</span></div>
+                <div class="forecast-grid">
+                  <div class="forecast-line"></div>
+                  <div class="forecast-line"></div>
+                  <div class="forecast-line"></div>
+                  <div class="forecast-line"></div>
+                  <div class="forecast-current"><span>现价 1,742</span></div>
+                  <div class="path-dots blue" id="path-dots">
+                    <span style="left:18%;top:34%" title="D+1 1,746.20"><i></i></span>
+                    <span style="left:49%;top:31%" title="D+2 1,750.80"><i></i></span>
+                    <span style="left:80%;top:28%" title="D+3 1,755.40"><i></i></span>
+                  </div>
+                  <div class="forecast-days"><span>今天</span><span>明天</span><span>后天</span></div>
+                </div>
+              </div>
+              <div class="forecast-summary">
+                <div class="path-tabs" id="path-tabs">
+                  <button class="active" data-path="base"><i class="blue"></i>基准路径</button>
+                  <button data-path="strong"><i class="red"></i>偏强路径</button>
+                  <button data-path="weak"><i class="green"></i>偏弱路径</button>
+                </div>
+                <h3 id="path-title">站上 MA5 后震荡上移</h3>
+                <p>当前选择路径的未来三日 MA5 轨迹：</p>
+                <div class="forecast-values">
+                  <div><span>D+1</span><strong id="d1">1,746.20</strong></div>
+                  <div><span>D+2</span><strong id="d2">1,750.80</strong></div>
+                  <div><span>D+3</span><strong id="d3">1,755.40</strong></div>
+                </div>
+                <div class="forecast-decision">
+                  <span>买入区域 <b>1,692 ~ 1,730</b></span>
+                  <span>卖出区域 <b>1,806 ~ 1,815</b></span>
+                  <span>触发/失效 <b>放量站稳 1,800</b></span>
+                </div>
+                <button class="btn">保存下个交易日预测</button>
+              </div>
+            </div>
+            <div class="forecast-table-wrap">
+              <table class="forecast-table">
+                <thead><tr><th>指标</th><th>明天</th><th>后天</th><th>第3日</th><th>用途</th></tr></thead>
+                <tbody>
+                  <tr><th>MA5</th><td>1,746.20</td><td>1,750.80</td><td>1,755.40</td><td>回踩买入参考</td></tr>
+                  <tr><th>BOLL 上轨</th><td>1,792.40</td><td>1,799.10</td><td>1,806.00</td><td>3天止盈参考</td></tr>
+                  <tr><th>BOLL 中轨</th><td>1,698.75</td><td>1,703.20</td><td>1,707.80</td><td>趋势底线观察</td></tr>
+                  <tr><th>有效价格区</th><td>1,730 ~ 1,786</td><td>1,738 ~ 1,799</td><td>1,745 ~ 1,806</td><td>结合振幅筛选</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="forecast-footnote"><span>i</span>未来值由 MA/BOLL 结构、近期振幅和已启用经验规则共同计算；三种路径用于表达不确定性，不代表实际最高价或收盘价。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 组合总览 ============ -->
+      <section id="page-overview" class="page" style="display:none">
+        <div class="page-head"><h2 class="page-title">组合总览</h2><p class="page-sub">默认组合 · 数据截至今日收盘</p></div>
+        <div class="grid cols-3" style="margin-bottom:16px">
+          <div class="card"><div class="card-body"><div class="tile"><div class="l">持仓股票</div><div class="v num">5 只</div></div></div></div>
+          <div class="card"><div class="card-body"><div class="tile"><div class="l">总投入</div><div class="v num">128,400</div></div></div></div>
+          <div class="card"><div class="card-body"><div class="tile"><div class="l">当前市值</div><div class="v num">134,820</div></div></div></div>
+          <div class="card"><div class="card-body"><div class="tile"><div class="l">总浮动盈亏</div><div class="v num up">+6,420</div></div></div></div>
+          <div class="card"><div class="card-body"><div class="tile"><div class="l">已实现盈亏</div><div class="v num up">+2,180</div></div></div></div>
+          <div class="card"><div class="card-body"><div class="tile"><div class="l">组合收益率</div><div class="v num up">+5.03%</div></div></div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="t">持仓明细</span><span class="hint">按浮动盈亏排序</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>股票</th><th>持仓 / 成本</th><th>现价 / 市值</th><th>浮动盈亏</th><th>收益率</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><b>贵州茅台</b> · 600519</td><td class="num">200 · 1,624.00</td><td class="num">1,742.00 · 348,400</td><td class="num up">+23,600</td><td class="num up">+7.27%</td><td class="look" data-goto="key-levels" data-stock-name="贵州茅台" data-stock-sub="600519 · 上海 · 白酒">查看详情 →</td></tr>
+              <tr><td><b>宁德时代</b> · 300750</td><td class="num">800 · 198.50</td><td class="num">201.30 · 161,040</td><td class="num up">+2,240</td><td class="num up">+1.41%</td><td class="look" data-goto="key-levels" data-stock-name="宁德时代" data-stock-sub="300750 · 深圳 · 电池">查看详情 →</td></tr>
+              <tr><td><b>中芯国际</b> · 688981</td><td class="num">1,000 · 46.80</td><td class="num">44.10 · 44,100</td><td class="num down">−2,700</td><td class="num down">−5.77%</td><td class="look" data-goto="key-levels" data-stock-name="中芯国际" data-stock-sub="688981 · 上海 · 半导体">查看详情 →</td></tr>
+              <tr><td><b>平安银行</b> · 000001</td><td class="num">1,500 · 12.10</td><td class="num">12.42 · 18,630</td><td class="num up">+480</td><td class="num up">+2.64%</td><td class="look" data-goto="key-levels" data-stock-name="平安银行" data-stock-sub="000001 · 深圳 · 银行">查看详情 →</td></tr>
+              <tr><td><b>北方华创</b> · 002371</td><td class="num">300 · 312.00</td><td class="num">305.40 · 91,620</td><td class="num down">−1,980</td><td class="num down">−2.12%</td><td class="look" data-goto="key-levels" data-stock-name="北方华创" data-stock-sub="002371 · 深圳 · 半导体">查看详情 →</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ============ 盈利模式 ============ -->
+      <section id="page-patterns" class="page" style="display:none">
+        <div class="page-head"><h2 class="page-title">盈利模式</h2><p class="page-sub">当前启用规则与命中状态</p></div>
+        <div class="grid cols-3" style="margin-bottom:16px">
+          <div class="card"><div class="card-body"><div class="tile"><div class="l">启用规则</div><div class="v num">11</div></div></div></div>
+          <div class="card"><div class="card-body"><div class="tile"><div class="l">今日命中</div><div class="v num down">8</div></div></div></div>
+          <div class="card"><div class="card-body"><div class="tile"><div class="l">命中率</div><div class="v num">73%</div></div></div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="t">规则库</span><span class="hint">按优先级排序</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>规则</th><th>类别</th><th>优先级</th><th>状态</th></tr></thead>
+            <tbody>
+              <tr><td><b>趋势确认</b></td><td><span class="band primary">主策略</span></td><td class="num">10</td><td class="status hit">● 命中</td></tr>
+              <tr><td><b>成交量确认</b></td><td><span class="band primary">主策略</span></td><td class="num">20</td><td class="status hit">● 命中</td></tr>
+              <tr><td><b>照镜子止盈</b></td><td><span class="band alt">备选</span></td><td class="num">30</td><td class="status hit">● 命中</td></tr>
+              <tr><td><b>反弹止损</b></td><td><span class="band risk">风控</span></td><td class="num">40</td><td class="status hit">● 命中</td></tr>
+              <tr><td><b>五日线破位</b></td><td><span class="band risk">风控</span></td><td class="num">50</td><td class="status miss">○ 未命中</td></tr>
+              <tr><td><b>弱势处理</b></td><td><span class="band caution">警戒</span></td><td class="num">60</td><td class="status miss">○ 未命中</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ============ 未来指标 ============ -->
+      <section id="page-future" class="page" style="display:none">
+        <div class="page-head"><h2 class="page-title">未来指标</h2><p class="page-sub">未来三日 MA / BOLL 延伸 · 线性外推</p></div>
+        <div class="card">
+          <div class="card-head"><span class="t">三日延伸</span><span class="hint">贵州茅台 · 波段</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>日期</th><th>MA5</th><th>MA20</th><th>BOLL 上轨</th><th>BOLL 中轨</th><th>BOLL 下轨</th></tr></thead>
+            <tbody>
+              <tr><td><b>08-24</b> · 周一</td><td class="num">1,746.20</td><td class="num">1,703.10</td><td class="num">1,792.40</td><td class="num">1,698.75</td><td class="num">1,605.10</td></tr>
+              <tr><td><b>08-25</b> · 周二</td><td class="num">1,750.80</td><td class="num">1,707.90</td><td class="num">1,799.10</td><td class="num">1,703.20</td><td class="num">1,607.30</td></tr>
+              <tr><td><b>08-26</b> · 周三</td><td class="num">1,755.40</td><td class="num">1,712.60</td><td class="num">1,806.00</td><td class="num">1,707.80</td><td class="num">1,609.60</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+        <div class="banner" style="margin-top:16px"><b>说明</b>：未来指标为历史趋势的线性外推，仅作参考，不构成买卖建议。</div>
+      </section>
+
+      <!-- ============ 预测记录 ============ -->
+      <section id="page-predictions" class="page" style="display:none">
+        <div class="page-head"><h2 class="page-title">预测记录</h2><p class="page-sub">不可变预测快照 · 每次生成递增版本</p></div>
+        <div class="history-toolbar">
+          <label class="history-search"><span>搜索</span><input id="pred-search" placeholder="股票、代码、模式或日期" value=""></label>
+          <select id="pred-filter" aria-label="预测状态">
+            <option value="all" selected>全部状态</option>
+            <option value="pending">待复盘</option>
+            <option value="hit">命中</option>
+            <option value="miss">偏离</option>
+          </select>
+          <span class="history-count" id="pred-count">共 3 条</span>
+        </div>
+        <div class="history-list" id="history-list">
+          <article class="history-card" data-status="pending" data-search="贵州茅台 600519 攀升 基准路径 08-21 2026-08-21">
+            <div class="history-card-top">
+              <div><b>贵州茅台</b><span class="code">600519 · 上海</span></div>
+              <em class="history-status pending">待复盘</em>
+            </div>
+            <div class="history-meta">
+              <span>生成 2026-08-21 15:02</span>
+              <strong>适用 2026-08-22</strong>
+              <span>攀升</span>
+              <span>基准路径</span>
+              <span>置信 72%</span>
+            </div>
+            <div class="history-levels">
+              <span><small>关键点</small><b>1,786.20</b></span>
+              <span class="target"><small>目标位</small><b>1,815.60</b></span>
+              <span class="support"><small>支撑位</small><b>1,692.40</b></span>
+              <span class="risk"><small>风险位</small><b>1,672.00</b></span>
+            </div>
+            <button class="history-detail">查看预测详情 · 实际关键点 · 保存复盘结果 ▾</button>
+            <div class="history-detail-panel" style="display:none">
+              <label>实际关键点 <input class="actual-input" placeholder="待下个交易日复盘" value=""></label>
+              <div class="review-actions">
+                <button class="btn" data-choice="hit">命中</button>
+                <button class="btn" data-choice="miss">偏离</button>
+                <button class="btn primary" data-save>保存复盘结果</button>
+              </div>
+            </div>
+          </article>
+          <article class="history-card" data-status="hit" data-search="贵州茅台 600519 照镜子止盈 偏强路径 08-20 2026-08-20">
+            <div class="history-card-top">
+              <div><b>贵州茅台</b><span class="code">600519 · 上海</span></div>
+              <em class="history-status hit">命中</em>
+            </div>
+            <div class="history-meta">
+              <span>生成 2026-08-20 15:05</span>
+              <strong>适用 2026-08-21</strong>
+              <span>照镜子止盈</span>
+              <span>偏强路径</span>
+              <span>置信 68%</span>
+            </div>
+            <div class="history-levels">
+              <span><small>关键点</small><b>1,771.00</b></span>
+              <span class="target"><small>目标位</small><b>1,802.00</b></span>
+              <span class="support"><small>支撑位</small><b>1,688.00</b></span>
+              <span class="risk"><small>风险位</small><b>1,660.00</b></span>
+            </div>
+            <button class="history-detail">查看预测详情 · 实际关键点 · 保存复盘结果 ▾</button>
+            <div class="history-detail-panel" style="display:none">
+              <label>实际关键点 <input class="actual-input" value="1,775.00"></label>
+              <div class="review-actions">
+                <button class="btn selected" data-choice="hit">命中</button>
+                <button class="btn" data-choice="miss">偏离</button>
+                <button class="btn primary" data-save>保存复盘结果</button>
+              </div>
+            </div>
+          </article>
+          <article class="history-card" data-status="miss" data-search="贵州茅台 600519 反弹止损 偏弱路径 08-19 2026-08-19">
+            <div class="history-card-top">
+              <div><b>贵州茅台</b><span class="code">600519 · 上海</span></div>
+              <em class="history-status miss">偏离</em>
+            </div>
+            <div class="history-meta">
+              <span>生成 2026-08-19 15:03</span>
+              <strong>适用 2026-08-20</strong>
+              <span>反弹止损</span>
+              <span>偏弱路径</span>
+              <span>置信 64%</span>
+            </div>
+            <div class="history-levels">
+              <span><small>关键点</small><b>1,759.00</b></span>
+              <span class="target"><small>目标位</small><b>1,790.00</b></span>
+              <span class="support"><small>支撑位</small><b>1,681.00</b></span>
+              <span class="risk"><small>风险位</small><b>1,650.00</b></span>
+            </div>
+            <button class="history-detail">查看预测详情 · 实际关键点 · 保存复盘结果 ▾</button>
+            <div class="history-detail-panel" style="display:none">
+              <label>实际关键点 <input class="actual-input" value="1,748.00"></label>
+              <div class="review-actions">
+                <button class="btn" data-choice="hit">命中</button>
+                <button class="btn selected" data-choice="miss">偏离</button>
+                <button class="btn primary" data-save>保存复盘结果</button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ 统计图表 ============ -->
+      <section id="page-charts" class="page" style="display:none">
+        <div class="page-head"><h2 class="page-title">统计图表</h2><p class="page-sub">交易统计 · 组合收益与持仓分布</p></div>
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-head"><span class="t">交易统计</span><span class="hint">近 5 个交易日 · 按已保存交易记录计算</span></div>
+          <div class="card-body">
+            <div class="stats-layout">
+              <div>
+                <div class="chart-subhead"><b>累计盈亏曲线</b><span>近 5 个交易日</span></div>
+                <svg class="stats-equity" viewBox="0 0 430 150" role="img" aria-label="累计盈亏曲线">
+                  <line x1="32" y1="120" x2="410" y2="120" stroke="var(--hairline)"/>
+                  <polyline points="42,105 124,78 206,87 288,44 370,20" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+                  <circle cx="42" cy="105" r="3.5" fill="var(--accent)"/><text x="42" y="136" font-size="10" fill="var(--faint)" text-anchor="middle">08-04</text>
+                  <circle cx="124" cy="78" r="3.5" fill="var(--accent)"/><text x="124" y="136" font-size="10" fill="var(--faint)" text-anchor="middle">08-05</text>
+                  <circle cx="206" cy="87" r="3.5" fill="var(--accent)"/><text x="206" y="136" font-size="10" fill="var(--faint)" text-anchor="middle">08-06</text>
+                  <circle cx="288" cy="44" r="3.5" fill="var(--accent)"/><text x="288" y="136" font-size="10" fill="var(--faint)" text-anchor="middle">08-07</text>
+                  <circle cx="370" cy="20" r="3.5" fill="var(--accent)"/><text x="370" y="136" font-size="10" fill="var(--faint)" text-anchor="middle">08-08</text>
+                </svg>
+              </div>
+              <div>
+                <div class="chart-subhead"><b>每日盈亏</b><span>元</span></div>
+                <div class="daily-bars">
+                  <div class="daily-bar"><span class="v pos">+1,240</span><i class="pos" style="height:44px"></i><small>08-04</small></div>
+                  <div class="daily-bar"><span class="v pos">+2,180</span><i class="pos" style="height:76px"></i><small>08-05</small></div>
+                  <div class="daily-bar"><span class="v neg">-680</span><i class="neg" style="height:24px"></i><small>08-06</small></div>
+                  <div class="daily-bar"><span class="v pos">+3,520</span><i class="pos" style="height:110px"></i><small>08-07</small></div>
+                  <div class="daily-bar"><span class="v pos">+1,960</span><i class="pos" style="height:62px"></i><small>08-08</small></div>
+                </div>
+              </div>
+            </div>
+            <div class="stats-metrics">
+              <div><small>累计盈亏</small><strong class="up">+8,220</strong><span>元</span></div>
+              <div><small>盈利天数</small><strong>4 / 5</strong><span>交易日</span></div>
+              <div><small>交易次数</small><strong>12</strong><span>买卖合计</span></div>
+              <div><small>平均单笔</small><strong>685</strong><span>元</span></div>
+              <div><small>执行偏差</small><strong>16.7%</strong><span>未按计划</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="grid cols-2">
+          <div class="card">
+            <div class="card-head"><span class="t">组合收益曲线</span><span class="hint">近 12 个月</span></div>
+            <div class="card-body">
+              <svg viewBox="0 0 520 200" style="width:100%;height:auto" role="img" aria-label="组合收益曲线">
+                <g class="chart-grid">
+                  <line x1="40" y1="170" x2="500" y2="170" stroke="var(--hairline)"/>
+                  <line x1="40" y1="120" x2="500" y2="120" stroke="var(--hairline)"/>
+                  <line x1="40" y1="70" x2="500" y2="70" stroke="var(--hairline)"/>
+                  <line x1="40" y1="20" x2="500" y2="20" stroke="var(--hairline)"/>
+                </g>
+                <path d="M40 158 L90 150 L140 143 L190 138 L240 120 L290 108 L340 96 L390 82 L440 70 L490 52 L500 46 L500 170 L40 170 Z" fill="var(--accent)" class="area"/>
+                <polyline points="40,158 90,150 140,143 190,138 240,120 290,108 340,96 390,82 440,70 490,52 500,46" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+                <circle cx="500" cy="46" r="4" fill="var(--accent)" style="filter: drop-shadow(0 0 5px var(--accent))"/>
+                <text x="40" y="190" font-size="10" fill="var(--faint)">8月</text>
+                <text x="500" y="190" font-size="10" fill="var(--faint)" text-anchor="end">7月</text>
+                <text x="36" y="24" font-size="10" fill="var(--faint)" text-anchor="end">+6%</text>
+                <text x="36" y="74" font-size="10" fill="var(--faint)" text-anchor="end">+4%</text>
+                <text x="36" y="124" font-size="10" fill="var(--faint)" text-anchor="end">+2%</text>
+                <text x="36" y="174" font-size="10" fill="var(--faint)" text-anchor="end">0%</text>
+              </svg>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="t">持仓分布</span><span class="hint">按市值</span></div>
+            <div class="card-body">
+              <div class="dist-row"><div class="label">贵州茅台</div><div class="bar"><i style="width:52%"></i></div><div class="val num">348,400</div></div>
+              <div class="dist-row"><div class="label">宁德时代</div><div class="bar"><i style="width:24%"></i></div><div class="val num">161,040</div></div>
+              <div class="dist-row"><div class="label">北方华创</div><div class="bar"><i style="width:14%"></i></div><div class="val num">91,620</div></div>
+              <div class="dist-row"><div class="label">中芯国际</div><div class="bar"><i style="width:7%"></i></div><div class="val num">44,100</div></div>
+              <div class="dist-row"><div class="label">平安银行</div><div class="bar"><i style="width:3%"></i></div><div class="val num">18,630</div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 当日复盘 ============ -->
+      <section id="page-review" class="page" style="display:none">
+        <div class="page-head"><h2 class="page-title">当日复盘</h2><p class="page-sub">本周交易复盘 · 单笔 / 每日 / 每周</p></div>
+        <div class="grid cols-3" style="margin-bottom:16px">
+          <div class="card"><div class="card-body"><div class="tile"><div class="l">本周交易</div><div class="v num">4 笔</div></div></div></div>
+          <div class="card"><div class="card-body"><div class="tile"><div class="l">已复盘</div><div class="v num down">3</div></div></div></div>
+          <div class="card"><div class="card-body"><div class="tile"><div class="l">待复盘</div><div class="v num up">1</div></div></div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="t">复盘记录</span><span class="hint">最近一周</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>日期</th><th>标题</th><th>结果</th><th>摘要</th></tr></thead>
+            <tbody>
+              <tr><td><b>08-20</b></td><td>贵州茅台 · 回踩五日线加仓</td><td class="up">+1.2%</td><td>执行到位，回踩支撑后反弹，止盈位下移保护利润</td></tr>
+              <tr><td><b>08-19</b></td><td>宁德时代 · 突破前高追入</td><td class="down">−0.8%</td><td>追高被套，次日缩量，纪律性止损</td></tr>
+              <tr><td><b>08-18</b></td><td>中芯国际 · 破位减仓</td><td class="up">+0.4%</td><td>破五断头反抽离场，保留底仓</td></tr>
+              <tr><td><b>08-17</b></td><td>平安银行 · 分红再投</td><td class="flat">—</td><td>待复盘</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ============ AI 策略 ============ -->
+      <section id="page-ai" class="page" style="display:none">
+        <div class="page-head"><h2 class="page-title">AI 策略</h2><p class="page-sub">策略建议 · 可解释分析中心</p></div>
+        <div class="grid cols-2">
+          <div class="card">
+            <div class="card-head"><span class="t">策略建议</span><span class="hint">贵州茅台 · 波段</span></div>
+            <div class="card-body">
+              <div class="rule"><span class="band primary">主策略</span><span class="name">攀升</span><span class="score num up">86</span></div>
+              <div class="rule"><span class="band alt">备选</span><span class="name">照镜子止盈</span><span class="score num">74</span></div>
+              <div class="rule"><span class="band risk">风控</span><span class="name">反弹止损</span><span class="score num">61</span></div>
+              <div style="border-top:1px solid var(--hairline);margin-top:10px;padding-top:10px">
+                <div class="cond" style="padding:3px 0"><div class="l" style="color:var(--muted)">买入关注</div><div class="num" style="font-weight:600">1,692 ~ 1,730</div></div>
+                <div class="cond" style="padding:3px 0"><div class="l" style="color:var(--muted)">卖出 / 止盈</div><div class="num" style="font-weight:600">1,815.60</div></div>
+                <div class="cond" style="padding:3px 0"><div class="l" style="color:var(--muted)">失效条件</div><div class="num" style="font-weight:600">收盘跌破 1,692</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="t">可解释分析</span><span class="hint">计算 → 规则 → 解释</span></div>
+            <div class="card-body">
+              <div class="pipeline">
+                <div class="stage"><div class="n">01</div><div class="name">数值计算层</div><div class="detail">MA · BOLL · ATR</div><div class="count">12 项参数</div></div>
+                <div class="arrow">→</div>
+                <div class="stage"><div class="n">02</div><div class="name">规则引擎层</div><div class="detail">经验 · 策略</div><div class="count">命中 8/11</div></div>
+                <div class="arrow">→</div>
+                <div class="stage"><div class="n">03</div><div class="name">AI 解释层</div><div class="detail">复杂推理</div><div class="count">评分 86</div></div>
+              </div>
+              <div class="tabs ai-tabs" data-ai-tabs>
+                <button class="on" data-ai="conclusion">策略结论</button>
+                <button data-ai="basis">解释依据</button>
+                <button data-ai="pending">待确认经验</button>
+              </div>
+              <div class="ai-panel" data-ai-panel="conclusion">
+                <div class="conclusion">
+                  <div class="conclusion-mark">↗</div>
+                  <div class="conclusion-body">
+                    <span class="ai-label">当前推荐</span>
+                    <h3>3天5日线买入 → BOLL上轨止盈</h3>
+                    <p>当前价格位于 MA5 上方，BOLL 上轨持续抬升，近期振幅适合短线区间策略。建议下个交易日等待 1,692 ~ 1,730 回踩，不追高；目标位 1,786 ~ 1,815。</p>
+                    <div class="ai-scores">
+                      <span>策略匹配度 <b>86</b></span>
+                      <span>规则可信度 <b>78</b></span>
+                      <span>风险等级 <b class="risk-low">中等</b></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="ai-panel" data-ai-panel="basis" style="display:none">
+                <div class="explain-cols">
+                  <div>
+                    <div class="explain-head">命中 8 条</div>
+                    <div class="explain-item"><span class="ok">✓</span>趋势确认</div>
+                    <div class="explain-item"><span class="ok">✓</span>成交量确认</div>
+                    <div class="explain-item"><span class="ok">✓</span>照镜子止盈</div>
+                    <div class="explain-item"><span class="ok">✓</span>反弹止损</div>
+                    <div class="explain-item"><span class="ok">✓</span>海龟战法</div>
+                    <div class="explain-item"><span class="ok">✓</span>摸线八字箴言</div>
+                    <div class="explain-item"><span class="ok">✓</span>MA 多头排列</div>
+                    <div class="explain-item"><span class="ok">✓</span>BOLL 中轨向上</div>
+                  </div>
+                  <div>
+                    <div class="explain-head">未命中 3 条</div>
+                    <div class="explain-item"><span class="no">—</span>五日线破位</div>
+                    <div class="explain-item"><span class="no">—</span>弱势处理</div>
+                    <div class="explain-item"><span class="no">—</span>振幅达标</div>
+                  </div>
+                </div>
+              </div>
+              <div class="ai-panel" data-ai-panel="pending" style="display:none">
+                <div class="pending-item"><span class="pending-dot">!</span><span>R-07 短线关键位优先参考未来四日日线与周线均线 / BOLL</span><span class="tag">待确认</span></div>
+                <div class="pending-item"><span class="pending-dot">!</span><span>R-03 前收密集区与未来 MA10 重叠时，优先作为首要支撑</span><span class="tag">样本不足</span></div>
+              </div>
+              <div class="model-note">当前模型 · GPT-5 轻量分类模型</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 经验规则 ============ -->
+      <section id="page-rules" class="page" style="display:none">
+        <div class="page-head"><h2 class="page-title">经验规则</h2><p class="page-sub">从交易笔记沉淀为可执行规则</p></div>
+        <div class="card">
+          <div class="card-head">
+            <div class="tabs"><button class="on">规则</button><button>笔记</button></div>
+            <span class="hint">已启用 8 · 已停用 3</span>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>规则</th><th>来源</th><th>版本</th><th>状态</th></tr></thead>
+            <tbody>
+              <tr><td><b>趋势确认</b></td><td>系统</td><td class="num">v1</td><td><div class="switch on" aria-label="启用"></div></td></tr>
+              <tr><td><b>成交量确认</b></td><td>系统</td><td class="num">v1</td><td><div class="switch on"></div></td></tr>
+              <tr><td><b>摸线八字箴言</b></td><td>四期第五课</td><td class="num">v3</td><td><div class="switch on"></div></td></tr>
+              <tr><td><b>海龟战法</b></td><td>20250905 晚评</td><td class="num">v2</td><td><div class="switch on"></div></td></tr>
+              <tr><td><b>除权股不做</b></td><td>四期第七课</td><td class="num">v1</td><td><div class="switch"></div></td></tr>
+              <tr><td><b>信托股不做</b></td><td>四期第八课</td><td class="num">v1</td><td><div class="switch"></div></td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ============ 交易与盈亏 ============ -->
+      <section id="page-trades" class="page" style="display:none">
+        <div class="page-head"><h2 class="page-title">交易与盈亏</h2><p class="page-sub">交易记录 · 成本与盈亏 · A股 T+1 校验</p></div>
+        <div class="grid cols-3" style="margin-bottom:16px">
+          <div class="card"><div class="card-body"><div class="tile"><div class="l">已实现盈亏</div><div class="v num up">+2,180</div></div></div></div>
+          <div class="card"><div class="card-body"><div class="tile"><div class="l">浮动盈亏</div><div class="v num up">+6,420</div></div></div></div>
+          <div class="card"><div class="card-body"><div class="tile"><div class="l">总盈亏</div><div class="v num up">+8,600</div></div></div></div>
+        </div>
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-head"><span class="t">持仓与录入交易</span><span class="hint">A 股 T+1 校验 · 非真实下单</span></div>
+          <div class="card-body">
+            <div class="trading-layout">
+              <div class="holding-overview">
+                <div class="holding-card"><small>当前市值</small><strong>348,400 元</strong><span>现价 1,742.00</span></div>
+                <div class="holding-card"><small>持仓 / 可卖数量</small><strong>200 / 200 股</strong><span>买入当日不可卖出</span></div>
+                <div class="holding-card"><small>平均成本</small><strong>1,624.00</strong><span>已计入有效交易</span></div>
+                <div class="holding-card profit"><small>浮动盈亏</small><strong>+23,600.00 元</strong><span>按当前演示价格计算</span></div>
+              </div>
+              <form class="trade-entry" id="trade-entry">
+                <div class="trade-entry-head"><div><span class="lbl">录入交易</span><h3>记录一笔买卖</h3></div><span class="trade-date">交易日 2026-08-14</span></div>
+                <div class="trade-side-tabs" id="trade-side-tabs" role="group" aria-label="交易方向">
+                  <button type="button" class="buy active" aria-pressed="true">买入</button>
+                  <button type="button" class="sell" aria-pressed="false">卖出</button>
+                </div>
+                <div class="trade-fields">
+                  <label>数量（股）<input id="trade-qty" inputmode="numeric" value="100"></label>
+                  <label>成交价<input id="trade-price" inputmode="decimal" value="1742.00"></label>
+                  <label>备注<input placeholder="可选" value=""></label>
+                </div>
+                <div class="fee-preview">
+                  <span>成交金额 <b id="fee-amount">174,200.00</b></span>
+                  <span>手续费 <b id="fee-fee">5.00</b></span>
+                  <span>可卖数量 <b>200 股</b></span>
+                </div>
+                <button class="btn primary trade-submit" type="submit">保存交易记录</button>
+              </form>
+            </div>
+            <div class="trade-history">
+              <div class="trade-history-head"><div><h3>交易明细</h3><small>支持编辑交易、纠正记录；保留纠正前数据</small></div><span>已记录 2 笔 · 实现盈亏 0.00 元</span></div>
+              <div class="trade-row"><span class="trade-badge buy">买入</span><b>200 股</b><span>@ 1,624.00</span><span>2026-08-13</span><small>示例建仓</small><button class="trade-edit-button">编辑交易</button></div>
+              <div class="trade-row"><span class="trade-badge buy">买入</span><b>100 股</b><span>@ 1,700.00</span><span>2026-08-14</span><small>示例加仓</small><button class="trade-edit-button">编辑交易</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="t">交易统计</span><span class="hint">按已保存交易记录计算</span></div>
+          <div class="card-body">
+            <div class="stats-layout">
+              <div class="stats-chart-card">
+                <div class="chart-subhead"><b>累计盈亏曲线</b><span>近 5 个交易日</span></div>
+                <svg class="stats-line-chart" viewBox="0 0 430 150" role="img" aria-label="交易累计盈亏曲线">
+                  <line x1="32" y1="120" x2="410" y2="120" class="chart-axis"></line>
+                  <polyline points="42,108 124,92 206,100 288,64 370,40" class="stats-equity-line"></polyline>
+                  <g><circle cx="42" cy="108" r="3.5" class="equity-point"></circle><text x="42" y="139" text-anchor="middle" class="chart-date">08/04</text></g>
+                  <g><circle cx="124" cy="92" r="3.5" class="equity-point"></circle><text x="124" y="139" text-anchor="middle" class="chart-date">08/05</text></g>
+                  <g><circle cx="206" cy="100" r="3.5" class="equity-point"></circle><text x="206" y="139" text-anchor="middle" class="chart-date">08/06</text></g>
+                  <g><circle cx="288" cy="64" r="3.5" class="equity-point"></circle><text x="288" y="139" text-anchor="middle" class="chart-date">08/07</text></g>
+                  <g><circle cx="370" cy="40" r="3.5" class="equity-point"></circle><text x="370" y="139" text-anchor="middle" class="chart-date">08/08</text></g>
+                </svg>
+              </div>
+              <div class="daily-bars-card">
+                <div class="chart-subhead"><b>每日盈亏</b><span>元</span></div>
+                <div class="daily-bars">
+                  <div class="daily-bar-item"><span class="positive">+1,500</span><i class="profit-bar" style="height:27px"></i><small>08/04</small></div>
+                  <div class="daily-bar-item"><span class="positive">+2,400</span><i class="profit-bar" style="height:43px"></i><small>08/05</small></div>
+                  <div class="daily-bar-item"><span class="negative">−600</span><i class="loss-bar" style="height:11px"></i><small>08/06</small></div>
+                  <div class="daily-bar-item"><span class="positive">+3,200</span><i class="profit-bar" style="height:58px"></i><small>08/07</small></div>
+                  <div class="daily-bar-item"><span class="positive">+2,100</span><i class="profit-bar" style="height:38px"></i><small>08/08</small></div>
+                </div>
+              </div>
+            </div>
+            <div class="stats-metrics">
+              <div><small>累计盈亏</small><strong>+8,600.00</strong><span>元</span></div>
+              <div><small>盈利天数</small><strong>4 / 5</strong><span>交易日</span></div>
+              <div><small>交易次数</small><strong>12</strong><span>买卖合计</span></div>
+              <div><small>平均单笔</small><strong>716.67</strong><span>元</span></div>
+              <div><small>执行偏差</small><strong>16.7%</strong><span>未按计划</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 专业 K 线 ============ -->
+      <section id="page-chart" class="page" style="display:none">
+        <div class="banner">专业 K 线 · MA 全周期 + BOLL 可显隐 · 演示数据，不构成投资建议</div>
+        <div class="stock-head">
+          <div class="id"><h1>贵州茅台</h1><div class="meta">600519 · 上海 · 白酒<span class="tag">已加自选</span></div></div>
+          <div class="seg"><button>日线</button><button class="on">周线</button><button>月线</button></div>
+          <div class="seg"><button class="on">前复权</button><button>不复权</button></div>
+          <div class="price"><div class="v num up">1,742.00</div><div class="chg up">+12.50 &nbsp;+0.72%</div></div>
+        </div>
+        <div class="quote-bar">
+          <div class="q"><div class="l">今开</div><div class="v num">1,731.00</div></div>
+          <div class="q"><div class="l">昨收</div><div class="v num">1,729.00</div></div>
+          <div class="q"><div class="l">最高</div><div class="v num up">1,745.00</div></div>
+          <div class="q"><div class="l">最低</div><div class="v num down">1,695.50</div></div>
+          <div class="q"><div class="l">振幅</div><div class="v num">2.86%</div></div>
+          <div class="q"><div class="l">成交量</div><div class="v num">3.2万手</div></div>
+          <div class="q"><div class="l">成交额</div><div class="v num">55.4亿</div></div>
+          <div class="q"><div class="l">换手率</div><div class="v num">0.26%</div></div>
+          <div class="q"><div class="l">量比</div><div class="v num">1.18</div></div>
+          <div class="q"><div class="l">市盈率</div><div class="v num">22.4</div></div>
+          <div class="q"><div class="l">市净率</div><div class="v num">7.6</div></div>
+          <div class="q"><div class="l">总市值</div><div class="v num">2.19万亿</div></div>
+          <div class="q"><div class="l">流通市值</div><div class="v num">2.19万亿</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <span class="t">K 线</span>
+            <div class="kline-legend">
+              <span><i class="legend-actual"></i>实际行情</span>
+              <span><i class="legend-prediction"></i>预测路径</span>
+              <span><i style="background:#3987e5"></i>MA5</span>
+              <span><i style="background:#d95926"></i>MA10</span>
+              <span><i style="background:#199e70"></i>MA20</span>
+              <span><i style="background:#8B94A8"></i>BOLL上轨</span>
+              <span><i style="background:#8B94A8"></i>BOLL中轨</span>
+              <span><i style="background:#8B94A8"></i>BOLL下轨</span>
+              <span><i class="legend-zone"></i>共振区域</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="chart-primary-toolbar" aria-label="K线工具栏">
+              <div class="chart-primary-actions">
+                <button class="active" data-tool="pointer">指针</button>
+                <button data-tool="trendline">趋势线</button>
+                <button data-tool="rect">矩形</button>
+                <button data-tool="mark">标记</button>
+                <details class="chart-menu drawing-menu">
+                  <summary>更多绘图</summary>
+                  <div class="chart-menu-panel compact-menu">
+                    <button data-tool="crosshair">十字光标</button><button data-tool="hline">水平线</button><button data-tool="buy">买入点</button><button data-tool="sell">卖出点</button><button data-tool="target">目标位</button><button data-tool="stop">止损位</button><button data-tool="text">文字备注</button>
+                  </div>
+                </details>
+                <span class="chart-tool-divider"></span>
+                <button data-action="undo" disabled>撤销</button>
+                <button data-action="redo" disabled>重做</button>
+                <button disabled>编辑标注</button>
+              </div>
+              <div class="chart-secondary-actions">
+                <details class="chart-menu indicator-menu">
+                  <summary>指标</summary>
+                  <div class="chart-menu-panel indicator-menu-panel">
+                    <div class="indicator-setting-group">
+                      <div><button class="indicator-group-toggle" data-ma-count>MA均线 4/7</button></div>
+                      <div class="indicator-chips">
+                        <button class="active" data-ma="5" style="--indicator-color:#3987e5"><span>MA5</span><i></i></button>
+                        <button class="active" data-ma="10" style="--indicator-color:#d95926"><span>MA10</span><i></i></button>
+                        <button class="active" data-ma="20" style="--indicator-color:#199e70"><span>MA20</span><i></i></button>
+                        <button data-ma="30" style="--indicator-color:#a46ee8"><span>MA30</span><i></i></button>
+                        <button class="active" data-ma="60" style="--indicator-color:#d55181"><span>MA60</span><i></i></button>
+                        <button data-ma="120" style="--indicator-color:#e17b43"><span>MA120</span><i></i></button>
+                        <button data-ma="250" style="--indicator-color:#65738a"><span>MA250</span><i></i></button>
+                      </div>
+                    </div>
+                    <div class="indicator-setting-group">
+                      <div><button class="indicator-group-toggle">BOLL指标 3/3</button></div>
+                      <div class="indicator-chips">
+                        <button class="active boll-switch" data-boll="up"><span>BOLL上轨</span><i></i></button>
+                        <button class="active boll-switch" data-boll="mid"><span>BOLL中轨</span><i></i></button>
+                        <button class="active boll-switch" data-boll="down"><span>BOLL下轨</span><i></i></button>
+                      </div>
+                    </div>
+                    <span class="indicator-count">已显示 7/10 条指标线</span>
+                    <div class="indicator-parameter-form">
+                      <label>MA 周期 <input value="5,10,20,30,60,120,250"></label>
+                      <label>BOLL 周期 <input type="number" value="20"></label>
+                      <label>标准差 <input type="number" value="2"></label>
+                    </div>
+                  </div>
+                </details>
+                <details class="chart-menu">
+                  <summary>图层</summary>
+                  <div class="chart-menu-panel compact-menu">
+                    <button class="active" data-layer-toggle="actual">实际行情</button>
+                    <button class="active" data-layer-toggle="levels">预测关键位</button>
+                    <button class="active" data-layer-toggle="forecast">预测路径</button>
+                    <button class="active" data-layer-toggle="indicator">预测MA/BOLL</button>
+                  </div>
+                </details>
+                <details class="chart-menu">
+                  <summary>标签管理</summary>
+                  <div class="chart-menu-panel compact-menu">
+                    <button disabled>隐藏选中</button>
+                    <button data-action="delete" disabled>删除标注</button>
+                    <button class="save-annotation" data-action="save">保存标注</button>
+                    <button data-action="export">导出标注</button>
+                    <label class="import-annotation">导入标注<input type="file" accept="application/json"></label>
+                    <button data-action="clear">清除全部</button>
+                    <button class="active" data-filter="all">全部标注</button>
+                    <button class="active" data-filter="trendline">趋势线</button>
+                    <button class="active" data-filter="rect">矩形框</button>
+                    <button class="active" data-filter="point">点位标注</button>
+                    <button class="active" data-filter="hline">水平线</button>
+                  </div>
+                </details>
+                <details class="chart-menu more-menu">
+                  <summary>更多</summary>
+                  <div class="chart-menu-panel compact-menu">
+                    <button data-view="zoom-in">放大</button><button data-view="zoom-out">缩小</button><button data-view="pan-left">向左平移</button><button data-view="pan-right">向右平移</button><button data-view="reset">重置视图</button>
+                  </div>
+                </details>
+              </div>
+            </div>
+            <svg viewBox="0 0 760 420" style="width:100%;height:auto" role="img" aria-label="贵州茅台 K 线图">
+              <g stroke="var(--hairline)" stroke-width="1">
+                <line x1="10" y1="40" x2="750" y2="40"/>
+                <line x1="10" y1="105" x2="750" y2="105"/>
+                <line x1="10" y1="170" x2="750" y2="170"/>
+                <line x1="10" y1="235" x2="750" y2="235"/>
+                <line x1="10" y1="300" x2="750" y2="300"/>
+                <line x1="10" y1="320" x2="750" y2="320"/>
+              </g>
+              <g data-layer="forecast">
+                <rect x="606" y="20" width="150" height="300" fill="rgba(240,82,93,0.06)"/>
+                <line x1="608" y1="20" x2="608" y2="320" stroke="rgba(240,82,93,0.5)" stroke-dasharray="4 4"/>
+                <text x="681" y="14" font-size="10" fill="var(--faint)" text-anchor="middle">未来 3 日推演</text>
+              </g>
+              <!-- 历史 K 线 -->
+              <g data-layer="actual">
+                <line x1="30" y1="258" x2="30" y2="288" stroke="#F0525D"/><rect x="24" y="266" width="12" height="8" fill="#F0525D"/>
+                <line x1="70" y1="260" x2="70" y2="292" stroke="#2BB673"/><rect x="64" y="268" width="12" height="10" fill="#2BB673"/>
+                <line x1="110" y1="250" x2="110" y2="284" stroke="#F0525D"/><rect x="104" y="254" width="12" height="10" fill="#F0525D"/>
+                <line x1="150" y1="242" x2="150" y2="272" stroke="#F0525D"/><rect x="144" y="246" width="12" height="8" fill="#F0525D"/>
+                <line x1="190" y1="244" x2="190" y2="278" stroke="#2BB673"/><rect x="184" y="248" width="12" height="10" fill="#2BB673"/>
+                <line x1="230" y1="234" x2="230" y2="266" stroke="#F0525D"/><rect x="224" y="236" width="12" height="10" fill="#F0525D"/>
+                <line x1="270" y1="226" x2="270" y2="258" stroke="#F0525D"/><rect x="264" y="228" width="12" height="10" fill="#F0525D"/>
+                <line x1="310" y1="228" x2="310" y2="262" stroke="#2BB673"/><rect x="304" y="230" width="12" height="10" fill="#2BB673"/>
+                <line x1="350" y1="216" x2="350" y2="246" stroke="#F0525D"/><rect x="344" y="218" width="12" height="10" fill="#F0525D"/>
+                <line x1="390" y1="208" x2="390" y2="238" stroke="#F0525D"/><rect x="384" y="210" width="12" height="10" fill="#F0525D"/>
+                <line x1="430" y1="210" x2="430" y2="244" stroke="#2BB673"/><rect x="424" y="212" width="12" height="10" fill="#2BB673"/>
+                <line x1="470" y1="198" x2="470" y2="228" stroke="#F0525D"/><rect x="464" y="200" width="12" height="10" fill="#F0525D"/>
+                <line x1="510" y1="190" x2="510" y2="220" stroke="#F0525D"/><rect x="504" y="192" width="12" height="10" fill="#F0525D"/>
+                <line x1="550" y1="192" x2="550" y2="224" stroke="#2BB673"/><rect x="544" y="194" width="12" height="10" fill="#2BB673"/>
+                <line x1="590" y1="180" x2="590" y2="212" stroke="#F0525D"/><rect x="584" y="182" width="12" height="10" fill="#F0525D"/>
+              </g>
+              <!-- 预测区 K 线（浅色） -->
+              <g data-layer="forecast">
+                <line x1="630" y1="170" x2="630" y2="200" stroke="#F0525D" opacity="0.7"/><rect x="624" y="172" width="12" height="10" fill="#F0525D" opacity="0.55"/>
+                <line x1="670" y1="160" x2="670" y2="190" stroke="#F0525D" opacity="0.7"/><rect x="664" y="162" width="12" height="10" fill="#F0525D" opacity="0.55"/>
+                <line x1="710" y1="150" x2="710" y2="180" stroke="#F0525D" opacity="0.7"/><rect x="704" y="152" width="12" height="10" fill="#F0525D" opacity="0.55"/>
+              </g>
+              <!-- 均线 + BOLL -->
+              <g data-layer="indicator">
+                <polyline data-ma="5" points="30,268 70,272 110,256 150,250 190,254 230,240 270,232 310,238 350,220 390,214 430,218 470,204 510,196 550,198 590,186 630,176 670,166 710,156" fill="none" stroke="#3987e5" stroke-width="1.5"/>
+                <polyline data-ma="10" points="30,274 70,275 110,264 150,259 190,260 230,251 270,244 310,245 350,233 390,228 430,228 470,218 510,211 550,210 590,201 630,193 670,185 710,177" fill="none" stroke="#d95926" stroke-width="1.5"/>
+                <polyline data-ma="20" points="30,280 70,278 110,272 150,268 190,266 230,262 270,256 310,252 350,246 390,242 430,238 470,232 510,226 550,222 590,216 630,210 670,204 710,198" fill="none" stroke="#199e70" stroke-width="1.5"/>
+                <polyline data-ma="30" points="30,284 70,282 110,277 150,273 190,271 230,268 270,263 310,260 350,255 390,251 430,248 470,243 510,238 550,234 590,229 630,224 670,219 710,214" fill="none" stroke="#a46ee8" stroke-width="1.5" style="display:none"/>
+                <polyline data-ma="60" points="30,288 70,286 110,282 150,279 190,277 230,274 270,271 310,268 350,264 390,261 430,258 470,254 510,250 550,247 590,243 630,239 670,235 710,231" fill="none" stroke="#d55181" stroke-width="1.5"/>
+                <polyline data-ma="120" points="30,293 70,292 110,290 150,289 190,287 230,285 270,283 310,280 350,277 390,274 430,271 470,268 510,265 550,262 590,259 630,256 670,253 710,250" fill="none" stroke="#e17b43" stroke-width="1.5" style="display:none"/>
+                <polyline data-ma="250" points="30,298 70,297 110,296 150,295 190,294 230,293 270,291 310,289 350,287 390,285 430,282 470,280 510,277 550,275 590,272 630,270 670,267 710,265" fill="none" stroke="#65738a" stroke-width="1.5" style="display:none"/>
+                <polyline data-boll="up" points="30,258 70,256 110,252 150,248 190,246 230,242 270,236 310,232 350,226 390,222 430,218 470,212 510,206 550,202 590,196 630,190 670,184 710,178" fill="none" stroke="#8B94A8" stroke-width="1" stroke-dasharray="4 3"/>
+                <polyline data-boll="mid" points="30,280 70,278 110,272 150,268 190,266 230,262 270,256 310,252 350,246 390,242 430,238 470,232 510,226 550,222 590,216 630,210 670,204 710,198" fill="none" stroke="#8B94A8" stroke-width="1" stroke-dasharray="4 3"/>
+                <polyline data-boll="down" points="30,302 70,300 110,296 150,292 190,290 230,286 270,280 310,276 350,270 390,266 430,262 470,256 510,250 550,246 590,240 630,234 670,228 710,222" fill="none" stroke="#8B94A8" stroke-width="1" stroke-dasharray="4 3"/>
+              </g>
+              <!-- 关键位 -->
+              <g data-layer="levels">
+                <line x1="10" y1="100" x2="750" y2="100" stroke="var(--accent)" stroke-dasharray="5 4" opacity="0.7"/>
+                <text x="12" y="96" font-size="10" fill="var(--accent)">目标 1815</text>
+                <line x1="10" y1="150" x2="750" y2="150" stroke="#F0525D" stroke-dasharray="5 4" opacity="0.7"/>
+                <text x="12" y="146" font-size="10" fill="#F0525D">压力 1786</text>
+                <line x1="10" y1="280" x2="750" y2="280" stroke="#2BB673" stroke-dasharray="5 4" opacity="0.7"/>
+                <text x="12" y="292" font-size="10" fill="#2BB673">支撑 1692</text>
+              </g>
+              <!-- 成交量 -->
+              <g data-layer="actual">
+                <rect x="24" y="360" width="12" height="40" fill="#F0525D" opacity="0.5"/>
+                <rect x="64" y="370" width="12" height="30" fill="#2BB673" opacity="0.5"/>
+                <rect x="104" y="354" width="12" height="46" fill="#F0525D" opacity="0.5"/>
+                <rect x="144" y="360" width="12" height="40" fill="#F0525D" opacity="0.5"/>
+                <rect x="184" y="372" width="12" height="28" fill="#2BB673" opacity="0.5"/>
+                <rect x="224" y="348" width="12" height="52" fill="#F0525D" opacity="0.5"/>
+                <rect x="264" y="354" width="12" height="46" fill="#F0525D" opacity="0.5"/>
+                <rect x="304" y="374" width="12" height="26" fill="#2BB673" opacity="0.5"/>
+                <rect x="344" y="352" width="12" height="48" fill="#F0525D" opacity="0.5"/>
+                <rect x="384" y="358" width="12" height="42" fill="#F0525D" opacity="0.5"/>
+                <rect x="424" y="376" width="12" height="24" fill="#2BB673" opacity="0.5"/>
+                <rect x="464" y="350" width="12" height="50" fill="#F0525D" opacity="0.5"/>
+                <rect x="504" y="356" width="12" height="44" fill="#F0525D" opacity="0.5"/>
+                <rect x="544" y="372" width="12" height="28" fill="#2BB673" opacity="0.5"/>
+                <rect x="584" y="348" width="12" height="52" fill="#F0525D" opacity="0.5"/>
+                <rect x="624" y="354" width="12" height="46" fill="#F0525D" opacity="0.5"/>
+                <rect x="664" y="350" width="12" height="50" fill="#F0525D" opacity="0.5"/>
+                <rect x="704" y="346" width="12" height="54" fill="#F0525D" opacity="0.5"/>
+              </g>
+              <!-- 坐标标签 -->
+              <text x="10" y="316" font-size="10" fill="var(--faint)">成交量</text>
+              <text x="750" y="44" font-size="10" fill="var(--faint)" text-anchor="end">1780</text>
+              <text x="750" y="109" font-size="10" fill="var(--faint)" text-anchor="end">1755</text>
+              <text x="750" y="174" font-size="10" fill="var(--faint)" text-anchor="end">1730</text>
+              <text x="750" y="239" font-size="10" fill="var(--faint)" text-anchor="end">1705</text>
+              <text x="750" y="304" font-size="10" fill="var(--faint)" text-anchor="end">1680</text>
+            </svg>
+            <div class="kline-toggles" style="margin-top:12px">
+              <span class="chip on">MA5</span><span class="chip on">MA10</span><span class="chip on">MA20</span><span class="chip">MA30</span><span class="chip on">MA60</span><span class="chip">MA90</span><span class="chip">MA120</span><span class="chip">MA250</span><span class="chip on">BOLL</span>
+            </div>
+            <div class="chart-statusbar"><span>缩放 100%</span><span>拖动画布平移</span><span>十字光标读取行情</span><em>虚线区域为推演值，不是未来价格</em></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 我的 ============ -->
+      <section id="page-account" class="page" style="display:none">
+        <div class="page-head"><h2 class="page-title">我的</h2><p class="page-sub">账户与个人资料</p></div>
+        <div class="grid cols-2">
+          <div class="grid">
+            <div class="card">
+              <div class="card-head"><span class="t">个人资料</span><span class="hint">已登录</span></div>
+              <div class="card-body">
+                <div style="display:flex;align-items:center;gap:14px">
+                  <div class="avatar" style="width:52px;height:52px;font-size:20px;flex:none">股</div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-weight:700">alex</div>
+                    <div style="color:var(--muted);font-size:12.5px" class="num">138****0000 · 普通用户</div>
+                  </div>
+                  <button class="btn">编辑资料</button>
+                </div>
+                <div class="tiles" style="margin-top:14px">
+                  <div class="tile"><div class="l">自选股</div><div class="v num">12</div></div>
+                  <div class="tile"><div class="l">笔记</div><div class="v num">45</div></div>
+                  <div class="tile"><div class="l">预测</div><div class="v num">8</div></div>
+                  <div class="tile"><div class="l">复盘</div><div class="v num">23</div></div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head"><span class="t">设备管理</span><span class="hint">1 台在线</span></div>
+              <div class="card-body">
+                <div class="rule"><span style="font-size:18px">🖥️</span><span class="name">当前设备 · iPhone 15 Pro</span><span style="color:var(--down);font-size:12px">在线</span></div>
+                <div class="rule"><span style="font-size:18px">📱</span><span class="name">iPad Air · 3 天前</span><button class="btn danger" style="padding:4px 10px;font-size:12px">撤销</button></div>
+              </div>
+            </div>
+          </div>
+          <div class="grid">
+            <div class="card">
+              <div class="card-head"><span class="t">同步状态</span><span class="hint">最近同步 15:32</span></div>
+              <div class="card-body">
+                <div class="cond"><div class="chk on">✓</div><div class="l">自选股、交易、标注</div><div class="st">已同步</div></div>
+                <div class="cond"><div class="chk on">✓</div><div class="l">经验规则与预测</div><div class="st">已同步</div></div>
+                <div class="cond"><div class="chk on">✓</div><div class="l">访问令牌</div><div class="st">有效 · 到期自动续期</div></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head"><span class="t">账户操作</span></div>
+              <div class="card-body">
+                <div class="cond"><div class="l">退出登录</div><button class="btn">退出登录</button></div>
+                <div class="cond" style="margin-top:10px"><div class="l" style="color:var(--muted)">注销账户 · 删除全部数据，不可恢复</div><button class="btn danger">注销账户</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+  const navButtons = document.querySelectorAll('.nav button[data-page]');
+  const sections = document.querySelectorAll('main .page');
+  function show(id) {
+    sections.forEach(s => s.style.display = (s.id === 'page-' + id) ? '' : 'none');
+    navButtons.forEach(b => b.classList.toggle('active', b.dataset.page === id));
+    window.scrollTo(0, 0);
+  }
+  navButtons.forEach(b => b.addEventListener('click', () => show(b.dataset.page)));
+  show('key-levels');
+
+  document.querySelectorAll('[data-goto]').forEach(el => {
+    el.addEventListener('click', () => {
+      const name = el.dataset.stockName;
+      const sub = el.dataset.stockSub;
+      if (name) document.getElementById('kl-name').textContent = name;
+      if (sub) document.getElementById('kl-sub').textContent = sub;
+      show(el.dataset.goto);
+    });
+  });
+
+  const plans = {
+    climbing: { name: '攀升', band: '主策略', bandClass: 'primary', buy: '1,692 ~ 1,730', sell: '1,815.60', fail: '收盘跌破 1,692', reason: 'MA5/10/20 多头排列，价格站上 MA5 且上翘', evidence: ['MA5/10/20 多头排列', '价格站上 MA5 且上翘', '近 20 日振幅 2.86%'] },
+    mirror: { name: '照镜子止盈', band: '备选', bandClass: 'alt', buy: '1,705 ~ 1,728', sell: '1,806.00', fail: '收盘跌破 1,705', reason: '前日突破 BOLL 上轨、昨日跌破，预计反抽上轨', evidence: ['前日突破 BOLL 上轨', '预计反抽上轨', '近 20 日振幅 2.86%'] },
+    rebound: { name: '反弹止损', band: '风控', bandClass: 'risk', buy: '1,710 ~ 1,738', sell: '1,788.00', fail: '收盘跌破 1,710', reason: '昨日跌破 MA5，今日反弹回踩 MA5', evidence: ['昨日跌破 MA5', '今日反弹回踩 MA5', '近 20 日振幅 2.86%'] },
+    weak: { name: '弱势处理', band: '警戒', bandClass: 'caution', buy: '观望 · 不新开仓', sell: '反抽减仓', fail: '跌破 1,660', reason: '破位未收复，弱势整理', evidence: ['破位未收复', '弱势整理', '近 20 日振幅 2.86%'] },
+  };
+  let currentPattern = 'climbing';
+  function selectPattern(key) {
+    currentPattern = key;
+    document.querySelectorAll('#pattern-list .mode-card').forEach(r => r.classList.toggle('selected', r.dataset.pattern === key));
+    const p = plans[key];
+    if (!p) return;
+    const badge = document.getElementById('plan-badge');
+    badge.textContent = p.band;
+    badge.className = 'band ' + p.bandClass;
+    document.getElementById('plan-name').textContent = p.name;
+    document.getElementById('plan-buy').textContent = p.buy;
+    document.getElementById('plan-sell').textContent = p.sell;
+    document.getElementById('plan-fail').textContent = p.fail;
+    document.getElementById('plan-reason').textContent = p.reason;
+    document.getElementById('plan-evidence').innerHTML = p.evidence.map(e => '<span>✓ ' + e + '</span>').join('');
+  }
+  document.querySelectorAll('#pattern-list .mode-card').forEach(r => {
+    r.addEventListener('click', () => selectPattern(r.dataset.pattern));
+  });
+
+  function promoteToPrimary() {
+    const p = plans[currentPattern];
+    if (!p || p.band === '主策略') return;
+    for (const k in plans) {
+      if (plans[k].band === '主策略') { plans[k].band = '备选'; plans[k].bandClass = 'alt'; }
+    }
+    p.band = '主策略'; p.bandClass = 'primary';
+    document.querySelectorAll('#pattern-list .mode-card').forEach(card => {
+      const k = card.dataset.pattern;
+      const em = card.querySelector('.mode-card-top .band');
+      if (em) { em.textContent = plans[k].band; em.className = 'band ' + plans[k].bandClass; }
+    });
+    const cur = document.querySelector('#pattern-list .mode-card[data-pattern="' + currentPattern + '"]');
+    if (cur) document.getElementById('pattern-list').prepend(cur);
+    const badge = document.getElementById('plan-badge');
+    badge.textContent = '主策略'; badge.className = 'band primary';
+  }
+  document.getElementById('promote-btn').addEventListener('click', promoteToPrimary);
+
+  function showMetricDetail(key) {
+    document.querySelectorAll('#metric-tabs .metric-tab').forEach(t => t.classList.toggle('selected', t.dataset.detail === key));
+    document.querySelectorAll('#metric-detail .metric-panel').forEach(p => p.style.display = (p.id === 'detail-' + key) ? '' : 'none');
+  }
+  document.querySelectorAll('#metric-tabs .metric-tab').forEach(t => {
+    t.addEventListener('click', () => showMetricDetail(t.dataset.detail));
+  });
+
+  const cycles = {
+    short: {
+      key: { price: '1,758.60', range: '1,746.00 ~ 1,771.00' },
+      target: { price: '1,772.40', range: '1,765.00 ~ 1,780.00' },
+      support: { price: '1,711.20', range: '1,699.00 ~ 1,723.00' },
+      risk: { price: '1,680.00', range: '1,672.00 ~ 1,688.00' },
+    },
+    swing: {
+      key: { price: '1,786.20', range: '1,772.00 ~ 1,800.00' },
+      target: { price: '1,815.60', range: '1,806.00 ~ 1,825.00' },
+      support: { price: '1,692.40', range: '1,680.00 ~ 1,705.00' },
+      risk: { price: '1,660.00', range: '1,652.00 ~ 1,668.00' },
+    },
+    long: {
+      key: { price: '1,802.00', range: '1,788.00 ~ 1,816.00' },
+      target: { price: '1,850.00', range: '1,838.00 ~ 1,862.00' },
+      support: { price: '1,660.00', range: '1,648.00 ~ 1,672.00' },
+      risk: { price: '1,630.00', range: '1,622.00 ~ 1,638.00' },
+    },
+  };
+  function setCycle(key) {
+    document.querySelectorAll('#cycle-seg button').forEach(b => b.classList.toggle('on', b.dataset.cycle === key));
+    const c = cycles[key];
+    if (!c) return;
+    document.getElementById('zone-key-price').textContent = c.key.price;
+    document.getElementById('zone-key-range').textContent = c.key.range;
+    document.getElementById('zone-target-price').textContent = c.target.price;
+    document.getElementById('zone-target-range').textContent = c.target.range;
+    document.getElementById('zone-support-price').textContent = c.support.price;
+    document.getElementById('zone-support-range').textContent = c.support.range;
+    document.getElementById('zone-risk-price').textContent = c.risk.price;
+    document.getElementById('zone-risk-range').textContent = c.risk.range;
+  }
+  document.querySelectorAll('#cycle-seg button').forEach(b => {
+    b.addEventListener('click', () => setCycle(b.dataset.cycle));
+  });
+
+  document.querySelectorAll('.zone-card .zone-main').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const card = btn.closest('.zone-card');
+      const expanded = !card.classList.contains('is-expanded');
+      card.classList.toggle('is-expanded', expanded);
+      btn.setAttribute('aria-expanded', expanded);
+      const label = btn.querySelector('.expand-label');
+      if (label && label.firstChild) label.firstChild.textContent = expanded ? '收起依据 ' : '展开依据 ';
+    });
+  });
+
+  const paths = {
+    base: { title: '站上 MA5 后震荡上移', d: ['1,746.20', '1,750.80', '1,755.40'], cls: 'blue', tops: ['34%', '31%', '28%'] },
+    strong: { title: '放量突破，向 BOLL 上轨靠拢', d: ['1,752.00', '1,762.00', '1,774.00'], cls: 'red', tops: ['30%', '24%', '16%'] },
+    weak: { title: '回踩 MA5 未破，横盘整理', d: ['1,738.00', '1,739.00', '1,741.00'], cls: 'green', tops: ['39%', '38%', '37%'] },
+  };
+  function selectPath(key) {
+    document.querySelectorAll('#path-tabs button').forEach(b => b.classList.toggle('active', b.dataset.path === key));
+    const p = paths[key];
+    if (!p) return;
+    document.getElementById('path-title').textContent = p.title;
+    document.getElementById('d1').textContent = p.d[0];
+    document.getElementById('d2').textContent = p.d[1];
+    document.getElementById('d3').textContent = p.d[2];
+    const dots = document.getElementById('path-dots');
+    dots.className = 'path-dots ' + p.cls;
+    dots.querySelectorAll('span').forEach((s, i) => { s.style.top = p.tops[i]; });
+  }
+  document.querySelectorAll('#path-tabs button').forEach(b => {
+    b.addEventListener('click', () => selectPath(b.dataset.path));
+  });
+
+  document.querySelectorAll('#trade-side-tabs button').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('#trade-side-tabs button').forEach(x => {
+        x.classList.toggle('active', x === b);
+        x.setAttribute('aria-pressed', x === b);
+      });
+    });
+  });
+  function updateFeePreview() {
+    const qty = parseFloat(document.getElementById('trade-qty').value) || 0;
+    const price = parseFloat(document.getElementById('trade-price').value) || 0;
+    const amount = qty * price;
+    const fee = Math.max(5, amount * 0.0003);
+    document.getElementById('fee-amount').textContent = amount.toFixed(2);
+    document.getElementById('fee-fee').textContent = fee.toFixed(2);
+  }
+  document.getElementById('trade-qty').addEventListener('input', updateFeePreview);
+  document.getElementById('trade-price').addEventListener('input', updateFeePreview);
+
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme');
+    document.documentElement.setAttribute('data-theme', cur === 'light' ? 'dark' : 'light');
+  });
+
+  document.querySelectorAll('[data-ai-tabs]').forEach(tabs => {
+    tabs.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabs.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === btn));
+        const key = btn.dataset.ai;
+        tabs.parentElement.querySelectorAll('[data-ai-panel]').forEach(p => {
+          p.style.display = (p.dataset.aiPanel === key) ? '' : 'none';
+        });
+      });
+    });
+  });
+
+  document.querySelectorAll('[data-layer]').forEach(card => {
+    card.addEventListener('click', () => {
+      const group = card.closest('.card-body');
+      const key = card.dataset.layer;
+      const wasActive = card.classList.contains('active');
+      group.querySelectorAll('[data-layer]').forEach(c => c.classList.remove('active'));
+      group.querySelectorAll('[data-layer-detail]').forEach(p => p.style.display = 'none');
+      if (!wasActive) {
+        card.classList.add('active');
+        const target = group.querySelector('[data-layer-detail="' + key + '"]');
+        if (target) target.style.display = '';
+      }
+    });
+  });
+
+  // ===== K 线图交互 =====
+  (function initKline() {
+    const svg = document.querySelector('#page-chart svg');
+    if (!svg) return;
+    const scope = document.querySelector('#page-chart');
+    const NS = 'http://www.w3.org/2000/svg';
+
+    // 指标线显隐 + 计数
+    function refreshIndicator() {
+      const active = scope.querySelectorAll('.indicator-chips button[data-ma].active, .indicator-chips button[data-boll].active').length;
+      const count = scope.querySelector('.indicator-count');
+      if (count) count.textContent = '已显示 ' + active + '/10 条指标线';
+      const maShown = scope.querySelectorAll('.indicator-chips button[data-ma].active').length;
+      const maToggle = scope.querySelector('[data-ma-count]');
+      if (maToggle) maToggle.textContent = 'MA均线 ' + maShown + '/7';
+    }
+    scope.querySelectorAll('.indicator-chips button[data-ma], .indicator-chips button[data-boll]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const key = chip.hasAttribute('data-ma') ? 'data-ma' : 'data-boll';
+        const val = chip.getAttribute(key);
+        const on = chip.classList.toggle('active');
+        svg.querySelectorAll('[' + key + '="' + val + '"]').forEach(el => el.style.display = on ? '' : 'none');
+        refreshIndicator();
+      });
+    });
+
+    // 图层显隐
+    scope.querySelectorAll('[data-layer-toggle]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const layer = btn.dataset.layerToggle;
+        const on = btn.classList.toggle('active');
+        svg.querySelectorAll('[data-layer="' + layer + '"]').forEach(g => g.style.display = on ? '' : 'none');
+      });
+    });
+
+    // 画图工具切换
+    let tool = 'pointer';
+    scope.querySelectorAll('[data-tool]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (btn.closest('.chart-primary-actions')) {
+          scope.querySelectorAll('.chart-primary-actions [data-tool]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        }
+        tool = btn.dataset.tool;
+      });
+    });
+
+    // 缩放 / 平移 / 重置
+    let scale = 1, tx = 0, ty = 0;
+    function applyView() {
+      svg.style.transform = 'scale(' + scale + ') translate(' + tx + 'px,' + ty + 'px)';
+      svg.style.transformOrigin = '0 0';
+    }
+    scope.querySelectorAll('[data-view]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        switch (btn.dataset.view) {
+          case 'zoom-in': scale = Math.min(scale * 1.25, 3); break;
+          case 'zoom-out': scale = Math.max(scale / 1.25, 0.5); break;
+          case 'pan-left': tx -= 40; break;
+          case 'pan-right': tx += 40; break;
+          case 'reset': scale = 1; tx = 0; ty = 0; break;
+        }
+        applyView();
+      });
+    });
+
+    // 趋势线 / 水平线绘制 + 撤销 / 重做 / 清除
+    const drawLayer = document.createElementNS(NS, 'g');
+    drawLayer.id = 'draw-layer';
+    svg.appendChild(drawLayer);
+    let pending = null;
+    const undoStack = [], redoStack = [];
+    const undoBtn = scope.querySelector('[data-action="undo"]');
+    const redoBtn = scope.querySelector('[data-action="redo"]');
+    const delBtn = scope.querySelector('[data-action="delete"]');
+
+    function syncHistory() {
+      if (undoBtn) undoBtn.disabled = undoStack.length === 0;
+      if (redoBtn) redoBtn.disabled = redoStack.length === 0;
+      if (delBtn) delBtn.disabled = undoStack.length === 0;
+    }
+    function svgPoint(e) {
+      const pt = svg.createSVGPoint();
+      pt.x = e.clientX; pt.y = e.clientY;
+      const ctm = svg.getScreenCTM();
+      return ctm ? pt.matrixTransform(ctm.inverse()) : pt;
+    }
+    function makeLine(a, b, cls) {
+      const l = document.createElementNS(NS, 'line');
+      l.setAttribute('x1', a.x); l.setAttribute('y1', a.y);
+      l.setAttribute('x2', b.x); l.setAttribute('y2', b.y);
+      l.setAttribute('stroke', 'var(--accent)'); l.setAttribute('stroke-width', '1.5');
+      l.setAttribute('data-anno', cls);
+      return l;
+    }
+    svg.addEventListener('click', (e) => {
+      if (tool === 'hline') {
+        const p = svgPoint(e);
+        const l = makeLine({ x: 10, y: p.y }, { x: 750, y: p.y }, 'hline');
+        drawLayer.appendChild(l); undoStack.push(l); redoStack.length = 0; syncHistory();
+        return;
+      }
+      if (tool !== 'trendline') return;
+      const p = svgPoint(e);
+      if (!pending) {
+        pending = p;
+        const dot = document.createElementNS(NS, 'circle');
+        dot.setAttribute('cx', p.x); dot.setAttribute('cy', p.y); dot.setAttribute('r', 3);
+        dot.setAttribute('fill', 'var(--accent)'); dot.id = 'pending-dot';
+        drawLayer.appendChild(dot);
+      } else {
+        const l = makeLine(pending, p, 'trendline');
+        drawLayer.appendChild(l); undoStack.push(l); redoStack.length = 0;
+        const dot = drawLayer.querySelector('#pending-dot'); if (dot) dot.remove();
+        pending = null; syncHistory();
+      }
+    });
+
+    if (undoBtn) undoBtn.addEventListener('click', () => {
+      const el = undoStack.pop(); if (!el) return;
+      el.remove(); redoStack.push(el); syncHistory();
+    });
+    if (redoBtn) redoBtn.addEventListener('click', () => {
+      const el = redoStack.pop(); if (!el) return;
+      drawLayer.appendChild(el); undoStack.push(el); syncHistory();
+    });
+    const clearBtn = scope.querySelector('[data-action="clear"]');
+    if (clearBtn) clearBtn.addEventListener('click', () => {
+      drawLayer.innerHTML = ''; undoStack.length = 0; redoStack.length = 0; pending = null; syncHistory();
+    });
+    const saveBtn = scope.querySelector('[data-action="save"]');
+    if (saveBtn) saveBtn.addEventListener('click', () => {
+      alert(undoStack.length ? '已保存 ' + undoStack.length + ' 条标注（演示）' : '暂无标注可保存');
+    });
+    const exportBtn = scope.querySelector('[data-action="export"]');
+    if (exportBtn) exportBtn.addEventListener('click', () => {
+      const data = Array.from(drawLayer.children).map(el => ({
+        type: el.getAttribute('data-anno') || 'line',
+        x1: el.getAttribute('x1'), y1: el.getAttribute('y1'),
+        x2: el.getAttribute('x2'), y2: el.getAttribute('y2')
+      }));
+      const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = 'annotations.json'; a.click();
+    });
+
+    // 标注过滤
+    scope.querySelectorAll('[data-filter]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.classList.toggle('active');
+        const filters = Array.from(scope.querySelectorAll('[data-filter].active')).map(b => b.dataset.filter);
+        drawLayer.querySelectorAll('[data-anno]').forEach(el => {
+          const t = el.getAttribute('data-anno');
+          el.style.display = (filters.includes('all') || filters.includes(t)) ? '' : 'none';
+        });
+      });
+    });
+  })();
+
+  // ===== 预测记录交互 =====
+  (function initPredictions() {
+    const scope = document.querySelector('#page-predictions');
+    if (!scope) return;
+    const list = scope.querySelector('#history-list');
+    const search = scope.querySelector('#pred-search');
+    const filter = scope.querySelector('#pred-filter');
+    const count = scope.querySelector('#pred-count');
+
+    function applyFilter() {
+      const q = (search.value || '').trim().toLowerCase();
+      const st = filter.value;
+      let n = 0;
+      list.querySelectorAll('.history-card').forEach(card => {
+        const okQ = !q || (card.dataset.search || '').toLowerCase().includes(q);
+        const okS = st === 'all' || card.dataset.status === st;
+        const show = okQ && okS;
+        card.style.display = show ? '' : 'none';
+        if (show) n++;
+      });
+      if (count) count.textContent = '共 ' + n + ' 条';
+    }
+    search.addEventListener('input', applyFilter);
+    filter.addEventListener('change', applyFilter);
+
+    list.querySelectorAll('.history-card').forEach(card => {
+      const btn = card.querySelector('.history-detail');
+      const panel = card.querySelector('.history-detail-panel');
+      if (btn && panel) {
+        btn.addEventListener('click', () => {
+          panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+        });
+      }
+      card.querySelectorAll('[data-choice]').forEach(b => {
+        b.addEventListener('click', () => {
+          card.querySelectorAll('[data-choice]').forEach(x => x.classList.remove('selected'));
+          b.classList.add('selected');
+        });
+      });
+      const save = card.querySelector('[data-save]');
+      if (save) save.addEventListener('click', () => {
+        const input = card.querySelector('.actual-input');
+        const actual = input ? input.value.trim() : '';
+        const chosen = card.querySelector('[data-choice].selected');
+        const status = chosen ? chosen.dataset.choice : card.dataset.status;
+        const label = status === 'hit' ? '命中' : status === 'miss' ? '偏离' : '待复盘';
+        const badge = card.querySelector('.history-status');
+        if (badge) { badge.className = 'history-status ' + status; badge.textContent = label; }
+        card.dataset.status = status;
+        if (panel) panel.style.display = 'none';
+        applyFilter();
+        alert('已保存复盘结果' + (actual ? ' · 实际关键点 ' + actual : '') + ' · ' + label);
+      });
+    });
+  })();
+</script>
