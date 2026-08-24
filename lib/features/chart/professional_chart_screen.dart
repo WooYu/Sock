@@ -136,12 +136,12 @@ class _ProfessionalChartScreenState extends State<ProfessionalChartScreen> {
                     padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
                     child: Row(
                       children: [
-                        const _RegionLabel(
+                        _RegionLabel(
                           label: '真实行情',
                           color: StockCalColors.loss,
                         ),
                         Expanded(child: Divider(color: colors.outlineVariant)),
-                        const _RegionLabel(
+                        _RegionLabel(
                           label: '预测区',
                           color: StockCalColors.accent,
                         ),
