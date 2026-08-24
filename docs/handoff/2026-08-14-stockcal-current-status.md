@@ -94,3 +94,18 @@ cd backend
 | `./gradlew test`（backend） | 32 项通过，0 失败、0 错误、0 跳过 |
 
 后端自动测试使用 H2 测试结构验证控制器和服务契约；这不能替代尚待执行的真实 PostgreSQL、Redis 和 Flyway 部署演练。Android/iOS 构建及真机验证也不包含在本次进度归档中。
+
+### 2026-08-24 设计系统 Phase 0 验证结果
+
+范围：`docs/superpowers/specs/2026-08-24-stockcal-design-system-design.md`（token 层 + 十个共享组件 + 组件画廊）。配色由深空青色切换为原型浅色蓝（`#f5f6f8` / `#4057e8`），深色为过渡取值待 X 配色确定。
+
+| 检查 | 结果 |
+|---|---|
+| `flutter test` | 273 项通过，0 项失败 |
+| `flutter analyze` | 通过，0 个问题 |
+| `flutter build web --release` | 通过，产物生成于 `build/web` |
+| 颜色字面量机检（`grep 0xFF lib/widgets/design/*.dart`） | 通过，0 处（颜色仅存于 `design_tokens.dart`） |
+| `./gradlew test`（backend） | 本次未运行（无后端改动） |
+
+组件画廊入口：设置 → 数据与账户 → 组件画廊。
+
