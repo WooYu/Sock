@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../account/session.dart';
 import '../analysis/technical_analysis.dart';
+import '../dev/design_gallery_screen.dart';
 import '../preferences/preferences_controller.dart';
 import '../preferences/user_preferences.dart';
 import '../rules/persistent_rules_repository.dart';
@@ -470,6 +471,16 @@ class _SettingsPanel extends StatelessWidget {
           onTap: onExport,
         ),
         _ActionTile(icon: Icons.backup_outlined, title: '备份', onTap: onBackup),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.palette_outlined),
+          title: const Text('组件画廊'),
+          subtitle: const Text('开发期对照原型核对组件还原度'),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const DesignGalleryScreen()),
+          ),
+        ),
         _ActionTile(
           icon: Icons.person_off_outlined,
           title: '注销账户',
