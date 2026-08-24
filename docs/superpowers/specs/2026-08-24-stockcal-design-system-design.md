@@ -144,7 +144,7 @@
 | `LedgerTable` | `.portfolio-table` ≡ `.backtest-table` | 列 flex 权重、行可点 |
 | `SegTabs` | `.cycle-tabs` / `.period-switches` / `.trade-side-tabs` | `pill` / `chip` / `duo` |
 | `ScoreBar` | `.mode-score` / `.gauge-track` | `bar`（渐变条 + mono 数）/ `gauge`（三段渐变 + 游标） |
-| `Badge` | `.panel-note` `.demo-tag` `.trade-badge` `.history-status` `.status-dot` | tone 枚举 + 是否带光晕圆点 |
+| `StatusBadge` | `.panel-note` `.demo-tag` `.trade-badge` `.history-status` `.status-dot` | tone 枚举 + 是否带光晕圆点 |
 | `SwitchPill` | `.switch`（30×17，钮 11，位移 13） | on / off |
 | `AppButton` | `.button` | `primary` / `ghost` |
 | `MonoText` | `font-variant-numeric: tabular-nums` | — |
@@ -248,7 +248,7 @@ lib/widgets/design/metric_strip.dart
 lib/widgets/design/ledger_table.dart
 lib/widgets/design/seg_tabs.dart
 lib/widgets/design/score_bar.dart
-lib/widgets/design/badge.dart
+lib/widgets/design/status_badge.dart          (命名避开 material.Badge 冲突)
 lib/widgets/design/switch_pill.dart
 lib/widgets/design/app_button.dart
 lib/widgets/design/mono_text.dart
