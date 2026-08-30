@@ -24,6 +24,7 @@ final class StructuredRuleSpec {
         "MIRROR_RETEST", "SIDEWAYS_PHASE3", "MONTHLY_WAIT", "DEMON_STOCK",
         "EXCLUSION"
     );
+    private static final Set<String> TIMEFRAMES = Set.of("日线", "分钟线", "周线", "月线");
     private static final Set<String> STRENGTHS = Set.of(
         "PRINCIPLE", "EXPERIENCE", "PREFERENCE", "OBSERVATION", "UNSPECIFIED"
     );
@@ -65,7 +66,7 @@ final class StructuredRuleSpec {
 
     static String timeframe(JsonNode item) {
         var value = item.path("timeframe").asText("日线");
-        if (value.isBlank() || value.length() > 50) {
+        if (!TIMEFRAMES.contains(value)) {
             throw new IllegalArgumentException("AI 返回的周期无效");
         }
         return value;
