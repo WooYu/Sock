@@ -385,13 +385,14 @@ class KnowledgeController extends ChangeNotifier {
         .join('|');
     if (signature == _appliedRulesSignature) return false;
 
+    final executableRules = rules.where((rule) => rule.isExecutable);
     book.removeUserVersions(_appliedRuleIds);
     book.restoreUserVersions(
-      rules.map((rule) => rule.toRuleVersion()),
+      executableRules.map((rule) => rule.toRuleVersion()),
     );
     _appliedRuleIds
       ..clear()
-      ..addAll(rules.map((rule) => rule.id));
+      ..addAll(executableRules.map((rule) => rule.id));
     _appliedRulesSignature = signature;
     return true;
   }
