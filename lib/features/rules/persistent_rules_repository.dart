@@ -111,7 +111,7 @@ class PersistentRuleRepository {
     'phase3opening' => StrategyMode.phase3Opening,
     'seaturtle' => StrategyMode.seaTurtle,
     'rebound' => StrategyMode.rebound,
-    'mirroreretest' => StrategyMode.mirrorRetest,
+    'mirrorretest' => StrategyMode.mirrorRetest,
     'sidewaysphase3' => StrategyMode.sidewaysPhase3,
     'monthlywait' => StrategyMode.monthlyWait,
     'demonstock' => StrategyMode.demonStock,
