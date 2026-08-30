@@ -391,6 +391,7 @@ class StockAnalyzer {
     this.settings = const IndicatorSettings(),
     this.ruleBook,
     this.calibrationBook,
+    this.calibrationHorizonSessions = 3,
     DecisionEngine? decisionEngine,
   }) : _calculator = calculator ?? IndicatorCalculator(),
        _decisionEngine = decisionEngine ?? DecisionEngine();
@@ -400,6 +401,7 @@ class StockAnalyzer {
   IndicatorSettings settings;
   final RuleBook? ruleBook;
   final CalibrationBook? calibrationBook;
+  final int calibrationHorizonSessions;
 
   StockAnalysis analyze(
     List<Candle> source, {
@@ -674,7 +676,10 @@ class StockAnalyzer {
         )
         .toList(growable: false),
     invalidationConditions: rule.invalidationConditions,
-    calibration: calibrationBook?.forRule(rule),
+    calibration: calibrationBook?.forRule(
+      rule,
+      horizonSessions: calibrationHorizonSessions,
+    ),
   );
 
   List<DecisionCandidate> _localCandidates({
