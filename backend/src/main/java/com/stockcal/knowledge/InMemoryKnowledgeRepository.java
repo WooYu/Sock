@@ -52,7 +52,8 @@ final class InMemoryKnowledgeRepository implements KnowledgeRepository {
         var updated = new KnowledgeDraft(draft.id(), draft.sourceDocumentId(), draft.kind(), title, summary,
             draft.sourceExcerpt(), draft.sourceLineStart(), draft.sourceLineEnd(), draft.extractionMethod(),
             draft.status(), draft.approvedBy(), draft.reviewedAt(), draft.conditions(), draft.action(),
-            draft.mode(), draft.timeframe(), draft.priority(), draft.evidenceIds());
+            draft.mode(), draft.timeframe(), draft.priority(), draft.evidenceIds(),
+            draft.invalidationConditions(), draft.strength());
         drafts.put(id, updated);
         return Optional.of(updated);
     }
@@ -65,7 +66,7 @@ final class InMemoryKnowledgeRepository implements KnowledgeRepository {
         var updated = new PublishedRule(rule.id(), rule.sourceDocumentId(), rule.name(), rule.description(),
             rule.sourceExcerpt(), rule.sourceLineStart(), rule.sourceLineEnd(), rule.approvedBy(),
             rule.publishedAt(), enabled, rule.conditions(), rule.action(), rule.mode(), rule.timeframe(),
-            rule.priority(), rule.evidenceIds());
+            rule.priority(), rule.evidenceIds(), rule.invalidationConditions(), rule.strength());
         rules.put(id, updated);
         return Optional.of(updated);
     }
