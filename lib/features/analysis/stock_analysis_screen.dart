@@ -739,25 +739,6 @@ class _DecisionOnlyContent extends StatelessWidget {
     MarketDataState.offlineCache => Icons.cloud_off_outlined,
   };
 
-telessWidget {
-  const _DecisionOnlyContent({
-    required this.snapshot,
-    required this.decision,
-    required this.onRefresh,
-    this.onExplain,
-    this.explanation,
-    this.explanationError,
-    this.explaining = false,
-  });
-
-  final MarketSnapshot snapshot;
-  final DecisionResult decision;
-  final VoidCallback onRefresh;
-  final VoidCallback? onExplain;
-  final StrategyExplanation? explanation;
-  final String? explanationError;
-  final bool explaining;
-
   @override
   Widget build(BuildContext context) {
     return Column(
