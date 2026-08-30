@@ -500,7 +500,8 @@ class _Workspace extends StatelessWidget {
                     ),
                     if (analysis.decision != null &&
                         analysis.decision!.decision != DecisionAction.wait &&
-                        analysis.decision!.decision != DecisionAction.avoid)
+                        analysis.decision!.decision != DecisionAction.avoid &&
+                        analysis.decision!.decision != DecisionAction.exit)
                       ChartLevel(
                         price: analysis.target,
                         label: '目标',
