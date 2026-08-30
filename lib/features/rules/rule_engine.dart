@@ -101,6 +101,7 @@ class RuleVersion {
     this.timeframe = '日线',
     List<String> invalidationConditions = const [],
     List<String> evidenceIds = const [],
+    this.strength = 'UNSPECIFIED',
   }) : conditions = List.unmodifiable(conditions),
        invalidationConditions = List.unmodifiable(invalidationConditions),
        evidenceIds = List.unmodifiable(evidenceIds);
@@ -118,6 +119,7 @@ class RuleVersion {
   final String timeframe;
   final List<String> invalidationConditions;
   final List<String> evidenceIds;
+  final String strength;
 }
 
 class RuleBook {
@@ -239,6 +241,7 @@ class RuleBook {
     String timeframe = '日线',
     List<String> invalidationConditions = const [],
     List<String> evidenceIds = const [],
+    String strength = 'UNSPECIFIED',
   }) {
     final id = idFactory();
     final rule = RuleVersion(
@@ -255,6 +258,7 @@ class RuleBook {
       timeframe: timeframe,
       invalidationConditions: invalidationConditions,
       evidenceIds: evidenceIds,
+      strength: strength,
     );
     _history[id] = [rule];
     return rule;
@@ -289,6 +293,7 @@ class RuleBook {
         invalidationConditions:
             invalidationConditions ?? current.invalidationConditions,
         evidenceIds: evidenceIds ?? current.evidenceIds,
+        strength: current.strength,
       ),
     );
   }
@@ -311,6 +316,7 @@ class RuleBook {
         timeframe: current.timeframe,
         invalidationConditions: current.invalidationConditions,
         evidenceIds: current.evidenceIds,
+        strength: current.strength,
       ),
     );
   }
