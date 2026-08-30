@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { browserMarketClient, type BrowserMarketClient } from '@/lib/api/browser-client'
+import { analyzeMarketSnapshot } from '../analysis/analysis-engine'
 import type {
   MarketSnapshot,
   OperationCycle,
@@ -63,7 +64,7 @@ export function StockWorkspaceProvider({ children, client = browserMarketClient,
         symbol,
         security: market.quote?.security ?? security,
         market,
-        analysis: null,
+        analysis: analyzeMarketSnapshot(market, nextCycle),
         cycle: nextCycle,
         generatedAt: new Date().toISOString(),
       }
