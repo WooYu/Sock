@@ -15,7 +15,7 @@ class OpenAiKnowledgeExtractorTest {
     void mapsStructuredAiOutputAndKeepsVerifiableSourceEvidence() {
         var client = new RecordingKnowledgeAiClient("""
             {"items":[
-              {"kind":"RULE","title":"目标位减仓","summary":"价格触达目标位时执行减仓", "sourceExcerpt":"关键点规则：触达目标位时减仓。","sourceLineStart":1,"sourceLineEnd":1},
+              {"kind":"RULE","title":"目标位减仓","summary":"价格触达目标位时执行减仓", "sourceExcerpt":"关键点规则：触达目标位时减仓。","sourceLineStart":1,"sourceLineEnd":1,"conditions":[{"field":"supportDistance","operator":"lessThanOrEqual","value":0.05}],"action":"REDUCE","mode":"REBOUND","timeframe":"日线","priority":12},
               {"kind":"EXPERIENCE","title":"遵守纪律","summary":"不因短期涨停改变计划", "sourceExcerpt":"经验：不要因为涨停改变纪律。","sourceLineStart":2,"sourceLineEnd":2}
             ]}
             """);
@@ -28,6 +28,12 @@ class OpenAiKnowledgeExtractorTest {
         assertThat(drafts.getFirst().status()).isEqualTo(ApprovalStatus.PENDING);
         assertThat(drafts.getFirst().extractionMethod()).isEqualTo(ExtractionMethod.AI);
         assertThat(drafts.getFirst().sourceExcerpt()).isEqualTo("关键点规则：触达目标位时减仓。");
+        assertThat(drafts.getFirst().conditions()).containsExactly(
+            new RuleConditionSpec("supportDistance", "lessThanOrEqual", 0.05)
+        );
+        assertThat(drafts.getFirst().action()).isEqualTo("REDUCE");
+        assertThat(drafts.getFirst().mode()).isEqualTo("REBOUND");
+        assertThat(drafts.getFirst().priority()).isEqualTo(12);
     }
 
     @Test
