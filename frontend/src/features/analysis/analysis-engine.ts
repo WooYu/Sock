@@ -141,13 +141,6 @@ function bollinger(candles: Candle[], period: number) {
   return { middle, upper: middle + deviation * 2, lower: middle - deviation * 2 }
 }
 
-function volumeAverageRatio(candles: Candle[], period: number) {
-  const current = candles[candles.length - 1].volume
-  const values = candles.slice(-period).map((candle) => candle.volume)
-  const average = values.reduce((sum, value) => sum + value, 0) / values.length
-  return average === 0 ? 0 : current / average
-}
-
 function buildFuture(
   candles: Candle[],
   cycle: OperationCycle,
