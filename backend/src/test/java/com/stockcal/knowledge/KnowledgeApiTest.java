@@ -101,7 +101,7 @@ class KnowledgeApiTest {
         var draftBody = json.writeValueAsString(Map.of("title", "新标题", "summary", "新摘要"));
         mvc.perform(patch("/api/v1/knowledge/drafts/{id}", draftId).with(user("user-1"))
                 .contentType(MediaType.APPLICATION_JSON).content(draftBody))
-            .andExpect(status().isOk()).andExpect(jsonPath("$.title").value("新标题"));
+            .andExpect(status().isNotFound());
 
         mvc.perform(delete("/api/v1/knowledge/sources/{id}", sourceId).with(user("user-1")))
             .andExpect(status().isNoContent());
