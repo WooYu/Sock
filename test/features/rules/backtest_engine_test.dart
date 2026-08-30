@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stockcal/domain/stockcal_domain.dart';
+import 'package:stockcal/features/decision/decision_models.dart';
 import 'package:stockcal/features/rules/backtest_engine.dart';
 import 'package:stockcal/features/rules/rule_engine.dart';
 
@@ -95,6 +96,32 @@ void main() {
         ),
         throwsArgumentError,
       );
+    });
+
+    test('converts a backtest into a historical calibration summary', () {
+      final result = BacktestResult(
+        stockCode: '600519',
+        ruleId: rule.id,
+        ruleVersion: rule.version,
+        samples: const [
+          BacktestSample(
+            signalDay: DateTime(2026, 1, 1),
+            predictedTarget: 100,
+            actualClose: 102,
+            absoluteError: 0.02,
+            hit: true,
+          ),
+        ],
+        hitRate: 1,
+        meanAbsoluteError: 0.02,
+        maximumDrawdown: 0.03,
+      );
+
+      final calibration = result.toCalibration(minimumSampleCount: 1);
+
+      expect(calibration.calibrated, isTrue);
+      expect(calibration.sampleCount, 1);
+      expect(calibration.hitRate, 1);
     });
   });
 }
