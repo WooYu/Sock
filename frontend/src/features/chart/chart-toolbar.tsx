@@ -13,5 +13,22 @@ const drawingTools: Array<[ChartTool, string]> = [
 ]
 
 export function ChartToolbar({ activeTool, onToolChange }: { activeTool: ChartTool; onToolChange: (tool: ChartTool) => void }) {
-  return <div className="flex flex-wrap items-center gap-2" aria-label="绘图工具"><span className="mr-1 text-xs font-semibold text-[var(--sc-muted)]">绘图</span>{drawingTools.map(([tool, label]) => <button aria-pressed={activeTool === tool} className={`min-h-12 rounded-xl px-3 text-sm font-semibold ${activeTool === tool ? 'bg-[var(--sc-primary)] text-white' : 'bg-[var(--sc-surface-muted)] text-[var(--sc-muted)]'}`} key={tool} onClick={() => onToolChange(tool)} type="button">{label}</button>)}</div>
+  return (
+    <div className="sc-kline-tool-row" aria-label="绘图工具">
+      <span className="sc-kline-group-label">绘图工具</span>
+      <div className="sc-kline-tool-buttons">
+        {drawingTools.map(([tool, label]) => (
+          <button
+            aria-pressed={activeTool === tool}
+            className={`sc-kline-tool-button ${activeTool === tool ? 'is-active' : ''}`}
+            key={tool}
+            onClick={() => onToolChange(tool)}
+            type="button"
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
 }
