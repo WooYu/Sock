@@ -1,0 +1,30 @@
+name: Decision engine verification
+
+on:
+  push:
+    branches:
+      - agent/local-first-watchlist
+    paths:
+      - lib/**
+      - test/**
+      - pubspec.yaml
+      - pubspec.lock
+      - .github/workflows/decision-engine.yml
+  pull_request:
+    paths:
+      - lib/**
+      - test/**
+      - pubspec.yaml
+      - pubspec.lock
+
+jobs:
+  flutter-decision-engine:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter test test/features/decision/decision_engine_test.dart
