@@ -29,7 +29,9 @@ class StructuredRuleWorkflowTest {
                 "BASE_GRANVILLE",
                 "日线",
                 10,
-                List.of("source:1-1")
+                List.of("source:1-1"),
+                List.of("收盘跌破 MA5"),
+                "PRINCIPLE"
             )
         );
         var workflow = new KnowledgeWorkflow(
@@ -50,6 +52,8 @@ class StructuredRuleWorkflowTest {
         assertThat(published.mode()).isEqualTo("BASE_GRANVILLE");
         assertThat(published.priority()).isEqualTo(10);
         assertThat(published.evidenceIds()).containsExactly("source:1-1");
+        assertThat(published.invalidationConditions()).containsExactly("收盘跌破 MA5");
+        assertThat(published.strength()).isEqualTo("PRINCIPLE");
     }
 
     @Test
