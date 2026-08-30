@@ -43,6 +43,12 @@ final class OpenAiKnowledgeExtractor implements KnowledgeExtractor {
                 var priority = kind == KnowledgeKind.RULE
                     ? StructuredRuleSpec.priority(item)
                     : 50;
+                var invalidationConditions = kind == KnowledgeKind.RULE
+                    ? StructuredRuleSpec.invalidationConditions(item)
+                    : List.<String>of();
+                var strength = kind == KnowledgeKind.RULE
+                    ? StructuredRuleSpec.strength(item)
+                    : kind == KnowledgeKind.EXPERIENCE ? "EXPERIENCE" : "OBSERVATION";
                 var idSeed = source.id() + ":ai:" + start + ":" + end + ":" + excerpt;
                 drafts.add(new KnowledgeDraft(
                     UUID.nameUUIDFromBytes(idSeed.getBytes(StandardCharsets.UTF_8)).toString(),
@@ -50,7 +56,7 @@ final class OpenAiKnowledgeExtractor implements KnowledgeExtractor {
                     item.path("title").asText(), item.path("summary").asText(), excerpt,
                     start, end, ExtractionMethod.AI, ApprovalStatus.PENDING, null, null,
                     conditions, action, mode, timeframe, priority,
-                    List.of("source:" + start + "-" + end)));
+                    List.of("source:" + start + "-" + end), invalidationConditions, strength));
             }
             return List.copyOf(drafts);
         } catch (IllegalArgumentException exception) {
