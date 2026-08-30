@@ -30,6 +30,8 @@ import '../portfolio/persistent_portfolio_repository.dart';
 import '../portfolio/portfolio_screen.dart';
 import '../preferences/preferences_controller.dart';
 import '../rules/rule_engine.dart';
+import '../decision/calibration.dart';
+import '../decision/persistent_calibration_repository.dart';
 import '../rules/persistent_rules_repository.dart';
 import '../rules/persistent_prediction_repository.dart';
 import '../rules/rules_workspace.dart';
@@ -69,6 +71,8 @@ class _HomeScreenState extends State<HomeScreen> {
   late final ChartAnnotationController _chartAnnotationController;
   late final RuleBook _ruleBook;
   late final PersistentRuleRepository _ruleRepository;
+  late final CalibrationBook _calibrationBook;
+  late final PersistentCalibrationRepository _calibrationRepository;
   late final PersistentPredictionRepository _predictionRepository;
   late final PersistentReviewStore _reviewStore;
   late final RemoteReviewExplanationAdapter _reviewExplanation;
@@ -108,10 +112,16 @@ class _HomeScreenState extends State<HomeScreen> {
     unawaited(_restorePortfolio());
     _ruleBook = RuleBook.withSystemDefaults();
     _ruleRepository = PersistentRuleRepository();
+    _calibrationBook = CalibrationBook.fromEntries(const []);
+    _calibrationRepository = PersistentCalibrationRepository();
     _stockAnalysisController = StockAnalysisController(
       catalog: _marketService,
       market: _marketService,
-      analyzer: StockAnalyzer(ruleBook: _ruleBook),
+      analyzer: StockAnalyzer(
+        ruleBook: _ruleBook,
+        calibrationBook: _calibrationBook,
+        calibrationHorizonSessions: 3,
+      ),
       strategyExplanationAdapter: _strategyExplanation,
     );
     _stockAnalysisController.addListener(_onAnalysisSelectionChanged);
@@ -131,6 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
       accessToken: () => _sessionController.session?.accessToken,
     );
     _restoreRules();
+    unawaited(_restoreCalibration());
     _watchlistController = WatchlistController(
       repository: PersistentWatchlistRepository(),
       outbox: PersistentMutationOutbox(),
@@ -229,6 +240,13 @@ class _HomeScreenState extends State<HomeScreen> {
     ]);
   }
 
+  Future<void> _restoreCalibration() async {
+    final restored = await _calibrationRepository.load();
+    _calibrationBook.replaceWith(restored.entries);
+    if (!mounted || _stockAnalysisController.analysis == null) return;
+    unawaited(_stockAnalysisController.refresh());
+  }
+
   Future<void> _restoreRules() async {
     await _ruleRepository.restoreInto(_ruleBook);
     if (!mounted) return;
@@ -311,6 +329,13 @@ class _HomeScreenState extends State<HomeScreen> {
         reviewStore: _reviewStore,
         reviewExplanation: _reviewExplanation,
         knowledgeController: _knowledgeController,
+        calibrationBook: _calibrationBook,
+        calibrationRepository: _calibrationRepository,
+        onCalibrationChanged: () {
+          if (_stockAnalysisController.analysis != null) {
+            unawaited(_stockAnalysisController.refresh());
+          }
+        },
         watchlistController: _watchlistController,
         sessionController: _sessionController,
         adminService: _adminService,
@@ -337,6 +362,9 @@ class _Workspace extends StatelessWidget {
     required this.reviewStore,
     required this.reviewExplanation,
     required this.knowledgeController,
+    required this.calibrationBook,
+    required this.calibrationRepository,
+    this.onCalibrationChanged,
     required this.watchlistController,
     required this.sessionController,
     required this.adminService,
@@ -356,6 +384,9 @@ class _Workspace extends StatelessWidget {
   final PersistentReviewStore reviewStore;
   final RemoteReviewExplanationAdapter reviewExplanation;
   final KnowledgeController knowledgeController;
+  final CalibrationBook calibrationBook;
+  final PersistentCalibrationRepository calibrationRepository;
+  final VoidCallback? onCalibrationChanged;
   final WatchlistController watchlistController;
   final SessionController sessionController;
   final RemoteAdminService adminService;
@@ -483,6 +514,9 @@ class _Workspace extends StatelessWidget {
           ruleRepository: ruleRepository,
           predictionRepository: predictionRepository,
           knowledgeController: knowledgeController,
+          calibrationBook: calibrationBook,
+          calibrationRepository: calibrationRepository,
+          onCalibrationChanged: onCalibrationChanged,
           candles: snapshot.dailyCandles,
           stockCode: chartStockCode,
         ),
