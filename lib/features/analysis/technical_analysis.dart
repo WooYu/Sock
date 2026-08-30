@@ -350,6 +350,7 @@ class StockAnalysis {
     required this.trendPattern,
     required this.trendReason,
     this.decision,
+    this.facts,
   });
 
   final double lastClose;
@@ -381,6 +382,7 @@ class StockAnalysis {
   final TrendPattern trendPattern;
   final String trendReason;
   final DecisionResult? decision;
+  final RuleFacts? facts;
 }
 
 class StockAnalyzer {
@@ -651,6 +653,7 @@ class StockAnalyzer {
       trendPattern: trend.pattern,
       trendReason: trend.reason,
       decision: decision,
+      facts: facts,
     );
   }
 
