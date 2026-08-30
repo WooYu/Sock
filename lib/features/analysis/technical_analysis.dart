@@ -408,6 +408,7 @@ class StockAnalyzer {
     int lookback = 20,
     bool holding = false,
     bool dataFresh = true,
+    String timeframe = '日线',
   }) {
     if (source.length < 20) {
       throw const AnalysisException('个股分析至少需要 20 根日 K 线');
@@ -615,6 +616,7 @@ class StockAnalyzer {
     final decision = _decisionEngine.evaluate(
       DecisionInput(
         dataFresh: dataFresh,
+        timeframe: timeframe,
         holding: holding,
         hardInvalidations: hardInvalidations,
         candidates: decisionCandidates,
@@ -666,6 +668,7 @@ class StockAnalyzer {
     mode: rule.mode,
     action: rule.action,
     priority: rule.priority,
+    timeframe: rule.timeframe,
     evidence: rule.evidenceIds
         .map(
           (id) => DecisionEvidence(
