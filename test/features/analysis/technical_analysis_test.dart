@@ -157,4 +157,74 @@ void main() {
       expect(analysis.modelName, isNot(contains('GPT')));
     });
   });
+
+  group('decision gate integration', () {
+    test('attaches WAIT when the decision engine has no applicable rule', () {
+      final falling = candles(
+        List.generate(30, (i) => 40.0 - i * 0.5),
+      );
+
+      final analysis = StockAnalyzer().analyze(falling);
+
+      expect(analysis.decision, isNotNull);
+      expect(analysis.decision!.decision, DecisionAction.wait);
+      expect(analysis.decision!.reason, contains('规则'));
+    });
+
+    test('attaches ENTER for a confirmed rising trend', () {
+      final risingStrong = candles(
+        List.generate(30, (i) => 10.0 + i * 0.5),
+      );
+
+      final analysis = StockAnalyzer().analyze(risingStrong);
+
+      expect(analysis.decision!.decision, DecisionAction.enter);
+      expect(analysis.decision!.matchedRules, isNotEmpty);
+    });
+
+    test('surfaces a rule conflict as WAIT', () {
+      final book = RuleBook(idFactory: () => 'rule');
+      book.create(
+        name: '允许进入',
+        priority: 10,
+        action: DecisionAction.enter,
+        conditions: const [
+          RuleCondition(
+            field: RuleField.closeAboveMa20,
+            operator: RuleOperator.equals,
+            value: 1,
+          ),
+        ],
+      );
+      book.create(
+        name: '禁止进入',
+        priority: 10,
+        action: DecisionAction.exit,
+        conditions: const [
+          RuleCondition(
+            field: RuleField.closeAboveMa20,
+            operator: RuleOperator.equals,
+            value: 1,
+          ),
+        ],
+      );
+
+      final analysis = StockAnalyzer(
+        ruleBook: book,
+      ).analyze(candles(List.generate(30, (i) => 10.0 + i * 0.5)));
+
+      expect(analysis.decision!.decision, DecisionAction.wait);
+      expect(analysis.decision!.conflicts, containsAll(['允许进入', '禁止进入']));
+    });
+
+    test('does not make a fresh-looking conclusion from stale data', () {
+      final analysis = StockAnalyzer().analyze(
+        candles(List.generate(30, (i) => 10.0 + i * 0.5)),
+        dataFresh: false,
+      );
+
+      expect(analysis.decision!.decision, DecisionAction.wait);
+      expect(analysis.decision!.reason, contains('过期'));
+    });
+  });
 }
