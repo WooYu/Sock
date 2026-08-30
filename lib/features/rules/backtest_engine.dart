@@ -1,5 +1,7 @@
 import '../../domain/stockcal_domain.dart';
 import '../analysis/technical_analysis.dart';
+import '../decision/calibration.dart';
+import '../decision/decision_models.dart';
 import 'rule_engine.dart';
 
 class BacktestRequest {
@@ -56,6 +58,16 @@ class BacktestResult {
   final double maximumDrawdown;
 
   int get sampleCount => samples.length;
+
+  DecisionCalibration toCalibration({int minimumSampleCount = 10}) =>
+      CalibrationService.fromMetrics(
+        sampleCount: sampleCount,
+        hitRate: hitRate,
+        meanAbsoluteError: meanAbsoluteError,
+        meanSlippage: 0,
+        maximumDrawdown: maximumDrawdown,
+        minimumSampleCount: minimumSampleCount,
+      );
 }
 
 class BacktestEngine {
@@ -83,13 +95,14 @@ class BacktestEngine {
       }
       final historical = ordered.sublist(0, index + 1);
       final analysis = analyzer.analyze(historical);
-      final facts = RuleFacts(
-        closeAboveMa20: analysis.lastClose >= analysis.maLong,
-        volumeRatio: analysis.volumeRatio,
-        supportDistance: analysis.lastClose == 0
-            ? 1
-            : (analysis.lastClose - analysis.support) / analysis.lastClose,
-      );
+      final facts = analysis.facts ??
+          RuleFacts(
+            closeAboveMa20: analysis.lastClose >= analysis.maLong,
+            volumeRatio: analysis.volumeRatio,
+            supportDistance: analysis.lastClose == 0
+                ? 1
+                : (analysis.lastClose - analysis.support) / analysis.lastClose,
+          );
       if (!book.evaluate(request.rule, facts)) continue;
 
       final future = ordered.sublist(
