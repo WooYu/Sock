@@ -498,11 +498,13 @@ class _Workspace extends StatelessWidget {
                       label: '压力',
                       color: StockCalColors.gain,
                     ),
-                    ChartLevel(
-                      price: analysis.target,
-                      label: '目标',
-                      color: StockCalColors.primary,
-                    ),
+                    if (analysis.decision?.decision != DecisionAction.wait &&
+                        analysis.decision?.decision != DecisionAction.avoid)
+                      ChartLevel(
+                        price: analysis.target,
+                        label: '目标',
+                        color: StockCalColors.primary,
+                      ),
                   ],
           );
         },
