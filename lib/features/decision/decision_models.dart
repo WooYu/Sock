@@ -50,6 +50,7 @@ class DecisionCandidate {
     required this.mode,
     required this.action,
     required this.priority,
+    this.timeframe = '日线',
     this.requiredFactsKnown = true,
     List<DecisionEvidence> evidence = const [],
     List<String> invalidationConditions = const [],
@@ -63,6 +64,7 @@ class DecisionCandidate {
   final StrategyMode mode;
   final DecisionAction action;
   final int priority;
+  final String timeframe;
   final bool requiredFactsKnown;
   final List<DecisionEvidence> evidence;
   final List<String> invalidationConditions;
@@ -72,6 +74,7 @@ class DecisionCandidate {
 class DecisionInput {
   DecisionInput({
     required this.dataFresh,
+    this.timeframe = '日线',
     this.missingFacts = const [],
     this.holding = false,
     this.hardInvalidations = const [],
@@ -87,6 +90,7 @@ class DecisionInput {
        exclusions = List.unmodifiable(exclusions);
 
   final bool dataFresh;
+  final String timeframe;
   final List<String> missingFacts;
   final bool holding;
   final List<String> hardInvalidations;
