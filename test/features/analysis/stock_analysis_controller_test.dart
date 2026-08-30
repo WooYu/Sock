@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stockcal/features/analysis/stock_analysis_controller.dart';
 import 'package:stockcal/features/analysis/technical_analysis.dart';
+import 'package:stockcal/features/decision/decision_models.dart';
 import 'package:stockcal/features/market/market_data.dart';
 
 void main() {
@@ -20,6 +21,7 @@ void main() {
     expect(controller.selected?.code, '600519');
     expect(controller.snapshot?.source.state, MarketDataState.delayed);
     expect(controller.analysis?.future, hasLength(3));
+    expect(controller.decision, isNotNull);
     expect(controller.errorMessage, isNull);
   });
 
@@ -57,4 +59,18 @@ class _FailingAfterFirstMarket implements AShareMarketAdapter {
       clock: () => DateTime(2026, 8, 14, 15, 15),
     ).snapshot(code);
   }
+
+  test('exposes WAIT when the market snapshot is stale', () async {
+    final controller = StockAnalysisController(
+      catalog: MemoryStockCatalog(DemoAshareData.securities),
+      market: _StaleMarket(),
+      analyzer: StockAnalyzer(),
+    );
+
+    await controller.select(DemoAshareData.securities.first);
+
+    expect(controller.status, StockAnalysisStatus.ready);
+    expect(controller.decision?.decision, DecisionAction.wait);
+    expect(controller.decision?.reason, contains('过期'));
+  });
 }
