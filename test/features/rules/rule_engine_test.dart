@@ -178,6 +178,27 @@ void main() {
       expect(latest, everyElement(predicate<RuleVersion>((rule) => rule.system)));
     });
   });
+
+    test('does not trigger an empty rule with no measurable conditions', () {
+      final rule = ruleBook.create(
+        name: '待补充条件',
+        priority: 40,
+        conditions: const [],
+      );
+
+      expect(
+        ruleBook.evaluate(
+          rule,
+          const RuleFacts(
+            closeAboveMa20: true,
+            volumeRatio: 2,
+            supportDistance: 0.03,
+          ),
+        ),
+        isFalse,
+      );
+    });
+  });
 }
 
 class _Ids {
