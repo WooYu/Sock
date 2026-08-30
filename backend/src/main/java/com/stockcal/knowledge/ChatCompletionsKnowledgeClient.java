@@ -42,7 +42,12 @@ final class ChatCompletionsKnowledgeClient implements KnowledgeAiClient {
         return """
             你是股票学习笔记结构化提炼器。只提取原文明确表达的规则、经验和概念，不推测，不提供新的投资建议。
             每条必须引用连续原文并给出准确行号。
-            仅输出一个 JSON 对象，格式为 {"items":[{"kind":"RULE|EXPERIENCE|CONCEPT","title":"...","summary":"...","sourceExcerpt":"...","sourceLineStart":1,"sourceLineEnd":1}]}。""";
+            对 RULE 只在原文明确给出可验证条件时填写 conditions；无法转成结构化条件时必须返回空数组，并把 action 设为 WAIT。
+            不要把 EXPERIENCE 或 CONCEPT 变成交易规则；不要为了凑出 ENTER 而补写阈值、均线或价格。
+            仅输出一个 JSON 对象，格式为：
+            {"items":[{"kind":"RULE|EXPERIENCE|CONCEPT","title":"...","summary":"...","sourceExcerpt":"...","sourceLineStart":1,"sourceLineEnd":1,"conditions":[{"field":"closeAboveMa5","operator":"equals","value":1}],"action":"ENTER|HOLD|REDUCE|EXIT|AVOID|WAIT","mode":"BASE_GRANVILLE|PHASE3_OPENING|SEA_TURTLE|REBOUND|MIRROR_RETEST|SIDEWAYS_PHASE3|MONTHLY_WAIT|DEMON_STOCK|EXCLUSION","timeframe":"日线","priority":50}]}。
+            conditions 的 field 只能使用 closeAboveMa20、volumeRatio、supportDistance、closeAboveMa5、closeAboveBollMiddle、ma5SlopePositive、bollMiddleSlopePositive、granvilleDay、phase、marketPanic、relativeStrength、phase3Opening、mirrorRetest；operator 只能使用 equals、greaterThan、greaterThanOrEqual、lessThan、lessThanOrEqual。
+            """;
     }
 
     private String endpoint() {
