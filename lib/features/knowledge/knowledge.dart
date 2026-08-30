@@ -380,7 +380,7 @@ class KnowledgeController extends ChangeNotifier {
         .map(
           (rule) =>
               '${rule.id}:${rule.enabled}:${rule.action.name}:${rule.mode.name}:'
-              '${rule.priority}:${rule.strength}:${rule.invalidationConditions.join(',')}:${rule.conditions.map((c) => '${c.field.name}:${c.operator.name}:${c.value}').join(',')}',
+              '${rule.priority}:${rule.timeframe}:${rule.strength}:${rule.evidenceIds.join(',')}:${rule.invalidationConditions.join(',')}:${rule.conditions.map((c) => '${c.field.name}:${c.operator.name}:${c.value}').join(',')}',
         )
         .join('|');
     if (signature == _appliedRulesSignature) return false;
