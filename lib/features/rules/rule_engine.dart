@@ -208,6 +208,14 @@ class RuleBook {
     }
   }
 
+  void removeUserVersions(Iterable<String> ids) {
+    for (final id in ids) {
+      final versions = _history[id];
+      if (versions == null || versions.any((rule) => rule.system)) continue;
+      _history.remove(id);
+    }
+  }
+
   List<RuleVersion> get activeRules {
     final rules = _history.values
         .where((versions) => versions.isNotEmpty)
