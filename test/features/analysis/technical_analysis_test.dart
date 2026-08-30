@@ -184,7 +184,8 @@ void main() {
     });
 
     test('surfaces a rule conflict as WAIT', () {
-      final book = RuleBook(idFactory: () => 'rule');
+      var id = 0;
+      final book = RuleBook(idFactory: () => 'rule-${++id}');
       book.create(
         name: '允许进入',
         priority: 10,
