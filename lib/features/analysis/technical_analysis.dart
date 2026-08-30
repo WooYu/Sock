@@ -1,7 +1,9 @@
 import 'dart:math' as math;
 
 import '../../domain/stockcal_domain.dart';
-import '../rules/rule_engine.dart';
+import '../decision/decision_engine.dart';
+import '../decision/decision_models.dart';
+import '../rules/rule_engine.dart;
 
 class AnalysisException implements Exception {
   const AnalysisException(this.message);
@@ -346,6 +348,7 @@ class StockAnalysis {
     required this.modelName,
     required this.trendPattern,
     required this.trendReason,
+    this.decision,
   });
 
   final double lastClose;
@@ -376,6 +379,7 @@ class StockAnalysis {
   final String modelName;
   final TrendPattern trendPattern;
   final String trendReason;
+  final DecisionResult? decision;
 }
 
 class StockAnalyzer {
@@ -383,13 +387,21 @@ class StockAnalyzer {
     IndicatorCalculator? calculator,
     this.settings = const IndicatorSettings(),
     this.ruleBook,
-  }) : _calculator = calculator ?? IndicatorCalculator();
+    DecisionEngine? decisionEngine,
+  }) : _calculator = calculator ?? IndicatorCalculator(),
+       _decisionEngine = decisionEngine ?? DecisionEngine();
 
   final IndicatorCalculator _calculator;
+  final DecisionEngine _decisionEngine;
   IndicatorSettings settings;
   final RuleBook? ruleBook;
 
-  StockAnalysis analyze(List<Candle> source, {int lookback = 20}) {
+  StockAnalysis analyze(
+    List<Candle> source, {
+    int lookback = 20,
+    bool holding = false,
+    bool dataFresh = true,
+  }) {
     if (source.length < 20) {
       throw const AnalysisException('个股分析至少需要 20 根日 K 线');
     }
@@ -399,16 +411,29 @@ class StockAnalyzer {
     final resistance = recent.map((item) => item.high).reduce(math.max);
     final range = resistance - support;
     final lastClose = candles.last.close;
-    final maShort = _calculator.sma(candles, period: settings.maShortPeriod).last!;
-    final maLong = _calculator.sma(candles, period: settings.maLongPeriod).last!;
+    final maShortSeries = _calculator.sma(
+      candles,
+      period: settings.maShortPeriod,
+    );
+    final maLongSeries = _calculator.sma(
+      candles,
+      period: settings.maLongPeriod,
+    );
+    final bollSeries = _calculator.bollinger(
+      candles,
+      period: settings.bollPeriod,
+      multiplier: settings.bollMultiplier,
+    );
+    final maShort = maShortSeries.last!;
+    final maLong = maLongSeries.last!;
+    final previousMaShort = maShortSeries.length > 1
+        ? maShortSeries[maShortSeries.length - 2] ?? maShort
+        : maShort;
     final ema = _calculator.ema(candles, period: settings.emaPeriod).last!;
-    final boll = _calculator
-        .bollinger(
-          candles,
-          period: settings.bollPeriod,
-          multiplier: settings.bollMultiplier,
-        )
-        .last!;
+    final boll = bollSeries.last!;
+    final previousBollMiddle = bollSeries.length > 1
+        ? bollSeries[bollSeries.length - 2]?.middle
+        : null;
     final volumeRatio = _calculator
         .volume(candles, period: settings.volumePeriod)
         .latestRatio;
@@ -522,15 +547,36 @@ class StockAnalyzer {
       ConditionCheck(label: 'BOLL 抬升', met: lastClose >= boll.middle),
       ConditionCheck(label: '振幅达标', met: amplitude >= 3),
     ];
+    final trend = recognizeTrend(candles);
+    final facts = RuleFacts(
+      closeAboveMa20: trendPositive,
+      volumeRatio: volumeRatio,
+      supportDistance: supportDistance.toDouble(),
+      closeAboveMa5: lastClose >= maShort,
+      closeAboveBollMiddle: lastClose >= boll.middle,
+      ma5SlopePositive: maShort >= previousMaShort,
+      bollMiddleSlopePositive: previousBollMiddle == null
+          ? null
+          : boll.middle >= previousBollMiddle,
+      granvilleDay: _granvilleDay(
+        close: lastClose,
+        previousClose: prevClose,
+        maShort: maShort,
+        previousMaShort: previousMaShort,
+      ),
+      phase: _phase(
+        close: lastClose,
+        maShort: maShort,
+        maLong: maLong,
+        trend: trend,
+      ),
+      phase3Opening: _phase3Opening(candles, maShort: maShort),
+      mirrorRetest: trend.pattern == TrendPattern.mirrorBollUpper,
+    );
     var hit = 0;
     var total = matchedRules.length;
     final hitRuleNames = <String>[];
     if (ruleBook != null) {
-      final facts = RuleFacts(
-        closeAboveMa20: trendPositive,
-        volumeRatio: volumeRatio,
-        supportDistance: supportDistance.toDouble(),
-      );
       total = ruleBook!.activeRules.length;
       for (final rule in ruleBook!.activeRules) {
         if (ruleBook!.evaluate(rule, facts)) {
@@ -541,10 +587,37 @@ class StockAnalyzer {
     }
     final ruleCredibility =
         (0.4 + hit / (total == 0 ? 1 : total) * 0.5).clamp(0.4, 0.9) * 100;
-    final trend = recognizeTrend(candles);
     final finalSupport = trend.support ?? combinedSupport;
     final finalResistance = trend.resistance ?? combinedResistance;
     final finalTarget = trend.target ?? combinedTarget;
+    final hardInvalidations = <String>[
+      if (holding && lastClose < maShort) '收盘跌破 MA${settings.maShortPeriod}',
+      if (holding && lastClose < maLong) '收盘跌破 MA${settings.maLongPeriod}',
+      if (holding && lastClose < boll.middle) '收盘跌破 BOLL 中轨',
+    ];
+    final decisionCandidates = ruleBook != null
+        ? ruleBook!.matching(facts).map(_candidateFromRule).toList(growable: false)
+        : _localCandidates(
+            trend: trend,
+            lastClose: lastClose,
+            maShort: maShort,
+            maLong: maLong,
+            previousMaShort: previousMaShort,
+            bollMiddle: boll.middle,
+            facts: facts,
+          );
+    final decision = _decisionEngine.evaluate(
+      DecisionInput(
+        dataFresh: dataFresh,
+        holding: holding,
+        hardInvalidations: hardInvalidations,
+        candidates: decisionCandidates,
+        support: finalSupport,
+        resistance: finalResistance,
+        target: finalTarget,
+        generatedAt: DateTime.now(),
+      ),
+    );
 
     return StockAnalysis(
       lastClose: lastClose,
@@ -575,7 +648,107 @@ class StockAnalyzer {
       modelName: '本地规则引擎（启发式）',
       trendPattern: trend.pattern,
       trendReason: trend.reason,
+      decision: decision,
     );
+  }
+
+  DecisionCandidate _candidateFromRule(RuleVersion rule) => DecisionCandidate(
+    ruleId: rule.id,
+    ruleVersion: rule.version,
+    name: rule.name,
+    mode: rule.mode,
+    action: rule.action,
+    priority: rule.priority,
+    evidence: rule.evidenceIds
+        .map(
+          (id) => DecisionEvidence(
+            id: id,
+            label: id,
+            detail: '规则 ${rule.name} 第 ${rule.version} 版',
+          ),
+        )
+        .toList(growable: false),
+    invalidationConditions: rule.invalidationConditions,
+  );
+
+  List<DecisionCandidate> _localCandidates({
+    required TrendSignal trend,
+    required double lastClose,
+    required double maShort,
+    required double maLong,
+    required double previousMaShort,
+    required double bollMiddle,
+    required RuleFacts facts,
+  }) {
+    final confirmed = trend.pattern == TrendPattern.climbing &&
+        lastClose >= maShort &&
+        lastClose >= bollMiddle &&
+        maShort >= previousMaShort &&
+        maShort >= maLong;
+    if (!confirmed) return const [];
+    return [
+      DecisionCandidate(
+        ruleId: 'local-trend-confirmation',
+        ruleVersion: 1,
+        name: '趋势、MA${settings.maShortPeriod} 与 BOLL 中轨确认',
+        mode: StrategyMode.baseGranville,
+        action: DecisionAction.enter,
+        priority: 50,
+        evidence: [
+          DecisionEvidence(
+            id: 'trend:${trend.pattern.name}',
+            label: '趋势模式',
+            detail: trend.reason,
+          ),
+          DecisionEvidence(
+            id: 'indicator:ma${settings.maShortPeriod}',
+            label: 'MA${settings.maShortPeriod} 斜率向上',
+            detail: '当前 ${maShort.toStringAsFixed(2)}，上一值 ${previousMaShort.toStringAsFixed(2)}',
+          ),
+          DecisionEvidence(
+            id: 'indicator:boll-middle',
+            label: '收盘站上 BOLL 中轨',
+            detail: '收盘 ${lastClose.toStringAsFixed(2)}，中轨 ${bollMiddle.toStringAsFixed(2)}',
+          ),
+        ],
+        invalidationConditions: [
+          '收盘跌破 MA${settings.maShortPeriod}',
+          '收盘跌破 BOLL 中轨',
+        ],
+      ),
+    ];
+  }
+
+  double _granvilleDay({
+    required double close,
+    required double previousClose,
+    required double maShort,
+    required double previousMaShort,
+  }) {
+    if (close >= maShort && previousClose < previousMaShort) return 1;
+    if (close >= maShort && maShort >= previousMaShort) return 2;
+    return 0;
+  }
+
+  double _phase({
+    required double close,
+    required double maShort,
+    required double maLong,
+    required TrendSignal trend,
+  }) {
+    if (trend.pattern == TrendPattern.climbing && close >= maShort && maShort > maLong) {
+      return 3;
+    }
+    if (close >= maLong) return 2;
+    if (close >= maShort) return 1;
+    return 0;
+  }
+
+  bool _phase3Opening(List<Candle> candles, {required double maShort}) {
+    if (candles.length < 6) return false;
+    final prior = candles.sublist(candles.length - 6, candles.length - 1);
+    final priorHigh = prior.map((candle) => candle.high).reduce(math.max);
+    return candles.last.close > priorHigh && candles.last.close >= maShort;
   }
 
   /// 识别次日走势模式，并给出该模式对应的支撑 / 压力 / 目标位。
