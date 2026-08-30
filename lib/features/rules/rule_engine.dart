@@ -158,6 +158,11 @@ class RuleBook {
           system: true,
           conditions: const [
             RuleCondition(
+              field: RuleField.closeAboveMa20,
+              operator: RuleOperator.equals,
+              value: 1,
+            ),
+            RuleCondition(
               field: RuleField.volumeRatio,
               operator: RuleOperator.greaterThanOrEqual,
               value: 1,
