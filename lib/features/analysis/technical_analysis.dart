@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import '../../domain/stockcal_domain.dart';
+import '../decision/calibration.dart';
 import '../decision/decision_engine.dart';
 import '../decision/decision_models.dart';
 import '../rules/rule_engine.dart';
@@ -387,6 +388,7 @@ class StockAnalyzer {
     IndicatorCalculator? calculator,
     this.settings = const IndicatorSettings(),
     this.ruleBook,
+    this.calibrationBook,
     DecisionEngine? decisionEngine,
   }) : _calculator = calculator ?? IndicatorCalculator(),
        _decisionEngine = decisionEngine ?? DecisionEngine();
@@ -395,6 +397,7 @@ class StockAnalyzer {
   final DecisionEngine _decisionEngine;
   IndicatorSettings settings;
   final RuleBook? ruleBook;
+  final CalibrationBook? calibrationBook;
 
   StockAnalysis analyze(
     List<Candle> source, {
@@ -668,6 +671,7 @@ class StockAnalyzer {
         )
         .toList(growable: false),
     invalidationConditions: rule.invalidationConditions,
+    calibration: calibrationBook?.forRule(rule),
   );
 
   List<DecisionCandidate> _localCandidates({
