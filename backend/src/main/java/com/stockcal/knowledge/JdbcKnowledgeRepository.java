@@ -78,11 +78,11 @@ public class JdbcKnowledgeRepository implements KnowledgeRepository {
                 id,source_document_id,kind,title,summary,source_excerpt,
                 source_line_start,source_line_end,extraction_method,status,
                 approved_by,reviewed_at,rule_conditions,rule_action,strategy_mode,
-                timeframe,priority,evidence_ids
+                timeframe,priority,evidence_ids,invalidation_conditions,strength
             ) values(
                 :id,:source,:kind,:title,:summary,:excerpt,
                 :start,:end,:method,:status,:by,:at,:conditions,:action,:mode,
-                :timeframe,:priority,:evidence
+                :timeframe,:priority,:evidence,:invalidation,:strength
             )
             """)
             .param("id", value.id())
