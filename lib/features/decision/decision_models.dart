@@ -75,10 +75,10 @@ class DecisionInput {
   DecisionInput({
     required this.dataFresh,
     this.timeframe = '日线',
-    this.missingFacts = const [],
+    List<String> missingFacts = const [],
     this.holding = false,
-    this.hardInvalidations = const [],
-    this.exclusions = const [],
+    List<String> hardInvalidations = const [],
+    List<String> exclusions = const [],
     List<DecisionCandidate> candidates = const [],
     this.support,
     this.resistance,
