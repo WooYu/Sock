@@ -35,10 +35,19 @@ class DecisionEngine {
     }
 
     final applicable = input.candidates
-        .where((candidate) => candidate.requiredFactsKnown)
+        .where(
+          (candidate) =>
+              candidate.requiredFactsKnown &&
+              candidate.timeframe == input.timeframe,
+        )
         .toList(growable: false);
     if (applicable.isEmpty) {
-      return _wait(input, '当前没有已确认的适用规则，等待方向确认');
+      return _wait(
+        input,
+        input.candidates.isEmpty
+            ? '当前没有已确认的适用规则，等待方向确认'
+            : '当前周期没有适用规则，等待切换到对应周期',
+      );
     }
 
     final highestPriority = applicable
