@@ -1,6 +1,7 @@
 package com.stockcal.knowledge;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import tools.jackson.databind.JsonNode;
 
@@ -23,6 +24,9 @@ final class StructuredRuleSpec {
         "MIRROR_RETEST", "SIDEWAYS_PHASE3", "MONTHLY_WAIT", "DEMON_STOCK",
         "EXCLUSION"
     );
+    private static final Set<String> STRENGTHS = Set.of(
+        "PRINCIPLE", "EXPERIENCE", "PREFERENCE", "OBSERVATION", "UNSPECIFIED"
+    );
 
     private StructuredRuleSpec() {}
 
@@ -44,14 +48,18 @@ final class StructuredRuleSpec {
     }
 
     static String action(JsonNode item) {
-        var value = item.path("action").asText("ENTER").toUpperCase();
-        if (!ACTIONS.contains(value)) throw new IllegalArgumentException("AI 返回的规则动作无法识别");
+        var value = item.path("action").asText("WAIT").toUpperCase(Locale.ROOT);
+        if (!ACTIONS.contains(value)) {
+            throw new IllegalArgumentException("AI 返回的规则动作无法识别");
+        }
         return value;
     }
 
     static String mode(JsonNode item) {
-        var value = item.path("mode").asText("BASE_GRANVILLE").toUpperCase();
-        if (!MODES.contains(value)) throw new IllegalArgumentException("AI 返回的策略模式无法识别");
+        var value = item.path("mode").asText("BASE_GRANVILLE").toUpperCase(Locale.ROOT);
+        if (!MODES.contains(value)) {
+            throw new IllegalArgumentException("AI 返回的策略模式无法识别");
+        }
         return value;
     }
 
@@ -67,6 +75,28 @@ final class StructuredRuleSpec {
         var value = item.path("priority").asInt(50);
         if (value < 1 || value > 1000) {
             throw new IllegalArgumentException("AI 返回的优先级无效");
+        }
+        return value;
+    }
+
+    static List<String> invalidationConditions(JsonNode item) {
+        var node = item.path("invalidationConditions");
+        if (!node.isArray()) return List.of();
+        var result = new java.util.ArrayList<String>();
+        for (var value : node) {
+            var text = value.asText();
+            if (text.isBlank() || text.length() > 500) {
+                throw new IllegalArgumentException("AI 返回的失效条件无效");
+            }
+            result.add(text);
+        }
+        return List.copyOf(result);
+    }
+
+    static String strength(JsonNode item) {
+        var value = item.path("strength").asText("UNSPECIFIED").toUpperCase(Locale.ROOT);
+        if (!STRENGTHS.contains(value)) {
+            throw new IllegalArgumentException("AI 返回的规则强度无法识别");
         }
         return value;
     }
