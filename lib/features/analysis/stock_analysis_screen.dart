@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/display.dart';
 import '../../widgets/metric_card.dart';
+import '../decision/decision_models.dart';
 import '../market/market_data.dart';
 import '../knowledge/knowledge.dart';
 import 'stock_analysis_controller.dart';
@@ -108,6 +109,14 @@ class _StockAnalysisScreenState extends State<StockAnalysisScreen> {
                       const [],
                   knowledgeController: widget.knowledgeController,
                 ),
+              if (controller.snapshot != null &&
+                  controller.analysis == null &&
+                  controller.decision != null)
+                _DecisionOnlyContent(
+                  snapshot: controller.snapshot!,
+                  decision: controller.decision!,
+                  onRefresh: controller.refresh,
+                ),
             ],
           ),
         ),
@@ -166,6 +175,10 @@ class _AnalysisContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final quote = snapshot.quote;
     final positive = quote.change >= 0;
+    final decision = analysis.decision;
+    final canPlan = decision != null &&
+        decision.decision != DecisionAction.wait &&
+        decision.decision != DecisionAction.avoid;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -235,6 +248,8 @@ class _AnalysisContent extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
+        _DecisionCard(decision: decision),
+        const SizedBox(height: 16),
         Center(
           child: DirectionGauge(
             strength: analysis.directionStrength,
@@ -260,7 +275,7 @@ class _AnalysisContent extends StatelessWidget {
           children: [
             _ValueTile(label: '支撑位', value: analysis.support),
             _ValueTile(label: '压力位', value: analysis.resistance),
-            _ValueTile(label: '目标位', value: analysis.target),
+            if (canPlan) _ValueTile(label: '目标位', value: analysis.target),
             _ValueTile(
               label: '置信度',
               value: analysis.confidence * 100,
@@ -303,19 +318,30 @@ class _AnalysisContent extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 12),
-                _PlanRow(
-                  label: '买入关注',
-                  value:
-                      '${analysis.support.toStringAsFixed(2)} ~ ${((analysis.support + analysis.resistance) / 2).toStringAsFixed(2)}',
-                ),
-                _PlanRow(
-                  label: '卖出 / 止盈',
-                  value: analysis.target.toStringAsFixed(2),
-                ),
-                _PlanRow(
-                  label: '失效条件',
-                  value: '收盘跌破 ${analysis.support.toStringAsFixed(2)}',
-                ),
+                if (canPlan) ...[
+                  _PlanRow(
+                    label: '买入关注',
+                    value:
+                        '${analysis.support.toStringAsFixed(2)} ~ ${((analysis.support + analysis.resistance) / 2).toStringAsFixed(2)}',
+                  ),
+                  _PlanRow(
+                    label: '卖出 / 止盈',
+                    value: analysis.target.toStringAsFixed(2),
+                  ),
+                  _PlanRow(
+                    label: '失效条件',
+                    value: decision?.invalidationConditions.isNotEmpty == true
+                        ? decision!.invalidationConditions.join('；')
+                        : '收盘跌破 ${analysis.support.toStringAsFixed(2)}',
+                  ),
+                ] else
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Text(
+                      '当前不生成买卖计划：${decision?.reason ?? '条件不足，等待确认'}',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
                 const SizedBox(height: 8),
                 ...analysis.conditions.map(
                   (c) => Row(
@@ -508,6 +534,145 @@ class _ValueTile extends StatelessWidget {
   );
 }
 
+String _decisionLabel(DecisionAction action) => switch (action) {
+  DecisionAction.enter => '允许进入',
+  DecisionAction.hold => '继续持有',
+  DecisionAction.reduce => '减仓',
+  DecisionAction.exit => '退出',
+  DecisionAction.avoid => '回避',
+  DecisionAction.wait => '等待 / 不可判断',
+};
+
+String _decisionSummary(DecisionResult? decision, Direction direction) {
+  if (decision == null) {
+    return switch (direction) {
+      Direction.bullish => '策略结论：偏多，关注买入区间',
+      Direction.bearish => '策略结论：偏空，注意失效条件',
+      Direction.neutral => '策略结论：中性，等待方向确认',
+    };
+  }
+  return '决策结论：${_decisionLabel(decision.decision)}。${decision.reason}';
+}
+
+class _DecisionCard extends StatelessWidget {
+  const _DecisionCard({required this.decision});
+
+  final DecisionResult? decision;
+
+  @override
+  Widget build(BuildContext context) {
+    final current = decision;
+    if (current == null) return const SizedBox.shrink();
+    final waiting = current.decision == DecisionAction.wait;
+    final color = waiting
+        ? Theme.of(context).colorScheme.tertiary
+        : current.decision == DecisionAction.exit ||
+              current.decision == DecisionAction.avoid
+        ? Theme.of(context).colorScheme.error
+        : Theme.of(context).colorScheme.primary;
+    return Card(
+      color: color.withValues(alpha: 0.08),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  waiting ? Icons.pause_circle_outline : Icons.rule_outlined,
+                  color: color,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    '决策门：${_decisionLabel(current.decision)}',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: color,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(current.reason),
+            if (current.missingFacts.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text('缺失条件：${current.missingFacts.join('、')}'),
+            ],
+            if (current.conflicts.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text('冲突规则：${current.conflicts.join('、')}'),
+            ],
+            if (current.invalidationConditions.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text('失效条件：${current.invalidationConditions.join('；')}'),
+            ],
+            if (current.calibration != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                '历史校准：${current.calibration!.sampleCount} 个样本 · '
+                '命中率 ${(current.calibration!.hitRate * 100).round()}%',
+              ),
+            ],
+            if (waiting) ...[
+              const SizedBox(height: 8),
+              Text(
+                '规则冲突或条件不完整时，系统只输出等待，不生成买卖结论。',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DecisionOnlyContent extends StatelessWidget {
+  const _DecisionOnlyContent({
+    required this.snapshot,
+    required this.decision,
+    required this.onRefresh,
+  });
+
+  final MarketSnapshot snapshot;
+  final DecisionResult decision;
+  final VoidCallback onRefresh;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: 16),
+        Text(
+          '${snapshot.quote.security.name} · ${snapshot.quote.security.code}',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        const SizedBox(height: 8),
+        Chip(
+          avatar: Icon(_stateIcon(snapshot.source.state), size: 18),
+          label: Text(
+            '${_stateLabel(snapshot.source.state)} · ${snapshot.source.name}',
+          ),
+        ),
+        const SizedBox(height: 16),
+        _DecisionCard(decision: decision),
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton.icon(
+            onPressed: onRefresh,
+            icon: const Icon(Icons.refresh),
+            label: const Text('刷新后重试'),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _PipelineCard extends StatelessWidget {
   const _PipelineCard({required this.analysis});
 
@@ -569,11 +734,7 @@ class _PipelineCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              switch (analysis.direction) {
-                Direction.bullish => '策略结论：偏多，关注买入区间',
-                Direction.bearish => '策略结论：偏空，注意失效条件',
-                Direction.neutral => '策略结论：中性，等待方向确认',
-              },
+              _decisionSummary(analysis.decision, analysis.direction),
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 4),
