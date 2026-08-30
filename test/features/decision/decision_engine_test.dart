@@ -117,5 +117,25 @@ void main() {
       expect(result.primaryMode, StrategyMode.baseGranville);
       expect(result.matchedRules.single.name, '站上 MA5 的基础上涨');
     });
+    test('waits when a matched rule belongs to another timeframe', () {
+      final result = DecisionEngine().evaluate(
+        input(
+          candidates: [
+            DecisionCandidate(
+              ruleId: 'monthly-rule',
+              ruleVersion: 1,
+              name: '月线规则',
+              mode: StrategyMode.monthlyWait,
+              action: DecisionAction.enter,
+              priority: 1,
+              timeframe: '月线',
+            ),
+          ],
+        ),
+      );
+
+      expect(result.decision, DecisionAction.wait);
+      expect(result.reason, contains('周期'));
+    });
   });
 }
