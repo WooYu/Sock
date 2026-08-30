@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'rule_engine.dart';
+import '../decision/decision_models.dart';
 
 class PersistentRuleRepository {
   static const _key = 'stockcal.rules.v1';
