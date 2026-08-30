@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import '../../domain/stockcal_domain.dart';
 import '../decision/decision_engine.dart';
 import '../decision/decision_models.dart';
-import '../rules/rule_engine.dart;
+import '../rules/rule_engine.dart';
 
 class AnalysisException implements Exception {
   const AnalysisException(this.message);
@@ -604,7 +604,6 @@ class StockAnalyzer {
             maLong: maLong,
             previousMaShort: previousMaShort,
             bollMiddle: boll.middle,
-            facts: facts,
           );
     final decision = _decisionEngine.evaluate(
       DecisionInput(
@@ -678,7 +677,6 @@ class StockAnalyzer {
     required double maLong,
     required double previousMaShort,
     required double bollMiddle,
-    required RuleFacts facts,
   }) {
     final confirmed = trend.pattern == TrendPattern.climbing &&
         lastClose >= maShort &&
