@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../widgets/metric_card.dart';
+import '../decision/calibration.dart';
+import '../decision/persistent_calibration_repository.dart';
+import '../rules/rule_engine.dart';
 import '../portfolio/portfolio_ledger.dart';
 import 'persistent_review_store.dart';
 import 'review_ai.dart';
@@ -12,11 +15,17 @@ class ReviewWorkspace extends StatefulWidget {
     this.store,
     this.trades = const [],
     this.explanationAdapter,
+    this.ruleBook,
+    this.calibrationBook,
+    this.calibrationRepository,
   });
 
   final PersistentReviewStore? store;
   final List<TradeEntry> trades;
   final ReviewExplanationAdapter? explanationAdapter;
+  final RuleBook? ruleBook;
+  final CalibrationBook? calibrationBook;
+  final PersistentCalibrationRepository? calibrationRepository;
 
   @override
   State<ReviewWorkspace> createState() => _ReviewWorkspaceState();
@@ -295,6 +304,8 @@ class _ReviewWorkspaceState extends State<ReviewWorkspace> {
   Future<void> _createReview() async {
     final formKey = GlobalKey<FormState>();
     var trade = _reviewableTrades.first;
+    final availableRules = widget.ruleBook?.activeRules ?? const <RuleVersion>[];
+    var selectedRule = availableRules.isEmpty ? null : availableRules.first;
     var plannedPrice = '';
     var actualClose = '';
     var predictionVersion = '';
@@ -329,7 +340,21 @@ class _ReviewWorkspaceState extends State<ReviewWorkspace> {
                       if (value != null) trade = value;
                     },
                   ),
-                  const SizedBox(height: 12),
+                  if (availableRules.isNotEmpty) ...[
+                    DropdownButtonFormField<RuleVersion>(
+                      initialValue: selectedRule,
+                      decoration: const InputDecoration(labelText: '关联规则版本'),
+                      items: [
+                        for (final rule in availableRules)
+                          DropdownMenuItem(
+                            value: rule,
+                            child: Text('${rule.name} · v${rule.version}'),
+                          ),
+                      ],
+                      onChanged: (value) => selectedRule = value,
+                    ),
+                    const SizedBox(height: 12),
+                  ],
                   _numberField('计划价', (value) => plannedPrice = value),
                   const SizedBox(height: 12),
                   _numberField('实际收盘', (value) => actualClose = value),
@@ -373,6 +398,7 @@ class _ReviewWorkspaceState extends State<ReviewWorkspace> {
                 context,
                 _ReviewDraft(
                   trade,
+                  selectedRule,
                   double.parse(plannedPrice),
                   double.parse(actualClose),
                   int.parse(predictionVersion),
@@ -390,6 +416,7 @@ class _ReviewWorkspaceState extends State<ReviewWorkspace> {
     if (draft == null) return;
     final review = await _reviews.createTradeReview(
       stockCode: draft.trade.code!,
+      ruleId: draft.rule?.id,
       tradeId: draft.trade.id,
       tradedAt: draft.trade.occurredAt,
       plannedPrice: draft.plannedPrice,
@@ -402,6 +429,19 @@ class _ReviewWorkspaceState extends State<ReviewWorkspace> {
           ? null
           : draft.invalidationReason,
     );
+    final rule = draft.rule;
+    final calibrationBook = widget.calibrationBook;
+    if (rule != null && calibrationBook != null) {
+      final calibration = await _reviews.calibrationForRule(
+        ruleId: rule.id,
+        ruleVersion: rule.version,
+        mode: rule.mode,
+        timeframe: rule.timeframe,
+        horizonSessions: 3,
+      );
+      calibrationBook.upsert(calibration);
+      await widget.calibrationRepository?.save(calibrationBook);
+    }
     if (!mounted) return;
     setState(() {
       _review = review;
@@ -486,6 +526,7 @@ class _ReviewWorkspaceState extends State<ReviewWorkspace> {
 class _ReviewDraft {
   const _ReviewDraft(
     this.trade,
+    this.rule,
     this.plannedPrice,
     this.actualClose,
     this.predictionVersion,
@@ -495,6 +536,7 @@ class _ReviewDraft {
   );
 
   final TradeEntry trade;
+  final RuleVersion? rule;
   final double plannedPrice;
   final double actualClose;
   final int predictionVersion;
