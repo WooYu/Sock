@@ -188,6 +188,20 @@ class _AnalysisContent extends StatelessWidget {
   final String? explanationError;
   final bool explaining;
 
+  static String _stateLabel(MarketDataState state) => switch (state) {
+    MarketDataState.realtime => '实时行情',
+    MarketDataState.delayed => '延迟行情',
+    MarketDataState.stale => '行情已过期',
+    MarketDataState.offlineCache => '离线缓存',
+  };
+
+  static IconData _stateIcon(MarketDataState state) => switch (state) {
+    MarketDataState.realtime => Icons.bolt,
+    MarketDataState.delayed => Icons.schedule,
+    MarketDataState.stale => Icons.warning_amber,
+    MarketDataState.offlineCache => Icons.cloud_off_outlined,
+  };
+
   @override
   Widget build(BuildContext context) {
     final quote = snapshot.quote;
@@ -354,8 +368,8 @@ class _AnalysisContent extends StatelessWidget {
                   ),
                   _PlanRow(
                     label: '失效条件',
-                    value: decision?.invalidationConditions.isNotEmpty == true
-                        ? decision!.invalidationConditions.join('；')
+                    value: decision.invalidationConditions.isNotEmpty
+                        ? decision.invalidationConditions.join('；')
                         : '收盘跌破 ${analysis.support.toStringAsFixed(2)}',
                   ),
                 ] else
