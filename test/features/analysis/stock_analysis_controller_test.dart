@@ -74,3 +74,23 @@ class _FailingAfterFirstMarket implements AShareMarketAdapter {
     expect(controller.decision?.reason, contains('过期'));
   });
 }
+
+
+class _StaleMarket implements AShareMarketAdapter {
+  @override
+  Future<MarketSnapshot> snapshot(String code) async {
+    final snapshot = await DemoAshareMarketAdapter(
+      clock: () => DateTime(2026, 8, 14, 15, 15),
+    ).snapshot(code);
+    return MarketSnapshot(
+      quote: snapshot.quote,
+      dailyCandles: snapshot.dailyCandles,
+      source: MarketSourceInfo(
+        name: snapshot.source.name,
+        fetchedAt: snapshot.source.fetchedAt,
+        state: MarketDataState.stale,
+        isOnline: true,
+      ),
+    );
+  }
+}
