@@ -17,14 +17,17 @@ import jakarta.servlet.DispatcherType;
 
 @Configuration
 public class SecurityConfig {
+    @Value("${stockcal.auth.required:true}")
+    private boolean authenticationRequired;
+
     @Bean
     SecurityFilterChain security(HttpSecurity http, BearerTokenFilter bearer) throws Exception {
         return http
             .cors(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
-                .requestMatchers(
+            .authorizeHttpRequests(auth -> {
+                auth.dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR).permitAll();
+                auth.requestMatchers(
                     "/",
                     "/index.html",
                     "/main.dart.js",
@@ -42,9 +45,14 @@ public class SecurityConfig {
                     "/api/v1/auth/refresh",
                     "/actuator/health",
                     "/error"
-                ).permitAll()
-                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                .anyRequest().authenticated())
+                ).permitAll();
+                if (authenticationRequired) {
+                    auth.requestMatchers("/api/v1/admin/**").hasRole("ADMIN");
+                    auth.anyRequest().authenticated();
+                } else {
+                    auth.anyRequest().permitAll();
+                }
+            })
             .httpBasic(Customizer.withDefaults())
             .addFilterBefore(bearer, UsernamePasswordAuthenticationFilter.class)
             .build();

@@ -38,6 +38,7 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: "6379"
       PORT: "8080"
+      STOCKCAL_AUTH_REQUIRED: ${STOCKCAL_AUTH_REQUIRED:-false}
       STOCKCAL_AI_ENABLED: ${STOCKCAL_AI_ENABLED:-true}
       STOCKCAL_AI_BASE_URL: ${STOCKCAL_AI_BASE_URL:-https://api.deepseek.com}
       STOCKCAL_AI_MODEL: ${STOCKCAL_AI_MODEL:-deepseek-chat}
