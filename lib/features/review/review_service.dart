@@ -1,6 +1,10 @@
+import '../decision/calibration.dart';
+import '../decision/decision_models.dart';
+
 class TradeReview {
   const TradeReview({
     required this.id,
+    this.ruleId,
     required this.stockCode,
     required this.tradeId,
     required this.tradedAt,
@@ -14,6 +18,7 @@ class TradeReview {
   });
 
   final String id;
+  final String? ruleId;
   final String stockCode;
   final String tradeId;
   final DateTime tradedAt;
@@ -76,6 +81,7 @@ class ReviewService {
 
   Future<TradeReview> createTradeReview({
     required String stockCode,
+    String? ruleId,
     required String tradeId,
     required DateTime tradedAt,
     required double plannedPrice,
@@ -88,6 +94,7 @@ class ReviewService {
   }) async {
     final review = TradeReview(
       id: idFactory(),
+      ruleId: ruleId,
       stockCode: stockCode,
       tradeId: tradeId,
       tradedAt: tradedAt,
@@ -103,6 +110,69 @@ class ReviewService {
     return review;
   }
 
+  Future<CalibrationEntry> calibrationForRule({
+    required String ruleId,
+    required int ruleVersion,
+    required StrategyMode mode,
+    required String timeframe,
+    int horizonSessions = 2,
+    String? stockCode,
+    double hitTolerance = 0.05,
+    int minimumSampleCount = 10,
+  }) async {
+    final reviews = (await repository.tradeReviews())
+        .where(
+          (review) =>
+              review.ruleId == ruleId &&
+              review.predictionVersion == ruleVersion &&
+              (stockCode == null || review.stockCode == stockCode),
+        )
+        .toList()
+      ..sort((a, b) => a.tradedAt.compareTo(b.tradedAt));
+    final reasons = <String, int>{};
+    for (final review in reviews) {
+      final reason = review.invalidationReason;
+      if (reason != null && reason.isNotEmpty) {
+        reasons[reason] = (reasons[reason] ?? 0) + 1;
+      }
+    }
+    final count = reviews.length;
+    final hitCount = reviews
+        .where((review) => review.predictionErrorPercent <= hitTolerance)
+        .length;
+    final summary = CalibrationService.fromMetrics(
+      sampleCount: count,
+      hitRate: count == 0 ? 0 : hitCount / count,
+      meanAbsoluteError: count == 0
+          ? 0
+          : reviews.fold<double>(
+                  0,
+                  (sum, review) => sum + review.predictionErrorPercent,
+                ) /
+                count,
+      meanSlippage: count == 0
+          ? 0
+          : reviews.fold<double>(
+                  0,
+                  (sum, review) => sum + review.slippagePercent,
+                ) /
+                count,
+      maximumDrawdown: _maximumDrawdown(
+        reviews.map((review) => review.actualClose).toList(growable: false),
+      ),
+      minimumSampleCount: minimumSampleCount,
+      invalidationReasons: reasons,
+    );
+    return CalibrationEntry(
+      ruleId: ruleId,
+      ruleVersion: ruleVersion,
+      mode: mode,
+      timeframe: timeframe,
+      horizonSessions: horizonSessions,
+      summary: summary,
+    );
+  }
+
   Future<ReviewSummary> daily(DateTime day) {
     final from = DateTime(day.year, day.month, day.day);
     return _summarize(from, from.add(const Duration(days: 1)));
@@ -114,6 +184,19 @@ class ReviewService {
       Duration(days: date.weekday - DateTime.monday),
     );
     return _summarize(monday, monday.add(const Duration(days: 7)));
+  }
+
+  double _maximumDrawdown(List<double> values) {
+    if (values.isEmpty) return 0;
+    var peak = values.first;
+    var maximum = 0.0;
+    for (final value in values) {
+      if (value > peak) peak = value;
+      if (peak == 0) continue;
+      final drawdown = (peak - value) / peak;
+      if (drawdown > maximum) maximum = drawdown;
+    }
+    return maximum;
   }
 
   Future<ReviewSummary> _summarize(DateTime from, DateTime exclusiveTo) async {
