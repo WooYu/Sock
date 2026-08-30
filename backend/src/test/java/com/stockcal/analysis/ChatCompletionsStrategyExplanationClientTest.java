@@ -26,13 +26,7 @@ class ChatCompletionsStrategyExplanationClientTest {
             .andExpect(jsonPath("$.messages[1].content").value(
                 org.hamcrest.Matchers.containsString(""decision":"WAIT"")))
             .andRespond(withSuccess("""
-                {"choices":[{"message":{"content":"{
-                  "decision":"WAIT",
-                  "summary":"等待条件补齐",
-                  "evidenceIds":["freshness"],
-                  "risks":["行情可能过期"],
-                  "unknowns":["板块强弱"]
-                }"}}]}
+                {"choices":[{"message":{"content":"{\"decision\":\"WAIT\",\"summary\":\"等待条件补齐\",\"evidenceIds\":[\"freshness\"],\"risks\":[\"行情可能过期\"],\"unknowns\":[\"板块强弱\"]}"}}]}
                 """, MediaType.APPLICATION_JSON));
         var client = new ChatCompletionsStrategyExplanationClient(
             builder.build(), "https://api.deepseek.com", "test-key", "deepseek-chat");
