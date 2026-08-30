@@ -19,7 +19,7 @@ class DecisionEngine {
         invalidationConditions: input.hardInvalidations,
         support: input.support,
         resistance: input.resistance,
-        target: input.target,
+        target: null,
         generatedAt: input.generatedAt,
       );
     }
@@ -95,7 +95,7 @@ class DecisionEngine {
     conflicts: conflicts,
     support: input.support,
     resistance: input.resistance,
-    target: input.target,
+    target: null,
     generatedAt: input.generatedAt,
   );
 }
