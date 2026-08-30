@@ -311,6 +311,7 @@ class RuleBook {
       List.unmodifiable(_history[id] ?? const []);
 
   bool evaluate(RuleVersion rule, RuleFacts facts) {
+    if (!rule.enabled || rule.conditions.isEmpty) return false;
     return rule.conditions.every((condition) {
       final actual = facts.valueFor(condition.field);
       if (actual == null) return false;
