@@ -36,10 +36,14 @@ final class InMemoryKnowledgeRepository implements KnowledgeRepository {
         return Optional.of(updated);
     }
 
+    public void invalidateDerived(String sourceId) {
+        drafts.values().removeIf(draft -> draft.sourceDocumentId().equals(sourceId));
+        rules.values().removeIf(rule -> rule.sourceDocumentId().equals(sourceId));
+    }
+
     public void deleteSource(String id) {
+        invalidateDerived(id);
         sources.remove(id);
-        drafts.values().removeIf(d -> d.sourceDocumentId().equals(id));
-        rules.values().removeIf(r -> r.sourceDocumentId().equals(id));
     }
 
     public Optional<KnowledgeDraft> updateDraft(String id, String title, String summary) {
@@ -47,7 +51,8 @@ final class InMemoryKnowledgeRepository implements KnowledgeRepository {
         if (draft == null) return Optional.empty();
         var updated = new KnowledgeDraft(draft.id(), draft.sourceDocumentId(), draft.kind(), title, summary,
             draft.sourceExcerpt(), draft.sourceLineStart(), draft.sourceLineEnd(), draft.extractionMethod(),
-            draft.status(), draft.approvedBy(), draft.reviewedAt());
+            draft.status(), draft.approvedBy(), draft.reviewedAt(), draft.conditions(), draft.action(),
+            draft.mode(), draft.timeframe(), draft.priority(), draft.evidenceIds());
         drafts.put(id, updated);
         return Optional.of(updated);
     }
@@ -59,7 +64,8 @@ final class InMemoryKnowledgeRepository implements KnowledgeRepository {
         if (rule == null) return Optional.empty();
         var updated = new PublishedRule(rule.id(), rule.sourceDocumentId(), rule.name(), rule.description(),
             rule.sourceExcerpt(), rule.sourceLineStart(), rule.sourceLineEnd(), rule.approvedBy(),
-            rule.publishedAt(), enabled);
+            rule.publishedAt(), enabled, rule.conditions(), rule.action(), rule.mode(), rule.timeframe(),
+            rule.priority(), rule.evidenceIds());
         rules.put(id, updated);
         return Optional.of(updated);
     }
