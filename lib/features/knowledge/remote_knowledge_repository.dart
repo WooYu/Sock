@@ -170,6 +170,8 @@ class RemoteKnowledgeRepository implements KnowledgeRepository {
       timeframe: value['timeframe'] as String? ?? '日线',
       priority: (value['priority'] as num?)?.toInt() ?? 50,
       evidenceIds: _strings(value['evidenceIds']),
+      invalidationConditions: _strings(value['invalidationConditions']),
+      strength: value['strength'] as String? ?? 'UNSPECIFIED',
       publishedAt: _date(value['publishedAt']),
     );
   }
@@ -199,6 +201,8 @@ class RemoteKnowledgeRepository implements KnowledgeRepository {
       timeframe: value['timeframe'] as String? ?? '日线',
       priority: (value['priority'] as num?)?.toInt() ?? 50,
       evidenceIds: _strings(value['evidenceIds']),
+      invalidationConditions: _strings(value['invalidationConditions']),
+      strength: value['strength'] as String? ?? 'UNSPECIFIED',
     );
   }
 
