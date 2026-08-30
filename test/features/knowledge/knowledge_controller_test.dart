@@ -119,8 +119,8 @@ void main() {
           KnowledgeDraft(
             id: 'experience-1',
             sourceId: 'source-3',
-            kind: KnowledgeKind.experience,
-            title: '纪律',
+            kind: KnowledgeKind.rule,
+            title: '未结构化原则',
             summary: '不因涨停改变纪律',
             excerpt: '不要因为涨停改变纪律。',
             sourceLine: 1,
