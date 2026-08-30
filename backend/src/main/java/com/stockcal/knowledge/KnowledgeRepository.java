@@ -14,6 +14,7 @@ interface KnowledgeRepository {
     List<KnowledgeDraft> drafts(ApprovalStatus status);
     void savePublishedRule(PublishedRule rule);
     Optional<SourceDocument> updateSource(String id, String content, String hash);
+    void invalidateDerived(String sourceId);
     void deleteSource(String id);
     Optional<KnowledgeDraft> updateDraft(String id, String title, String summary);
     List<PublishedRule> publishedRules();
