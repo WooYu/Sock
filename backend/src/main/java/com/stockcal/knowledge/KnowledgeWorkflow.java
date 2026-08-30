@@ -60,7 +60,8 @@ final class KnowledgeWorkflow {
         var rule = new PublishedRule(UUID.randomUUID().toString(), draft.sourceDocumentId(), draft.title(),
             draft.summary(), draft.sourceExcerpt(), draft.sourceLineStart(), draft.sourceLineEnd(),
             draft.approvedBy(), clock.get(), true, draft.conditions(), draft.action(), draft.mode(),
-            draft.timeframe(), draft.priority(), draft.evidenceIds());
+            draft.timeframe(), draft.priority(), draft.evidenceIds(), draft.invalidationConditions(),
+            draft.strength());
         repository.savePublishedRule(rule);
         return rule;
     }
