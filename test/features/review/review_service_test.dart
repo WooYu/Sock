@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:stockcal/features/decision/decision_models.dart';
 import 'package:stockcal/features/review/review_service.dart';
 
 void main() {
@@ -55,11 +56,39 @@ void main() {
         expect(await repository.tradeReviews(), hasLength(3));
       },
     );
+
+    test('calibrates a rule from review history', () async {
+      await repository.saveTrade(_review(
+        'r4',
+        DateTime(2026, 8, 14),
+        '趋势延续',
+        ruleId: 'trend',
+      ));
+      await repository.saveTrade(_review(
+        'r5',
+        DateTime(2026, 8, 15),
+        '趋势延续',
+        ruleId: 'trend',
+      ));
+
+      final entry = await service.calibrationForRule(
+        ruleId: 'trend',
+        ruleVersion: 1,
+        mode: StrategyMode.baseGranville,
+        timeframe: '日线',
+        minimumSampleCount: 2,
+      );
+
+      expect(entry.key.ruleId, 'trend');
+      expect(entry.summary.sampleCount, 2);
+      expect(entry.summary.calibrated, isTrue);
+    });
   });
 }
 
-TradeReview _review(String id, DateTime day, String failure) => TradeReview(
+TradeReview _review(String id, DateTime day, String failure, {String? ruleId}) => TradeReview(
   id: id,
+  ruleId: ruleId,
   stockCode: '600519',
   tradeId: 'trade-$id',
   tradedAt: day,
