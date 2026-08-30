@@ -12,6 +12,15 @@ const analysis = {
   directionStrength: 0.7,
   matchedRules: [],
   future: [],
+  decision: {
+    action: 'ENTER' as const,
+    reason: '测试规则已命中',
+    matchedRules: [],
+    missingFacts: [],
+    conflicts: [],
+    invalidationConditions: [],
+    evidence: [],
+  },
 }
 
 describe('analysis panels', () => {
