@@ -27,12 +27,30 @@ final class OpenAiKnowledgeExtractor implements KnowledgeExtractor {
                 var end = item.path("sourceLineEnd").asInt();
                 var excerpt = item.path("sourceExcerpt").asText();
                 validateEvidence(lines, start, end, excerpt);
+                var kind = KnowledgeKind.valueOf(item.path("kind").asText());
+                var conditions = kind == KnowledgeKind.RULE
+                    ? StructuredRuleSpec.conditions(item)
+                    : List.<RuleConditionSpec>of();
+                var action = conditions.isEmpty()
+                    ? "WAIT"
+                    : StructuredRuleSpec.action(item);
+                var mode = kind == KnowledgeKind.RULE
+                    ? StructuredRuleSpec.mode(item)
+                    : "BASE_GRANVILLE";
+                var timeframe = kind == KnowledgeKind.RULE
+                    ? StructuredRuleSpec.timeframe(item)
+                    : "日线";
+                var priority = kind == KnowledgeKind.RULE
+                    ? StructuredRuleSpec.priority(item)
+                    : 50;
                 var idSeed = source.id() + ":ai:" + start + ":" + end + ":" + excerpt;
                 drafts.add(new KnowledgeDraft(
                     UUID.nameUUIDFromBytes(idSeed.getBytes(StandardCharsets.UTF_8)).toString(),
-                    source.id(), KnowledgeKind.valueOf(item.path("kind").asText()),
+                    source.id(), kind,
                     item.path("title").asText(), item.path("summary").asText(), excerpt,
-                    start, end, ExtractionMethod.AI, ApprovalStatus.PENDING, null, null));
+                    start, end, ExtractionMethod.AI, ApprovalStatus.PENDING, null, null,
+                    conditions, action, mode, timeframe, priority,
+                    List.of("source:" + start + "-" + end)));
             }
             return List.copyOf(drafts);
         } catch (IllegalArgumentException exception) {
