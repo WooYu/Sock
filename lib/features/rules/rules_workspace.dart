@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../../domain/stockcal_domain.dart';
 import 'backtest_engine.dart';
+import '../decision/calibration.dart';
+import '../decision/persistent_calibration_repository.dart';
 import 'prediction_store.dart';
 import 'persistent_rules_repository.dart';
 import 'rule_engine.dart';
@@ -18,6 +20,9 @@ class RulesWorkspace extends StatefulWidget {
     this.ruleRepository,
     this.predictionRepository,
     this.knowledgeController,
+    this.calibrationBook,
+    this.calibrationRepository,
+    this.onCalibrationChanged,
   });
 
   final RuleBook ruleBook;
@@ -26,6 +31,9 @@ class RulesWorkspace extends StatefulWidget {
   final PersistentRuleRepository? ruleRepository;
   final PredictionRepository? predictionRepository;
   final KnowledgeController? knowledgeController;
+  final CalibrationBook? calibrationBook;
+  final PersistentCalibrationRepository? calibrationRepository;
+  final VoidCallback? onCalibrationChanged;
 
   @override
   State<RulesWorkspace> createState() => _RulesWorkspaceState();
@@ -197,21 +205,38 @@ class _RulesWorkspaceState extends State<RulesWorkspace> {
     setState(() => _prediction = record);
   }
 
-  void _runBacktest() {
+  Future<void> _runBacktest() async {
     final rule = _selected;
     if (rule == null) return;
     try {
+      const horizonSessions = 3;
       final result = BacktestEngine().run(
         request: BacktestRequest(
           stockCode: widget.stockCode,
           rule: rule,
           from: widget.candles.first.day,
           to: widget.candles.last.day,
-          horizonSessions: 3,
+          horizonSessions: horizonSessions,
           hitTolerance: 0.08,
         ),
         candles: widget.candles,
       );
+      final calibrationBook = widget.calibrationBook;
+      if (calibrationBook != null) {
+        calibrationBook.upsert(
+          CalibrationEntry(
+            ruleId: rule.id,
+            ruleVersion: rule.version,
+            mode: rule.mode,
+            timeframe: rule.timeframe,
+            horizonSessions: horizonSessions,
+            summary: result.toCalibration(),
+          ),
+        );
+        await widget.calibrationRepository?.save(calibrationBook);
+        widget.onCalibrationChanged?.call();
+      }
+      if (!mounted) return;
       setState(() {
         _backtest = result;
         _backtestError = null;
