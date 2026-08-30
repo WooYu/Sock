@@ -77,7 +77,7 @@ class RemoteStrategyExplanationAdapter implements StrategyExplanationAdapter {
     final json = jsonDecode(response.body);
     if (json is! Map) throw StateError('AI 策略解释格式无效');
     return StrategyExplanation.fromJson(
-      Map<String, Object?>.from(json as Map),
+      Map<String, Object?>.from(json),
     );
   }
 
