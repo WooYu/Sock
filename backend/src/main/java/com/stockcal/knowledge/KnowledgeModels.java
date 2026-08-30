@@ -65,7 +65,7 @@ record KnowledgeDraft(
     ) {
         this(id, sourceDocumentId, kind, title, summary, sourceExcerpt, sourceLineStart,
             sourceLineEnd, extractionMethod, status, approvedBy, reviewedAt, List.of(),
-            "ENTER", "BASE_GRANVILLE", "日线", 50, List.of());
+            "WAIT", "BASE_GRANVILLE", "日线", 50, List.of());
     }
 
     KnowledgeDraft approve(String userId, Instant at) {
@@ -111,7 +111,7 @@ record PublishedRule(
         boolean enabled
     ) {
         this(id, sourceDocumentId, name, description, sourceExcerpt, sourceLineStart, sourceLineEnd,
-            approvedBy, publishedAt, enabled, List.of(), "ENTER", "BASE_GRANVILLE", "日线", 50,
+            approvedBy, publishedAt, enabled, List.of(), "WAIT", "BASE_GRANVILLE", "日线", 50,
             List.of());
     }
 }
