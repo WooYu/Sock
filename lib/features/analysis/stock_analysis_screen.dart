@@ -300,7 +300,7 @@ class _AnalysisContent extends StatelessWidget {
             _ValueTile(label: '压力位', value: analysis.resistance),
             if (canPlan) _ValueTile(label: '目标位', value: analysis.target),
             _ValueTile(
-              label: '置信度',
+              label: '策略匹配度',
               value: analysis.confidence * 100,
               suffix: '%',
             ),
@@ -646,8 +646,13 @@ class _DecisionCard extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 '历史校准：${current.calibration!.sampleCount} 个样本 · '
-                '命中率 ${(current.calibration!.hitRate * 100).round()}%',
+                '命中率 ${(current.calibration!.hitRate * 100).round()}% · '
+                '${current.calibration!.calibrated ? '已校准' : '样本不足'}'
+                '${current.calibration!.confidence == null ? '' : ' · 校准置信 ${(current.calibration!.confidence! * 100).round()}%'}',
               ),
+            ] else ...[
+              const SizedBox(height: 8),
+              const Text('历史校准：暂无该规则版本的有效样本'),
             ],
             if (waiting) ...[
               const SizedBox(height: 8),
@@ -811,7 +816,7 @@ class _PipelineCard extends StatelessWidget {
                   child: _Stage(
                     number: '03',
                     label: 'AI解释层',
-                    detail: '${(analysis.confidence * 100).round()}% 置信',
+                    detail: '${(analysis.confidence * 100).round()}% 匹配',
                   ),
                 ),
               ],
@@ -824,8 +829,8 @@ class _PipelineCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               analysis.hitRuleNames.isEmpty
-                  ? '解释依据：命中 ${analysis.ruleHitCount}/${analysis.ruleTotalCount} 条规则，置信 ${(analysis.confidence * 100).round()}%'
-                  : '解释依据：命中 ${analysis.hitRuleNames.join('、')}，置信 ${(analysis.confidence * 100).round()}%',
+                  ? '解释依据：命中 ${analysis.ruleHitCount}/${analysis.ruleTotalCount} 条规则，匹配度 ${(analysis.confidence * 100).round()}%'
+                  : '解释依据：命中 ${analysis.hitRuleNames.join('、')}，匹配度 ${(analysis.confidence * 100).round()}%',
               style: Theme.of(context).textTheme.bodySmall,
             ),
             const SizedBox(height: 4),
