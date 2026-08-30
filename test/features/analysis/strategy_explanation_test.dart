@@ -2,12 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/testing.dart' as testing;
 import 'package:stockcal/features/analysis/strategy_explanation.dart';
 import 'package:stockcal/features/decision/decision_models.dart';
 
 void main() {
   test('remote adapter sends the deterministic decision and parses explanation', () async {
-    final client = http.MockClient((request) async {
+    final client = testing.MockClient((request) async {
       expect(request.url.path, '/api/v1/analysis/strategy-explanation');
       expect(request.headers['authorization'], 'Bearer token');
       final body = jsonDecode(request.body) as Map<String, Object?>;
