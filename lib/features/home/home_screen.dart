@@ -31,6 +31,7 @@ import '../portfolio/portfolio_screen.dart';
 import '../preferences/preferences_controller.dart';
 import '../rules/rule_engine.dart';
 import '../decision/calibration.dart';
+import '../decision/decision_models.dart';
 import '../decision/persistent_calibration_repository.dart';
 import '../rules/persistent_rules_repository.dart';
 import '../rules/persistent_prediction_repository.dart';
