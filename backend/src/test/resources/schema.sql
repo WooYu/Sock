@@ -59,14 +59,30 @@ create table if not exists knowledge_draft (
     kind varchar(20) not null, title varchar(500) not null, summary clob not null, source_excerpt clob not null,
     source_line_start integer not null, source_line_end integer not null, status varchar(20) not null,
     extraction_method varchar(20) not null,
-    approved_by varchar(100), reviewed_at timestamp with time zone
+    approved_by varchar(100), reviewed_at timestamp with time zone,
+    rule_conditions clob not null default '[]',
+    rule_action varchar(20) not null default 'WAIT',
+    strategy_mode varchar(40) not null default 'BASE_GRANVILLE',
+    timeframe varchar(50) not null default '日线',
+    priority integer not null default 50,
+    evidence_ids clob not null default '[]',
+    invalidation_conditions clob not null default '[]',
+    strength varchar(20) not null default 'UNSPECIFIED'
 );
 create table if not exists published_rule_source (
     id varchar(36) primary key, source_document_id varchar(36) not null references knowledge_source(id),
     name varchar(500) not null, description clob not null, source_excerpt clob not null,
     source_line_start integer not null, source_line_end integer not null, approved_by varchar(100) not null,
     published_at timestamp with time zone not null,
-    enabled boolean not null default true
+    enabled boolean not null default true,
+    rule_conditions clob not null default '[]',
+    rule_action varchar(20) not null default 'WAIT',
+    strategy_mode varchar(40) not null default 'BASE_GRANVILLE',
+    timeframe varchar(50) not null default '日线',
+    priority integer not null default 50,
+    evidence_ids clob not null default '[]',
+    invalidation_conditions clob not null default '[]',
+    strength varchar(20) not null default 'UNSPECIFIED'
 );
 
 create table if not exists admin_job (
