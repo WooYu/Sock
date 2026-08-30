@@ -5,12 +5,14 @@ import java.util.Map;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 final class ChatCompletionsKnowledgeClient implements KnowledgeAiClient {
     private final RestClient rest;
     private final String baseUrl;
     private final String apiKey;
     private final String model;
+    private final JsonMapper mapper = JsonMapper.builder().build();
 
     ChatCompletionsKnowledgeClient(RestClient rest, String baseUrl, String apiKey, String model) {
         this.rest = rest;
@@ -20,7 +22,7 @@ final class ChatCompletionsKnowledgeClient implements KnowledgeAiClient {
     }
 
     public String extract(String lineNumberedContent) {
-        var response = rest.post().uri(endpoint())
+        var responseText = rest.post().uri(endpoint())
             .contentType(MediaType.APPLICATION_JSON)
             .header("Authorization", "Bearer " + apiKey)
             .body(Map.of(
@@ -31,8 +33,16 @@ final class ChatCompletionsKnowledgeClient implements KnowledgeAiClient {
                 ),
                 "response_format", Map.of("type", "json_object")
             ))
-            .retrieve().body(JsonNode.class);
-        if (response == null) throw new IllegalStateException("AI 服务没有返回内容");
+            .retrieve().body(String.class);
+        if (responseText == null || responseText.isBlank()) {
+            throw new IllegalStateException("AI 服务没有返回内容");
+        }
+        final JsonNode response;
+        try {
+            response = mapper.readTree(responseText);
+        } catch (Exception error) {
+            throw new IllegalStateException("AI 服务返回内容不是有效 JSON", error);
+        }
         var text = response.path("choices").path(0).path("message").path("content").asText();
         if (text.isBlank()) throw new IllegalStateException("AI 服务未返回结构化文本");
         return text;
