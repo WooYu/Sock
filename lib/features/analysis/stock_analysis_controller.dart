@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../decision/decision_models.dart';
 import '../market/market_data.dart';
+import 'strategy_explanation.dart';
 import 'technical_analysis.dart';
 
 enum StockAnalysisStatus { idle, searching, loading, ready, error }
@@ -11,11 +12,13 @@ class StockAnalysisController extends ChangeNotifier {
     required this.catalog,
     required this.market,
     required this.analyzer,
+    this.strategyExplanationAdapter,
   });
 
   final StockCatalog catalog;
   final AShareMarketAdapter market;
   final StockAnalyzer analyzer;
+  final StrategyExplanationAdapter? strategyExplanationAdapter;
 
   StockAnalysisStatus status = StockAnalysisStatus.idle;
   OperationCycle cycle = OperationCycle.swing;
@@ -24,6 +27,9 @@ class StockAnalysisController extends ChangeNotifier {
   MarketSnapshot? snapshot;
   StockAnalysis? analysis;
   DecisionResult? decision;
+  StrategyExplanation? aiExplanation;
+  bool explaining = false;
+  String? explanationError;
   String? errorMessage;
 
   bool get canRetry => selected != null && status == StockAnalysisStatus.error;
@@ -62,9 +68,41 @@ class StockAnalysisController extends ChangeNotifier {
     await _load();
   }
 
+  Future<void> explainDecision() async {
+    final current = decision;
+    final adapter = strategyExplanationAdapter;
+    if (current == null) {
+      explanationError = '当前没有可解释的决策结果';
+      notifyListeners();
+      return;
+    }
+    if (adapter == null) {
+      explanationError = 'AI 解释服务尚未配置';
+      notifyListeners();
+      return;
+    }
+    explaining = true;
+    explanationError = null;
+    notifyListeners();
+    try {
+      final generated = await adapter.explain(current);
+      if (generated.decision != current.decision) {
+        throw StateError('AI 返回的决策与规则引擎不一致');
+      }
+      aiExplanation = generated;
+    } on Object catch (error) {
+      explanationError = 'AI 策略解释暂不可用：$error';
+    } finally {
+      explaining = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> _load() async {
     status = StockAnalysisStatus.loading;
     errorMessage = null;
+    explanationError = null;
+    aiExplanation = null;
     notifyListeners();
     try {
       final loaded = await market.snapshot(selected!.code);
