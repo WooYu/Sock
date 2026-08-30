@@ -195,7 +195,8 @@ class _AnalysisContent extends StatelessWidget {
     final decision = analysis.decision;
     final canPlan = decision != null &&
         decision.decision != DecisionAction.wait &&
-        decision.decision != DecisionAction.avoid;
+        decision.decision != DecisionAction.avoid &&
+        decision.decision != DecisionAction.exit;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
