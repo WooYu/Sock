@@ -459,6 +459,9 @@ class _Workspace extends StatelessWidget {
         store: reviewStore,
         trades: portfolioController.ledger.entries,
         explanationAdapter: reviewExplanation,
+        ruleBook: ruleBook,
+        calibrationBook: calibrationBook,
+        calibrationRepository: calibrationRepository,
       );
     }
     if (module == 'rules') {
