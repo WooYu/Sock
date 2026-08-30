@@ -40,6 +40,8 @@ class KnowledgeDraft {
     this.timeframe = '日线',
     this.priority = 50,
     this.evidenceIds = const [],
+    this.invalidationConditions = const [],
+    this.strength = 'UNSPECIFIED',
   });
 
   final String id;
@@ -58,6 +60,8 @@ class KnowledgeDraft {
   final String timeframe;
   final int priority;
   final List<String> evidenceIds;
+  final List<String> invalidationConditions;
+  final String strength;
 
   bool get isExecutableRule =>
       kind == KnowledgeKind.rule &&
@@ -81,6 +85,8 @@ class KnowledgeDraft {
     timeframe: timeframe,
     priority: priority,
     evidenceIds: evidenceIds,
+    invalidationConditions: invalidationConditions,
+    strength: strength,
   );
 }
 
@@ -101,6 +107,7 @@ class PublishedRule {
     this.priority = 50,
     this.evidenceIds = const [],
     this.invalidationConditions = const [],
+    this.strength = 'UNSPECIFIED',
     this.publishedAt,
   });
 
@@ -119,6 +126,7 @@ class PublishedRule {
   final int priority;
   final List<String> evidenceIds;
   final List<String> invalidationConditions;
+  final String strength;
   final DateTime? publishedAt;
 
   bool get isExecutable => conditions.isNotEmpty && action != DecisionAction.wait;
@@ -137,6 +145,7 @@ class PublishedRule {
     timeframe: timeframe,
     invalidationConditions: invalidationConditions,
     evidenceIds: evidenceIds,
+    strength: strength,
   );
 }
 
@@ -207,6 +216,8 @@ class MemoryKnowledgeRepository implements KnowledgeRepository {
         timeframe: draft.timeframe,
         priority: draft.priority,
         evidenceIds: draft.evidenceIds,
+        invalidationConditions: draft.invalidationConditions,
+        strength: draft.strength,
       ),
     );
   }
@@ -255,6 +266,8 @@ class MemoryKnowledgeRepository implements KnowledgeRepository {
       timeframe: draft.timeframe,
       priority: draft.priority,
       evidenceIds: draft.evidenceIds,
+      invalidationConditions: draft.invalidationConditions,
+      strength: draft.strength,
     );
   }
 
@@ -282,6 +295,7 @@ class MemoryKnowledgeRepository implements KnowledgeRepository {
       priority: rule.priority,
       evidenceIds: rule.evidenceIds,
       invalidationConditions: rule.invalidationConditions,
+      strength: rule.strength,
       publishedAt: rule.publishedAt,
     );
   }
@@ -366,7 +380,7 @@ class KnowledgeController extends ChangeNotifier {
         .map(
           (rule) =>
               '${rule.id}:${rule.enabled}:${rule.action.name}:${rule.mode.name}:'
-              '${rule.priority}:${rule.conditions.map((c) => '${c.field.name}:${c.operator.name}:${c.value}').join(',')}',
+              '${rule.priority}:${rule.strength}:${rule.invalidationConditions.join(',')}:${rule.conditions.map((c) => '${c.field.name}:${c.operator.name}:${c.value}').join(',')}',
         )
         .join('|');
     if (signature == _appliedRulesSignature) return false;
