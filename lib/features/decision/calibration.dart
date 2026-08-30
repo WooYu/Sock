@@ -74,11 +74,23 @@ class CalibrationEntry {
 
 class CalibrationBook {
   CalibrationBook.fromEntries(Iterable<CalibrationEntry> entries)
-    : _summaries = Map.unmodifiable({
+    : _summaries = {
         for (final entry in entries) entry.key: entry.summary,
-      });
+      };
 
   final Map<CalibrationKey, DecisionCalibration> _summaries;
+
+  void upsert(CalibrationEntry entry) {
+    _summaries[entry.key] = entry.summary;
+  }
+
+  void replaceWith(Iterable<CalibrationEntry> entries) {
+    _summaries
+      ..clear()
+      ..addEntries(
+        entries.map((entry) MapEntry(entry.key, entry.summary)),
+      );
+  }
 
   List<CalibrationEntry> get entries => List.unmodifiable(
     _summaries.entries.map(
