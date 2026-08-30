@@ -498,8 +498,9 @@ class _Workspace extends StatelessWidget {
                       label: '压力',
                       color: StockCalColors.gain,
                     ),
-                    if (analysis.decision?.decision != DecisionAction.wait &&
-                        analysis.decision?.decision != DecisionAction.avoid)
+                    if (analysis.decision != null &&
+                        analysis.decision!.decision != DecisionAction.wait &&
+                        analysis.decision!.decision != DecisionAction.avoid)
                       ChartLevel(
                         price: analysis.target,
                         label: '目标',
