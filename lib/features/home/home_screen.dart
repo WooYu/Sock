@@ -141,6 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
         accessToken: () => _sessionController.session?.accessToken,
       ),
     );
+    _knowledgeController.addListener(_onKnowledgeChanged);
     _annotationSyncWorker = AnnotationSyncWorker(
       store: _annotationStore,
       remote: RemoteSyncService(baseUrl: Uri.parse(apiUrl)),
@@ -159,8 +160,16 @@ class _HomeScreenState extends State<HomeScreen> {
     _watchlistController.dispose();
     _sessionController.removeListener(_syncPending);
     _sessionController.dispose();
+    _knowledgeController.removeListener(_onKnowledgeChanged);
     _knowledgeController.dispose();
     super.dispose();
+  }
+
+  void _onKnowledgeChanged() {
+    if (!_knowledgeController.applyPublishedRulesTo(_ruleBook)) return;
+    if (_stockAnalysisController.analysis != null) {
+      unawaited(_stockAnalysisController.refresh());
+    }
   }
 
   void _syncPending() {
