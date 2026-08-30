@@ -35,7 +35,7 @@ final class ChatCompletionsStrategyExplanationClient implements StrategyExplanat
         } catch (Exception error) {
             throw new IllegalStateException("无法序列化策略解释输入", error);
         }
-        var response = rest.post().uri(endpoint())
+        var responseText = rest.post().uri(endpoint())
             .contentType(MediaType.APPLICATION_JSON)
             .header("Authorization", "Bearer " + apiKey)
             .body(Map.of(
@@ -46,8 +46,16 @@ final class ChatCompletionsStrategyExplanationClient implements StrategyExplanat
                 ),
                 "response_format", Map.of("type", "json_object")
             ))
-            .retrieve().body(JsonNode.class);
-        if (response == null) throw new IllegalStateException("AI 服务没有返回内容");
+            .retrieve().body(String.class);
+        if (responseText == null || responseText.isBlank()) {
+            throw new IllegalStateException("AI 服务没有返回内容");
+        }
+        final JsonNode response;
+        try {
+            response = mapper.readTree(responseText);
+        } catch (Exception error) {
+            throw new IllegalStateException("AI 服务返回内容不是有效 JSON", error);
+        }
         var text = response.path("choices").path(0).path("message").path("content").asText();
         if (text.isBlank()) throw new IllegalStateException("AI 服务未返回结构化解释");
         try {
