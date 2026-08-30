@@ -1,13 +1,13 @@
 import { describe, expect, test, vi } from 'vitest'
 import { POST } from './route'
 
-const explainStrategy = vi.fn(async (payload: unknown, authorization?: string) => ({
+const explainStrategy = vi.hoisted(() => vi.fn(async (payload: unknown, authorization?: string) => ({
   decision: (payload as { decision: string }).decision,
   summary: authorization ? '解释成功' : '未登录',
   evidenceIds: [],
   risks: [],
   unknowns: [],
-}))
+})))
 
 vi.mock('@/lib/api/backend-client', () => ({ explainStrategy }))
 
