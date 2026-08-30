@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stockcal/domain/stockcal_domain.dart';
 import 'package:stockcal/features/analysis/technical_analysis.dart';
+import 'package:stockcal/features/decision/decision_models.dart';
 import 'package:stockcal/features/market/market_data.dart';
 import 'package:stockcal/features/rules/rule_engine.dart';
 
