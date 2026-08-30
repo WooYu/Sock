@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../decision/decision_models.dart';
 import '../market/market_data.dart';
 import 'technical_analysis.dart';
 
@@ -22,6 +23,7 @@ class StockAnalysisController extends ChangeNotifier {
   Security? selected;
   MarketSnapshot? snapshot;
   StockAnalysis? analysis;
+  DecisionResult? decision;
   String? errorMessage;
 
   bool get canRetry => selected != null && status == StockAnalysisStatus.error;
@@ -66,9 +68,28 @@ class StockAnalysisController extends ChangeNotifier {
     notifyListeners();
     try {
       final loaded = await market.snapshot(selected!.code);
-      final calculated = analyzer.analyze(loaded.dailyCandles, lookback: cycle.lookback);
       snapshot = loaded;
-      analysis = calculated;
+      final dataFresh = switch (loaded.source.state) {
+        MarketDataState.realtime || MarketDataState.delayed => true,
+        MarketDataState.stale || MarketDataState.offlineCache => false,
+      };
+      try {
+        final calculated = analyzer.analyze(
+          loaded.dailyCandles,
+          lookback: cycle.lookback,
+          dataFresh: dataFresh,
+        );
+        analysis = calculated;
+        decision = calculated.decision;
+      } on AnalysisException catch (error) {
+        analysis = null;
+        decision = DecisionResult(
+          decision: DecisionAction.wait,
+          reason: '分析条件不完整，等待更多历史行情：${error.message}',
+          missingFacts: [error.message],
+          generatedAt: DateTime.now(),
+        );
+      }
       status = StockAnalysisStatus.ready;
     } on MarketLoadException catch (error) {
       status = StockAnalysisStatus.error;
