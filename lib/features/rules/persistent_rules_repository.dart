@@ -36,6 +36,7 @@ class PersistentRuleRepository {
     'timeframe': rule.timeframe,
     'invalidationConditions': rule.invalidationConditions,
     'evidenceIds': rule.evidenceIds,
+    'strength': rule.strength,
     'conditions': [
       for (final condition in rule.conditions)
         {
@@ -64,6 +65,7 @@ class PersistentRuleRepository {
       timeframe: json['timeframe'] as String? ?? '日线',
       invalidationConditions: _strings(json['invalidationConditions']),
       evidenceIds: _strings(json['evidenceIds']),
+      strength: json['strength'] as String? ?? 'UNSPECIFIED',
     );
   }
 
