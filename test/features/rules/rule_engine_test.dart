@@ -177,7 +177,6 @@ void main() {
       expect(latest, hasLength(2));
       expect(latest, everyElement(predicate<RuleVersion>((rule) => rule.system)));
     });
-  });
 
     test('does not trigger an empty rule with no measurable conditions', () {
       final rule = ruleBook.create(
