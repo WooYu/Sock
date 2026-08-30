@@ -6,6 +6,7 @@ import '../decision/decision_models.dart';
 import '../market/market_data.dart';
 import '../knowledge/knowledge.dart';
 import 'stock_analysis_controller.dart';
+import 'strategy_explanation.dart';
 import 'direction_gauge.dart';
 import 'technical_analysis.dart';
 
@@ -108,6 +109,10 @@ class _StockAnalysisScreenState extends State<StockAnalysisScreen> {
                           .toList(growable: false) ??
                       const [],
                   knowledgeController: widget.knowledgeController,
+                  onExplain: controller.explainDecision,
+                  explanation: controller.aiExplanation,
+                  explanationError: controller.explanationError,
+                  explaining: controller.explaining,
                 ),
               if (controller.snapshot != null &&
                   controller.analysis == null &&
@@ -116,6 +121,10 @@ class _StockAnalysisScreenState extends State<StockAnalysisScreen> {
                   snapshot: controller.snapshot!,
                   decision: controller.decision!,
                   onRefresh: controller.refresh,
+                  onExplain: controller.explainDecision,
+                  explanation: controller.aiExplanation,
+                  explanationError: controller.explanationError,
+                  explaining: controller.explaining,
                 ),
             ],
           ),
@@ -159,6 +168,10 @@ class _AnalysisContent extends StatelessWidget {
     required this.onCycleChanged,
     required this.knowledge,
     required this.knowledgeController,
+    required this.onExplain,
+    required this.explanation,
+    required this.explanationError,
+    required this.explaining,
     this.onOpenChart,
   });
 
@@ -170,6 +183,10 @@ class _AnalysisContent extends StatelessWidget {
   final ValueChanged<OperationCycle> onCycleChanged;
   final List<KnowledgeDraft> knowledge;
   final KnowledgeController? knowledgeController;
+  final VoidCallback? onExplain;
+  final StrategyExplanation? explanation;
+  final String? explanationError;
+  final bool explaining;
 
   @override
   Widget build(BuildContext context) {
@@ -248,7 +265,13 @@ class _AnalysisContent extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        _DecisionCard(decision: decision),
+        _DecisionCard(
+          decision: decision,
+          onExplain: onExplain,
+          explanation: explanation,
+          explanationError: explanationError,
+          explaining: explaining,
+        ),
         const SizedBox(height: 16),
         Center(
           child: DirectionGauge(
@@ -555,9 +578,19 @@ String _decisionSummary(DecisionResult? decision, Direction direction) {
 }
 
 class _DecisionCard extends StatelessWidget {
-  const _DecisionCard({required this.decision});
+  const _DecisionCard({
+    required this.decision,
+    this.onExplain,
+    this.explanation,
+    this.explanationError,
+    this.explaining = false,
+  });
 
   final DecisionResult? decision;
+  final VoidCallback? onExplain;
+  final StrategyExplanation? explanation;
+  final String? explanationError;
+  final bool explaining;
 
   @override
   Widget build(BuildContext context) {
@@ -623,6 +656,43 @@ class _DecisionCard extends StatelessWidget {
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
+            if (onExplain != null) ...[
+              const SizedBox(height: 12),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: OutlinedButton.icon(
+                  onPressed: explaining ? null : onExplain,
+                  icon: explaining
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.auto_awesome),
+                  label: Text(explaining ? '解释中…' : '让 AI 解释已确定结果'),
+                ),
+              ),
+            ],
+            if (explanationError != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                explanationError!,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            ],
+            if (explanation != null) ...[
+              const SizedBox(height: 12),
+              Text(
+                'AI 解释（不改变决策）',
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              const SizedBox(height: 4),
+              Text(explanation!.summary),
+              if (explanation!.risks.isNotEmpty)
+                Text('风险：${explanation!.risks.join('、')}'),
+              if (explanation!.unknowns.isNotEmpty)
+                Text('未知：${explanation!.unknowns.join('、')}'),
+            ],
           ],
         ),
       ),
@@ -635,11 +705,19 @@ class _DecisionOnlyContent extends StatelessWidget {
     required this.snapshot,
     required this.decision,
     required this.onRefresh,
+    this.onExplain,
+    this.explanation,
+    this.explanationError,
+    this.explaining = false,
   });
 
   final MarketSnapshot snapshot;
   final DecisionResult decision;
   final VoidCallback onRefresh;
+  final VoidCallback? onExplain;
+  final StrategyExplanation? explanation;
+  final String? explanationError;
+  final bool explaining;
 
   @override
   Widget build(BuildContext context) {
@@ -659,7 +737,13 @@ class _DecisionOnlyContent extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        _DecisionCard(decision: decision),
+        _DecisionCard(
+          decision: decision,
+          onExplain: onExplain,
+          explanation: explanation,
+          explanationError: explanationError,
+          explaining: explaining,
+        ),
         Align(
           alignment: Alignment.centerRight,
           child: TextButton.icon(
