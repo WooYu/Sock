@@ -53,7 +53,9 @@ public class JdbcKnowledgeRepository implements KnowledgeRepository {
                    strategy_mode=:mode,
                    timeframe=:timeframe,
                    priority=:priority,
-                   evidence_ids=:evidence
+                   evidence_ids=:evidence,
+                   invalidation_conditions=:invalidation,
+                   strength=:strength
              where id=:id
             """)
             .param("id", value.id())
@@ -66,6 +68,8 @@ public class JdbcKnowledgeRepository implements KnowledgeRepository {
             .param("timeframe", value.timeframe())
             .param("priority", value.priority())
             .param("evidence", writeJson(value.evidenceIds()))
+            .param("invalidation", writeJson(value.invalidationConditions()))
+            .param("strength", value.strength())
             .update();
         if (updated > 0) return;
 
@@ -99,6 +103,8 @@ public class JdbcKnowledgeRepository implements KnowledgeRepository {
             .param("timeframe", value.timeframe())
             .param("priority", value.priority())
             .param("evidence", writeJson(value.evidenceIds()))
+            .param("invalidation", writeJson(value.invalidationConditions()))
+            .param("strength", value.strength())
             .update();
     }
 
@@ -126,11 +132,13 @@ public class JdbcKnowledgeRepository implements KnowledgeRepository {
             insert into published_rule_source(
                 id,source_document_id,name,description,source_excerpt,
                 source_line_start,source_line_end,approved_by,published_at,enabled,
-                rule_conditions,rule_action,strategy_mode,timeframe,priority,evidence_ids
+                rule_conditions,rule_action,strategy_mode,timeframe,priority,evidence_ids,
+                invalidation_conditions,strength
             ) values(
                 :id,:source,:name,:description,:excerpt,
                 :start,:end,:by,:at,:enabled,
-                :conditions,:action,:mode,:timeframe,:priority,:evidence
+                :conditions,:action,:mode,:timeframe,:priority,:evidence,
+                :invalidation,:strength
             )
             """)
             .param("id", value.id())
@@ -149,6 +157,8 @@ public class JdbcKnowledgeRepository implements KnowledgeRepository {
             .param("timeframe", value.timeframe())
             .param("priority", value.priority())
             .param("evidence", writeJson(value.evidenceIds()))
+            .param("invalidation", writeJson(value.invalidationConditions()))
+            .param("strength", value.strength())
             .update();
     }
 
@@ -204,7 +214,9 @@ public class JdbcKnowledgeRepository implements KnowledgeRepository {
             rs.getString("strategy_mode"),
             rs.getString("timeframe"),
             rs.getInt("priority"),
-            readStrings(rs.getString("evidence_ids"))
+            readStrings(rs.getString("evidence_ids")),
+            readStrings(rs.getString("invalidation_conditions")),
+            rs.getString("strength")
         );
     }
 
@@ -239,7 +251,9 @@ public class JdbcKnowledgeRepository implements KnowledgeRepository {
             rs.getString("strategy_mode"),
             rs.getString("timeframe"),
             rs.getInt("priority"),
-            readStrings(rs.getString("evidence_ids"))
+            readStrings(rs.getString("evidence_ids")),
+            readStrings(rs.getString("invalidation_conditions")),
+            rs.getString("strength")
         );
     }
 
