@@ -16,11 +16,9 @@ export function analyzeMarketSnapshot(
   const ma20 = sma(candles, 20)
   const previousMa5 = sma(candles.slice(0, -1), 5)
   const currentBoll = bollinger(candles, 20)
-  const previousBoll = bollinger(candles.slice(0, -1), 20)
   const support = Math.min(...candles.slice(-20).map((candle) => candle.low))
   const resistance = Math.max(...candles.slice(-20).map((candle) => candle.high))
   const range = resistance - support
-  const volumeRatio = volumeAverageRatio(candles, 5)
   const closeAboveMa20 = last.close >= ma20
   const closeAboveMa5 = last.close >= ma5
   const ma5SlopePositive = ma5 >= previousMa5
@@ -64,7 +62,7 @@ export function analyzeMarketSnapshot(
     : []
   const state = market.source.state.toLowerCase()
   const stale = !market.source.online || state === 'stale' || state === 'offline'
-  const decision = stale
+  const decision: StockAnalysis['decision'] = stale
     ? {
         action: 'WAIT' as const,
         reason: '行情数据已过期或离线，等待刷新后再判断',
