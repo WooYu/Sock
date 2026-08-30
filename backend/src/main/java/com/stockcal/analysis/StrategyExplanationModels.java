@@ -43,7 +43,7 @@ record CalibrationPayload(
     Double confidence
 ) {}
 
-public record StrategyExplanation(
+record StrategyExplanation(
     @NotBlank String decision,
     @NotBlank String summary,
     List<String> evidenceIds,
