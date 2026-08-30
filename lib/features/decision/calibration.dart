@@ -88,7 +88,7 @@ class CalibrationBook {
     _summaries
       ..clear()
       ..addEntries(
-        entries.map((entry) MapEntry(entry.key, entry.summary)),
+        entries.map((entry) => MapEntry(entry.key, entry.summary)),
       );
   }
 
