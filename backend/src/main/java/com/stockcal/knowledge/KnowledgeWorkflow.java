@@ -59,14 +59,17 @@ final class KnowledgeWorkflow {
         }
         var rule = new PublishedRule(UUID.randomUUID().toString(), draft.sourceDocumentId(), draft.title(),
             draft.summary(), draft.sourceExcerpt(), draft.sourceLineStart(), draft.sourceLineEnd(),
-            draft.approvedBy(), clock.get(), true);
+            draft.approvedBy(), clock.get(), true, draft.conditions(), draft.action(), draft.mode(),
+            draft.timeframe(), draft.priority(), draft.evidenceIds());
         repository.savePublishedRule(rule);
         return rule;
     }
 
     SourceDocument updateSource(String id, String content) {
-        return repository.updateSource(id, content, sha256(content))
+        var updated = repository.updateSource(id, content, sha256(content))
             .orElseThrow(() -> new IllegalArgumentException("来源不存在"));
+        repository.invalidateDerived(id);
+        return updated;
     }
 
     void deleteSource(String id) { repository.deleteSource(id); }
