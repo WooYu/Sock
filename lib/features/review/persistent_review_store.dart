@@ -68,6 +68,7 @@ class PersistentReviewStore
 
   Map<String, Object?> _reviewToJson(TradeReview item) => {
     'id': item.id,
+    'ruleId': item.ruleId,
     'stockCode': item.stockCode,
     'tradeId': item.tradeId,
     'tradedAt': item.tradedAt.toIso8601String(),
@@ -82,6 +83,7 @@ class PersistentReviewStore
 
   TradeReview _reviewFromJson(Map<String, Object?> json) => TradeReview(
     id: json['id']! as String,
+    ruleId: json['ruleId'] as String?,
     stockCode: json['stockCode']! as String,
     tradeId: json['tradeId']! as String,
     tradedAt: DateTime.parse(json['tradedAt']! as String),
