@@ -188,20 +188,6 @@ class _AnalysisContent extends StatelessWidget {
   final String? explanationError;
   final bool explaining;
 
-  static String _stateLabel(MarketDataState state) => switch (state) {
-    MarketDataState.realtime => '实时行情',
-    MarketDataState.delayed => '延迟行情',
-    MarketDataState.stale => '行情已过期',
-    MarketDataState.offlineCache => '离线缓存',
-  };
-
-  static IconData _stateIcon(MarketDataState state) => switch (state) {
-    MarketDataState.realtime => Icons.bolt,
-    MarketDataState.delayed => Icons.schedule,
-    MarketDataState.stale => Icons.warning_amber,
-    MarketDataState.offlineCache => Icons.cloud_off_outlined,
-  };
-
   @override
   Widget build(BuildContext context) {
     final quote = snapshot.quote;
@@ -721,6 +707,39 @@ class _DecisionCard extends StatelessWidget {
 }
 
 class _DecisionOnlyContent extends StatelessWidget {
+  const _DecisionOnlyContent({
+    required this.snapshot,
+    required this.decision,
+    required this.onRefresh,
+    this.onExplain,
+    this.explanation,
+    this.explanationError,
+    this.explaining = false,
+  });
+
+  final MarketSnapshot snapshot;
+  final DecisionResult decision;
+  final VoidCallback onRefresh;
+  final VoidCallback? onExplain;
+  final StrategyExplanation? explanation;
+  final String? explanationError;
+  final bool explaining;
+
+  static String _stateLabel(MarketDataState state) => switch (state) {
+    MarketDataState.realtime => '实时行情',
+    MarketDataState.delayed => '延迟行情',
+    MarketDataState.stale => '行情已过期',
+    MarketDataState.offlineCache => '离线缓存',
+  };
+
+  static IconData _stateIcon(MarketDataState state) => switch (state) {
+    MarketDataState.realtime => Icons.bolt,
+    MarketDataState.delayed => Icons.schedule,
+    MarketDataState.stale => Icons.warning_amber,
+    MarketDataState.offlineCache => Icons.cloud_off_outlined,
+  };
+
+telessWidget {
   const _DecisionOnlyContent({
     required this.snapshot,
     required this.decision,
