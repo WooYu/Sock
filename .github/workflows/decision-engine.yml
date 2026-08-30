@@ -27,4 +27,5 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      - run: flutter test test/features/decision/decision_engine_test.dart
+      - run: flutter analyze
+      - run: flutter test
