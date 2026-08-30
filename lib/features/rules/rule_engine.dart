@@ -274,6 +274,7 @@ class RuleBook {
     String? timeframe,
     List<String>? invalidationConditions,
     List<String>? evidenceIds,
+    String? strength,
   }) {
     final current = _latest(id);
     return _publish(
@@ -293,7 +294,7 @@ class RuleBook {
         invalidationConditions:
             invalidationConditions ?? current.invalidationConditions,
         evidenceIds: evidenceIds ?? current.evidenceIds,
-        strength: current.strength,
+        strength: strength ?? current.strength,
       ),
     );
   }
