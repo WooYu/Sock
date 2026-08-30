@@ -13,6 +13,7 @@ import '../account/remote_auth_service.dart';
 import '../account/session.dart';
 import '../analysis/stock_analysis_controller.dart';
 import '../analysis/stock_analysis_screen.dart';
+import '../analysis/strategy_explanation.dart';
 import '../analysis/technical_analysis.dart';
 import '../admin/settings_admin_workspace.dart';
 import '../admin/remote_admin_service.dart';
@@ -63,6 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late final PortfolioController _portfolioController;
   late final StockAnalysisController _stockAnalysisController;
   late final RemoteMarketService _marketService;
+  late final RemoteStrategyExplanationAdapter _strategyExplanation;
   late final RemoteAdminService _adminService;
   late final ChartAnnotationController _chartAnnotationController;
   late final RuleBook _ruleBook;
@@ -91,6 +93,10 @@ class _HomeScreenState extends State<HomeScreen> {
       baseUrl: Uri.parse(apiUrl),
       accessToken: () => _sessionController.session?.accessToken,
     );
+    _strategyExplanation = RemoteStrategyExplanationAdapter(
+      baseUrl: Uri.parse(apiUrl),
+      accessToken: () => _sessionController.session?.accessToken,
+    );
     _adminService = RemoteAdminService(
       baseUrl: Uri.parse(apiUrl),
       accessToken: () => _sessionController.session?.accessToken,
@@ -106,6 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
       catalog: _marketService,
       market: _marketService,
       analyzer: StockAnalyzer(ruleBook: _ruleBook),
+      strategyExplanationAdapter: _strategyExplanation,
     );
     _stockAnalysisController.addListener(_onAnalysisSelectionChanged);
     widget.preferences?.addListener(_applyIndicatorSettings);
