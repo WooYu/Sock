@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stockcal/domain/stockcal_domain.dart';
-import 'package:stockcal/features/decision/decision_models.dart';
 import 'package:stockcal/features/rules/backtest_engine.dart';
 import 'package:stockcal/features/rules/rule_engine.dart';
 
@@ -103,7 +102,7 @@ void main() {
         stockCode: '600519',
         ruleId: rule.id,
         ruleVersion: rule.version,
-        samples: const [
+        samples: [
           BacktestSample(
             signalDay: DateTime(2026, 1, 1),
             predictedTarget: 100,
