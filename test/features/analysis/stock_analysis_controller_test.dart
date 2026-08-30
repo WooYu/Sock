@@ -46,19 +46,6 @@ void main() {
       expect(controller.errorMessage, contains('行情'));
     },
   );
-}
-
-class _FailingAfterFirstMarket implements AShareMarketAdapter {
-  var calls = 0;
-
-  @override
-  Future<MarketSnapshot> snapshot(String code) {
-    calls++;
-    if (calls > 1) throw const MarketLoadException('行情服务暂时不可用');
-    return DemoAshareMarketAdapter(
-      clock: () => DateTime(2026, 8, 14, 15, 15),
-    ).snapshot(code);
-  }
 
   test('exposes WAIT when the market snapshot is stale', () async {
     final controller = StockAnalysisController(
@@ -75,6 +62,18 @@ class _FailingAfterFirstMarket implements AShareMarketAdapter {
   });
 }
 
+class _FailingAfterFirstMarket implements AShareMarketAdapter {
+  var calls = 0;
+
+  @override
+  Future<MarketSnapshot> snapshot(String code) {
+    calls++;
+    if (calls > 1) throw const MarketLoadException('行情服务暂时不可用');
+    return DemoAshareMarketAdapter(
+      clock: () => DateTime(2026, 8, 14, 15, 15),
+    ).snapshot(code);
+  }
+}
 
 class _StaleMarket implements AShareMarketAdapter {
   @override
