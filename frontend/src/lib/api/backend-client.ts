@@ -23,3 +23,18 @@ export function searchSecurities(query: string) {
 export function getMarketSnapshot(symbol: string) {
   return request<MarketSnapshot>(`/api/v1/market/stocks/${encodeURIComponent(symbol)}/snapshot`)
 }
+
+
+export function explainStrategy(
+  payload: Record<string, unknown>,
+  authorization?: string,
+) {
+  return request<Record<string, unknown>>('/api/v1/analysis/strategy-explanation', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(authorization ? { Authorization: authorization } : {}),
+    },
+    body: JSON.stringify(payload),
+  })
+}
