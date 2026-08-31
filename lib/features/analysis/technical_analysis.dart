@@ -498,17 +498,9 @@ class StockAnalyzer {
           band: RuleBand.risk,
         ),
       if (nearSupport)
-        MatchedRule(
-          name: '价格接近二十日支撑区',
-          score: 48,
-          band: RuleBand.risk,
-        ),
+        MatchedRule(name: '价格接近二十日支撑区', score: 48, band: RuleBand.risk),
       if (lastClose < boll.upper)
-        MatchedRule(
-          name: '仍处于 BOLL 上轨以内',
-          score: 39,
-          band: RuleBand.caution,
-        ),
+        MatchedRule(name: '仍处于 BOLL 上轨以内', score: 39, band: RuleBand.caution),
     ]..sort((a, b) => b.score.compareTo(a.score));
     final confidence = (0.5 + matchedRules.length * 0.08).clamp(0.5, 0.9);
     final direction = trendPositive
@@ -516,7 +508,11 @@ class StockAnalyzer {
         : maShort >= maLong
         ? Direction.neutral
         : Direction.bearish;
-    final directionStrength = (confidence * 100).round().toDouble();
+    final directionStrength = switch (direction) {
+      Direction.bullish => 50 + confidence * 50,
+      Direction.neutral => 50.0,
+      Direction.bearish => 50 - confidence * 50,
+    };
     final supportDistance = lastClose == 0
         ? 1
         : (lastClose - support) / lastClose;
@@ -534,8 +530,16 @@ class StockAnalyzer {
         : (candles.last.high - candles.last.low) / prevClose * 100;
     final atr = _calculator.atr(candles, period: 14);
     final parameters = <ParameterItem>[
-      ParameterItem(label: 'MA${settings.maShortPeriod}', value: maShort, unit: ''),
-      ParameterItem(label: 'MA${settings.maLongPeriod}', value: maLong, unit: ''),
+      ParameterItem(
+        label: 'MA${settings.maShortPeriod}',
+        value: maShort,
+        unit: '',
+      ),
+      ParameterItem(
+        label: 'MA${settings.maLongPeriod}',
+        value: maLong,
+        unit: '',
+      ),
       ParameterItem(label: 'EMA${settings.emaPeriod}', value: ema, unit: ''),
       ParameterItem(label: 'BOLL 上轨', value: boll.upper, unit: ''),
       ParameterItem(label: 'BOLL 中轨', value: boll.middle, unit: ''),
@@ -796,7 +800,9 @@ class StockAnalyzer {
     final bollUpper = bolls[n - 1]!.upper;
     final prevBollUpper = bolls[n - 2]!.upper;
     final prevPrevBollUpper = bolls[n - 3]!.upper;
-    final ma30 = n >= 30 ? _calculator.sma(candles, period: 30).last! : double.nan;
+    final ma30 = n >= 30
+        ? _calculator.sma(candles, period: 30).last!
+        : double.nan;
 
     // 攀升：多头排列 + 价格站上 MA5 + MA5 上翘
     if (ma5 > ma10 && ma10 > ma20 && close >= ma5 && ma5 > prevMa5) {

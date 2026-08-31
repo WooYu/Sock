@@ -1,11 +1,12 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
-import '../../core/display.dart';
+import '../../theme/design_tokens.dart';
+import '../../widgets/design.dart';
 import 'technical_analysis.dart';
 
-/// Semicircular direction-strength gauge（深空科技风）。
+/// 原型同款线性方向强度条。
+///
+/// 从左到右依次表示空头、中性、多头；游标位置由 [strength] 决定。
 class DirectionGauge extends StatelessWidget {
   const DirectionGauge({
     super.key,
@@ -18,35 +19,49 @@ class DirectionGauge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = switch (direction) {
-      Direction.bullish => gainColor(context),
-      Direction.neutral => Theme.of(context).colorScheme.onSurfaceVariant,
-      Direction.bearish => lossColor(context),
-    };
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SizedBox(
-          height: 138,
-          width: 260,
-          child: CustomPaint(
-            painter: _GaugePainter(
-              value: strength,
-              color: color,
-              track: Theme.of(context).colorScheme.surfaceContainerHigh,
-              needle: Theme.of(context).colorScheme.onSurface,
-              label: Theme.of(context).colorScheme.onSurfaceVariant,
+    final t = StockCalTokens.of(context);
+    final value = strength.clamp(0, 100).toDouble();
+    return Semantics(
+      label: '方向强度 ${value.round()}/100，${_label(direction)}',
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 360),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Text(
+                  '方向强度',
+                  style: TextStyle(
+                    color: t.muted,
+                    fontSize: StockCalType.body,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const Spacer(),
+                MonoText(
+                  '${value.round()}/100',
+                  color: t.ink,
+                  size: StockCalType.metric,
+                  weight: FontWeight.w700,
+                ),
+              ],
             ),
-          ),
+            const SizedBox(height: 10),
+            ScoreBar(value: value, variant: ScoreBarVariant.gauge),
+            const SizedBox(height: 6),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _AxisLabel('空头', color: t.faint),
+                _AxisLabel('中性', color: t.faint),
+                _AxisLabel('多头', color: t.faint),
+              ],
+            ),
+          ],
         ),
-        Text(
-          '${strength.round()}/100',
-          style: withTabular(
-            Theme.of(context).textTheme.titleLarge?.copyWith(color: color),
-          ),
-        ),
-        Text(_label(direction), style: Theme.of(context).textTheme.bodySmall),
-      ],
+      ),
     );
   }
 
@@ -57,94 +72,19 @@ class DirectionGauge extends StatelessWidget {
   };
 }
 
-class _GaugePainter extends CustomPainter {
-  _GaugePainter({
-    required this.value,
-    required this.color,
-    required this.track,
-    required this.needle,
-    required this.label,
-  });
+class _AxisLabel extends StatelessWidget {
+  const _AxisLabel(this.label, {required this.color});
 
-  final double value;
+  final String label;
   final Color color;
-  final Color track;
-  final Color needle;
-  final Color label;
 
   @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height * 0.82);
-    final radius = size.width * 0.40;
-    final rect = Rect.fromCircle(center: center, radius: radius);
-    final ratio = (value / 100).clamp(0.0, 1.0);
-
-    final trackPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 14
-      ..color = track
-      ..strokeCap = StrokeCap.round;
-    final glowPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 20
-      ..color = color.withValues(alpha: 0.16)
-      ..strokeCap = StrokeCap.round;
-    final valuePaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 14
-      ..color = color
-      ..strokeCap = StrokeCap.round;
-
-    canvas.drawArc(rect, math.pi, math.pi, false, trackPaint);
-    final sweep = math.pi * ratio;
-    if (sweep > 0) {
-      canvas.drawArc(rect, math.pi, sweep, false, glowPaint);
-      canvas.drawArc(rect, math.pi, sweep, false, valuePaint);
-    }
-
-    final angle = math.pi + sweep;
-    final tip =
-        center + Offset(math.cos(angle), math.sin(angle)) * (radius - 18);
-    canvas.drawLine(
-      center,
-      tip,
-      Paint()
-        ..color = needle
-        ..strokeWidth = 2.5
-        ..strokeCap = StrokeCap.round,
-    );
-    canvas.drawCircle(center, 5, Paint()..color = needle);
-
-    _drawLabel(canvas, '空头', Offset(14, size.height - 12), label, TextAlign.left);
-    _drawLabel(
-      canvas,
-      '多头',
-      Offset(size.width - 14, size.height - 12),
-      label,
-      TextAlign.right,
-    );
-  }
-
-  void _drawLabel(
-    Canvas canvas,
-    String text,
-    Offset anchor,
-    Color color,
-    TextAlign align,
-  ) {
-    final tp = TextPainter(
-      text: TextSpan(text: text, style: TextStyle(color: color, fontSize: 11)),
-      textDirection: TextDirection.ltr,
-      textAlign: align,
-    )..layout();
-    final x = align == TextAlign.left ? anchor.dx : anchor.dx - tp.width;
-    tp.paint(canvas, Offset(x, anchor.dy));
-  }
-
-  @override
-  bool shouldRepaint(_GaugePainter old) =>
-      old.value != value ||
-      old.color != color ||
-      old.track != track ||
-      old.needle != needle;
+  Widget build(BuildContext context) => Text(
+    label,
+    style: TextStyle(
+      color: color,
+      fontSize: StockCalType.micro,
+      fontWeight: FontWeight.w600,
+    ),
+  );
 }

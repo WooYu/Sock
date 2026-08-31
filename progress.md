@@ -1,5 +1,14 @@
 # StockCal Progress
 
+## 2026-08-26
+- Re-audited the public `agent/local-first-watchlist` branch against the checked-in prototype DOM/CSS snapshots and confirmed that feature delivery is substantially ahead of the stale 2026-08-14 handoff summary.
+- Provisioned a temporary Flutter 3.47.1 toolchain and established a fresh clean baseline: 271 Flutter tests passed.
+- Witnessed the direction-gauge test fail because the business screen still rendered the obsolete semicircular painter instead of the prototype's shared linear gauge.
+- Replaced the semicircular gauge with the token-driven `ScoreBar.gauge` presentation and verified the focused tests pass.
+- Began the first business-screen design-system migration: key-level analysis now uses `MetricStrip`, `SegTabs`, `PanelCard`, `SectionHeading`, `StatusBadge`, and rule `ScoreBar` components while preserving existing search, strategy, rule-hit, forecast, and narrow-phone behavior.
+- Fresh completion gates after the migration: 274 Flutter tests passed, `flutter analyze` reported no issues, and the Web release build completed successfully.
+- Browser visual verification remains pending because the cloud browser blocks the container-local URL and the local browser binary download failed certificate validation; no pixel-parity claim is made.
+
 ## 2026-08-14
 - Recovered repository state and confirmed local commit `56c9c27`.
 - Reconstructed full product scope from the referenced conversation preview.

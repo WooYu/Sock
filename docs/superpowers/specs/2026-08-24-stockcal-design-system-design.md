@@ -1,6 +1,6 @@
 # StockCal 设计系统层（Phase 0：Token + 组件库）
 
-> 状态：待评审。范围：**仅** token 层与共享表现型组件库，不改任何业务屏。
+> 状态：Phase 0 已实施。Token 与共享组件继续有效；「保留左侧 rail + 独立页面」的衔接决策已被 `2026-08-26-stockcal-prototype-realignment-design.md` 替代。
 > 参考基准：`docs/stockcal-redesign-prototype.html` + `docs/stockcal-prototype.css`（线上站 `https://stock-key-levels.amos369.chatgpt.site/` 的完整 DOM/CSS 快照）。
 
 ## 与既有 spec 的关系

@@ -4,18 +4,20 @@ import 'package:stockcal/theme/design_tokens.dart';
 import 'package:stockcal/widgets/design/seg_tabs.dart';
 
 Widget _wrap(Widget child) => MaterialApp(
-      theme: ThemeData(extensions: [StockCalTokens.light()]),
-      home: Scaffold(body: Center(child: child)),
-    );
+  theme: ThemeData(extensions: [StockCalTokens.light()]),
+  home: Scaffold(body: Center(child: child)),
+);
 
-BoxDecoration _segDeco(WidgetTester tester, String label) => tester
-    .widget<Container>(
-      find.ancestor(
-        of: find.text(label),
-        matching: find.byKey(const ValueKey('seg-tab-item')),
-      ),
-    )
-    .decoration! as BoxDecoration;
+BoxDecoration _segDeco(WidgetTester tester, String label) =>
+    tester
+            .widget<Container>(
+              find.ancestor(
+                of: find.text(label),
+                matching: find.byKey(const ValueKey('seg-tab-item')),
+              ),
+            )
+            .decoration!
+        as BoxDecoration;
 
 void main() {
   final t = StockCalTokens.light();
@@ -40,9 +42,11 @@ void main() {
         SegTabs(labels: const ['短线', '波段'], selected: 0, onSelected: (_) {}),
       ),
     );
-    final deco = tester
-        .widget<Container>(find.byKey(const ValueKey('seg-tab-track')))
-        .decoration! as BoxDecoration;
+    final deco =
+        tester
+                .widget<Container>(find.byKey(const ValueKey('seg-tab-track')))
+                .decoration!
+            as BoxDecoration;
     expect(deco.color, t.surfaceInset);
   });
 
@@ -104,5 +108,32 @@ void main() {
     await tester.tap(find.text('中长线'));
     await tester.pump();
     expect(got, 2);
+  });
+
+  testWidgets('每个页签有选中语义、键盘焦点和至少 48dp 触控高度', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        SegTabs(labels: const ['短线', '波段'], selected: 0, onSelected: (_) {}),
+      ),
+    );
+
+    expect(
+      tester.getSemantics(find.text('短线')),
+      matchesSemantics(
+        label: '短线',
+        isButton: true,
+        hasSelectedState: true,
+        isSelected: true,
+        isInMutuallyExclusiveGroup: true,
+        isFocusable: true,
+        hasTapAction: true,
+        hasFocusAction: true,
+      ),
+    );
+    final item = find.ancestor(
+      of: find.text('短线'),
+      matching: find.byKey(const ValueKey('seg-tab-item')),
+    );
+    expect(tester.getSize(item).height, greaterThanOrEqualTo(48));
   });
 }

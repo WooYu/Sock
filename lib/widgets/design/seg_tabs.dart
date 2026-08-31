@@ -93,32 +93,37 @@ class SegTabs extends StatelessWidget {
         border = active ? (isBuy ? t.profit : t.loss) : t.tileLine;
     }
 
-    return GestureDetector(
-      onTap: () => onSelected(index),
-      child: Container(
-        key: const ValueKey('seg-tab-item'),
-        alignment: Alignment.center,
-        constraints: variant == SegTabsVariant.pill
-            ? const BoxConstraints(minWidth: 58)
-            : const BoxConstraints(),
-        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
-        decoration: BoxDecoration(
-          color: bg,
-          border: border == null
-              ? null
-              : Border.all(color: border, width: StockCalRadii.hairline),
-          borderRadius: BorderRadius.circular(
-            variant == SegTabsVariant.pill
-                ? StockCalRadii.tile
-                : StockCalRadii.chip,
+    final radius = BorderRadius.circular(
+      variant == SegTabsVariant.pill ? StockCalRadii.tile : StockCalRadii.chip,
+    );
+    return Semantics(
+      button: true,
+      selected: active,
+      inMutuallyExclusiveGroup: true,
+      child: InkWell(
+        borderRadius: radius,
+        onTap: () => onSelected(index),
+        child: Container(
+          key: const ValueKey('seg-tab-item'),
+          alignment: Alignment.center,
+          constraints: variant == SegTabsVariant.pill
+              ? const BoxConstraints(minWidth: 58, minHeight: 48)
+              : const BoxConstraints(minHeight: 48),
+          padding: const EdgeInsets.symmetric(horizontal: 11),
+          decoration: BoxDecoration(
+            color: bg,
+            border: border == null
+                ? null
+                : Border.all(color: border, width: StockCalRadii.hairline),
+            borderRadius: radius,
           ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: StockCalType.bodyLg,
-            fontWeight: active ? FontWeight.w700 : FontWeight.w600,
-            color: fg,
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: StockCalType.bodyLg,
+              fontWeight: active ? FontWeight.w700 : FontWeight.w600,
+              color: fg,
+            ),
           ),
         ),
       ),

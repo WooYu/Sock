@@ -1,6 +1,6 @@
 # StockCal 参考站「位界 KEYLINE」全站 1:1 还原
 
-> 状态：已评审通过。范围：全站 1:1（导航 shell + 关键位分析 + 组合总览 + 其余 8 页）。
+> 状态：已被 `2026-08-26-stockcal-prototype-realignment-design.md` 替代。本文只保留为历史记录；Rail、Drawer、半圆方向仪表和旧深色视觉结论不再执行。
 > 参考来源：`docs/reference/stock-key-levels-reference.md`（位界 KEYLINE 结构分析）。
 
 ## 目标

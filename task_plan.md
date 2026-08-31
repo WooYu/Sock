@@ -21,6 +21,7 @@ Deliver the complete Flutter StockCal product described in the referenced conver
 | 7. Review and constrained AI explanation | complete | 9 domain/widget/navigation tests, 92-test full suite, clean analyze |
 | 8. Backend services, auth, sync, knowledge, and administration | in_progress | Code and contract tests exist; live SMS/Tushare/OpenAI plus PostgreSQL/Redis deployment verification remain |
 | 9. Release hardening and delivery | in_progress | Current source/docs handoff and verification; signed mobile builds and final visual/accessibility QA remain |
+| 10. Prototype design-system migration | in_progress | Phase 0 tokens/components complete; key-level analysis first slice migrated; remaining business screens and visual regression remain |
 
 ## Decisions
 - Flutter remains the single client codebase for Android, iOS, and Web.

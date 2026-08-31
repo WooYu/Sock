@@ -5,9 +5,9 @@ import 'package:stockcal/widgets/design/section_heading.dart';
 import 'package:stockcal/widgets/design/status_badge.dart';
 
 Widget _wrap(Widget child) => MaterialApp(
-      theme: ThemeData(extensions: [StockCalTokens.light()]),
-      home: Scaffold(body: child),
-    );
+  theme: ThemeData(extensions: [StockCalTokens.light()]),
+  home: Scaffold(body: child),
+);
 
 void main() {
   final t = StockCalTokens.light();
@@ -16,8 +16,7 @@ void main() {
     await tester.pumpWidget(
       _wrap(const SectionHeading(eyebrow: '组合视角 · 多股票盈亏', title: '组合总览')),
     );
-    final style =
-        tester.widget<Text>(find.text('组合视角 · 多股票盈亏')).style!;
+    final style = tester.widget<Text>(find.text('组合视角 · 多股票盈亏')).style!;
     expect(style.fontSize, StockCalType.eyebrow);
     expect(style.letterSpacing, StockCalType.eyebrowSpacing);
     expect(style.fontWeight, FontWeight.w800);
@@ -47,9 +46,33 @@ void main() {
   });
 
   testWidgets('无 trailing 时不占位', (tester) async {
-    await tester
-        .pumpWidget(_wrap(const SectionHeading(eyebrow: 'A', title: 'B')));
+    await tester.pumpWidget(
+      _wrap(const SectionHeading(eyebrow: 'A', title: 'B')),
+    );
     expect(find.byType(StatusBadge), findsNothing);
     expect(find.byType(Spacer), findsNothing);
+  });
+
+  testWidgets('窄屏大字体时尾部徽章换行且不溢出', (tester) async {
+    await tester.pumpWidget(
+      MediaQuery(
+        data: const MediaQueryData(textScaler: TextScaler.linear(2)),
+        child: _wrap(
+          const SizedBox(
+            width: 320,
+            child: SectionHeading(
+              eyebrow: 'Pattern Matching',
+              title: '盈利模式识别',
+              trailing: StatusBadge('命中 8/11'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    final titleBottom = tester.getBottomLeft(find.text('盈利模式识别')).dy;
+    final badgeTop = tester.getTopLeft(find.byType(StatusBadge)).dy;
+    expect(badgeTop, greaterThanOrEqualTo(titleBottom));
   });
 }

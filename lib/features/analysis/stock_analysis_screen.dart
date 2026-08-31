@@ -283,13 +283,10 @@ class _AnalysisContent extends StatelessWidget {
         const SizedBox(height: 12),
         Align(
           alignment: Alignment.centerLeft,
-          child: SegmentedButton<OperationCycle>(
-            segments: OperationCycle.values
-                .map((c) => ButtonSegment(value: c, label: Text(c.label)))
-                .toList(),
-            selected: {cycle},
-            showSelectedIcon: false,
-            onSelectionChanged: (values) => onCycleChanged(values.first),
+          child: SegTabs(
+            labels: OperationCycle.values.map((c) => c.label).toList(),
+            selected: OperationCycle.values.indexOf(cycle),
+            onSelected: (index) => onCycleChanged(OperationCycle.values[index]),
           ),
         ),
         const SizedBox(height: 16),
@@ -308,36 +305,51 @@ class _AnalysisContent extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 20),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.auto_graph, size: 18),
-                    const SizedBox(width: 6),
-                    Text(
-                      '策略建议',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ],
+        PanelCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SectionHeading(
+                eyebrow: 'Strategy',
+                title: '策略建议',
+                trailing: StatusBadge(
+                  analysis.trendPattern.label,
+                  tone: BadgeTone.accent,
                 ),
-                const SizedBox(height: 10),
-                Row(
+              ),
+              Text(
+                analysis.trendReason,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              const SizedBox(height: 12),
+              _PlanRow(
+                label: '买入关注',
+                value:
+                    '${analysis.support.toStringAsFixed(2)} ~ ${((analysis.support + analysis.resistance) / 2).toStringAsFixed(2)}',
+              ),
+              _PlanRow(
+                label: '卖出 / 止盈',
+                value: analysis.target.toStringAsFixed(2),
+              ),
+              _PlanRow(
+                label: '失效条件',
+                value: '收盘跌破 ${analysis.support.toStringAsFixed(2)}',
+              ),
+              const SizedBox(height: 8),
+              ...analysis.conditions.map(
+                (c) => Row(
                   children: [
-                    Chip(
-                      label: Text(analysis.trendPattern.label),
-                      visualDensity: VisualDensity.compact,
-                      side: BorderSide.none,
+                    Icon(
+                      c.met ? Icons.check_circle : Icons.circle_outlined,
+                      size: 18,
+                      color: c.met
+                          ? Theme.of(context).colorScheme.primary
+                          : null,
                     ),
                     const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        analysis.trendReason,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
+                    Text(
+                      c.label,
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ],
                 ),
@@ -392,8 +404,7 @@ class _AnalysisContent extends StatelessWidget {
         const SizedBox(height: 20),
         _PipelineCard(analysis: analysis),
         const SizedBox(height: 20),
-        Text('技术指标', style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: 8),
+        const SectionHeading(eyebrow: 'Indicators', title: '技术指标'),
         Wrap(
           spacing: 8,
           runSpacing: 8,
@@ -412,58 +423,51 @@ class _AnalysisContent extends StatelessWidget {
             ),
             _Indicator(label: 'BOLL 上轨', value: analysis.bollinger.upper),
             _Indicator(label: '量比', value: analysis.volumeRatio),
-            Chip(label: Text('风险 ${_riskLabel(analysis.riskLevel)}')),
+            StatusBadge(
+              '风险 ${_riskLabel(analysis.riskLevel)}',
+              tone: analysis.riskLevel == RiskLevel.high
+                  ? BadgeTone.loss
+                  : BadgeTone.amber,
+            ),
           ],
         ),
         const SizedBox(height: 20),
-        Text('盈利模式识别', style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: 4),
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                '今日参数 ${analysis.parameters.length} 项 · 振幅 ${analysis.amplitude.toStringAsFixed(2)}%',
-                style: Theme.of(context).textTheme.bodySmall,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              '规则命中 ${analysis.ruleHitCount}/${analysis.ruleTotalCount}',
-              style: withTabular(Theme.of(context).textTheme.bodySmall),
-            ),
-          ],
+        SectionHeading(
+          eyebrow: 'Pattern Matching',
+          title: '盈利模式识别',
+          trailing: StatusBadge(
+            '命中 ${analysis.ruleHitCount}/${analysis.ruleTotalCount}',
+            tone: BadgeTone.accent,
+            mono: true,
+          ),
         ),
+        Text(
+          '今日参数 ${analysis.parameters.length} 项 · 振幅 ${analysis.amplitude.toStringAsFixed(2)}%',
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+        const SizedBox(height: 8),
         ...analysis.matchedRules.map(
-          (rule) => ListTile(
-            dense: true,
-            contentPadding: EdgeInsets.zero,
-            leading: Icon(
-              rule.score >= 80 ? Icons.star : Icons.check_circle_outline,
-              color: rule.score >= 80
-                  ? Theme.of(context).colorScheme.primary
-                  : null,
-            ),
-            title: Row(
+          (rule) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: 7),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Chip(
-                  label: Text(_bandLabel(rule.band)),
-                  visualDensity: VisualDensity.compact,
-                  side: BorderSide.none,
+                Row(
+                  children: [
+                    StatusBadge(
+                      _bandLabel(rule.band),
+                      tone: _bandBadgeTone(rule.band),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(rule.name)),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                Expanded(child: Text(rule.name)),
+                const SizedBox(height: 7),
+                ScoreBar(
+                  value: rule.score.toDouble(),
+                  tone: _bandScoreTone(rule.band),
+                ),
               ],
-            ),
-            trailing: Text(
-              '${rule.score}',
-              style: withTabular(
-                Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: rule.score >= 80
-                      ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ),
             ),
           ),
         ),
@@ -486,8 +490,7 @@ class _AnalysisContent extends StatelessWidget {
           }),
         ],
         const SizedBox(height: 12),
-        Text('未来三日指标延伸', style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: 8),
+        const SectionHeading(eyebrow: 'Forecast', title: '未来三日指标延伸'),
         ...analysis.future.map(
           (point) => ListTile(
             contentPadding: EdgeInsets.zero,
@@ -537,25 +540,20 @@ class _AnalysisContent extends StatelessWidget {
     RuleBand.risk => '风控',
     RuleBand.caution => '警戒',
   };
-}
 
-class _ValueTile extends StatelessWidget {
-  const _ValueTile({
-    required this.label,
-    required this.value,
-    this.suffix = '',
-  });
+  static BadgeTone _bandBadgeTone(RuleBand band) => switch (band) {
+    RuleBand.primary => BadgeTone.rise,
+    RuleBand.alternate => BadgeTone.accent,
+    RuleBand.risk => BadgeTone.amber,
+    RuleBand.caution => BadgeTone.fall,
+  };
 
-  final String label;
-  final double value;
-  final String suffix;
-
-  @override
-  Widget build(BuildContext context) => MetricCard(
-    label: label,
-    value: '${value.toStringAsFixed(suffix.isEmpty ? 2 : 0)}$suffix',
-    width: 144,
-  );
+  static ScoreTone _bandScoreTone(RuleBand band) => switch (band) {
+    RuleBand.primary => ScoreTone.rise,
+    RuleBand.alternate => ScoreTone.accent,
+    RuleBand.risk => ScoreTone.amber,
+    RuleBand.caution => ScoreTone.fall,
+  };
 }
 
 String _decisionLabel(DecisionAction action) => switch (action) {
@@ -784,43 +782,84 @@ class _PipelineCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.account_tree_outlined, size: 18),
-                const SizedBox(width: 6),
-                Text(
-                  '模型编排 · 可解释分析',
-                  style: Theme.of(context).textTheme.titleMedium,
+    return PanelCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          StatusBadge('分析引擎：${analysis.modelName}', tone: BadgeTone.accent),
+          const SizedBox(height: 10),
+          const SectionHeading(
+            eyebrow: 'Explainable Pipeline',
+            title: '模型编排 · 可解释分析',
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: _Stage(
+                  number: '01',
+                  label: '数值计算层',
+                  detail: 'MA·EMA·BOLL·量比',
                 ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _Stage(
-                    number: '01',
-                    label: '数值计算层',
-                    detail: 'MA·EMA·BOLL·量比',
-                  ),
+              ),
+              Icon(
+                Icons.arrow_forward,
+                size: 16,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              Expanded(
+                child: _Stage(
+                  number: '02',
+                  label: '规则引擎层',
+                  detail:
+                      '${analysis.ruleHitCount}/${analysis.ruleTotalCount} 命中',
                 ),
-                Icon(
-                  Icons.arrow_forward,
-                  size: 16,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              Icon(
+                Icons.arrow_forward,
+                size: 16,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              Expanded(
+                child: _Stage(
+                  number: '03',
+                  label: 'AI解释层',
+                  detail: '${(analysis.confidence * 100).round()}% 置信',
                 ),
-                Expanded(
-                  child: _Stage(
-                    number: '02',
-                    label: '规则引擎层',
-                    detail: '${analysis.ruleHitCount}/${analysis.ruleTotalCount} 命中',
-                  ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(switch (analysis.direction) {
+            Direction.bullish => '策略结论：偏多，关注买入区间',
+            Direction.bearish => '策略结论：偏空，注意失效条件',
+            Direction.neutral => '策略结论：中性，等待方向确认',
+          }, style: Theme.of(context).textTheme.bodyMedium),
+          const SizedBox(height: 4),
+          Text(
+            analysis.hitRuleNames.isEmpty
+                ? '解释依据：命中 ${analysis.ruleHitCount}/${analysis.ruleTotalCount} 条规则，置信 ${(analysis.confidence * 100).round()}%'
+                : '解释依据：命中 ${analysis.hitRuleNames.join('、')}，置信 ${(analysis.confidence * 100).round()}%',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '待确认经验：复核目标位与失效条件',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              Chip(label: Text('策略匹配度 ${(analysis.confidence * 100).round()}')),
+              Chip(label: Text('规则可信度 ${analysis.ruleCredibility.round()}')),
+              Chip(
+                label: Text(
+                  '风险等级 ${switch (analysis.riskLevel) {
+                    RiskLevel.low => '低',
+                    RiskLevel.medium => '中',
+                    RiskLevel.high => '高',
+                  }}',
                 ),
                 Icon(
                   Icons.arrow_forward,
@@ -886,7 +925,11 @@ class _PipelineCard extends StatelessWidget {
 }
 
 class _Stage extends StatelessWidget {
-  const _Stage({required this.number, required this.label, required this.detail});
+  const _Stage({
+    required this.number,
+    required this.label,
+    required this.detail,
+  });
 
   final String number;
   final String label;
@@ -931,9 +974,9 @@ class _PlanRow extends StatelessWidget {
             child: Text(
               value,
               style: withTabular(
-                Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
               ),
             ),
           ),

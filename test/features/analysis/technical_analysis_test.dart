@@ -115,9 +115,7 @@ void main() {
   });
 
   group('model extensions', () {
-    final rising = candles(
-      List.generate(30, (i) => 10.0 + i * 0.1),
-    );
+    final rising = candles(List.generate(30, (i) => 10.0 + i * 0.1));
 
     test('analyze exposes amplitude, atr and parameter snapshot', () {
       final analysis = StockAnalyzer().analyze(rising);
@@ -129,15 +127,32 @@ void main() {
       expect(analysis.conditions, hasLength(3));
     });
 
-    test('matched rules carry a band and hit counts fall back to heuristics', () {
-      final analysis = StockAnalyzer().analyze(rising);
-      expect(analysis.matchedRules, isNotEmpty);
-      expect(analysis.matchedRules.first.band, isNotNull);
-      expect(
-        analysis.ruleTotalCount,
-        greaterThanOrEqualTo(analysis.ruleHitCount),
-      );
-    });
+    test(
+      'matched rules carry a band and hit counts fall back to heuristics',
+      () {
+        final analysis = StockAnalyzer().analyze(rising);
+        expect(analysis.matchedRules, isNotEmpty);
+        expect(analysis.matchedRules.first.band, isNotNull);
+        expect(
+          analysis.ruleTotalCount,
+          greaterThanOrEqualTo(analysis.ruleHitCount),
+        );
+      },
+    );
+
+    test(
+      'direction strength stays on the matching side of the neutral axis',
+      () {
+        final bullish = StockAnalyzer().analyze(rising);
+        final falling = candles(List.generate(30, (i) => 30.0 - i * 0.2));
+        final bearish = StockAnalyzer().analyze(falling);
+
+        expect(bullish.direction, Direction.bullish);
+        expect(bullish.directionStrength, greaterThan(50));
+        expect(bearish.direction, Direction.bearish);
+        expect(bearish.directionStrength, lessThan(50));
+      },
+    );
 
     test('analyzer uses RuleBook for hit counts when provided', () {
       final book = RuleBook.withSystemDefaults();

@@ -20,43 +20,55 @@ class SectionHeading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = StockCalTokens.of(context);
+    final heading = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          eyebrow.toUpperCase(),
+          style: TextStyle(
+            fontSize: StockCalType.eyebrow,
+            fontWeight: FontWeight.w800,
+            letterSpacing: StockCalType.eyebrowSpacing,
+            color: t.eyebrowInk,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: StockCalType.h2,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.36,
+            color: t.ink,
+          ),
+        ),
+      ],
+    );
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Expanded(
-            child: Column(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          if (trailing == null) return heading;
+          final scaledTitle = MediaQuery.textScalerOf(
+            context,
+          ).scale(StockCalType.h2);
+          final stack = constraints.maxWidth < 420 || scaledTitle > 24;
+          if (stack) {
+            return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  eyebrow.toUpperCase(),
-                  style: TextStyle(
-                    fontSize: StockCalType.eyebrow,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: StockCalType.eyebrowSpacing,
-                    color: t.eyebrowInk,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: StockCalType.h2,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.36,
-                    color: t.ink,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (trailing != null) ...[
-            const SizedBox(width: 18),
-            trailing!,
-          ],
-        ],
+              children: [heading, const SizedBox(height: 10), trailing!],
+            );
+          }
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(child: heading),
+              const SizedBox(width: 18),
+              trailing!,
+            ],
+          );
+        },
       ),
     );
   }

@@ -1,6 +1,6 @@
 # StockCal
 
-StockCal 是一个面向 A 股的本地优先决策与复盘工具。Flutter 客户端覆盖手机和 Web，Spring Boot 服务负责认证、同步、行情、知识提取、AI 调用与管理能力。
+StockCal 是一个面向手机浏览器和桌面浏览器的 A 股决策与复盘工具。Next.js Web 前端负责交互，Spring Boot 服务负责认证、同步、行情、知识提取、AI 调用与管理能力；现有 Flutter 工程保留作迁移参考。
 
 > 当前仓库是一套可持续开发和演示的产品实现，不是已上线的证券交易系统。自动交易、券商直连、付费订阅以及港美股不在当前范围内。
 
@@ -21,12 +21,15 @@ StockCal 是一个面向 A 股的本地优先决策与复盘工具。Flutter 客
 - [生产设计](docs/superpowers/specs/2026-08-14-stockcal-production-design.md)
 - [实施路线图](docs/superpowers/plans/2026-08-14-stockcal-production-roadmap.md)
 - [当前交接说明](docs/handoff/2026-08-14-stockcal-current-status.md)
+- [Web-first 设计](docs/superpowers/specs/2026-08-26-stockcal-prototype-realignment-design.md)
+- [Web-first 实施计划](docs/superpowers/plans/2026-08-27-stockcal-web-first-plan.md)
 
 ## 项目结构
 
 ```text
 lib/                         Flutter 客户端
 test/                        Flutter 单元与组件测试
+frontend/                    Next.js Web-first 前端
 backend/                     Spring Boot 4 / Java 21 服务
 backend/src/main/resources/  配置与 Flyway 数据库迁移
 docs/                        产品设计、路线图与交接文档
@@ -40,6 +43,15 @@ compose.yaml                 PostgreSQL 17 与 Redis 8 本地服务
 ```powershell
 flutter pub get
 flutter run -d chrome --dart-define=STOCKCAL_API_BASE_URL=http://localhost:8080
+```
+
+Web 前端：
+
+```bash
+cd frontend
+npm install
+cp .env.example .env.local
+npm run dev
 ```
 
 基础服务与后端：

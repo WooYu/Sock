@@ -1,18 +1,20 @@
-# StockCal 当前进度与交接说明
+# StockCal Web-first 当前进度与交接说明
 
-更新日期：2026-08-14
+更新日期：2026-08-27
 
 代码分支：`agent/local-first-watchlist`
 
 远程仓库：`https://github.com/WooYu/Sock.git`
 
-## 1. 产品定位
+## 1. 产品定位与当前路线
 
-StockCal 是 Flutter 编写的 A 股本地优先分析、记录与复盘工具。系统将行情和交易等确定性数据与 AI 文字说明严格分离：AI 只能读取已经计算并固化的快照，不能修改价格、交易、指标或预测结果。
+StockCal 当前改为以手机浏览器和桌面浏览器为主的 Web-first A 股分析、记录与复盘工具。Android/iOS 原生包不再是当前前置条件；Next.js/React 负责 Web 前端，现有 Spring Boot、PostgreSQL、Redis 和外部服务继续作为后端基础。系统将行情和交易等确定性数据与 AI 文字说明严格分离：AI 只能读取已经计算并固化的快照，不能修改价格、交易、指标或预测结果。
 
-客户端使用 Material 3 和自适应布局；后端使用 Spring Boot、PostgreSQL、Redis 和 Flyway。手机主导航限制为总览、个股分析、专业 K 线、组合、更多五项，规则、复盘、知识规则、账户和后台从“更多”进入。
+阿里云服务器是首选生产环境；Vercel 作为可选 Preview/CI 平台，不要求购买 Pro，也不替代后端。正式前端计划位于 `docs/superpowers/plans/2026-08-27-stockcal-web-first-plan.md`，权威产品与技术设计位于 `docs/superpowers/specs/2026-08-26-stockcal-prototype-realignment-design.md`。
 
-## 2. 已实现范围
+Flutter 工程和已实现能力保留为迁移参考；旧的 Flutter 导航计划已被 Web-first 计划替代。
+
+## 2. 已实现范围（现有 Flutter/后端基础）
 
 | 模块 | 当前实现 |
 |---|---|
@@ -58,16 +60,19 @@ C:\Users\Administrator\Documents\Obsidian Vault\印象笔记\股票
 
 ## 6. 继续开发顺序
 
-1. 配置 PostgreSQL、Redis、Tushare、短信和有余额的 OpenAI 项目，完成外部服务集成验证。
-2. 对全部笔记运行在线提取，人工审批代表性规则，并验证发布规则进入分析和回测。
-3. 完善多组合、多账户、文件级导入导出和管理日志操作。
-4. 完成 Android/iOS 真机、Web 响应式、无障碍、离线恢复和性能回归。
-5. 执行逐条需求验收、安全审计、数据备份恢复演练和正式发布配置。
+1. 创建 `frontend/` Next.js 工程、测试门槛和 Web-first 响应式导航。
+2. 通过 Next.js BFF 接入现有行情接口，建立 URL 股票状态和跨页工作区。
+3. 按 Web-first 计划完成总览、个股分析、专业 K 线、交易、复盘和规则库。
+4. 配置 PostgreSQL、Redis、Tushare、短信和有余额的 OpenAI 项目，完成外部服务集成验证。
+5. 将前端部署到阿里云生产环境，使用 Vercel Preview 做分支验收，再执行安全、性能和备份恢复演练。
 
 ## 7. 设计与记录索引
 
 - `docs/superpowers/specs/2026-08-14-stockcal-production-design.md`：稳定的产品与架构原则。
 - `docs/superpowers/plans/2026-08-14-stockcal-production-roadmap.md`：按垂直功能拆分的实施路线。
+- `docs/superpowers/specs/2026-08-26-stockcal-prototype-realignment-design.md`：当前 Web-first + Next.js/Vercel 权威设计。
+- `docs/superpowers/plans/2026-08-27-stockcal-web-first-plan.md`：当前 Next.js/Vercel 实施计划。
+- `docs/superpowers/plans/2026-08-27-stockcal-navigation-workspace.md`：已替代的 Flutter 导航计划，仅作历史记录。
 - `task_plan.md`：当前阶段状态和验收门槛。
 - `progress.md`：按时间记录的 TDD 与验证历史。
 - `findings.md`：环境限制、架构发现和关键决策。
@@ -109,3 +114,27 @@ cd backend
 
 组件画廊入口：设置 → 数据与账户 → 组件画廊。
 
+### 2026-08-26 进度复核与业务屏迁移
+
+本次重新从远端 `agent/local-first-watchlist` 分支拉取并核对了代码、提交历史、原型 DOM/CSS 快照和运行基线。功能主链路仍完整，当前工作的重点已经从「补功能」切换为「把九个业务屏逐步迁移到 Phase 0 设计系统」。
+
+| 范围 | 当前状态 |
+|---|---|
+| 产品功能 | 账户、自选、组合、分析、K 线、规则预测、回测复盘、知识管理和后台主链路已实现；外部服务和发布项仍按第 5 节处理 |
+| 原型资料 | `docs/stockcal-redesign-prototype.html` 与 `docs/stockcal-prototype.css` 已作为离线可复核基准，不再依赖线上站登录状态 |
+| 设计系统 | token、十个共享组件和组件画廊已完成 |
+| 业务屏迁移 | 「关键位分析」首个切片已接入 `MetricStrip`、`SegTabs`、`PanelCard`、`SectionHeading`、`StatusBadge`、`ScoreBar`；其余业务屏仍主要使用旧版 Material 组件 |
+| 方向强度 | 已由旧半圆仪表修正为原型实际使用的线性三段强度条，并保留空头/中性/多头语义 |
+
+本次新鲜验证：
+
+| 检查 | 结果 |
+|---|---|
+| `flutter test` | 274 项通过，0 项失败 |
+| `flutter analyze` | 通过，0 个问题 |
+| `flutter build web --release` | 通过，产物生成于 `build/web` |
+| 375×812 关键位页布局测试 | 通过，无横向溢出 |
+
+容器内浏览器无法完成最终目视验收：云浏览器不允许访问容器本机地址，本地浏览器安装又被证书链拦截。因此本次只声明构建、组件与布局测试通过，不声明已完成像素级视觉验收。
+
+后续业务屏迁移顺序：组合与交易 → 未来指标/预测记录/统计 → 专业 K 线工具栏 → 规则/复盘/知识 → 设置与后台 → 全站响应式、无障碍和视觉回归。
