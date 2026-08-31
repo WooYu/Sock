@@ -24,6 +24,76 @@ export function getMarketSnapshot(symbol: string) {
   return request<MarketSnapshot>(`/api/v1/market/stocks/${encodeURIComponent(symbol)}/snapshot`)
 }
 
+export type SyncMutation = {
+  idempotencyKey: string
+  entityType: string
+  entityId: string
+  operation: 'UPSERT' | 'DELETE'
+  revision: number
+  payload?: Record<string, unknown>
+}
+
+export type SyncResponse = { applied: boolean; cursor: number }
+export type SyncChange = SyncMutation & { cursor: number; changedAt: string }
+
+export function applySyncMutation(mutation: SyncMutation, clientId?: string, authorization?: string) {
+  return request<SyncResponse>('/api/v1/sync/mutations', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(clientId ? { 'X-Client-Id': clientId } : {}),
+      ...(authorization ? { Authorization: authorization } : {}),
+    },
+    body: JSON.stringify(mutation),
+  })
+}
+
+export function pullSyncChanges(cursor: number, clientId?: string, authorization?: string) {
+  return request<{ nextCursor: number; changes: SyncChange[] }>(`/api/v1/sync/changes?cursor=${cursor}`, {
+    headers: {
+      ...(clientId ? { 'X-Client-Id': clientId } : {}),
+      ...(authorization ? { Authorization: authorization } : {}),
+    },
+  })
+}
+
+export type PortfolioTrade = {
+  id: string
+  symbol: string
+  side: 'buy' | 'sell'
+  quantity: number
+  price: number
+  fee: number
+  tradedAt: string
+  note: string
+  revision: number
+}
+
+export type PortfolioResponse = {
+  trades: PortfolioTrade[]
+  holdings: Array<{ symbol: string; quantity: number; averageCost: number }>
+}
+
+export function getPortfolio(clientId?: string, authorization?: string) {
+  return request<PortfolioResponse>('/api/v1/account/portfolio', {
+    headers: {
+      ...(clientId ? { 'X-Client-Id': clientId } : {}),
+      ...(authorization ? { Authorization: authorization } : {}),
+    },
+  })
+}
+
+export function saveAccountTrade(trade: PortfolioTrade, clientId?: string, authorization?: string) {
+  return request<PortfolioTrade>('/api/v1/account/trades', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(clientId ? { 'X-Client-Id': clientId } : {}),
+      ...(authorization ? { Authorization: authorization } : {}),
+    },
+    body: JSON.stringify(trade),
+  })
+}
 
 export function explainStrategy(
   payload: Record<string, unknown>,

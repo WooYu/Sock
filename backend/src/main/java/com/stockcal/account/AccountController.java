@@ -29,6 +29,8 @@ public class AccountController {
 
         jdbc.sql("delete from sync_change where user_id=:phone")
             .param("phone", phone).update();
+        jdbc.sql("delete from account_trade where user_id=:phone")
+            .param("phone", phone).update();
         jdbc.sql("""
                 delete from sync_mutation
                 where user_id in (select id from app_user where phone=:phone)

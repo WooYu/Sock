@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  output: "standalone",
-};
+export function getNextOutputMode() {
+  return process.env.VERCEL ? undefined : 'standalone' as const
+}
+
+const nextConfig: NextConfig = { output: getNextOutputMode() };
 
 export default nextConfig;

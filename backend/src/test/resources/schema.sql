@@ -113,3 +113,19 @@ create table if not exists ai_call_log (
     status varchar(20) not null,
     created_at timestamp with time zone not null default current_timestamp
 );
+
+create table if not exists account_trade (
+    id varchar(180) not null,
+    user_id varchar(100) not null,
+    symbol varchar(32) not null,
+    side varchar(10) not null,
+    quantity decimal(20, 6) not null,
+    price decimal(20, 6) not null,
+    fee decimal(20, 6) not null default 0,
+    traded_at timestamp with time zone not null,
+    note varchar(2000),
+    revision bigint not null,
+    created_at timestamp with time zone not null default current_timestamp,
+    updated_at timestamp with time zone not null default current_timestamp,
+    primary key (user_id, id)
+);

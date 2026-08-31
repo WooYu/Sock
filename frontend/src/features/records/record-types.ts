@@ -8,9 +8,9 @@ export type PredictionRecord = {
   createdAt: string
   direction: string
   confidence: number
-  support: number
-  resistance: number
-  target: number
+  support: number | null
+  resistance: number | null
+  target: number | null
   reason: string
 }
 
@@ -23,6 +23,7 @@ export type TradeRecord = {
   fee: number
   tradedAt: string
   note: string
+  revision: number
 }
 
 export type ReviewRecord = {
