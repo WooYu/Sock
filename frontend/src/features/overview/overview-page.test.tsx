@@ -26,6 +26,7 @@ describe('OverviewPage', () => {
     expect(screen.getByRole('heading', { name: 'AI策略分析中心' })).toBeInTheDocument()
     expect(screen.getByRole('table', { name: '持仓股票盈亏' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: '华芯动力' })).toBeInTheDocument()
+    expect(screen.getByText('演示持仓 · 非真实账户')).toBeInTheDocument()
   })
 
   test('holding selection updates the shared analysis context', async () => {

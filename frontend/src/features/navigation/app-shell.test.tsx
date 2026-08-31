@@ -9,7 +9,7 @@ describe('AppShell', () => {
 
     expect(screen.getByTestId('desktop-primary-nav')).toBeInTheDocument()
     expect(screen.getByTestId('mobile-primary-nav')).toBeInTheDocument()
-    expect(screen.getByTestId('mobile-primary-nav').querySelector('a[aria-current="page"]')).toHaveTextContent('总览')
+    expect(screen.getByTestId('desktop-primary-nav').querySelector('a[aria-current="page"]')).toHaveTextContent('关键位分析')
   })
 
   test('selecting a mobile destination reports the primary section', async () => {
@@ -25,15 +25,16 @@ describe('AppShell', () => {
     render(<AppShell section="overview" onSectionChange={vi.fn()} />)
 
     const links = screen.getByTestId('mobile-primary-nav').querySelectorAll('a')
-    expect(links).toHaveLength(5)
+    expect(links).toHaveLength(9)
     for (const link of links) {
       expect(link.className).toContain('min-h-12')
     }
   })
 
-  test('search control opens a stock symbol field', async () => {
+  test('reference shell renders the stock search field', async () => {
     render(<AppShell section="overview" onSectionChange={vi.fn()} />)
-    await userEvent.click(screen.getByRole('button', { name: '搜索股票' }))
+    expect(screen.getByRole('textbox', { name: '搜索股票' })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: '搜索股票（移动端）' }))
     expect(screen.getByRole('textbox', { name: '股票代码或名称' })).toBeInTheDocument()
   })
 })

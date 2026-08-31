@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { getPortfolio } from '@/lib/api/backend-client'
 import { getAuthorizationHeader, getClientId } from '../records/record-sync'
-import { RecordSyncButton } from '../records/record-sync-button'
 import { useStockWorkspace } from '../workspace/stock-workspace-provider'
 import type { OperationCycle } from '../workspace/stock-workspace-types'
 
@@ -71,7 +70,7 @@ export function OverviewPage({ holdings = demoHoldings }: { holdings?: OverviewH
   return (
     <div className="sc-dashboard">
       <section className="sc-section sc-portfolio" aria-labelledby="portfolio-title">
-        <div className="flex flex-wrap items-end justify-between gap-3"><SectionHeading eyebrow="组合视角 · 多股票盈亏" title="组合总览" note={remoteHoldings ? '真实账户 · 已同步' : '账户持仓加载中'} titleId="portfolio-title" /><RecordSyncButton onSynced={() => window.location.reload()} /></div>
+        <div className="sc-portfolio-heading"><SectionHeading eyebrow="组合视角 · 多股票盈亏" title="组合总览" titleId="portfolio-title" /><span className="sc-portfolio-status">{remoteHoldings ? '真实账户 · 已同步' : '演示持仓 · 非真实账户'}</span></div>
         <div className="sc-metrics sc-metrics-six">
           <Metric label="持仓股票" value={visibleHoldings.length.toString()} suffix="只" />
           <Metric label="总投入" value={remoteHoldings ? totalInvested.toFixed(2) : '78,570.00'} suffix="元" />
