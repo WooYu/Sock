@@ -8,6 +8,7 @@
   --sc-border: #dfe3ec;
   --sc-muted: #697386;
   --sc-primary: #4057e8;
+  --sc-primary-soft: #eef1ff;
   --sc-gain: #d94b5b;
   --sc-loss: #15946f;
 }
@@ -203,3 +204,73 @@ body {
 
 @media (max-width: 900px) { .sc-kline-main-grid { grid-template-columns: 1fr; }.sc-kline-side-column { grid-template-columns: repeat(2, minmax(0, 1fr)); }.sc-kline-side-card { min-height: 100%; } }
 @media (max-width: 640px) { .sc-kline-workspace { padding: 14px; }.sc-kline-header { align-items: flex-start; flex-direction: column; }.sc-kline-quote { justify-items: start; }.sc-kline-controls { padding: 6px; }.sc-kline-control-row, .sc-kline-tool-row { align-items: flex-start; flex-direction: column; }.sc-kline-group-label { min-width: auto; }.sc-kline-tool-buttons, .sc-kline-indicator-buttons { width: 100%; }.sc-kline-tool-button, .sc-kline-segmented button, .sc-kline-control-button { min-height: 34px; }.sc-kline-hint { width: 100%; }.sc-kline-side-column, .sc-future-grid { grid-template-columns: 1fr; }.sc-kline-chart-panel { padding: 12px 10px 0; } }
+
+/* Overview is the primary product surface: keep desktop labels readable. */
+.sc-dashboard { gap: 22px; font-size: 14px; }
+.sc-section, .sc-ai, .sc-panel { padding: 26px; }
+.sc-heading h2, .sc-panel-heading h2 { font-size: 22px; }
+.sc-heading > span, .sc-panel-heading > span { font-size: 12px; }
+.sc-eyebrow { font-size: 12px; }
+.sc-metrics { gap: 12px; margin-top: 20px; }
+.sc-metric { min-height: 92px; padding: 14px; }
+.sc-metric small, .sc-metric span { font-size: 11px; }
+.sc-metric strong { margin-top: 10px; font-size: 23px; }
+.sc-table-row { padding: 13px 15px; font-size: 13px; }
+.sc-table-head { font-size: 11px; }
+.sc-holding-row small { font-size: 10px; }
+.sc-portfolio-analysis-link { font-size: 12px; }
+.sc-ticker { gap: 26px; padding: 24px 26px; }
+.sc-stock-avatar { width: 52px; height: 52px; font-size: 24px; }
+.sc-stock-title h1 { font-size: 24px; }
+.sc-stock-title span, .sc-stock-title em { font-size: 12px; }
+.sc-tags span, .sc-demo-tag { padding: 4px 7px; font-size: 10px; }
+.sc-price strong { font-size: 36px; }
+.sc-price span { font-size: 13px; }
+.sc-price small { font-size: 11px; }
+.sc-quote-stats dt { font-size: 11px; }
+.sc-quote-stats dd { font-size: 13px; }
+.sc-cycle > span { font-size: 11px; }
+.sc-cycle button, .sc-ai-tabs button, .sc-model-card button { font-size: 12px; }
+.sc-decision { gap: 28px; padding: 24px 26px; }
+.sc-decision-icon { width: 48px; height: 48px; font-size: 25px; }
+.sc-decision-primary p { font-size: 13px; }
+.sc-decision-primary h2 { font-size: 16px; }
+.sc-gauge span, .sc-decision-meta dt { font-size: 12px; }
+.sc-gauge strong, .sc-decision-meta dd { font-size: 24px; }
+.sc-mode-intro > p:not(.sc-eyebrow) { font-size: 13px; }
+.sc-parameter-strip span { padding: 8px 10px; font-size: 11px; }
+.sc-mode-option { padding: 14px; }
+.sc-mode-option b { font-size: 13px; }
+.sc-mode-option em, .sc-mode-option small { font-size: 11px; }
+.sc-mode-option > strong { font-size: 13px; }
+.sc-mode-detail h3 { font-size: 18px; }
+.sc-mode-detail > p { font-size: 12px; }
+.sc-levels small, .sc-evidence { font-size: 11px; }
+.sc-levels b { font-size: 13px; }
+.sc-ai-head h2 { font-size: 22px; }
+.sc-ai-head p:not(.sc-eyebrow) { font-size: 12px; }
+.sc-pipeline-item b { font-size: 12px; }
+.sc-pipeline-item small { font-size: 10px; }
+.sc-conclusion-content h3 { font-size: 18px; }
+.sc-conclusion-content p { font-size: 12px; }
+.sc-panel-heading h2 { font-size: 17px; }
+.sc-zone > button b { font-size: 13px; }
+.sc-zone > button em, .sc-zone > button > div, .sc-zone-detail { font-size: 11px; }
+.sc-zone > button > strong { font-size: 27px; }
+.sc-forecast-row, .sc-muted-copy { font-size: 12px; }
+.sc-selected-stock { font-size: 12px; }
+
+@media (max-width: 760px) {
+  .sc-dashboard { gap: 16px; }
+  .sc-section, .sc-ai, .sc-panel { padding: 16px; }
+  .sc-heading h2, .sc-panel-heading h2 { font-size: 19px; }
+  .sc-eyebrow { font-size: 10px; }
+  .sc-metric { min-height: 82px; padding: 11px; }
+  .sc-metric strong { font-size: 19px; }
+  .sc-table-row { font-size: 11px; }
+  .sc-ticker { gap: 14px; padding: 16px; }
+  .sc-stock-title h1 { font-size: 21px; }
+  .sc-price strong { font-size: 30px; }
+  .sc-decision { gap: 16px; padding: 16px; }
+  .sc-decision-primary h2 { font-size: 14px; }
+}

@@ -6,6 +6,14 @@ import { RulesPage } from './rules-page'
 describe('RulesPage interactions', () => {
   beforeEach(() => localStorage.clear())
 
+  test('shows built-in rules when no local rules exist', () => {
+    render(<RulesPage />)
+
+    expect(screen.getByText('5日线上方优先参与')).toBeInTheDocument()
+    expect(screen.getByText('大盘暴跌时优先看海龟')).toBeInTheDocument()
+    expect(screen.getByText('破位5日线不做')).toBeInTheDocument()
+  })
+
   test('creates a draft and publishes it from the rule workspace', async () => {
     const user = userEvent.setup()
     render(<RulesPage />)
@@ -18,6 +26,6 @@ describe('RulesPage interactions', () => {
     expect(screen.getByText('回踩 MA5 不追高')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '发布回踩 MA5 不追高' }))
 
-    expect(screen.getByText('已发布')).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent('规则已发布')
   })
 })
