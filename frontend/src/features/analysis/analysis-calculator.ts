@@ -2,22 +2,14 @@ import type { Candle, Security, StockAnalysis } from '../workspace/stock-workspa
 
 const WINDOW = 20
 
-export type CalculatedStockAnalysis = Omit<StockAnalysis, 'support' | 'resistance' | 'target'> & {
+export type CalculatedStockAnalysis = Omit<StockAnalysis, 'support' | 'resistance' | 'target' | 'confidence'> & {
   status: 'ready' | 'waiting'
   reason: string
-  indicators: AnalysisIndicators
+  indicators: { ma5: number; ma10: number; ma20: number; bollUpper: number; bollMiddle: number; bollLower: number }
   support: number
   resistance: number
   target: number
-}
-
-type AnalysisIndicators = {
-  ma5: number
-  ma10: number
-  ma20: number
-  bollUpper: number
-  bollMiddle: number
-  bollLower: number
+  confidence: number
 }
 
 export function calculateStockAnalysis(security: Security, candles: Candle[]): CalculatedStockAnalysis {
@@ -52,15 +44,7 @@ export function calculateStockAnalysis(security: Security, candles: Candle[]): C
     confidence,
     directionStrength,
     matchedRules: [],
-    decision: {
-      action: direction === 'bullish' ? 'ENTER' : direction === 'bearish' ? 'EXIT' : 'WAIT',
-      reason: `基于${security.name}最近${WINDOW}个交易日 K 线计算。`,
-      matchedRules: [],
-      missingFacts: [],
-      conflicts: [],
-      invalidationConditions: [],
-      evidence: [],
-    },
+    decision: waitingDecision(`基于${security.name}的确定性指标计算尚未接入规则库。`),
     future: [1, 2, 3].map((offset) => futureIndicator(offset, indicators, latest - (candles.at(-2)?.close ?? latest))),
   }
 }
@@ -77,20 +61,16 @@ function waitingAnalysis(): CalculatedStockAnalysis {
     confidence: 0,
     directionStrength: 0,
     matchedRules: [],
-    decision: {
-      action: 'WAIT',
-      reason: `至少需要${WINDOW}根日线 K 线，当前数据不足，暂不判断。`,
-      matchedRules: [],
-      missingFacts: [`至少需要${WINDOW}根日线 K 线`],
-      conflicts: [],
-      invalidationConditions: [],
-      evidence: [],
-    },
+    decision: waitingDecision(`至少需要${WINDOW}根日线 K 线，当前数据不足，暂不判断。`),
     future: [],
   }
 }
 
-function futureIndicator(offset: number, base: AnalysisIndicators, slope: number) {
+function waitingDecision(reason: string): StockAnalysis['decision'] {
+  return { action: 'WAIT', reason, matchedRules: [], missingFacts: [], conflicts: [], invalidationConditions: [], evidence: [] }
+}
+
+function futureIndicator(offset: number, base: CalculatedStockAnalysis['indicators'], slope: number) {
   const maShift = slope * offset * 0.35
   return {
     day: `T+${offset}`,
