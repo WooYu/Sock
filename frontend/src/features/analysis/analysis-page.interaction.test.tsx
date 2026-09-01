@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, test } from 'vitest'
@@ -21,6 +23,12 @@ function snapshotWithCandles() {
 
 describe('AnalysisPage interactions', () => {
   beforeEach(() => localStorage.clear())
+
+  test('keeps analysis tabs horizontal without a vertical scrollbar', () => {
+    const styles = readFileSync(resolve(process.cwd(), 'app/workspace-polish.css'), 'utf8')
+
+    expect(styles).toContain('.sc-analysis-tabs { display: flex; align-items: center; gap: 4px; overflow-x: auto; overflow-y: hidden;')
+  })
 
   test('exposes the redesigned analysis workspace regions', () => {
     const { container } = render(
