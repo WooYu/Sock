@@ -11,7 +11,7 @@ import type {
   WorkspaceStatus,
 } from './stock-workspace-types'
 
-export type MarketClient = Pick<BrowserMarketClient, 'snapshot'>
+export type MarketClient = Pick<BrowserMarketClient, 'snapshot'> & Pick<BrowserMarketClient, 'publishedRules'>
 
 type WorkspaceContextValue = {
   selectedSymbol: string | null
@@ -59,12 +59,13 @@ export function StockWorkspaceProvider({ children, client = browserMarketClient,
     if (!preserving) setCurrent(null)
     try {
       const market = await client.snapshot(symbol, controller.signal)
+      const rules = client.publishedRules ? await client.publishedRules(controller.signal).catch(() => []) : []
       if (version !== requestVersion.current) return
       const snapshot: StockWorkspaceSnapshot = {
         symbol,
         security: market.quote?.security ?? security,
         market,
-        analysis: analyzeMarketSnapshot(market, nextCycle),
+        analysis: analyzeMarketSnapshot(market, nextCycle, rules),
         cycle: nextCycle,
         generatedAt: new Date().toISOString(),
       }

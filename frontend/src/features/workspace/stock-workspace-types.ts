@@ -68,6 +68,37 @@ export type DecisionEvidence = {
   detail?: string
 }
 
+export type RuleConditionField =
+  | 'closeAboveMa5'
+  | 'closeAboveMa20'
+  | 'closeAboveBollMiddle'
+  | 'ma5SlopePositive'
+  | 'bollMiddleSlopePositive'
+  | 'volumeRatio'
+  | 'supportDistance'
+  | 'granvilleDay'
+  | 'phase'
+  | 'marketPanic'
+  | 'relativeStrength'
+  | 'phase3Opening'
+  | 'mirrorRetest'
+
+export type RuleConditionOperator = 'equals' | 'greaterThan' | 'greaterThanOrEqual' | 'lessThan' | 'lessThanOrEqual'
+
+export type RuleCondition = {
+  field: RuleConditionField
+  operator: RuleConditionOperator
+  value: number
+}
+
+export type RuleEvaluation = {
+  ruleId: string
+  status: 'matched' | 'not-matched' | 'insufficient'
+  conditions: Array<{ field: RuleConditionField; actual: number | boolean | string | null; passed: boolean | null }>
+  missingFacts: string[]
+  failedConditions: string[]
+}
+
 export type DecisionCalibration = {
   sampleCount: number
   hitRate: number
@@ -85,8 +116,11 @@ export type DecisionRule = {
   score?: number
   band?: string
   action: DecisionAction
+  mode?: string
   priority: number
   evidence: DecisionEvidence[]
+  conditions?: RuleCondition[]
+  invalidationConditions?: string[]
 }
 
 export type DecisionResult = {
@@ -94,6 +128,7 @@ export type DecisionResult = {
   mode?: StrategyMode
   reason: string
   matchedRules: DecisionRule[]
+  ruleEvaluations?: RuleEvaluation[]
   missingFacts: string[]
   conflicts: string[]
   invalidationConditions: string[]
@@ -109,6 +144,7 @@ export type StockAnalysis = {
   confidence: number | null
   directionStrength: number
   matchedRules: DecisionRule[]
+  ruleEvaluations?: RuleEvaluation[]
   future: Array<{ day: string; maValues: Record<string, number>; bollUpper: number; bollMiddle: number; bollLower: number }>
   decision: DecisionResult
 }
