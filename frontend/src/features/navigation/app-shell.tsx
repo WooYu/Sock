@@ -47,7 +47,8 @@ export function AppShell({
       <nav aria-label="主导航" className={isMobile ? 'sc-main-nav sc-main-nav-mobile' : 'sc-main-nav sc-main-nav-desktop'} data-testid={testId}>
         {items.map((item, index) => {
           const itemPath = item.href.split('#')[0]
-          const isActive = activeHref ? itemPath === activeHref : activeIndex === index
+          const itemRoot = itemPath.split('/').slice(0, 2).join('/') || itemPath
+          const isActive = activeHref ? itemPath === activeHref || activeHref.startsWith(`${itemRoot}/`) : activeIndex === index
           return (
           <Link
             aria-current={isActive ? 'page' : undefined}

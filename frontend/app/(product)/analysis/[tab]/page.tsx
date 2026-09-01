@@ -10,5 +10,5 @@ export default async function AnalysisRoute({ params, searchParams }: { params: 
   const { tab } = await params
   const { symbol } = await searchParams
   if (!validTabs.has(tab as AnalysisTab)) notFound()
-  return <StockWorkspaceProvider initialSymbol={symbol}><ProductShell activeHref={`/analysis/${tab}`} section="analysis"><AnalysisPage tab={tab as AnalysisTab} /></ProductShell></StockWorkspaceProvider>
+  return <StockWorkspaceProvider initialSymbol={symbol ?? '600519'}><ProductShell activeHref={`/analysis/${tab}`} section="analysis"><AnalysisPage tab={tab as AnalysisTab} /></ProductShell></StockWorkspaceProvider>
 }

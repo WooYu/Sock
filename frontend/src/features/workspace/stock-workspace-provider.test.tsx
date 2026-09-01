@@ -82,6 +82,28 @@ describe('StockWorkspaceProvider', () => {
     expect(screen.getByText('当前股票：600519')).toBeInTheDocument()
   })
 
+  test('retrying an initial load stays in loading state until it succeeds', async () => {
+    let calls = 0
+    const market: MarketClient = {
+      async snapshot() {
+        calls += 1
+        if (calls === 1) throw new Error('行情服务暂时不可用')
+        return new Promise(() => undefined)
+      },
+    }
+    render(
+      <StockWorkspaceProvider client={market}>
+        <Probe />
+      </StockWorkspaceProvider>,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: '选择 600519' }))
+    await screen.findByText('状态：error')
+    await userEvent.click(screen.getByRole('button', { name: '刷新' }))
+
+    expect(screen.getByText('状态：loading')).toBeInTheDocument()
+  })
+
   test('deep link initialSymbol loads the shared workspace', async () => {
     const market: MarketClient = { snapshot: async (symbol) => demoMarketSnapshot(symbol) }
     render(

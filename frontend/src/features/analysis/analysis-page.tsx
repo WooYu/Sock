@@ -20,7 +20,7 @@ export function AnalysisPage({ tab }: { tab: AnalysisTab }) {
   const workspace = useStockWorkspace()
   const analysis = workspace.current?.analysis
   const hasMarketSnapshot = Boolean(workspace.current ?? workspace.lastSuccessful)
-  const initialLoading = !hasMarketSnapshot && (workspace.status === 'loading' || (workspace.status === 'idle' && workspace.selectedSymbol))
+  const initialLoading = !hasMarketSnapshot && (workspace.status === 'loading' || workspace.status === 'refreshing' || (workspace.status === 'idle' && workspace.selectedSymbol))
   const initialError = !hasMarketSnapshot && workspace.status === 'error'
   const [saved, setSaved] = useState(false)
   const savePrediction = () => {
@@ -48,7 +48,7 @@ export function AnalysisPage({ tab }: { tab: AnalysisTab }) {
       {tabs.map(([value, label]) => <Link aria-current={tab === value ? 'page' : undefined} className={tab === value ? 'is-active' : ''} href={`/analysis/${value}${workspace.selectedSymbol ? `?symbol=${workspace.selectedSymbol}` : ''}`} key={value}>{label}</Link>)}
     </nav>
     <div className="sc-analysis-content">
-      {initialLoading ? <MarketLoadingState variant="analysis" /> : initialError ? <MarketFeedback errorMessage={workspace.errorMessage} onRetry={() => void workspace.refresh()} status={workspace.status} /> : null}
+      {initialLoading ? <MarketLoadingState variant="analysis" /> : initialError ? <MarketFeedback errorMessage={workspace.errorMessage} onRetry={() => void workspace.refresh()} status={workspace.status} /> : <MarketFeedback errorMessage={workspace.errorMessage} hasSnapshot={hasMarketSnapshot} onRetry={() => void workspace.refresh()} status={workspace.status} />}
       {!initialLoading && !initialError && tab === 'key-levels' ? <KeyLevelsPanel analysis={analysis} /> : null}
       {!initialLoading && !initialError && tab === 'patterns' ? <PatternsPanel analysis={analysis} /> : null}
       {!initialLoading && !initialError && tab === 'future' ? <FutureIndicatorsPanel analysis={analysis} /> : null}

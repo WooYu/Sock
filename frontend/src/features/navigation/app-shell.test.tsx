@@ -38,6 +38,12 @@ describe('AppShell', () => {
     expect(screen.getByRole('link', { name: '专业 K 线' })).not.toHaveAttribute('aria-current', 'page')
   })
 
+  test('keeps the primary workspace active on nested destinations', () => {
+    render(<AppShell activeHref="/analysis/future" section="analysis" onSectionChange={vi.fn()} />)
+
+    expect(screen.getByRole('link', { name: '个股分析' })).toHaveAttribute('aria-current', 'page')
+  })
+
   test('all mobile destinations meet the 48px touch target', () => {
     render(<AppShell section="overview" onSectionChange={vi.fn()} />)
 

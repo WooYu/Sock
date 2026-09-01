@@ -97,6 +97,8 @@ export function StockWorkspaceProvider({ children, client = browserMarketClient,
     const resolvedSecurity = security ?? { code: symbol, name: symbol }
     setSelectedSymbol(symbol)
     setSelectedSecurity(resolvedSecurity)
+    setCurrent(null)
+    setLastSuccessful(null)
     await load(symbol, resolvedSecurity, cycle, false)
   }, [cycle, load])
 
@@ -106,8 +108,8 @@ export function StockWorkspaceProvider({ children, client = browserMarketClient,
   }, [lastSuccessful, load, selectedSecurity, selectedSymbol])
 
   const refresh = useCallback(async () => {
-    if (selectedSymbol && selectedSecurity) await load(selectedSymbol, selectedSecurity, cycle, true)
-  }, [cycle, load, selectedSecurity, selectedSymbol])
+    if (selectedSymbol && selectedSecurity) await load(selectedSymbol, selectedSecurity, cycle, Boolean(lastSuccessful))
+  }, [cycle, lastSuccessful, load, selectedSecurity, selectedSymbol])
 
   useEffect(() => {
     if (!initialSymbol || initialLoadSymbol.current === initialSymbol) return
