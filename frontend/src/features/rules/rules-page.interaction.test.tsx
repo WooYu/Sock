@@ -28,4 +28,17 @@ describe('RulesPage interactions', () => {
 
     expect(screen.getByRole('status')).toHaveTextContent('规则已发布')
   })
+
+  test('toggles a rule and opens its detail panel', async () => {
+    const user = userEvent.setup()
+    render(<RulesPage />)
+
+    const toggle = screen.getByRole('button', { name: '停用规则 5日线上方优先参与' })
+    expect(toggle).toHaveAttribute('aria-pressed', 'true')
+    await user.click(toggle)
+    expect(screen.getByRole('button', { name: '启用规则 5日线上方优先参与' })).toHaveAttribute('aria-pressed', 'false')
+
+    await user.click(screen.getByRole('button', { name: '查看规则详情 5日线上方优先参与' }))
+    expect(screen.getByRole('dialog', { name: '规则详情 5日线上方优先参与' })).toBeInTheDocument()
+  })
 })

@@ -26,6 +26,14 @@ export function RulesPage({ initialRules = [] }: { initialRules?: RuleRecord[] }
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [message, setMessage] = useState('')
+  const [enabledRules, setEnabledRules] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(initialRulesWithBuiltIns().map((rule) => [rule.id, true])),
+  )
+  const [selectedRule, setSelectedRule] = useState<RuleRecord | null>(null)
+
+  const toggleRule = (rule: RuleRecord) => {
+    setEnabledRules((current) => ({ ...current, [rule.id]: !(current[rule.id] ?? rule.status === 'published') }))
+  }
 
   const publish = (id: string) => {
     const next = rules.map((item) => item.id === id ? { ...item, status: 'published' as const } : item)
@@ -80,15 +88,19 @@ export function RulesPage({ initialRules = [] }: { initialRules?: RuleRecord[] }
       {message ? <p className="text-sm text-emerald-700" role="status">{message}</p> : null}
       {rules.length === 0 ? <div className="rounded-xl bg-[var(--sc-surface-muted)] p-5 text-sm text-[var(--sc-muted)]">暂无规则，请先创建草稿。</div> : <div className="space-y-3">
         {rules.map((rule) => <article className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--sc-border)] p-4" key={rule.id}>
-          <div>
+          <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2"><h2 className="font-medium">{rule.title}</h2>{rule.source ? <span className="rounded-full bg-[var(--sc-surface-muted)] px-2 py-1 text-xs text-[var(--sc-muted)]">{rule.source}</span> : null}</div>
             {rule.description ? <p className="mt-1 text-sm text-[var(--sc-muted)]">{rule.description}</p> : null}
-            <p className="mt-1 text-sm text-[var(--sc-muted)]">{rule.status === 'published' ? '参与分析' : '草稿'}</p>
-            {rule.status === 'published' && (rule.timeframe || rule.mode) ? <p className="mt-1 text-xs text-[var(--sc-muted)]">已启用{rule.timeframe ? ` · ${rule.timeframe}` : ''}{rule.mode ? ` · ${rule.mode}` : ''}</p> : null}
+            <p className="mt-1 text-sm text-[var(--sc-muted)]">{rule.status === 'published' ? (enabledRules[rule.id] ? '参与分析' : '已停用') : '草稿'}</p>
+            {rule.status === 'published' && (rule.timeframe || rule.mode) ? <p className="mt-1 text-xs text-[var(--sc-muted)]">{enabledRules[rule.id] ? '已启用' : '未启用'}{rule.timeframe ? ` · ${rule.timeframe}` : ''}{rule.mode ? ` · ${rule.mode}` : ''}</p> : null}
           </div>
-          {rule.status === 'published' ? <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm text-emerald-700">已发布</span> : <button className="min-h-12 rounded-xl bg-[var(--sc-primary)] px-4 text-sm font-semibold text-white" onClick={() => publish(rule.id)} type="button" aria-label={`发布${rule.title}`}>发布</button>}
+          <div className="flex flex-wrap items-center gap-2">
+            {rule.status === 'published' ? <button aria-label={`${enabledRules[rule.id] ? '停用' : '启用'}规则 ${rule.title}`} aria-pressed={enabledRules[rule.id] ?? true} className={`min-h-10 rounded-full px-3 text-sm ${enabledRules[rule.id] ? 'bg-emerald-50 text-emerald-700' : 'bg-[var(--sc-surface-muted)] text-[var(--sc-muted)]'}`} onClick={() => toggleRule(rule)} type="button">{enabledRules[rule.id] ? '已启用' : '已停用'}</button> : <button className="min-h-12 rounded-xl bg-[var(--sc-primary)] px-4 text-sm font-semibold text-white" onClick={() => publish(rule.id)} type="button" aria-label={`发布${rule.title}`}>发布</button>}
+            <button aria-label={`查看规则详情 ${rule.title}`} className="min-h-10 rounded-xl border border-[var(--sc-border)] px-3 text-sm font-semibold" onClick={() => setSelectedRule(rule)} type="button">查看详情</button>
+          </div>
         </article>)}
       </div>}
+      {selectedRule ? <div className="modal-layer" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setSelectedRule(null)}><section aria-label={`规则详情 ${selectedRule.title}`} aria-modal="true" className="rule-detail-panel" role="dialog"><button aria-label="关闭规则详情" className="modal-close" onClick={() => setSelectedRule(null)} type="button">×</button><p className="text-sm text-[var(--sc-muted)]">规则详情 · {selectedRule.status === 'published' ? '已发布' : '草稿'}</p><h2 className="mt-2 text-xl font-semibold">{selectedRule.title}</h2><p className="mt-3 text-sm text-[var(--sc-muted)]">{selectedRule.description || '暂无规则说明。'}</p><dl className="mt-4 space-y-2 text-sm"><div className="flex justify-between gap-4"><dt className="text-[var(--sc-muted)]">状态</dt><dd>{selectedRule.status === 'published' && enabledRules[selectedRule.id] ? '已启用' : selectedRule.status === 'published' ? '已停用' : '草稿'}</dd></div>{selectedRule.timeframe ? <div className="flex justify-between gap-4"><dt className="text-[var(--sc-muted)]">周期</dt><dd>{selectedRule.timeframe}</dd></div> : null}{selectedRule.mode ? <div className="flex justify-between gap-4"><dt className="text-[var(--sc-muted)]">模式</dt><dd>{selectedRule.mode}</dd></div> : null}</dl><div className="mt-5 flex justify-end"><button className="min-h-12 rounded-xl bg-[var(--sc-primary)] px-4 text-sm font-semibold text-white" onClick={() => setSelectedRule(null)} type="button">返回规则列表</button></div></section></div> : null}
     </section>
   )
 }
