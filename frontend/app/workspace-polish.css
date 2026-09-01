@@ -192,6 +192,60 @@
   .sc-rule-card-actions > * { flex: 1; text-align: center; }
 }
 
+/* Shared market state: preserve layout while real data is in flight. */
+.sc-market-state { display: grid; gap: 20px; min-height: 340px; align-content: center; border: 1px solid var(--line); border-radius: 13px; background: var(--surface); padding: 30px; box-shadow: var(--shadow); }
+.sc-market-loading-heading { display: flex; align-items: flex-start; gap: 13px; }
+.sc-market-loading-heading h1 { margin: 7px 0 0; color: var(--ink); font-size: 26px; letter-spacing: -0.03em; }
+.sc-market-loading-heading p:last-child { margin: 8px 0 0; color: var(--muted); font-size: 14px; }
+.sc-market-spinner { display: inline-block; width: 18px; height: 18px; flex: 0 0 auto; margin-top: 25px; border: 2px solid #dce2ff; border-top-color: var(--blue); border-radius: 50%; animation: sc-market-spin .8s linear infinite; }
+.sc-market-spinner-small { width: 13px; height: 13px; margin: 0 7px 0 0; border-width: 2px; vertical-align: -2px; }
+.sc-market-loading-skeleton { display: grid; grid-template-columns: minmax(180px, 1.4fr) repeat(3, minmax(90px, 1fr)); gap: 12px; }
+.sc-market-loading-skeleton span { display: block; height: 64px; border-radius: 9px; background: linear-gradient(100deg, #eef1f7 20%, #f8f9fc 38%, #eef1f7 56%); background-size: 200% 100%; animation: sc-market-shimmer 1.35s ease-in-out infinite; }
+.sc-market-loading-skeleton span:first-child { height: 96px; }
+.sc-market-loading-detail { margin: 0; color: var(--muted); font-size: 13px; }
+.sc-market-feedback { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; border-radius: 9px; padding: 10px 13px; color: #59647a; font-size: 13px; line-height: 1.5; }
+.sc-market-feedback button { min-height: 32px; border: 1px solid currentColor; border-radius: 7px; background: transparent; padding: 0 10px; color: inherit; font-size: 12px; font-weight: 700; }
+.sc-market-feedback.is-refreshing { background: var(--blue-soft); color: var(--blue); }
+.sc-market-feedback.is-stale, .sc-market-feedback.is-offline { background: var(--amber-soft); color: #946a1d; }
+.sc-market-feedback.is-error { justify-content: space-between; background: var(--rise-soft); color: var(--rise); }
+.sc-live-error-state, .sc-chart-error-state { display: grid; gap: 14px; align-content: center; min-height: 340px; border: 1px solid var(--line); border-radius: 13px; background: var(--surface); padding: 30px; box-shadow: var(--shadow); }
+.sc-live-error-state h1 { margin: 0; color: var(--ink); font-size: 26px; }
+.sc-live-error-state .sc-link { margin-top: 0; }
+.sc-analysis-content > .sc-market-state { min-height: 300px; }
+.sc-analysis-content > .sc-market-feedback { min-height: 120px; }
+
+/* One clear primary action per workspace; secondary work stays in local tabs. */
+.sc-main-nav-desktop { gap: 22px; }
+.sc-nav-link { min-height: 44px; font-size: 13px; }
+.sc-shell-main { width: min(1392px, calc(100% - 32px)); padding-top: 20px; }
+.sc-shell-header-inner { width: min(1392px, calc(100% - 32px)); min-height: 64px; gap: 24px; }
+.sc-trading-page, .sc-review-workspace, .sc-rules-page { gap: 18px; padding: 22px; box-shadow: 0 5px 18px rgba(30, 42, 70, 0.045); }
+.sc-trading-page, .sc-review-workspace { border-radius: 12px; }
+.sc-trading-header h1, .sc-review-header h1, .sc-rules-header h1 { font-size: 26px; }
+.sc-workspace-tabs a, .sc-analysis-tabs a { min-height: 44px; font-size: 13px; }
+.sc-trading-stat-grid { gap: 10px; }
+.sc-trading-stat-card { min-height: 96px; padding: 17px !important; }
+.sc-trading-stat-card p:last-child { font-size: 24px; }
+.sc-rules-page { border-radius: 12px; }
+
+@keyframes sc-market-spin { to { transform: rotate(360deg); } }
+@keyframes sc-market-shimmer { to { background-position: -200% 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .sc-market-spinner, .sc-market-loading-skeleton span { animation: none; }
+}
+
+@media (max-width: 640px) {
+  .sc-shell-main, .sc-shell-header-inner, .sc-mobile-search-row { width: calc(100% - 24px); }
+  .sc-market-state { min-height: 300px; padding: 22px 18px; }
+  .sc-market-loading-heading h1 { font-size: 22px; }
+  .sc-market-loading-skeleton { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sc-market-loading-skeleton span:first-child { grid-column: 1 / -1; }
+  .sc-live-error-state, .sc-chart-error-state { min-height: 300px; padding: 22px 18px; }
+  .sc-main-nav-desktop { gap: 12px; }
+  .sc-nav-link { font-size: 12px; }
+}
+
 /* Final scale overrides follow the baseline page rules so every workspace shares the same readable rhythm. */
 .sc-live-card-heading h2 { font-size: 19px; }
 .sc-live-card-heading span { font-size: 12px; }

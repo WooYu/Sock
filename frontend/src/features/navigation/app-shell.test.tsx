@@ -11,7 +11,15 @@ describe('AppShell', () => {
 
     expect(screen.getByTestId('desktop-primary-nav')).toBeInTheDocument()
     expect(screen.getByTestId('mobile-primary-nav')).toBeInTheDocument()
-    expect(screen.getByTestId('desktop-primary-nav').querySelector('a[aria-current="page"]')).toHaveTextContent('关键位分析')
+    expect(screen.getByTestId('desktop-primary-nav').querySelector('a[aria-current="page"]')).toHaveTextContent('总览')
+  })
+
+  test('keeps the primary navigation focused on six workspaces', () => {
+    render(<AppShell section="overview" onSectionChange={vi.fn()} />)
+
+    expect(screen.getByTestId('desktop-primary-nav').querySelectorAll('a')).toHaveLength(6)
+    expect(screen.getByTestId('mobile-primary-nav').querySelectorAll('a')).toHaveLength(6)
+    expect(screen.getByRole('link', { name: '个股分析' })).toHaveAttribute('href', '/analysis/key-levels')
   })
 
   test('selecting a mobile destination reports the primary section', async () => {
@@ -23,18 +31,18 @@ describe('AppShell', () => {
     expect(onSectionChange).toHaveBeenCalledWith('chart')
   })
 
-  test('highlights the concrete destination when a section has multiple entries', () => {
-    render(<AppShell activeHref="/analysis/future" section="analysis" onSectionChange={vi.fn()} />)
+  test('highlights the concrete workspace destination', () => {
+    render(<AppShell activeHref="/analysis/key-levels" section="analysis" onSectionChange={vi.fn()} />)
 
-    expect(screen.getByRole('link', { name: '未来指标' })).toHaveAttribute('aria-current', 'page')
-    expect(screen.getByRole('link', { name: '盈利模式' })).not.toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('link', { name: '个股分析' })).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('link', { name: '专业 K 线' })).not.toHaveAttribute('aria-current', 'page')
   })
 
   test('all mobile destinations meet the 48px touch target', () => {
     render(<AppShell section="overview" onSectionChange={vi.fn()} />)
 
     const links = screen.getByTestId('mobile-primary-nav').querySelectorAll('a')
-    expect(links).toHaveLength(9)
+    expect(links).toHaveLength(6)
     for (const link of links) {
       expect(link.className).toContain('min-h-12')
     }
