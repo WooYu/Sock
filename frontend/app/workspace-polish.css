@@ -1,4 +1,67 @@
 /* Polished second-level workspaces: analysis, chart, and rules. */
+.sc-shell-main { font-size: 15px; line-height: 1.55; }
+.sc-shell-main h1, .sc-shell-main h2, .sc-shell-main h3 { line-height: 1.25; }
+.sc-shell-main .text-sm { font-size: 14px; }
+.sc-shell-main .text-xs { font-size: 12px; }
+
+.sc-workspace-tabs { display: flex; align-items: center; gap: 5px; overflow-x: auto; overflow-y: hidden; border-bottom: 1px solid var(--line); padding: 0 4px; scrollbar-width: none; }
+.sc-workspace-tabs::-webkit-scrollbar { display: none; }
+.sc-workspace-tabs a { position: relative; display: inline-flex; min-height: 46px; align-items: center; flex: 0 0 auto; border-radius: 9px 9px 0 0; padding: 0 17px; color: var(--muted); font-size: 14px; font-weight: 700; white-space: nowrap; }
+.sc-workspace-tabs a:hover { background: #f8f9fc; color: var(--ink); }
+.sc-workspace-tabs a.is-active { background: #fff; color: var(--blue); }
+.sc-workspace-tabs a.is-active::after { position: absolute; right: 13px; bottom: -1px; left: 13px; height: 3px; border-radius: 3px; background: var(--blue); content: ''; }
+
+.sc-trading-page, .sc-review-workspace { display: grid; gap: 22px; border: 1px solid var(--line); border-radius: 14px; background: #fff; padding: 28px; box-shadow: var(--shadow); }
+.sc-trading-header, .sc-review-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
+.sc-trading-header h1, .sc-review-header h1 { margin: 6px 0 0; color: var(--ink); font-size: 28px; letter-spacing: -0.035em; }
+.sc-trading-content, .sc-review-content { display: grid; gap: 20px; min-width: 0; }
+.sc-trading-view, .sc-review-content > form, .sc-review-content > div { display: grid; gap: 20px; }
+.sc-trading-stat-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.sc-trading-stat-card { min-height: 112px; display: grid; align-content: center; border: 1px solid #e2e6ef; background: linear-gradient(145deg, #f8f9ff, #f2f4f9) !important; padding: 20px !important; }
+.sc-trading-stat-card p:first-child { font-size: 14px; }
+.sc-trading-stat-card p:last-child { margin-top: 8px; color: var(--ink); font-family: var(--font-geist-mono), monospace; font-size: 27px; letter-spacing: -0.04em; }
+.sc-trading-actions { gap: 10px !important; }
+.sc-trading-actions a, .sc-trading-page button, .sc-review-page button, .sc-review-content a { font-size: 14px; }
+.sc-trading-page input, .sc-trading-page select, .sc-review-workspace textarea { font-size: 14px; line-height: 1.65; }
+.sc-trading-page article, .sc-review-workspace article { border-radius: 11px; }
+.sc-trading-page .border-dashed, .sc-review-workspace .border-dashed { background: #fbfcff; }
+.sc-review-header > div { display: grid; gap: 8px; }
+.sc-review-header .sc-account-sync { justify-self: start; }
+.sc-review-content textarea { min-height: 190px; border-color: #d8deeb; background: #fbfcff; padding: 17px; }
+.sc-review-content button { min-height: 44px; border-radius: 9px; padding: 0 17px; font-weight: 750; }
+.sc-review-content > form > button { width: fit-content; }
+.sc-review-content > div > div:first-child { border: 1px solid #e1e6ef; background: linear-gradient(145deg, #f8f9ff, #f2f4f9); padding: 18px; }
+.sc-review-content > div > div:first-child p:first-child { color: var(--ink); font-size: 15px; font-weight: 750; }
+.sc-review-content > div > div:first-child p:last-child { font-size: 14px; line-height: 1.65; }
+
+.sc-analysis-secondary-panel { box-shadow: var(--shadow); }
+.sc-analysis-secondary-panel h2 { font-size: 24px; letter-spacing: -0.035em; }
+.sc-analysis-secondary-panel > .text-sm { font-size: 14px; }
+.sc-analysis-secondary-card { min-height: 108px; padding: 18px !important; }
+.sc-analysis-secondary-card p { line-height: 1.65; }
+.sc-analysis-secondary-panel button { min-height: 44px; font-size: 14px; }
+.sc-analysis-empty { padding: 22px !important; font-size: 14px; }
+
+.sc-live-dashboard { font-size: 15px; }
+.sc-live-card-heading h2 { font-size: 19px; }
+.sc-live-card-heading span { font-size: 12px; }
+.sc-live-metrics dt { font-size: 12px; }
+.sc-live-metrics dd { font-size: 17px; }
+.sc-live-actions a { min-height: 42px; padding: 0 17px; font-size: 13px; line-height: 42px; }
+
+.sc-rules-page .text-sm { font-size: 14px; }
+.sc-rules-page .text-xs { font-size: 12px; }
+.sc-rules-header h1 { font-size: 28px; }
+.sc-rules-header p:last-child { font-size: 14px; }
+.sc-rules-overview span { font-size: 12px; }
+.sc-rules-overview strong { font-size: 24px; }
+.sc-rule-editor label { font-size: 13px; }
+.sc-rule-editor input, .sc-rule-editor textarea { font-size: 14px; }
+.sc-rule-card-main h2 { font-size: 16px; }
+.sc-rule-card-main p { font-size: 13px; }
+.sc-rule-status, .sc-rule-toggle, .sc-rule-publish, .sc-rule-detail-button { font-size: 12px; }
+.sc-rules-empty { font-size: 14px; }
+
 .sc-analysis-page { display: grid; gap: 16px; }
 .sc-stock-header { box-shadow: var(--shadow); }
 .sc-stock-header > div:first-child { align-items: center; }
@@ -97,6 +160,14 @@
 }
 
 @media (max-width: 640px) {
+  .sc-shell-main { font-size: 14px; }
+  .sc-trading-page, .sc-review-workspace { gap: 16px; padding: 18px; }
+  .sc-trading-header, .sc-review-header { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .sc-trading-header h1, .sc-review-header h1 { font-size: 24px; }
+  .sc-workspace-tabs a { min-height: 42px; padding: 0 13px; font-size: 13px; }
+  .sc-trading-stat-grid { grid-template-columns: 1fr; }
+  .sc-trading-stat-card { min-height: 88px; }
+  .sc-review-content textarea { min-height: 160px; }
   .sc-analysis-page { gap: 12px; }
   .sc-stock-header { padding: 16px !important; }
   .sc-stock-header > div:first-child { align-items: flex-start; }
@@ -114,6 +185,7 @@
   .sc-kline-quote strong { font-size: 29px; }
   .sc-rules-page { gap: 14px; padding: 16px; }
   .sc-rules-header h1 { font-size: 22px; }
+  .sc-live-metrics dd { font-size: 15px; }
   .sc-rules-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .sc-rules-overview > div { min-height: 66px; }
   .sc-rule-card { padding: 14px; }

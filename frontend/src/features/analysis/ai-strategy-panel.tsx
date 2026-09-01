@@ -26,7 +26,7 @@ export function AiStrategyPanel({ analysis }: { analysis?: StockAnalysis | null 
   const [error, setError] = useState<string | null>(null)
 
   if (!analysis) {
-    return <p className="rounded-2xl border border-dashed border-[var(--sc-border)] p-6 text-sm text-[var(--sc-muted)]">请先加载行情，未生成伪 AI 结果。</p>
+    return <p className="sc-analysis-empty rounded-2xl border border-dashed border-[var(--sc-border)] p-6 text-sm text-[var(--sc-muted)]">请先加载行情，未生成伪 AI 结果。</p>
   }
 
   const decision = analysis.decision
@@ -80,7 +80,7 @@ export function AiStrategyPanel({ analysis }: { analysis?: StockAnalysis | null 
     }
   }
 
-  return <section className="rounded-2xl border border-[var(--sc-border)] bg-[var(--sc-surface)] p-5">
+  return <section className="sc-analysis-panel sc-analysis-secondary-panel rounded-2xl border border-[var(--sc-border)] bg-[var(--sc-surface)] p-5">
     <p className="text-sm text-[var(--sc-muted)]">数值计算 → 规则匹配 → AI 解释</p>
     <div className="mt-1 flex flex-wrap items-center justify-between gap-3">
       <h2 className="text-xl font-semibold">AI 策略</h2>

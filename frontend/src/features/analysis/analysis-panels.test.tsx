@@ -40,4 +40,10 @@ describe('analysis panels', () => {
     expect(screen.getByText('closeAboveMa5')).toBeInTheDocument()
     expect(screen.getByText('已满足')).toBeInTheDocument()
   })
+
+  test('uses the shared analysis panel surface for secondary tabs', () => {
+    const { container } = render(<PatternsPanel analysis={analysis} />)
+
+    expect(container.querySelector('.sc-analysis-panel')).toBeInTheDocument()
+  })
 })

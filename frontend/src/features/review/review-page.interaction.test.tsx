@@ -6,6 +6,15 @@ import { ReviewPage } from './review-page'
 describe('ReviewPage interactions', () => {
   beforeEach(() => localStorage.clear())
 
+  test('exposes the shared review workspace regions', () => {
+    const { container } = render(<ReviewPage initialTab="daily" />)
+
+    expect(container.querySelector('.sc-review-workspace')).toBeInTheDocument()
+    expect(container.querySelector('.sc-review-header')).toBeInTheDocument()
+    expect(container.querySelector('.sc-workspace-tabs')).toBeInTheDocument()
+    expect(container.querySelector('.sc-review-content')).toBeInTheDocument()
+  })
+
   test('saves the daily review and restores it on a later render', async () => {
     const user = userEvent.setup()
     const first = render(<ReviewPage initialTab="daily" />)

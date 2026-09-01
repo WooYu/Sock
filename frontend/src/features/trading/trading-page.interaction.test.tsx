@@ -6,6 +6,15 @@ import { TradingPage } from './trading-page'
 describe('TradingPage interactions', () => {
   beforeEach(() => localStorage.clear())
 
+  test('exposes the shared trading workspace regions', () => {
+    const { container } = render(<TradingPage initialTab="positions" symbol="600519" />)
+
+    expect(container.querySelector('.sc-trading-page')).toBeInTheDocument()
+    expect(container.querySelector('.sc-trading-header')).toBeInTheDocument()
+    expect(container.querySelector('.sc-workspace-tabs')).toBeInTheDocument()
+    expect(container.querySelector('.sc-trading-content')).toBeInTheDocument()
+  })
+
   test('records a trade from the ledger action', async () => {
     const user = userEvent.setup()
     render(<TradingPage initialTab="ledger" symbol="600519" />)
