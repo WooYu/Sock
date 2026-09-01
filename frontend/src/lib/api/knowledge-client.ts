@@ -1,6 +1,23 @@
 import { getAuthorizationHeader } from '@/features/records/record-sync'
 
 export type KnowledgeSource = { id: string; path: string; title: string; contentHash: string; originalContent: string; importedAt: string }
+export type KnowledgeDraft = {
+  id: string
+  sourceDocumentId: string
+  kind: string
+  title: string
+  summary: string
+  sourceExcerpt: string
+  sourceLineStart: number
+  sourceLineEnd: number
+  extractionMethod: string
+  status: 'PENDING' | 'APPROVED' | 'REJECTED'
+  action?: string
+  mode?: string
+  timeframe?: string
+  priority?: number
+}
+export type PublishedKnowledgeRule = { id: string; name: string; description?: string; sourceDocumentId?: string; enabled: boolean; action?: string; mode?: string; timeframe?: string; priority?: number }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, { ...init, cache: 'no-store', headers: { Accept: 'application/json', ...init?.headers } })
@@ -21,4 +38,20 @@ export function extractKnowledgeSource(id: string) {
 export function getPublishedKnowledgeRules() {
   const authorization = typeof window === 'undefined' ? undefined : getAuthorizationHeader()
   return request<Array<Record<string, unknown>>>('/api/knowledge/rules', { headers: authorization ? { Authorization: authorization } : undefined })
+}
+
+export function getKnowledgeDrafts(status?: KnowledgeDraft['status']) {
+  const authorization = typeof window === 'undefined' ? undefined : getAuthorizationHeader()
+  const query = status ? `?status=${status}` : ''
+  return request<KnowledgeDraft[]>(`/api/knowledge/drafts${query}`, { headers: authorization ? { Authorization: authorization } : undefined })
+}
+
+export function approveKnowledgeDraft(id: string) {
+  const authorization = typeof window === 'undefined' ? undefined : getAuthorizationHeader()
+  return request<KnowledgeDraft>(`/api/knowledge/drafts/${encodeURIComponent(id)}/approve`, { method: 'POST', headers: authorization ? { Authorization: authorization } : undefined })
+}
+
+export function publishKnowledgeDraft(id: string) {
+  const authorization = typeof window === 'undefined' ? undefined : getAuthorizationHeader()
+  return request<PublishedKnowledgeRule>(`/api/knowledge/drafts/${encodeURIComponent(id)}/publish`, { method: 'POST', headers: authorization ? { Authorization: authorization } : undefined })
 }

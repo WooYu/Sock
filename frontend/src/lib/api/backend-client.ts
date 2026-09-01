@@ -133,6 +133,23 @@ export function getPublishedKnowledgeRules(authorization?: string) {
   })
 }
 
+export function getKnowledgeDrafts(status?: string, authorization?: string) {
+  return request<Array<Record<string, unknown>>>(`/api/v1/knowledge/drafts${status ? `?status=${encodeURIComponent(status)}` : ''}`, {
+    headers: authorization ? { Authorization: authorization } : undefined,
+  })
+}
+
+export function approveKnowledgeDraft(id: string, authorization?: string) {
+  return request<Record<string, unknown>>(`/api/v1/knowledge/drafts/${encodeURIComponent(id)}/approve`, {
+    method: 'POST',
+    headers: authorization ? { Authorization: authorization } : undefined,
+  })
+}
+
+export function publishKnowledgeDraft(id: string, authorization?: string) {
+  return request<Record<string, unknown>>(`/api/v1/knowledge/drafts/${encodeURIComponent(id)}/publish`, { method: 'POST', headers: authorization ? { Authorization: authorization } : undefined })
+}
+
 export function requestAuthCode(phone: string) {
   return request<void>('/api/v1/auth/request-code', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone }) })
 }

@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, test, vi } from 'vitest'
@@ -54,5 +56,13 @@ describe('AppShell', () => {
 
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))
     expect(search).toHaveFocus()
+  })
+
+  test('keeps the shared shell class names backed by global styles', () => {
+    const styles = readFileSync(resolve(process.cwd(), 'app/globals.css'), 'utf8')
+
+    expect(styles).toContain('.sc-shell-header')
+    expect(styles).toContain('.sc-shell-main')
+    expect(styles).toContain('.sc-live-empty')
   })
 })

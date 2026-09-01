@@ -7,6 +7,7 @@ import { syncRecord } from '../records/record-sync'
 import { RecordSyncButton } from '../records/record-sync-button'
 import { builtInRules } from './default-rules'
 import { MarkdownImportPanel } from './markdown-import-panel'
+import { KnowledgeReviewPanel } from './knowledge-review-panel'
 import { getPublishedKnowledgeRules } from '@/lib/api/knowledge-client'
 
 export type RuleRecord = {
@@ -104,6 +105,19 @@ export function RulesPage({ initialRules = [] }: { initialRules?: RuleRecord[] }
         </div>
       </div>
       <MarkdownImportPanel />
+      <KnowledgeReviewPanel onPublished={(published) => {
+        setRules((items) => items.some((item) => item.id === published.id) ? items : [...items, {
+          id: published.id,
+          title: published.name,
+          description: published.description,
+          status: 'published',
+          source: published.sourceDocumentId ?? '阿里云知识库',
+          action: published.action,
+          mode: published.mode,
+          timeframe: published.timeframe,
+          priority: published.priority,
+        }])
+      }} />
       {open ? <form className="space-y-3 rounded-xl border border-[var(--sc-border)] p-4" onSubmit={saveDraft}>
         <label className="block space-y-1 text-sm"><span>规则名称</span><input aria-label="规则名称" className="min-h-12 w-full rounded-xl border border-[var(--sc-border)] bg-transparent px-3" onChange={(event) => setTitle(event.target.value)} value={title} /></label>
         <label className="block space-y-1 text-sm"><span>规则说明</span><textarea aria-label="规则说明" className="min-h-28 w-full rounded-xl border border-[var(--sc-border)] bg-transparent p-3" onChange={(event) => setDescription(event.target.value)} value={description} /></label>
