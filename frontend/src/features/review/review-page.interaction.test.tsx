@@ -13,6 +13,8 @@ describe('ReviewPage interactions', () => {
     expect(container.querySelector('.sc-review-header')).toBeInTheDocument()
     expect(container.querySelector('.sc-workspace-tabs')).toBeInTheDocument()
     expect(container.querySelector('.sc-review-content')).toBeInTheDocument()
+    expect(container.querySelector('.sc-daily-review-form')).toBeInTheDocument()
+    expect(container.querySelector('.sc-review-primary-action')).toBeInTheDocument()
   })
 
   test('saves the daily review and restores it on a later render', async () => {

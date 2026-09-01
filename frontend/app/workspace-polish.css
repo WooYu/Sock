@@ -267,3 +267,58 @@
   .sc-rules-header h1 { font-size: 22px; }
   .sc-live-metrics dd { font-size: 15px; }
 }
+
+/* Mobile workspace refinements: keep controls readable, tappable, and inside the viewport. */
+.sc-daily-review-form { display: grid; gap: 14px; }
+.sc-daily-review-input { min-height: 220px; width: 100%; resize: vertical; border: 1px solid #d8deeb; border-radius: 14px; background: #fbfcff; padding: 18px; color: var(--ink); font-size: 15px; line-height: 1.7; outline: none; }
+.sc-daily-review-input:focus { border-color: #9eafff; box-shadow: 0 0 0 3px #eef1ff; }
+.sc-review-primary-action { min-height: 52px; width: 100%; border: 0; border-radius: 12px; background: linear-gradient(135deg, #4868ff, #3854df); color: #fff; font-size: 15px; font-weight: 750; box-shadow: 0 8px 16px rgba(72, 104, 255, 0.18); }
+.sc-review-primary-action:hover { background: linear-gradient(135deg, #3f5ef0, #304bd2); }
+
+@media (max-width: 640px) {
+  .sc-mobile-nav-wrap { padding: 8px 10px max(10px, env(safe-area-inset-bottom)); box-shadow: 0 -5px 18px rgba(30, 42, 70, 0.08); }
+  .sc-main-nav-mobile { gap: 4px; }
+  .sc-main-nav-mobile .sc-nav-link { min-height: 60px; gap: 5px; padding: 5px 2px 3px; border-radius: 10px; font-size: 12px; font-weight: 650; }
+  .sc-main-nav-mobile .sc-nav-icon { font-size: 20px; line-height: 1; }
+  .sc-main-nav-mobile .sc-nav-link.active::after { right: 14%; left: 14%; height: 3px; }
+  .sc-shell-main { padding-bottom: 112px; }
+
+  .sc-review-workspace { gap: 18px; padding: 16px; }
+  .sc-review-header > div { width: 100%; gap: 7px; }
+  .sc-review-header .sc-account-sync { align-self: stretch; justify-self: stretch; min-height: 44px; }
+  .sc-review-header h1 { font-size: 26px; }
+  .sc-workspace-tabs { gap: 4px; margin: 0 -4px; padding: 0 4px; }
+  .sc-workspace-tabs a { min-width: 92px; min-height: 48px; justify-content: center; padding: 0 12px; font-size: 14px; }
+  .sc-daily-review-input { min-height: 230px; }
+  .sc-review-primary-action { min-height: 54px; }
+
+  .sc-kline-workspace { gap: 12px; padding: 10px; }
+  .sc-kline-summary { align-items: flex-start; gap: 8px; padding: 4px 2px 0; }
+  .sc-kline-title-row { flex-wrap: wrap; gap: 5px 8px; }
+  .sc-kline-title-row h1 { font-size: 21px; }
+  .sc-kline-subtitle { max-width: 30em; font-size: 11px; line-height: 1.5; }
+  .sc-kline-quote { width: 100%; justify-items: start; }
+  .sc-kline-quote strong { font-size: 32px; }
+  .sc-kline-controls { gap: 8px; padding: 7px; }
+  .sc-kline-control-card .sc-kline-control-row, .sc-kline-control-card .sc-kline-tool-row { display: grid; grid-template-columns: 1fr; align-items: stretch; gap: 8px; min-height: 0; padding: 10px; }
+  .sc-kline-control-card .sc-kline-group-label { min-width: 0; font-size: 12px; }
+  .sc-kline-control-card .sc-kline-hint { font-size: 11px; line-height: 1.4; }
+  .sc-kline-segmented { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; gap: 4px; padding: 4px; }
+  .sc-kline-control-card .sc-kline-segmented button, .sc-kline-control-card .sc-kline-tool-button, .sc-kline-control-card .sc-kline-control-button { min-height: 44px; font-size: 13px; }
+  .sc-kline-tool-buttons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .sc-kline-tool-menu, .sc-kline-tool-menu summary { width: 100%; }
+  .sc-kline-tool-menu summary { display: flex; align-items: center; min-height: 44px; padding: 0 10px; font-size: 13px; line-height: 1; }
+  .sc-kline-tool-menu-panel { right: 0; left: 0; }
+  .sc-kline-indicator-buttons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .sc-kline-control-card .sc-kline-indicator { min-height: 44px; justify-content: center; font-size: 13px; }
+  .sc-kline-control-row[aria-label="视图控制"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .sc-kline-control-row[aria-label="视图控制"] .sc-kline-group-label, .sc-kline-control-row[aria-label="视图控制"] .sc-kline-hint { grid-column: 1 / -1; }
+  .sc-kline-zoom { min-width: 0; align-self: center; font-size: 12px; }
+  .sc-kline-chart-panel { padding: 12px 10px 0; }
+  .sc-kline-chart-heading { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .sc-kline-legend { gap: 7px; font-size: 10px; }
+  .sc-kline-chart-scroll { overflow-x: auto; }
+  .sc-kline-chart-surface { min-width: 0; }
+  .sc-kline-svg { min-height: 265px; }
+  .sc-kline-statusbar { flex-wrap: wrap; gap: 5px 10px; font-size: 10px; }
+}

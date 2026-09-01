@@ -23,7 +23,7 @@ function DailyReview() {
   })
   const [message, setMessage] = useState('')
   const save = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); const today = new Date().toISOString().slice(0, 10); const records = loadRecords<ReviewRecord>('reviews').filter((review) => !(review.date === today && !review.tradeId)); const review: ReviewRecord = { id: createRecordId('review'), date: today, content, createdAt: new Date().toISOString() }; saveRecords('reviews', [...records, review]); void syncRecord('reviews', review).catch(() => undefined); setMessage('当日总结已保存') }
-  return <form className="space-y-3" onSubmit={save}><textarea className="min-h-36 w-full rounded-xl border border-[var(--sc-border)] bg-transparent p-4 text-sm" onChange={(event) => setContent(event.target.value)} placeholder="记录今天的市场判断、执行情况和改进点" value={content} aria-label="当日复盘内容" /><button className="min-h-12 rounded-xl bg-[var(--sc-primary)] px-4 text-sm font-semibold text-white" type="submit">保存当日总结</button>{message ? <p className="text-sm text-emerald-700" role="status">{message}</p> : null}</form>
+  return <form className="sc-daily-review-form" onSubmit={save}><textarea aria-label="当日复盘内容" className="sc-daily-review-input" onChange={(event) => setContent(event.target.value)} placeholder="记录今天的市场判断、执行情况和改进点" value={content} /><button className="sc-review-primary-action" type="submit">保存当日总结</button>{message ? <p className="text-sm text-emerald-700" role="status">{message}</p> : null}</form>
 }
 
 function TradeReview({ tradeId, predictionId }: { tradeId?: string | null; predictionId?: string | null }) {
