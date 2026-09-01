@@ -1,7 +1,5 @@
-import { OverviewPage } from '@/features/overview/overview-page'
-import { ProductShell } from '@/features/navigation/product-shell'
-import { StockWorkspaceProvider } from '@/features/workspace/stock-workspace-provider'
+import { SampleDashboard } from '@/features/socksample/sample-dashboard'
 
 export default function Home() {
-  return <StockWorkspaceProvider><ProductShell section="overview"><OverviewPage /></ProductShell></StockWorkspaceProvider>
+  return <SampleDashboard />
 }

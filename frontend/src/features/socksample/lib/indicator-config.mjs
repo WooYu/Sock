@@ -1,0 +1,3 @@
+export const defaultIndicatorConfig = { maPeriods: [5, 10, 20, 30, 60, 120, 250], bollPeriod: 20, bollDeviation: 2 };
+export function normalizeIndicatorConfig(value = {}) { const maPeriods = [...new Set((Array.isArray(value.maPeriods) ? value.maPeriods : defaultIndicatorConfig.maPeriods).map(Number).filter((n) => Number.isInteger(n) && n >= 2 && n <= 250))].sort((a, b) => a - b); return { maPeriods: maPeriods.length ? maPeriods : defaultIndicatorConfig.maPeriods, bollPeriod: Number.isInteger(Number(value.bollPeriod)) && Number(value.bollPeriod) >= 2 && Number(value.bollPeriod) <= 250 ? Number(value.bollPeriod) : 20, bollDeviation: Number(value.bollDeviation) >= 0.5 && Number(value.bollDeviation) <= 5 ? Number(value.bollDeviation) : 2 }; }
+
