@@ -10,7 +10,7 @@ import org.springframework.web.client.RestClient;
 class MarketConfiguration {
     @Bean
     MarketProvider marketProvider(@Value("${stockcal.market-api-key:}") String token) {
-        if (token.isBlank()) return new ConfiguredMarketProvider();
+        if (token.isBlank()) return new UnavailableMarketProvider();
         return new TushareMarketProvider(
             new HttpTushareClient(RestClient.builder().build(), token), Instant::now);
     }

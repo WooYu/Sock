@@ -26,6 +26,7 @@ stockcal:
     base-url: ${STOCKCAL_AI_BASE_URL:https://api.deepseek.com}
   knowledge:
     notes-path: ${STOCKCAL_NOTES_PATH:}
+    auto-extract: ${STOCKCAL_KNOWLEDGE_AUTO_EXTRACT:true}
   sms-api-key: ${SMS_API_KEY:}
   sms-dev-code: ${SMS_DEV_CODE:000000}
   market-api-key: ${TUSHARE_TOKEN:${MARKET_API_KEY:}}

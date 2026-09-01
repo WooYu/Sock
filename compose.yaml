@@ -43,8 +43,9 @@ services:
       STOCKCAL_AI_BASE_URL: ${STOCKCAL_AI_BASE_URL:-https://api.deepseek.com}
       STOCKCAL_AI_MODEL: ${STOCKCAL_AI_MODEL:-deepseek-chat}
       AI_API_KEY: ${AI_API_KEY:-}
-      TUSHARE_TOKEN: ${TUSHARE_TOKEN:-}
+      TUSHARE_TOKEN: ${TUSHARE_TOKEN:?TUSHARE_TOKEN must be configured for real market data}
       STOCKCAL_NOTES_PATH: ${STOCKCAL_NOTES_PATH:-/notes}
+      STOCKCAL_KNOWLEDGE_AUTO_EXTRACT: ${STOCKCAL_KNOWLEDGE_AUTO_EXTRACT:-true}
     ports:
       - "8080:8080"
     volumes:

@@ -1,10 +1,13 @@
 'use client'
 
-import { useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import type { Candle, MarketSnapshot } from '../workspace/stock-workspace-types'
 import { ChartAnnotationStore, type ChartAnnotation, type ChartTool } from './chart-annotation-store'
 import { ChartLayerPanel, type ChartLayerState } from './chart-layer-panel'
 import { ChartToolbar } from './chart-toolbar'
+import { mergeChartWorkspace, type ChartWorkspaceSnapshot } from './chart-workspace-state'
+import { loadChartSyncCursor, loadChartWorkspace, pullChartWorkspace, pushChartWorkspace, saveChartSyncCursor, saveChartWorkspace } from './chart-workspace-sync'
+import { getAuthorizationHeader, getClientId } from '../records/record-sync'
 
 type ChartPeriod = 'day' | 'week' | 'month'
 type IndicatorKey = 'ma5' | 'ma10' | 'ma20' | 'boll'
@@ -12,19 +15,6 @@ type IndicatorKey = 'ma5' | 'ma10' | 'ma20' | 'boll'
 const periods: Array<[ChartPeriod, string]> = [['day', '日线'], ['week', '周线'], ['month', '月线']]
 const indicatorOptions: Array<[IndicatorKey, string]> = [['ma5', 'MA5'], ['ma10', 'MA10'], ['ma20', 'MA20'], ['boll', 'BOLL']]
 const indicatorColors: Record<IndicatorKey, string> = { ma5: '#d6a12a', ma10: '#4e9bd6', ma20: '#a46ee8', boll: '#6f7fd8' }
-
-const demoCandles: Candle[] = Array.from({ length: 42 }, (_, index) => {
-  const close = 31.2 + Math.sin(index / 3.8) * 1.1 + index * 0.035
-  const open = close - Math.cos(index / 2.7) * 0.28
-  return {
-    day: `2026-08-${String(index + 1).padStart(2, '0')}`,
-    open,
-    high: Math.max(open, close) + 0.22 + (index % 3) * 0.04,
-    low: Math.min(open, close) - 0.18 - (index % 2) * 0.03,
-    close,
-    volume: 100000 + index * 4500,
-  }
-})
 
 function aggregateCandles(candles: Candle[], period: ChartPeriod) {
   const groupSize = period === 'day' ? 1 : period === 'week' ? 5 : 20
@@ -79,26 +69,18 @@ export function ChartWorkspace({ snapshot }: { snapshot?: MarketSnapshot | null 
   const [indicators, setIndicators] = useState<Record<IndicatorKey, boolean>>({ ma5: true, ma10: true, ma20: true, boll: true })
   const [zoom, setZoom] = useState(100)
   const [crosshair, setCrosshair] = useState(false)
-  const [layers, setLayers] = useState<ChartLayerState>({ keyLevels: true, predictionPaths: true, trades: true, annotations: true })
+  const [layers, setLayers] = useState<ChartLayerState>({ keyLevels: true, annotations: true })
   const [annotations, setAnnotations] = useState<ChartAnnotation[]>([])
+  const [syncStatus, setSyncStatus] = useState<'本机保存' | '同步中' | '已同步' | '待同步'>('本机保存')
   const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null)
   const store = useRef(new ChartAnnotationStore())
 
-  const sourceCandles = snapshot?.dailyCandles?.length ? snapshot.dailyCandles : demoCandles
+  const sourceCandles = useMemo(() => snapshot?.dailyCandles ?? [], [snapshot?.dailyCandles])
   const candles = useMemo(() => aggregateCandles(sourceCandles, activePeriod), [activePeriod, sourceCandles])
   const movingAverages = useMemo(() => ({ ma5: movingAverage(candles, 5), ma10: movingAverage(candles, 10), ma20: movingAverage(candles, 20) }), [candles])
   const boll = useMemo(() => bollinger(candles), [candles])
+  const keyLevels = useMemo(() => candles.length ? [Math.max(...candles.slice(-20).map((candle) => candle.high)), Math.min(...candles.slice(-20).map((candle) => candle.low))] : [], [candles])
   const lastClose = candles[candles.length - 1]?.close ?? snapshot?.quote.price ?? 0
-  const futureValues = useMemo(() => [1, 2, 3].map((day) => ({
-    day,
-    ma5: lastClose + day * 0.12,
-    ma10: lastClose + day * 0.06,
-    ma20: lastClose + day * 0.025,
-    upper: lastClose + 0.72 + day * 0.09,
-    middle: lastClose + day * 0.025,
-    lower: lastClose - 0.67 + day * 0.01,
-  })), [lastClose])
-
   const addRectangle = () => {
     const next = store.current.create({ id: `rectangle-${Date.now()}`, kind: 'rectangle', start: { x: 20, y: 20 }, end: { x: 130, y: 90 } })
     setAnnotations(next)
@@ -165,7 +147,72 @@ export function ChartWorkspace({ snapshot }: { snapshot?: MarketSnapshot | null 
   const minPrice = Math.min(...values, lastClose) - 0.25
   const xForIndex = (index: number) => chartLeft + ((index + 0.5) / Math.max(candles.length, 1)) * chartWidth
   const yForValue = (value: number) => chartTop + ((maxPrice - value) / (maxPrice - minPrice)) * chartHeight
-  const keyLevels = [currentPrice + 0.72, currentPrice - 0.64]
+
+  const workspaceSnapshot: ChartWorkspaceSnapshot = {
+    version: 1,
+    stockCode: snapshot?.quote.security.code ?? '',
+    period: activePeriod,
+    drawings: annotations,
+    indicators,
+    indicatorConfig: {},
+    layers,
+    view: { zoom, panX: 0, panY: 0 },
+    crosshair,
+    updatedAt: new Date().toISOString(),
+    revision: 1,
+  }
+
+  useEffect(() => {
+    if (!snapshot) return
+    const saved = loadChartWorkspace(snapshot.quote.security.code, activePeriod)
+    if (!saved) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setAnnotations(saved.drawings as ChartAnnotation[])
+    store.current.replace(saved.drawings as ChartAnnotation[])
+    setIndicators(saved.indicators as Record<IndicatorKey, boolean>)
+    setLayers(saved.layers as ChartLayerState)
+    setZoom(saved.view.zoom)
+    setCrosshair(saved.crosshair)
+  }, [activePeriod, snapshot])
+
+  useEffect(() => {
+    if (!snapshot) return
+    const previous = loadChartWorkspace(workspaceSnapshot.stockCode, workspaceSnapshot.period)
+    const outgoing = { ...workspaceSnapshot, revision: Math.max(previous?.revision ?? 0, Date.now()) }
+    saveChartWorkspace(outgoing)
+    const authorization = getAuthorizationHeader()
+    if (!authorization) return
+    const timer = window.setTimeout(() => {
+      setSyncStatus('同步中')
+      void pushChartWorkspace(outgoing, getClientId(), authorization).then(() => setSyncStatus('已同步')).catch(() => setSyncStatus('待同步'))
+    }, 350)
+    return () => window.clearTimeout(timer)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activePeriod, annotations, crosshair, indicators, layers, snapshot, zoom])
+
+  useEffect(() => {
+    if (!snapshot || !getAuthorizationHeader()) return
+    let cancelled = false
+    void pullChartWorkspace(loadChartSyncCursor(), getClientId(), getAuthorizationHeader()).then((result) => {
+      if (cancelled) return
+      saveChartSyncCursor(result.nextCursor)
+      const remote = result.snapshots.find((item) => item.stockCode === snapshot.quote.security.code && item.period === activePeriod)
+      if (!remote) return
+      const merged = mergeChartWorkspace(workspaceSnapshot, remote)
+      saveChartWorkspace(merged)
+      setAnnotations(merged.drawings as ChartAnnotation[])
+      store.current.replace(merged.drawings as ChartAnnotation[])
+      setIndicators(merged.indicators as Record<IndicatorKey, boolean>)
+      setLayers(merged.layers as ChartLayerState)
+      setZoom(merged.view.zoom)
+      setCrosshair(merged.crosshair)
+    }).catch(() => undefined)
+    return () => { cancelled = true }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activePeriod, snapshot?.quote.security.code])
+  if (!snapshot || !sourceCandles.length) {
+    return <section className="sc-live-empty" aria-live="polite"><p className="sc-eyebrow">K 线 · 真实行情</p><h1>真实行情暂不可用</h1><p>没有收到可绘制的 K 线数据，请检查阿里云行情服务。</p></section>
+  }
 
   return (
     <section className="sc-kline-workspace">
@@ -174,8 +221,8 @@ export function ChartWorkspace({ snapshot }: { snapshot?: MarketSnapshot | null 
           <p className="sc-eyebrow">价格结构 · 多周期观察</p>
           <div className="sc-kline-title-row">
             <h1>专业 K 线</h1>
-            <span>{snapshot?.quote.security.name ?? '华芯动力'}</span>
-            <code>{snapshot?.quote.security.code ?? 'DEMO·001'}</code>
+            <span>{snapshot.quote.security.name}</span>
+            <code>{snapshot.quote.security.code}</code>
           </div>
           <p className="sc-kline-subtitle">真实行情 + 未来 3 日指标推演 · K 线数据与绘图数据独立</p>
         </div>
@@ -235,7 +282,7 @@ export function ChartWorkspace({ snapshot }: { snapshot?: MarketSnapshot | null 
                 {indicators.ma20 && <span><i style={{ background: indicatorColors.ma20 }} />MA20</span>}
                 {indicators.boll && <span><i style={{ background: indicatorColors.boll }} />BOLL</span>}
               </div>
-              <span className="sc-kline-data-badge">{snapshot?.source.online ? '实时接口' : '演示数据'}</span>
+            <span className="sc-kline-data-badge">{snapshot.source.online ? '实时接口' : '行情缓存'}</span>
             </div>
             <div className="sc-kline-chart-scroll">
               <div className="sc-kline-chart-surface" data-zoom={zoom} style={{ width: `${zoom}%` }}>
@@ -261,9 +308,7 @@ export function ChartWorkspace({ snapshot }: { snapshot?: MarketSnapshot | null 
                   {indicators.ma10 && <path d={linePath(movingAverages.ma10, xForIndex, yForValue)} fill="none" stroke={indicatorColors.ma10} strokeWidth="2" />}
                   {indicators.ma20 && <path d={linePath(movingAverages.ma20, xForIndex, yForValue)} fill="none" stroke={indicatorColors.ma20} strokeWidth="2" />}
                   {indicators.boll && <><path d={linePath(boll.upper, xForIndex, yForValue)} fill="none" stroke={indicatorColors.boll} strokeDasharray="5 4" strokeWidth="1.5" /><path d={linePath(boll.middle, xForIndex, yForValue)} fill="none" stroke="#9aa5c4" strokeWidth="1.5" /><path d={linePath(boll.lower, xForIndex, yForValue)} fill="none" stroke={indicatorColors.boll} strokeDasharray="5 4" strokeWidth="1.5" /></>}
-                  {layers.keyLevels && keyLevels.map((price, index) => <g key={price}><line className="sc-key-level-line" x1={chartLeft} x2={chartLeft + chartWidth} y1={yForValue(price)} y2={yForValue(price)} /><text className="sc-key-level-label" x={chartLeft + chartWidth - 78} y={yForValue(price) - 5}>{index === 0 ? '目标位' : '支撑位'} {priceText(price)}</text></g>)}
-                  {layers.predictionPaths && <path className="sc-prediction-path" d={`M ${xForIndex(candles.length - 1)} ${yForValue(lastClose)} L ${xForIndex(candles.length - 1) + 76} ${yForValue(futureValues[0].ma5)} L ${xForIndex(candles.length - 1) + 152} ${yForValue(futureValues[1].ma5)} L ${xForIndex(candles.length - 1) + 228} ${yForValue(futureValues[2].ma5)}`} fill="none" />}
-                  {layers.trades && <g data-testid="trade-layer"><circle className="sc-trade-buy" cx={xForIndex(Math.max(0, candles.length - 8))} cy={yForValue(candles[Math.max(0, candles.length - 8)]?.low ?? lastClose) + 14} r="5" /><text className="sc-trade-label" x={xForIndex(Math.max(0, candles.length - 8)) - 14} y={yForValue(candles[Math.max(0, candles.length - 8)]?.low ?? lastClose) + 32}>买入</text></g>}
+                  {layers.keyLevels && <g data-testid="key-level-layer">{keyLevels.map((price, index) => <g key={price}><line className="sc-key-level-line" x1={chartLeft} x2={chartLeft + chartWidth} y1={yForValue(price)} y2={yForValue(price)} /><text className="sc-key-level-label" x={chartLeft + chartWidth - 78} y={yForValue(price) - 5}>{index === 0 ? '近20日高点' : '近20日低点'} {priceText(price)}</text></g>)}</g>}
                   <g className="sc-volume-bars">{candles.map((candle, index) => <rect key={index} height={Math.max(3, (candle.volume / Math.max(...candles.map((item) => item.volume))) * volumeHeight)} width={Math.max(5, Math.min(14, chartWidth / candles.length * 0.56))} x={xForIndex(index) - 5} y={volumeTop + volumeHeight - Math.max(3, (candle.volume / Math.max(...candles.map((item) => item.volume))) * volumeHeight)} />)}</g>
                   <text className="sc-volume-label" x={chartLeft} y={volumeTop + volumeHeight + 23}>成交量</text>
                   {crosshair && <g data-testid="crosshair-layer"><line className="sc-crosshair" x1={xForIndex(Math.max(0, candles.length - 4))} x2={xForIndex(Math.max(0, candles.length - 4))} y1={chartTop} y2={volumeTop + volumeHeight} /><line className="sc-crosshair" x1={chartLeft} x2={chartLeft + chartWidth} y1={yForValue(lastClose)} y2={yForValue(lastClose)} /></g>}
@@ -271,19 +316,12 @@ export function ChartWorkspace({ snapshot }: { snapshot?: MarketSnapshot | null 
                 {layers.annotations && annotations.map((annotation) => <div className="sc-kline-annotation" data-testid={`annotation-${annotation.kind}`} key={annotation.id} style={{ left: annotation.start.x, top: annotation.start.y, width: (annotation.end?.x ?? annotation.start.x) - annotation.start.x, height: (annotation.end?.y ?? annotation.start.y) - annotation.start.y }} />)}
               </div>
             </div>
-            <div className="sc-kline-statusbar"><span>共 {candles.length} 根 K 线</span><span>当前周期：{periods.find(([period]) => period === activePeriod)?.[1]}</span><span>数据源：{snapshot?.source.name ?? '本地演示'}</span></div>
+            <div className="sc-kline-statusbar"><span>共 {candles.length} 根 K 线</span><span>当前周期：{periods.find(([period]) => period === activePeriod)?.[1]}</span><span>数据源：{snapshot.source.name}</span><span>{getAuthorizationHeader() ? syncStatus : '本机保存 · 登录后跨设备同步'}</span></div>
           </div>
-          {(activeTool === 'rectangle' || activeTool === 'trend-line') && <button className="sc-kline-add-annotation" onClick={addRectangle} type="button">添加矩形示例</button>}
+          {(activeTool === 'rectangle' || activeTool === 'trend-line') && <button className="sc-kline-add-annotation" onClick={addRectangle} type="button">添加矩形标注</button>}
 
-          <section className="sc-future-panel">
-            <div className="sc-kline-section-heading"><div><p className="sc-eyebrow">指标推演 · 可追溯</p><h2>日线与未来指标延伸</h2></div><span>未来 3 个交易日</span></div>
-            <div className="sc-future-grid">
-              {futureValues.map((value) => <article className="sc-future-card" key={value.day}><div className="sc-future-card-head"><strong>D+{value.day}</strong><span>{value.day === 1 ? '最近' : '候选值'}</span></div><div className="sc-future-value-row"><span>MA5</span><b>{priceText(value.ma5)}</b></div><div className="sc-future-value-row"><span>MA10</span><b>{priceText(value.ma10)}</b></div><div className="sc-future-value-row"><span>MA20</span><b>{priceText(value.ma20)}</b></div><div className="sc-future-value-row"><span>BOLL上轨</span><b>{priceText(value.upper)}</b></div><div className="sc-future-value-row"><span>BOLL中轨</span><b>{priceText(value.middle)}</b></div><div className="sc-future-value-row is-muted"><span>BOLL下轨</span><b>{priceText(value.lower)}</b></div></article>)}
-            </div>
-            <p className="sc-future-footnote">未来值根据当前周期的 MA / BOLL 结构和近期价格路径推演，仅作为图表参考，不代表实际最高价或收盘价。</p>
-          </section>
         </div>
-        <aside className="sc-kline-side-column"><ChartLayerPanel layers={layers} onChange={(key, value) => setLayers((old) => ({ ...old, [key]: value }))} /><section className="sc-kline-side-card"><p className="sc-eyebrow">当前观察</p><h2>{snapshot?.quote.security.name ?? '华芯动力'}</h2><dl><div><dt>现价</dt><dd>{priceText(currentPrice)}</dd></div><div><dt>近端目标</dt><dd>{priceText(keyLevels[0])}</dd></div><div><dt>防守位置</dt><dd>{priceText(keyLevels[1])}</dd></div></dl><p>先用周期和图层筛选结构，再用绘图工具记录买入、止盈和失效条件。</p></section></aside>
+        <aside className="sc-kline-side-column"><ChartLayerPanel layers={layers} onChange={(key, value) => setLayers((old) => ({ ...old, [key]: value }))} /><section className="sc-kline-side-card"><p className="sc-eyebrow">当前观察</p><h2>{snapshot.quote.security.name}</h2><dl><div><dt>现价</dt><dd>{priceText(currentPrice)}</dd></div><div><dt>数据源</dt><dd>{snapshot.source.name}</dd></div><div><dt>更新时间</dt><dd>{new Date(snapshot.source.fetchedAt).toLocaleString('zh-CN')}</dd></div></dl><p>先用周期和图层筛选结构，再用绘图工具记录买入、止盈和失效条件。</p></section></aside>
       </div>
     </section>
   )

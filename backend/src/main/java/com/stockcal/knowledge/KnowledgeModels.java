@@ -3,7 +3,7 @@ package com.stockcal.knowledge;
 import java.time.Instant;
 import java.util.List;
 
-enum KnowledgeKind { RULE, EXPERIENCE, CONCEPT }
+enum KnowledgeKind { RULE, EXPERIENCE, CONCEPT, RISK_DISCIPLINE, CASE }
 
 enum ApprovalStatus { PENDING, APPROVED, REJECTED }
 

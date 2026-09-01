@@ -29,15 +29,24 @@ class RemoteSyncService {
       },
       body: jsonEncode({
         'idempotencyKey': mutation.idempotencyKey,
-        'entityType': 'ANNOTATION',
-        'entityId': mutation.annotationId,
+        'entityType': 'CHART_WORKSPACE',
+        'entityId': '${mutation.stockCode}:day',
         'operation': mutation.operation == AnnotationOperation.delete
             ? 'DELETE'
             : 'UPSERT',
         'revision': mutation.revision,
         'payload': {
+          'version': 1,
           'stockCode': mutation.stockCode,
+          'period': 'day',
+          'drawings': mutation.annotation == null ? <Object?>[] : [chartAnnotationToJson(mutation.annotation!)],
+          'indicators': <String, bool>{},
+          'indicatorConfig': <String, Object?>{},
+          'layers': <String, bool>{},
+          'view': {'zoom': 100, 'panX': 0, 'panY': 0},
+          'crosshair': false,
           'updatedAt': mutation.updatedAt.toIso8601String(),
+          'revision': mutation.revision,
         },
       }),
     );
@@ -45,6 +54,35 @@ class RemoteSyncService {
       throw RemoteSyncException(response.statusCode, response.body);
     }
   }
+
+  Future<SyncPullResult> pullAnnotations(
+    String accessToken,
+    int cursor,
+    String stockCode,
+  ) async {
+    final response = await _client.get(
+      baseUrl.resolve('/api/v1/sync/changes?cursor=$cursor'),
+      headers: {'authorization': 'Bearer $accessToken'},
+    );
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw RemoteSyncException(response.statusCode, response.body);
+    }
+    final json = jsonDecode(response.body) as Map<String, Object?>;
+    final changes = json['changes']! as List<Object?>;
+    final annotations = changes.map((item) {
+      final change = item! as Map<String, Object?>;
+      final payload = change['payload'] as Map<String, Object?>?;
+      final drawings = payload?['drawings'] as List<Object?>?;
+      return drawings?.map((drawing) => chartAnnotationFromJson(drawing! as Map<String, Object?>)).toList() ?? const <ChartAnnotation>[];
+    }).expand((items) => items).where((item) => item.stockCode == stockCode).toList(growable: false);
+    return SyncPullResult(nextCursor: json['nextCursor']! as int, annotations: annotations);
+  }
+}
+
+class SyncPullResult {
+  const SyncPullResult({required this.nextCursor, required this.annotations});
+  final int nextCursor;
+  final List<ChartAnnotation> annotations;
 }
 
 class SyncDrainResult {
@@ -58,6 +96,17 @@ class AnnotationSyncWorker {
 
   final ChartAnnotationOutbox store;
   final RemoteSyncService remote;
+
+  Future<SyncPullResult> pull(
+    String accessToken,
+    int cursor,
+    String stockCode,
+    ChartAnnotationController controller,
+  ) async {
+    final result = await remote.pullAnnotations(accessToken, cursor, stockCode);
+    await controller.mergeRemote(result.annotations);
+    return result;
+  }
 
   Future<SyncDrainResult> drain(String accessToken) async {
     final pending = await store.loadPending();

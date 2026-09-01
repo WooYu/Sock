@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import type { PrimarySection } from './navigation-config'
 import { desktopNavigation, mobileNavigation } from './navigation-config'
+import { WebAccountButton } from '../account/web-account-button'
 
 type AppShellProps = {
   section: PrimarySection
@@ -87,17 +88,12 @@ export function AppShell({
               <kbd>⌘ K</kbd>
             </form>
             <button aria-expanded={searchOpen} aria-label="搜索股票（移动端）" className="sc-mobile-search-trigger" onClick={() => setSearchOpen((open) => !open)} type="button">⌕</button>
-            <button className="sc-alert-button" aria-label="提醒" onClick={() => notify('演示版暂无新增提醒')} type="button">●</button>
-            <Link className="sc-avatar" aria-label="个人账户" href="/rules">A</Link>
+            <button className="sc-alert-button" aria-label="提醒" onClick={() => notify('当前没有新增提醒')} type="button">●</button>
+            <WebAccountButton />
           </div>
         </div>
         {searchOpen ? <form className="sc-mobile-search-row" action="/analysis/key-levels" method="get"><input autoFocus name="symbol" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="输入股票代码或名称" aria-label="股票代码或名称" /><button type="submit">进入分析</button></form> : null}
       </header>
-
-      <div className="sc-demo-ribbon">
-        <div><span>演示数据</span> 当前数值用于验证产品逻辑，不构成投资建议，也不是实时行情。</div>
-        <button onClick={() => notify('真实行情接口将在下一开发阶段接入')} type="button">数据说明 →</button>
-      </div>
 
       <main className="sc-shell-main">
         {children}

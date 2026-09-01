@@ -187,7 +187,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void _syncPending() {
     final token = _sessionController.session?.accessToken;
     if (token == null || token.isEmpty) return;
-    _annotationSyncWorker.drain(token);
+    unawaited(_annotationSyncWorker.drain(token));
+    unawaited(_annotationSyncWorker.pull(token, 0, _chartStockCode, _chartAnnotationController));
     unawaited(_refreshPortfolioPrices());
     if (_knowledgeController.sources.isEmpty && !_knowledgeController.loading) {
       unawaited(_knowledgeController.load());

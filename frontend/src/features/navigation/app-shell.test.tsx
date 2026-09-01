@@ -50,10 +50,7 @@ describe('AppShell', () => {
     const search = screen.getByRole('textbox', { name: '搜索股票' })
 
     await userEvent.click(screen.getByRole('button', { name: '提醒' }))
-    expect(screen.getByRole('status')).toHaveTextContent('演示版暂无新增提醒')
-
-    await userEvent.click(screen.getByRole('button', { name: /数据说明/ }))
-    expect(screen.getByRole('status')).toHaveTextContent('真实行情接口将在下一开发阶段接入')
+    expect(screen.getByRole('status')).toHaveTextContent('当前没有新增提醒')
 
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))
     expect(search).toHaveFocus()

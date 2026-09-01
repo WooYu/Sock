@@ -1,20 +1,13 @@
 import { expect, test } from "@playwright/test";
 
-test.describe("socksample Sites baseline", () => {
-  test("renders the dashboard landmarks", async ({ page }) => {
+test.describe("live StockCal baseline", () => {
+  test("renders the live-data shell without demo modules", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("heading", { name: "组合总览" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "AI策略分析中心" })).toBeVisible();
-    await expect(page.getByRole("navigation", { name: "主导航" })).toBeAttached();
-    await expect(page.getByRole("navigation", { name: "移动端导航" })).toBeAttached();
-  });
-
-  test("keeps the earning mode interaction stateful", async ({ page }) => {
-    await page.goto("/");
-    const swingMode = page.getByRole("tab", { name: "攀升" });
-    await swingMode.click();
-    await expect(swingMode).toHaveAttribute("aria-selected", "true");
-    await expect(page.getByRole("heading", { name: "攀升" })).toBeVisible();
+    await expect(page.locator("h1").first()).toBeVisible();
+    await expect(page.getByTestId("desktop-primary-nav")).toBeAttached();
+    await expect(page.getByTestId("mobile-primary-nav")).toBeAttached();
+    await expect(page.getByText("公司行为调整")).toHaveCount(0);
+    await expect(page.getByText("演示数据")).toHaveCount(0);
   });
 
   test("does not create horizontal page overflow", async ({ page }) => {

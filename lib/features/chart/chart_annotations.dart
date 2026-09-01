@@ -82,6 +82,7 @@ class PendingAnnotationMutation {
     required this.operation,
     required this.revision,
     required this.updatedAt,
+    this.annotation,
   });
 
   final String idempotencyKey;
@@ -90,6 +91,7 @@ class PendingAnnotationMutation {
   final AnnotationOperation operation;
   final int revision;
   final DateTime updatedAt;
+  final ChartAnnotation? annotation;
 }
 
 abstract interface class ChartAnnotationOutbox {
@@ -147,6 +149,25 @@ class ChartAnnotationController extends ChangeNotifier {
     final restored = await repository.load(stockCode);
     if (_localWrites == writesAtStart) annotations = restored;
     _loaded = true;
+    notifyListeners();
+  }
+
+  Future<void> mergeRemote(List<ChartAnnotation> remote) async {
+    var changed = false;
+    final merged = List<ChartAnnotation>.of(annotations);
+    for (final incoming in remote.where((item) => item.stockCode == stockCode)) {
+      final index = merged.indexWhere((item) => item.id == incoming.id);
+      if (index < 0) {
+        merged.add(incoming);
+        changed = true;
+      } else if (incoming.revision > merged[index].revision || incoming.updatedAt.isAfter(merged[index].updatedAt)) {
+        merged[index] = incoming;
+        changed = true;
+      }
+    }
+    if (!changed) return;
+    annotations = merged;
+    await repository.save(stockCode, annotations);
     notifyListeners();
   }
 
@@ -245,9 +266,42 @@ class ChartAnnotationController extends ChangeNotifier {
         annotationId: annotation.id,
         stockCode: stockCode,
         operation: operation,
-        revision: annotation.revision,
-        updatedAt: annotation.updatedAt,
+            revision: annotation.revision,
+            updatedAt: annotation.updatedAt,
+            annotation: annotation,
       ),
     );
   }
+}
+
+Map<String, Object?> chartAnnotationToJson(ChartAnnotation item) => {
+  'id': item.id,
+  'stockCode': item.stockCode,
+  'type': item.type.name,
+  'points': [
+    for (final point in item.points)
+      {'candleIndex': point.candleIndex, 'price': point.price},
+  ],
+  'hidden': item.hidden,
+  'updatedAt': item.updatedAt.toIso8601String(),
+  'revision': item.revision,
+};
+
+ChartAnnotation chartAnnotationFromJson(Map<String, Object?> json) {
+  final points = json['points']! as List<Object?>;
+  return ChartAnnotation(
+    id: json['id']! as String,
+    stockCode: json['stockCode']! as String,
+    type: ChartAnnotationType.values.byName(json['type']! as String),
+    points: points.map((item) {
+      final point = item! as Map<String, Object?>;
+      return ChartPoint(
+        candleIndex: point['candleIndex']! as int,
+        price: (point['price']! as num).toDouble(),
+      );
+    }).toList(growable: false),
+    hidden: json['hidden']! as bool,
+    updatedAt: DateTime.parse(json['updatedAt']! as String),
+    revision: json['revision']! as int,
+  );
 }

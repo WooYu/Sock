@@ -30,7 +30,10 @@ final class NoteExtractor implements KnowledgeExtractor {
     }
 
     private KnowledgeKind classify(String text) {
-        if (text.startsWith("经验：") || text.contains("心态") || text.contains("纪律")) return KnowledgeKind.EXPERIENCE;
+        if (text.startsWith("经验：") || text.contains("心态")) return KnowledgeKind.EXPERIENCE;
+        if (text.contains("不借钱") || text.contains("不杠杆") || text.contains("不满仓")
+            || text.contains("止损") || text.contains("纪律")) return KnowledgeKind.RISK_DISCIPLINE;
+        if (text.contains("案例") || text.contains("复盘") || text.contains("当时")) return KnowledgeKind.CASE;
         if (text.contains("规则：") || text.contains("关键点") || text.contains("目标位") || text.contains("只做")) {
             return KnowledgeKind.RULE;
         }

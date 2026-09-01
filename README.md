@@ -14,6 +14,8 @@ StockCal 是一个面向手机浏览器和桌面浏览器的 A 股决策与复�
 - 版本化规则、不可覆盖的预测快照和历史回测
 - 单笔/每日/每周复盘，以及只读确定性输入的 AI 说明
 - 笔记原文保留、知识草稿提取、审批、发布和业务页面引用
+- GitHub 股票笔记 Markdown 批量导入、AI 候选识别、证据行号和人工审批
+- K 线绘图、指标设置、图层和视图的本机保存；登录后通过阿里云同步到手机/网页
 - 数据归档、恢复、备份、管理视图、审计和服务状态
 
 完整设计与阶段状态见：
@@ -73,6 +75,8 @@ STOCKCAL_NOTES_PATH=C:\Users\Administrator\Documents\Obsidian Vault\印象笔记
 ```
 
 缺少外部密钥时，确定性计算和本地功能仍可运行；实时行情、生产短信及 OpenAI 提取会明确返回不可用状态，不会伪装成成功。
+
+阿里云部署时必须配置真实行情和同步身份：`TUSHARE_TOKEN`、`STOCKCAL_API_BASE_URL`、`STOCKCAL_AUTH_REQUIRED=true`，并把 GitHub 股票笔记目录挂载为 `/notes`（`STOCKCAL_NOTES_PATH=/notes`）。后端启动会幂等导入笔记，并识别核心高信号文件；网页和 Flutter 使用同一账号登录后才能跨设备读取 K 线工作区。
 
 ## 验证
 

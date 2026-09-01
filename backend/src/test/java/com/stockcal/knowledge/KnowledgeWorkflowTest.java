@@ -68,4 +68,16 @@ class KnowledgeWorkflowTest {
             assertThat(draft.sourceLineStart()).isEqualTo(2);
         });
     }
+
+    @Test
+    void riskDisciplineNeverBecomesAnExecutableEntrySignal() {
+        var source = workflow.importNote(Path.of("纪律.md"), "不借钱、不杠杆、不满仓，盘前先写计划。\n");
+
+        var drafts = workflow.extract(source.id());
+
+        assertThat(drafts).anySatisfy(draft -> {
+            assertThat(draft.kind()).isEqualTo(KnowledgeKind.RISK_DISCIPLINE);
+            assertThat(draft.action()).isEqualTo("WAIT");
+        });
+    }
 }

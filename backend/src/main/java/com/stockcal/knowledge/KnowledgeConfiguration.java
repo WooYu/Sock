@@ -2,6 +2,7 @@ package com.stockcal.knowledge;
 
 import java.time.Instant;
 import java.nio.file.Path;
+import java.util.Set;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -28,10 +29,28 @@ class KnowledgeConfiguration {
     @Bean
     ApplicationRunner noteDirectoryImportRunner(
         KnowledgeWorkflow workflow,
-        @Value("${stockcal.knowledge.notes-path:}") String notesPath
+        @Value("${stockcal.knowledge.notes-path:}") String notesPath,
+        @Value("${stockcal.knowledge.auto-extract:true}") boolean autoExtract
     ) {
         return arguments -> {
-            if (!notesPath.isBlank()) new NoteDirectoryImporter(workflow).scan(Path.of(notesPath));
+            if (notesPath.isBlank()) return;
+            new NoteDirectoryImporter(workflow).scan(Path.of(notesPath));
+            if (!autoExtract) return;
+            var coreNames = Set.of(
+                "买股原则.md", "买股原则2.md", "五日线.md", "海龟.md", "海龟_1.md",
+                "十不做.md", "盈利模式.md", "参数计算.md", "参数计算注意点（20251023-晚评）.md",
+                "四期第五课-摸线八字箴言.md", "四期第二课-关键点（目标位）.md",
+                "20220915_收盘_月线炒股法.md"
+            );
+            workflow.sources().stream()
+                .filter(source -> coreNames.contains(Path.of(source.path()).getFileName().toString()))
+                .forEach(source -> {
+                    try {
+                        workflow.extract(source.id());
+                    } catch (RuntimeException exception) {
+                        // One bad note or unavailable AI service must not stop Aliyun startup.
+                    }
+                });
         };
     }
 }

@@ -108,3 +108,35 @@ export function explainStrategy(
     body: JSON.stringify(payload),
   })
 }
+
+export function importKnowledgeSource(path: string, content: string, authorization?: string) {
+  return request<Record<string, unknown>>('/api/v1/knowledge/sources', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(authorization ? { Authorization: authorization } : {}),
+    },
+    body: JSON.stringify({ path, content }),
+  })
+}
+
+export function extractKnowledgeSource(id: string, authorization?: string) {
+  return request<unknown[]>(`/api/v1/knowledge/sources/${encodeURIComponent(id)}/extract`, {
+    method: 'POST',
+    headers: authorization ? { Authorization: authorization } : undefined,
+  })
+}
+
+export function getPublishedKnowledgeRules(authorization?: string) {
+  return request<Array<Record<string, unknown>>>('/api/v1/knowledge/rules', {
+    headers: authorization ? { Authorization: authorization } : undefined,
+  })
+}
+
+export function requestAuthCode(phone: string) {
+  return request<void>('/api/v1/auth/request-code', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone }) })
+}
+
+export function verifyAuth(phone: string, code: string) {
+  return request<{ accessToken: string; refreshToken: string; expiresAt: string }>('/api/v1/auth/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone, code, deviceName: 'StockCal Web' }) })
+}

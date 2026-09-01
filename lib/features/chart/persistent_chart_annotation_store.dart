@@ -73,39 +73,9 @@ class PersistentChartAnnotationStore
     );
   }
 
-  Map<String, Object?> _annotationToJson(ChartAnnotation item) => {
-    'id': item.id,
-    'stockCode': item.stockCode,
-    'type': item.type.name,
-    'points': [
-      for (final point in item.points)
-        {'candleIndex': point.candleIndex, 'price': point.price},
-    ],
-    'hidden': item.hidden,
-    'updatedAt': item.updatedAt.toIso8601String(),
-    'revision': item.revision,
-  };
+  Map<String, Object?> _annotationToJson(ChartAnnotation item) => chartAnnotationToJson(item);
 
-  ChartAnnotation _annotationFromJson(Map<String, Object?> json) {
-    final points = json['points']! as List<Object?>;
-    return ChartAnnotation(
-      id: json['id']! as String,
-      stockCode: json['stockCode']! as String,
-      type: ChartAnnotationType.values.byName(json['type']! as String),
-      points: points
-          .map((item) {
-            final point = item! as Map<String, Object?>;
-            return ChartPoint(
-              candleIndex: point['candleIndex']! as int,
-              price: (point['price']! as num).toDouble(),
-            );
-          })
-          .toList(growable: false),
-      hidden: json['hidden']! as bool,
-      updatedAt: DateTime.parse(json['updatedAt']! as String),
-      revision: json['revision']! as int,
-    );
-  }
+  ChartAnnotation _annotationFromJson(Map<String, Object?> json) => chartAnnotationFromJson(json);
 
   Map<String, Object?> _mutationToJson(PendingAnnotationMutation item) => {
     'idempotencyKey': item.idempotencyKey,
@@ -114,6 +84,7 @@ class PersistentChartAnnotationStore
     'operation': item.operation.name,
     'revision': item.revision,
     'updatedAt': item.updatedAt.toIso8601String(),
+    if (item.annotation != null) 'annotation': chartAnnotationToJson(item.annotation!),
   };
 
   PendingAnnotationMutation _mutationFromJson(Map<String, Object?> json) {
@@ -126,6 +97,9 @@ class PersistentChartAnnotationStore
       ),
       revision: json['revision']! as int,
       updatedAt: DateTime.parse(json['updatedAt']! as String),
+      annotation: json['annotation'] == null
+          ? null
+          : chartAnnotationFromJson(json['annotation']! as Map<String, Object?>),
     );
   }
 }

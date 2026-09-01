@@ -28,6 +28,13 @@ export class ChartAnnotationStore {
     return this.current.map((item) => ({ ...item, start: { ...item.start }, end: item.end && { ...item.end } }))
   }
 
+  replace(annotations: ChartAnnotation[]) {
+    this.current = annotations.map((item) => ({ ...item, start: { ...item.start }, end: item.end && { ...item.end } }))
+    this.past = []
+    this.future = []
+    return this.list()
+  }
+
   create(annotation: ChartAnnotation) {
     this.record()
     this.current = [...this.current, annotation]

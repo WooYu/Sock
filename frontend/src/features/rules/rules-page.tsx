@@ -1,11 +1,13 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { addRecord, createRecordId, loadRecords, saveRecords } from '../records/record-store'
 import { syncRecord } from '../records/record-sync'
 import { RecordSyncButton } from '../records/record-sync-button'
 import { builtInRules } from './default-rules'
+import { MarkdownImportPanel } from './markdown-import-panel'
+import { getPublishedKnowledgeRules } from '@/lib/api/knowledge-client'
 
 export type RuleRecord = {
   id: string
@@ -30,6 +32,26 @@ export function RulesPage({ initialRules = [] }: { initialRules?: RuleRecord[] }
     Object.fromEntries([...initialRules, ...initialRulesWithBuiltIns()].map((rule) => [rule.id, true])),
   )
   const [selectedRule, setSelectedRule] = useState<RuleRecord | null>(null)
+
+  useEffect(() => {
+    let active = true
+    void getPublishedKnowledgeRules().then((remoteRules) => {
+      if (!active || !remoteRules.length) return
+      const remote = remoteRules.map((rule) => ({
+        id: String(rule.id),
+        title: String(rule.name ?? '未命名规则'),
+        description: String(rule.description ?? ''),
+        status: 'published' as const,
+        source: String(rule.sourceDocumentId ?? '阿里云知识库'),
+        mode: typeof rule.mode === 'string' ? rule.mode : undefined,
+        action: typeof rule.action === 'string' ? rule.action : undefined,
+        timeframe: typeof rule.timeframe === 'string' ? rule.timeframe : undefined,
+      }))
+      setRules(remote)
+      setEnabledRules(Object.fromEntries(remote.map((rule) => [rule.id, true])))
+    }).catch(() => undefined)
+    return () => { active = false }
+  }, [])
 
   const toggleRule = (rule: RuleRecord) => {
     setEnabledRules((current) => ({ ...current, [rule.id]: !(current[rule.id] ?? rule.status === 'published') }))
@@ -81,6 +103,7 @@ export function RulesPage({ initialRules = [] }: { initialRules?: RuleRecord[] }
           <Link className="min-h-12 rounded-xl border border-[var(--sc-border)] px-4 py-3 text-sm font-semibold" href="/review/backtest">查看规则回测</Link>
         </div>
       </div>
+      <MarkdownImportPanel />
       {open ? <form className="space-y-3 rounded-xl border border-[var(--sc-border)] p-4" onSubmit={saveDraft}>
         <label className="block space-y-1 text-sm"><span>规则名称</span><input aria-label="规则名称" className="min-h-12 w-full rounded-xl border border-[var(--sc-border)] bg-transparent px-3" onChange={(event) => setTitle(event.target.value)} value={title} /></label>
         <label className="block space-y-1 text-sm"><span>规则说明</span><textarea aria-label="规则说明" className="min-h-28 w-full rounded-xl border border-[var(--sc-border)] bg-transparent p-3" onChange={(event) => setDescription(event.target.value)} value={description} /></label>
