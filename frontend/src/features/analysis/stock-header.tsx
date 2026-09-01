@@ -15,7 +15,7 @@ export function StockHeader() {
   }
 
   return (
-    <section className="rounded-2xl border border-[var(--sc-border)] bg-[var(--sc-surface)] p-4 sm:p-5">
+    <section className="sc-stock-header rounded-2xl border border-[var(--sc-border)] bg-[var(--sc-surface)] p-4 sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-sm text-[var(--sc-muted)]">{security.code} · {security.exchange ?? 'A股'}</p>

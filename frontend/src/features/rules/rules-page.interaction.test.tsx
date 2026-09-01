@@ -6,6 +6,14 @@ import { RulesPage } from './rules-page'
 describe('RulesPage interactions', () => {
   beforeEach(() => localStorage.clear())
 
+  test('exposes the redesigned rules workspace regions', () => {
+    const { container } = render(<RulesPage />)
+
+    expect(container.querySelector('.sc-rules-page')).toBeInTheDocument()
+    expect(container.querySelector('.sc-rules-overview')).toBeInTheDocument()
+    expect(container.querySelector('.sc-rules-list')).toBeInTheDocument()
+  })
+
   test('shows built-in rules when no local rules exist', () => {
     render(<RulesPage />)
 

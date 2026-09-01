@@ -22,6 +22,18 @@ function snapshotWithCandles() {
 describe('AnalysisPage interactions', () => {
   beforeEach(() => localStorage.clear())
 
+  test('exposes the redesigned analysis workspace regions', () => {
+    const { container } = render(
+      <StockWorkspaceProvider client={{ snapshot: async () => snapshotWithCandles() }} initialSymbol="600519">
+        <AnalysisPage tab="key-levels" />
+      </StockWorkspaceProvider>,
+    )
+
+    expect(container.querySelector('.sc-analysis-page')).toBeInTheDocument()
+    expect(container.querySelector('.sc-analysis-tabs')).toBeInTheDocument()
+    expect(container.querySelector('.sc-analysis-actions')).toBeInTheDocument()
+  })
+
   test('saves a prediction snapshot from a ready analysis', async () => {
     const user = userEvent.setup()
     const client: MarketClient = { snapshot: async () => snapshotWithCandles() }

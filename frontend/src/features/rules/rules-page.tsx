@@ -91,18 +91,24 @@ export function RulesPage({ initialRules = [] }: { initialRules?: RuleRecord[] }
   }
 
   return (
-    <section className="space-y-5 rounded-2xl border border-[var(--sc-border)] bg-[var(--sc-surface)] p-5">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+    <section className="sc-rules-page">
+      <header className="sc-rules-header">
         <div>
-          <p className="text-sm text-[var(--sc-muted)]">经验、知识与审批</p>
-          <h1 className="mt-1 text-2xl font-semibold">规则库</h1>
-          <p className="mt-2 text-sm text-[var(--sc-muted)]">已内置从股票笔记提炼的基础规则，后续可继续审批和补充个人规则。</p>
+          <p className="sc-eyebrow">经验、知识与审批</p>
+          <h1>规则库</h1>
+          <p>已内置从股票笔记提炼的基础规则，后续可继续审批和补充个人规则。</p>
         </div>
-        <div className="flex flex-wrap gap-3">
+        <div className="sc-rules-actions">
           <RecordSyncButton />
-          <button className="min-h-12 rounded-xl bg-[var(--sc-primary)] px-4 text-sm font-semibold text-white" onClick={() => { setOpen(true); setMessage('') }} type="button">新建规则</button>
-          <Link className="min-h-12 rounded-xl border border-[var(--sc-border)] px-4 py-3 text-sm font-semibold" href="/review/backtest">查看规则回测</Link>
+          <button onClick={() => { setOpen(true); setMessage('') }} type="button">新建规则</button>
+          <Link href="/review/backtest">查看规则回测</Link>
         </div>
+      </header>
+      <div className="sc-rules-overview" aria-label="规则统计">
+        <div><span>规则总数</span><strong>{rules.length}</strong></div>
+        <div><span>已上线</span><strong>{rules.filter((rule) => rule.status === 'published').length}</strong></div>
+        <div><span>已启用</span><strong>{rules.filter((rule) => rule.status === 'published' && enabledRules[rule.id]).length}</strong></div>
+        <div><span>待处理草稿</span><strong>{rules.filter((rule) => rule.status === 'draft').length}</strong></div>
       </div>
       <MarkdownImportPanel />
       <KnowledgeReviewPanel onPublished={(published) => {
@@ -118,23 +124,23 @@ export function RulesPage({ initialRules = [] }: { initialRules?: RuleRecord[] }
           priority: published.priority,
         }])
       }} />
-      {open ? <form className="space-y-3 rounded-xl border border-[var(--sc-border)] p-4" onSubmit={saveDraft}>
+      {open ? <form className="sc-rule-editor" onSubmit={saveDraft}>
         <label className="block space-y-1 text-sm"><span>规则名称</span><input aria-label="规则名称" className="min-h-12 w-full rounded-xl border border-[var(--sc-border)] bg-transparent px-3" onChange={(event) => setTitle(event.target.value)} value={title} /></label>
         <label className="block space-y-1 text-sm"><span>规则说明</span><textarea aria-label="规则说明" className="min-h-28 w-full rounded-xl border border-[var(--sc-border)] bg-transparent p-3" onChange={(event) => setDescription(event.target.value)} value={description} /></label>
         <div className="flex gap-3"><button className="min-h-12 rounded-xl bg-[var(--sc-primary)] px-4 text-sm font-semibold text-white" type="submit">保存规则草稿</button><button className="min-h-12 rounded-xl border border-[var(--sc-border)] px-4" onClick={() => setOpen(false)} type="button">取消</button></div>
       </form> : null}
       {message ? <p className="text-sm text-emerald-700" role="status">{message}</p> : null}
-      {rules.length === 0 ? <div className="rounded-xl bg-[var(--sc-surface-muted)] p-5 text-sm text-[var(--sc-muted)]">暂无规则，请先创建草稿。</div> : <div className="space-y-3">
-        {rules.map((rule) => <article className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--sc-border)] p-4" key={rule.id}>
-          <div className="min-w-0 flex-1">
+      {rules.length === 0 ? <div className="sc-rules-empty">暂无规则，请先创建草稿。</div> : <div className="sc-rules-list">
+        {rules.map((rule) => <article className="sc-rule-card" key={rule.id}>
+          <div className="sc-rule-card-main">
             <div className="flex flex-wrap items-center gap-2"><h2 className="font-medium">{rule.title}</h2>{rule.source ? <span className="rounded-full bg-[var(--sc-surface-muted)] px-2 py-1 text-xs text-[var(--sc-muted)]">{rule.source}</span> : null}</div>
             {rule.description ? <p className="mt-1 text-sm text-[var(--sc-muted)]">{rule.description}</p> : null}
             <p className="mt-1 text-sm text-[var(--sc-muted)]">{rule.status === 'published' ? (enabledRules[rule.id] ? '参与分析' : '已停用') : '草稿'}</p>
             {rule.status === 'published' && (rule.timeframe || rule.mode) ? <p className="mt-1 text-xs text-[var(--sc-muted)]">{enabledRules[rule.id] ? '已启用' : '未启用'}{rule.timeframe ? ` · ${rule.timeframe}` : ''}{rule.mode ? ` · ${rule.mode}` : ''}</p> : null}
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            {rule.status === 'published' ? <><span className="rounded-full bg-emerald-50 px-3 py-1 text-sm text-emerald-700">已发布</span><button aria-label={`${enabledRules[rule.id] ? '停用' : '启用'}规则 ${rule.title}`} aria-pressed={enabledRules[rule.id] ?? true} className={`min-h-10 rounded-full px-3 text-sm ${enabledRules[rule.id] ? 'bg-emerald-50 text-emerald-700' : 'bg-[var(--sc-surface-muted)] text-[var(--sc-muted)]'}`} onClick={() => toggleRule(rule)} type="button">{enabledRules[rule.id] ? '已启用' : '已停用'}</button></> : <button className="min-h-12 rounded-xl bg-[var(--sc-primary)] px-4 text-sm font-semibold text-white" onClick={() => publish(rule.id)} type="button" aria-label={`发布${rule.title}`}>发布</button>}
-            <button aria-label={`查看规则详情 ${rule.title}`} className="min-h-10 rounded-xl border border-[var(--sc-border)] px-3 text-sm font-semibold" onClick={() => setSelectedRule(rule)} type="button">查看详情</button>
+          <div className="sc-rule-card-actions">
+            {rule.status === 'published' ? <><span className="sc-rule-status published">已发布</span><button aria-label={`${enabledRules[rule.id] ? '停用' : '启用'}规则 ${rule.title}`} aria-pressed={enabledRules[rule.id] ?? true} className={`sc-rule-toggle ${enabledRules[rule.id] ? 'enabled' : ''}`} onClick={() => toggleRule(rule)} type="button">{enabledRules[rule.id] ? '已启用' : '已停用'}</button></> : <button className="sc-rule-publish" onClick={() => publish(rule.id)} type="button" aria-label={`发布${rule.title}`}>发布</button>}
+            <button aria-label={`查看规则详情 ${rule.title}`} className="sc-rule-detail-button" onClick={() => setSelectedRule(rule)} type="button">查看详情</button>
           </div>
         </article>)}
       </div>}

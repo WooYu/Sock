@@ -216,7 +216,7 @@ export function ChartWorkspace({ snapshot }: { snapshot?: MarketSnapshot | null 
 
   return (
     <section className="sc-kline-workspace">
-      <header className="sc-kline-header">
+      <header className="sc-kline-header sc-kline-summary">
         <div>
           <p className="sc-eyebrow">价格结构 · 多周期观察</p>
           <div className="sc-kline-title-row">
@@ -232,7 +232,7 @@ export function ChartWorkspace({ snapshot }: { snapshot?: MarketSnapshot | null 
         </div>
       </header>
 
-      <div className="sc-kline-controls">
+      <div className="sc-kline-controls sc-kline-control-card">
         <div className="sc-kline-control-row" aria-label="K线周期">
           <span className="sc-kline-group-label">K线周期</span>
           <div className="sc-kline-segmented" role="tablist" aria-label="K线周期">
@@ -270,7 +270,7 @@ export function ChartWorkspace({ snapshot }: { snapshot?: MarketSnapshot | null 
         </div>
       </div>
 
-      <div className="sc-kline-main-grid">
+      <div className="sc-kline-main-grid sc-kline-content">
         <div className="sc-kline-main-column">
           <div className="sc-kline-chart-panel">
             <div className="sc-kline-chart-heading">

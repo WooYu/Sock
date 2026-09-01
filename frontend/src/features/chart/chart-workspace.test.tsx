@@ -13,6 +13,14 @@ const snapshot: MarketSnapshot = {
 const renderChart = () => render(<ChartWorkspace snapshot={snapshot} />)
 
 describe('ChartWorkspace', () => {
+  test('exposes the redesigned chart workspace regions', () => {
+    const { container } = renderChart()
+
+    expect(container.querySelector('.sc-kline-summary')).toBeInTheDocument()
+    expect(container.querySelector('.sc-kline-control-card')).toBeInTheDocument()
+    expect(container.querySelector('.sc-kline-content')).toBeInTheDocument()
+  })
+
   test('selecting a drawing tool clears the previous drawing tool', async () => {
     renderChart()
     await userEvent.click(screen.getByRole('button', { name: '趋势线' }))
