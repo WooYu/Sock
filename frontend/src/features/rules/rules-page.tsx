@@ -27,7 +27,7 @@ export function RulesPage({ initialRules = [] }: { initialRules?: RuleRecord[] }
   const [description, setDescription] = useState('')
   const [message, setMessage] = useState('')
   const [enabledRules, setEnabledRules] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(initialRulesWithBuiltIns().map((rule) => [rule.id, true])),
+    Object.fromEntries([...initialRules, ...initialRulesWithBuiltIns()].map((rule) => [rule.id, true])),
   )
   const [selectedRule, setSelectedRule] = useState<RuleRecord | null>(null)
 
@@ -40,6 +40,7 @@ export function RulesPage({ initialRules = [] }: { initialRules?: RuleRecord[] }
     const published = next.find((item) => item.id === id)
     saveRecords('rules', next)
     setRules(next)
+    setEnabledRules((current) => ({ ...current, [id]: true }))
     if (published) void syncRecord('rules', published).catch(() => undefined)
     setMessage('规则已发布')
   }
@@ -95,7 +96,7 @@ export function RulesPage({ initialRules = [] }: { initialRules?: RuleRecord[] }
             {rule.status === 'published' && (rule.timeframe || rule.mode) ? <p className="mt-1 text-xs text-[var(--sc-muted)]">{enabledRules[rule.id] ? '已启用' : '未启用'}{rule.timeframe ? ` · ${rule.timeframe}` : ''}{rule.mode ? ` · ${rule.mode}` : ''}</p> : null}
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            {rule.status === 'published' ? <button aria-label={`${enabledRules[rule.id] ? '停用' : '启用'}规则 ${rule.title}`} aria-pressed={enabledRules[rule.id] ?? true} className={`min-h-10 rounded-full px-3 text-sm ${enabledRules[rule.id] ? 'bg-emerald-50 text-emerald-700' : 'bg-[var(--sc-surface-muted)] text-[var(--sc-muted)]'}`} onClick={() => toggleRule(rule)} type="button">{enabledRules[rule.id] ? '已启用' : '已停用'}</button> : <button className="min-h-12 rounded-xl bg-[var(--sc-primary)] px-4 text-sm font-semibold text-white" onClick={() => publish(rule.id)} type="button" aria-label={`发布${rule.title}`}>发布</button>}
+            {rule.status === 'published' ? <><span className="rounded-full bg-emerald-50 px-3 py-1 text-sm text-emerald-700">已发布</span><button aria-label={`${enabledRules[rule.id] ? '停用' : '启用'}规则 ${rule.title}`} aria-pressed={enabledRules[rule.id] ?? true} className={`min-h-10 rounded-full px-3 text-sm ${enabledRules[rule.id] ? 'bg-emerald-50 text-emerald-700' : 'bg-[var(--sc-surface-muted)] text-[var(--sc-muted)]'}`} onClick={() => toggleRule(rule)} type="button">{enabledRules[rule.id] ? '已启用' : '已停用'}</button></> : <button className="min-h-12 rounded-xl bg-[var(--sc-primary)] px-4 text-sm font-semibold text-white" onClick={() => publish(rule.id)} type="button" aria-label={`发布${rule.title}`}>发布</button>}
             <button aria-label={`查看规则详情 ${rule.title}`} className="min-h-10 rounded-xl border border-[var(--sc-border)] px-3 text-sm font-semibold" onClick={() => setSelectedRule(rule)} type="button">查看详情</button>
           </div>
         </article>)}
