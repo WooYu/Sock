@@ -221,6 +221,14 @@ body {
 @media (max-width: 640px) { .sc-kline-workspace { padding: 14px; }.sc-kline-header { align-items: flex-start; flex-direction: column; }.sc-kline-quote { justify-items: start; }.sc-kline-controls { padding: 6px; }.sc-kline-control-row, .sc-kline-tool-row { align-items: flex-start; flex-direction: column; }.sc-kline-group-label { min-width: auto; }.sc-kline-tool-buttons, .sc-kline-indicator-buttons { width: 100%; }.sc-kline-tool-button, .sc-kline-segmented button, .sc-kline-control-button { min-height: 34px; }.sc-kline-hint { width: 100%; }.sc-kline-side-column, .sc-future-grid { grid-template-columns: 1fr; }.sc-kline-chart-panel { padding: 12px 10px 0; } }
 
 /* Overview is the primary product surface: keep desktop labels readable. */
+.sc-shell-notice { position: fixed; right: 22px; bottom: 22px; z-index: 60; margin: 0; border: 1px solid #dbe2ff; border-radius: 9px; background: #18233b; padding: 10px 14px; color: #fff; font-size: 12px; box-shadow: 0 10px 30px #18233b33; }
+.sc-kline-tool-menu { position: relative; }
+.sc-kline-tool-menu summary { min-height: 29px; border: 1px solid transparent; border-radius: 6px; background: #f7f8fb; padding: 4px 9px; color: #7e8798; font-size: 10px; font-weight: 650; cursor: pointer; list-style: none; }
+.sc-kline-tool-menu summary::-webkit-details-marker { display: none; }
+.sc-kline-tool-menu summary::after { content: '⌄'; margin-left: 5px; color: #a0a6b2; }
+.sc-kline-tool-menu[open] summary, .sc-kline-tool-menu summary:hover { border-color: #cdd6ff; background: #eef1ff; color: #4868ff; }
+.sc-kline-tool-menu-panel { position: absolute; top: calc(100% + 5px); left: 0; z-index: 10; display: grid; min-width: 112px; gap: 4px; border: 1px solid #dfe3ed; border-radius: 8px; background: #fff; padding: 6px; box-shadow: 0 12px 30px #1e2a4624; }
+.sc-kline-tool-menu-panel .sc-kline-tool-button { width: 100%; text-align: left; }
 .sc-dashboard { gap: 22px; font-size: 14px; }
 .sc-portfolio-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
 .sc-portfolio-status { margin-top: 20px; border-radius: 5px; background: #f6f7fb; padding: 6px 8px; color: #9aa1ae; font-size: 11px; white-space: nowrap; }

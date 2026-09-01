@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import type { Candle, MarketSnapshot } from '../workspace/stock-workspace-types'
 import { ChartAnnotationStore, type ChartAnnotation, type ChartTool } from './chart-annotation-store'
 import { ChartLayerPanel, type ChartLayerState } from './chart-layer-panel'
@@ -81,6 +81,7 @@ export function ChartWorkspace({ snapshot }: { snapshot?: MarketSnapshot | null 
   const [crosshair, setCrosshair] = useState(false)
   const [layers, setLayers] = useState<ChartLayerState>({ keyLevels: true, predictionPaths: true, trades: true, annotations: true })
   const [annotations, setAnnotations] = useState<ChartAnnotation[]>([])
+  const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null)
   const store = useRef(new ChartAnnotationStore())
 
   const sourceCandles = snapshot?.dailyCandles?.length ? snapshot.dailyCandles : demoCandles
@@ -101,6 +102,43 @@ export function ChartWorkspace({ snapshot }: { snapshot?: MarketSnapshot | null 
   const addRectangle = () => {
     const next = store.current.create({ id: `rectangle-${Date.now()}`, kind: 'rectangle', start: { x: 20, y: 20 }, end: { x: 130, y: 90 } })
     setAnnotations(next)
+  }
+
+  const chartPoint = (event: ReactPointerEvent<SVGSVGElement>) => {
+    const bounds = event.currentTarget.getBoundingClientRect()
+    const width = bounds.width || 960
+    const height = bounds.height || 430
+    return {
+      x: Math.max(0, Math.min(960, ((event.clientX - bounds.left) / width) * 960)),
+      y: Math.max(0, Math.min(430, ((event.clientY - bounds.top) / height) * 430)),
+    }
+  }
+
+  const createPointAnnotation = (event: ReactPointerEvent<SVGSVGElement>) => {
+    const point = chartPoint(event)
+    if (activeTool === 'pointer' || activeTool === 'trend-line' || activeTool === 'rectangle' || activeTool === 'marker') return
+    const next = store.current.create({
+      id: `${activeTool}-${Date.now()}`,
+      kind: activeTool,
+      start: point,
+      text: activeTool === 'text' ? '文字备注' : undefined,
+    })
+    setAnnotations(next)
+  }
+
+  const handleChartPointerDown = (event: ReactPointerEvent<SVGSVGElement>) => {
+    if (activeTool !== 'trend-line' && activeTool !== 'rectangle') return
+    event.currentTarget.setPointerCapture?.(event.pointerId)
+    setDragStart(chartPoint(event))
+  }
+
+  const handleChartPointerUp = (event: ReactPointerEvent<SVGSVGElement>) => {
+    if (!dragStart || (activeTool !== 'trend-line' && activeTool !== 'rectangle')) return
+    const end = chartPoint(event)
+    const next = store.current.create({ id: `${activeTool}-${Date.now()}`, kind: activeTool, start: dragStart, end })
+    setAnnotations(next)
+    setDragStart(null)
+    event.currentTarget.releasePointerCapture?.(event.pointerId)
   }
 
   const resetView = () => {
@@ -201,7 +239,7 @@ export function ChartWorkspace({ snapshot }: { snapshot?: MarketSnapshot | null 
             </div>
             <div className="sc-kline-chart-scroll">
               <div className="sc-kline-chart-surface" data-zoom={zoom} style={{ width: `${zoom}%` }}>
-                <svg aria-label="K线主图" className="sc-kline-svg" role="img" viewBox="0 0 960 430">
+                <svg aria-label="K线主图" className="sc-kline-svg" onClick={createPointAnnotation} onPointerDown={handleChartPointerDown} onPointerUp={handleChartPointerUp} role="img" viewBox="0 0 960 430">
                   <rect fill="#fbfcff" height="430" width="960" x="0" y="0" />
                   <g className="sc-kline-grid">
                     {[0, 1, 2, 3, 4].map((line) => <line key={`h-${line}`} x1={chartLeft} x2={chartLeft + chartWidth} y1={chartTop + line * (chartHeight / 4)} y2={chartTop + line * (chartHeight / 4)} />)}
@@ -235,7 +273,7 @@ export function ChartWorkspace({ snapshot }: { snapshot?: MarketSnapshot | null 
             </div>
             <div className="sc-kline-statusbar"><span>共 {candles.length} 根 K 线</span><span>当前周期：{periods.find(([period]) => period === activePeriod)?.[1]}</span><span>数据源：{snapshot?.source.name ?? '本地演示'}</span></div>
           </div>
-          {activeTool === 'rectangle' && <button className="sc-kline-add-annotation" onClick={addRectangle} type="button">添加矩形示例</button>}
+          {(activeTool === 'rectangle' || activeTool === 'trend-line') && <button className="sc-kline-add-annotation" onClick={addRectangle} type="button">添加矩形示例</button>}
 
           <section className="sc-future-panel">
             <div className="sc-kline-section-heading"><div><p className="sc-eyebrow">指标推演 · 可追溯</p><h2>日线与未来指标延伸</h2></div><span>未来 3 个交易日</span></div>

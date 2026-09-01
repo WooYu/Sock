@@ -19,7 +19,7 @@ export type NavigationItem = {
 
 export const desktopNavigation: NavigationItem[] = [
   { section: 'overview', label: '关键位分析', href: '/overview', icon: '◈' },
-  { section: 'analysis', label: '盈利模式', href: '/analysis/key-levels#profit-mode', icon: '↗' },
+  { section: 'analysis', label: '盈利模式', href: '/analysis/patterns', icon: '↗' },
   { section: 'analysis', label: '未来指标', href: '/analysis/future', icon: '⌁' },
   { section: 'trading', label: '预测记录', href: '/trading/predictions', icon: '▤' },
   { section: 'trading', label: '交易与盈亏', href: '/trading/positions', icon: '￥' },
@@ -31,7 +31,7 @@ export const desktopNavigation: NavigationItem[] = [
 
 export const mobileNavigation: NavigationItem[] = [
   { section: 'overview', label: '关键位', href: '/overview', icon: '◈' },
-  { section: 'analysis', label: '模式', href: '/analysis/key-levels#profit-mode', icon: '↗' },
+  { section: 'analysis', label: '模式', href: '/analysis/patterns', icon: '↗' },
   { section: 'analysis', label: '指标', href: '/analysis/future', icon: '⌁' },
   { section: 'trading', label: '记录', href: '/trading/predictions', icon: '▤' },
   { section: 'chart', label: 'K线', href: '/chart', icon: '▥' },

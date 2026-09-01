@@ -1,13 +1,14 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { PrimarySection } from './navigation-config'
 import { desktopNavigation, mobileNavigation } from './navigation-config'
 
 type AppShellProps = {
   section: PrimarySection
   onSectionChange: (section: PrimarySection) => void
+  activeHref?: string
   currentStockLabel?: string
   children?: React.ReactNode
 }
@@ -15,20 +16,41 @@ type AppShellProps = {
 export function AppShell({
   section,
   onSectionChange,
+  activeHref,
   currentStockLabel,
   children,
 }: AppShellProps) {
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const [notice, setNotice] = useState<string | null>(null)
+  const searchRef = useRef<HTMLInputElement>(null)
+  const notify = (message: string) => {
+    setNotice(message)
+    window.setTimeout(() => setNotice(null), 2600)
+  }
+
+  useEffect(() => {
+    const onShortcut = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        searchRef.current?.focus()
+      }
+    }
+    window.addEventListener('keydown', onShortcut)
+    return () => window.removeEventListener('keydown', onShortcut)
+  }, [])
   const renderNavigation = (items: typeof desktopNavigation, testId: string) => {
     const activeIndex = items.findIndex((item) => item.section === section)
     const isMobile = testId === 'mobile-primary-nav'
     return (
       <nav aria-label="主导航" className={isMobile ? 'sc-main-nav sc-main-nav-mobile' : 'sc-main-nav sc-main-nav-desktop'} data-testid={testId}>
-        {items.map((item, index) => (
+        {items.map((item, index) => {
+          const itemPath = item.href.split('#')[0]
+          const isActive = activeHref ? itemPath === activeHref : activeIndex === index
+          return (
           <Link
-            aria-current={activeIndex === index ? 'page' : undefined}
-            className={`${isMobile ? 'min-h-12' : ''} sc-nav-link ${activeIndex === index ? 'active' : ''}`}
+            aria-current={isActive ? 'page' : undefined}
+            className={`${isMobile ? 'min-h-12' : ''} sc-nav-link ${isActive ? 'active' : ''}`}
             href={item.href}
             key={`${item.section}-${item.label}`}
             onClick={() => onSectionChange(item.section)}
@@ -36,7 +58,8 @@ export function AppShell({
             <span aria-hidden="true" className="sc-nav-icon">{item.icon}</span>
             <span>{item.label}</span>
           </Link>
-        ))}
+          )
+        })}
       </nav>
     )
   }
@@ -58,22 +81,22 @@ export function AppShell({
                 {currentStockLabel}
               </span>
             ) : null}
-            <label className="sc-search-box">
+            <form className="sc-search-box" action="/analysis/key-levels" method="get" onSubmit={(event) => { if (!query.trim()) { event.preventDefault(); notify('请输入股票代码或名称') } }}>
               <span aria-hidden="true">⌕</span>
-              <input aria-label="搜索股票" placeholder="输入代码 / 名称" value={query} onChange={(event) => setQuery(event.target.value)} />
+              <input aria-label="搜索股票" name="symbol" placeholder="输入代码 / 名称" ref={searchRef} value={query} onChange={(event) => setQuery(event.target.value)} />
               <kbd>⌘ K</kbd>
-            </label>
+            </form>
             <button aria-expanded={searchOpen} aria-label="搜索股票（移动端）" className="sc-mobile-search-trigger" onClick={() => setSearchOpen((open) => !open)} type="button">⌕</button>
-            <button className="sc-alert-button" aria-label="提醒" type="button">●</button>
+            <button className="sc-alert-button" aria-label="提醒" onClick={() => notify('演示版暂无新增提醒')} type="button">●</button>
             <Link className="sc-avatar" aria-label="个人账户" href="/rules">A</Link>
           </div>
         </div>
-        {searchOpen ? <div className="sc-mobile-search-row"><input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="输入股票代码或名称" aria-label="股票代码或名称" /><Link href={query.trim() ? `/analysis/key-levels?symbol=${encodeURIComponent(query.trim())}` : '/analysis/key-levels'}>进入分析</Link></div> : null}
+        {searchOpen ? <form className="sc-mobile-search-row" action="/analysis/key-levels" method="get"><input autoFocus name="symbol" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="输入股票代码或名称" aria-label="股票代码或名称" /><button type="submit">进入分析</button></form> : null}
       </header>
 
       <div className="sc-demo-ribbon">
         <div><span>演示数据</span> 当前数值用于验证产品逻辑，不构成投资建议，也不是实时行情。</div>
-        <button type="button">数据说明 →</button>
+        <button onClick={() => notify('真实行情接口将在下一开发阶段接入')} type="button">数据说明 →</button>
       </div>
 
       <main className="sc-shell-main">
@@ -83,6 +106,7 @@ export function AppShell({
       <div className="sc-mobile-nav-wrap">
         {renderNavigation(mobileNavigation, 'mobile-primary-nav')}
       </div>
+      {notice ? <p className="sc-shell-notice" role="status">{notice}</p> : null}
     </div>
   )
 }

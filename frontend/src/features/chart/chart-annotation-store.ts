@@ -3,6 +3,7 @@ export type ChartTool =
   | 'trend-line'
   | 'horizontal-line'
   | 'rectangle'
+  | 'marker'
   | 'buy'
   | 'sell'
   | 'target'

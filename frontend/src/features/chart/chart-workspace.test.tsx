@@ -28,6 +28,23 @@ describe('ChartWorkspace', () => {
     expect(screen.queryByTestId('annotation-rectangle')).not.toBeInTheDocument()
   })
 
+  test('offers secondary drawing tools in the sample-style menu', async () => {
+    render(<ChartWorkspace />)
+    await userEvent.click(screen.getByText('更多绘图', { selector: 'summary' }))
+    await userEvent.click(screen.getByRole('button', { name: '水平线' }))
+
+    expect(screen.getByRole('button', { name: '水平线' })).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  test('creates a point annotation by clicking the chart', async () => {
+    render(<ChartWorkspace />)
+    await userEvent.click(screen.getByText('更多绘图', { selector: 'summary' }))
+    await userEvent.click(screen.getByRole('button', { name: '买入点' }))
+    await userEvent.click(screen.getByRole('img', { name: 'K线主图' }))
+
+    expect(screen.getByTestId('annotation-buy')).toBeInTheDocument()
+  })
+
   test('switches the active K-line period', async () => {
     render(<ChartWorkspace />)
     await userEvent.click(screen.getByRole('tab', { name: '周线' }))

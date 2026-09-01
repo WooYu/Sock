@@ -5,5 +5,6 @@ export default async function TradingRoute({ params, searchParams }: { params: P
   const { tab } = await params
   const { symbol } = await searchParams
   const validTabs: TradingTab[] = ['positions', 'ledger', 'predictions', 'statistics']
-  return <ProductShell section="trading"><TradingPage initialTab={validTabs.includes(tab as TradingTab) ? tab as TradingTab : 'positions'} symbol={symbol} /></ProductShell>
+  const activeTab = validTabs.includes(tab as TradingTab) ? tab as TradingTab : 'positions'
+  return <ProductShell activeHref={`/trading/${activeTab}`} section="trading"><TradingPage initialTab={activeTab} symbol={symbol} /></ProductShell>
 }
