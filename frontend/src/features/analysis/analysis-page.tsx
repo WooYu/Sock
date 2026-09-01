@@ -12,12 +12,16 @@ import { FutureIndicatorsPanel } from './future-indicators-panel'
 import { KeyLevelsPanel } from './key-levels-panel'
 import { PatternsPanel } from './patterns-panel'
 import { StockHeader } from './stock-header'
+import { MarketFeedback, MarketLoadingState } from '../workspace/market-state'
 
 const tabs: Array<[AnalysisTab, string]> = [['key-levels', '关键位'], ['patterns', '盈利模式'], ['future', '未来指标'], ['ai', 'AI 策略']]
 
 export function AnalysisPage({ tab }: { tab: AnalysisTab }) {
   const workspace = useStockWorkspace()
   const analysis = workspace.current?.analysis
+  const hasMarketSnapshot = Boolean(workspace.current ?? workspace.lastSuccessful)
+  const initialLoading = !hasMarketSnapshot && (workspace.status === 'loading' || (workspace.status === 'idle' && workspace.selectedSymbol))
+  const initialError = !hasMarketSnapshot && workspace.status === 'error'
   const [saved, setSaved] = useState(false)
   const savePrediction = () => {
     if (!analysis || !workspace.current) return
@@ -44,10 +48,11 @@ export function AnalysisPage({ tab }: { tab: AnalysisTab }) {
       {tabs.map(([value, label]) => <Link aria-current={tab === value ? 'page' : undefined} className={tab === value ? 'is-active' : ''} href={`/analysis/${value}${workspace.selectedSymbol ? `?symbol=${workspace.selectedSymbol}` : ''}`} key={value}>{label}</Link>)}
     </nav>
     <div className="sc-analysis-content">
-      {tab === 'key-levels' ? <KeyLevelsPanel analysis={analysis} /> : null}
-      {tab === 'patterns' ? <PatternsPanel analysis={analysis} /> : null}
-      {tab === 'future' ? <FutureIndicatorsPanel analysis={analysis} /> : null}
-      {tab === 'ai' ? <AiStrategyPanel analysis={analysis} /> : null}
+      {initialLoading ? <MarketLoadingState variant="analysis" /> : initialError ? <MarketFeedback errorMessage={workspace.errorMessage} onRetry={() => void workspace.refresh()} status={workspace.status} /> : null}
+      {!initialLoading && !initialError && tab === 'key-levels' ? <KeyLevelsPanel analysis={analysis} /> : null}
+      {!initialLoading && !initialError && tab === 'patterns' ? <PatternsPanel analysis={analysis} /> : null}
+      {!initialLoading && !initialError && tab === 'future' ? <FutureIndicatorsPanel analysis={analysis} /> : null}
+      {!initialLoading && !initialError && tab === 'ai' ? <AiStrategyPanel analysis={analysis} /> : null}
     </div>
     <div className="sc-analysis-actions">
       <button disabled={!analysis} onClick={savePrediction} type="button">保存预测快照</button>

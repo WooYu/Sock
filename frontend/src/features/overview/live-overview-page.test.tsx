@@ -9,6 +9,13 @@ const snapshot = {
 }
 
 describe('LiveOverviewPage', () => {
+  test('shows loading feedback while the first market request is pending', () => {
+    render(<LiveOverviewPage snapshot={null} status="loading" />)
+
+    expect(screen.getByRole('status')).toHaveTextContent('正在加载真实行情')
+    expect(screen.queryByText('真实行情暂不可用')).not.toBeInTheDocument()
+  })
+
   test('renders live security and source', () => {
     render(<LiveOverviewPage snapshot={snapshot} />)
     expect(screen.getByText('贵州茅台')).toBeInTheDocument()

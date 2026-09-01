@@ -8,6 +8,12 @@ import { AnalysisPage } from './analysis-page'
 import { StockWorkspaceProvider, type MarketClient } from '../workspace/stock-workspace-provider'
 import type { MarketSnapshot } from '../workspace/stock-workspace-types'
 
+class PendingMarketClient implements MarketClient {
+  async snapshot() {
+    return new Promise<MarketSnapshot>(() => undefined)
+  }
+}
+
 function snapshotWithCandles() {
   const snapshot = demoMarketSnapshot('600519') as MarketSnapshot
   snapshot.dailyCandles = Array.from({ length: 20 }, (_, index) => ({
@@ -40,6 +46,16 @@ describe('AnalysisPage interactions', () => {
     expect(container.querySelector('.sc-analysis-page')).toBeInTheDocument()
     expect(container.querySelector('.sc-analysis-tabs')).toBeInTheDocument()
     expect(container.querySelector('.sc-analysis-actions')).toBeInTheDocument()
+  })
+
+  test('shows loading feedback while analysis data is pending', () => {
+    render(
+      <StockWorkspaceProvider client={new PendingMarketClient()} initialSymbol="600519">
+        <AnalysisPage tab="key-levels" />
+      </StockWorkspaceProvider>,
+    )
+
+    expect(screen.getByRole('status')).toHaveTextContent('正在加载真实行情')
   })
 
   test('saves a prediction snapshot from a ready analysis', async () => {

@@ -13,6 +13,13 @@ const snapshot: MarketSnapshot = {
 const renderChart = () => render(<ChartWorkspace snapshot={snapshot} />)
 
 describe('ChartWorkspace', () => {
+  test('shows loading feedback before chart data arrives', () => {
+    render(<ChartWorkspace snapshot={null} status="loading" />)
+
+    expect(screen.getByRole('status')).toHaveTextContent('正在加载真实行情')
+    expect(screen.queryByText('真实行情暂不可用')).not.toBeInTheDocument()
+  })
+
   test('exposes the redesigned chart workspace regions', () => {
     const { container } = renderChart()
 

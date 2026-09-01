@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import type { Candle, MarketSnapshot } from '../workspace/stock-workspace-types'
+import type { WorkspaceStatus } from '../workspace/stock-workspace-types'
+import { MarketFeedback, MarketLoadingState } from '../workspace/market-state'
 import { ChartAnnotationStore, type ChartAnnotation, type ChartTool } from './chart-annotation-store'
 import { ChartLayerPanel, type ChartLayerState } from './chart-layer-panel'
 import { ChartToolbar } from './chart-toolbar'
@@ -63,7 +65,7 @@ function priceText(value: number) {
   return value.toFixed(2)
 }
 
-export function ChartWorkspace({ snapshot }: { snapshot?: MarketSnapshot | null }) {
+export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRetry }: { snapshot?: MarketSnapshot | null; status?: WorkspaceStatus; errorMessage?: string | null; onRetry?: () => void }) {
   const [activeTool, setActiveTool] = useState<ChartTool>('pointer')
   const [activePeriod, setActivePeriod] = useState<ChartPeriod>('day')
   const [indicators, setIndicators] = useState<Record<IndicatorKey, boolean>>({ ma5: true, ma10: true, ma20: true, boll: true })
@@ -211,11 +213,14 @@ export function ChartWorkspace({ snapshot }: { snapshot?: MarketSnapshot | null 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activePeriod, snapshot?.quote.security.code])
   if (!snapshot || !sourceCandles.length) {
+    if (!snapshot && (status === 'loading' || status === 'refreshing')) return <MarketLoadingState variant="chart" />
+    if (!snapshot && status === 'error') return <section className="sc-chart-error-state"><MarketFeedback errorMessage={errorMessage} onRetry={onRetry} status={status} /></section>
     return <section className="sc-live-empty" aria-live="polite"><p className="sc-eyebrow">K 线 · 真实行情</p><h1>真实行情暂不可用</h1><p>没有收到可绘制的 K 线数据，请检查阿里云行情服务。</p></section>
   }
 
   return (
     <section className="sc-kline-workspace">
+      <MarketFeedback errorMessage={errorMessage} hasSnapshot onRetry={onRetry} status={status} />
       <header className="sc-kline-header sc-kline-summary">
         <div>
           <p className="sc-eyebrow">价格结构 · 多周期观察</p>
