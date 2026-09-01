@@ -191,3 +191,25 @@
   .sc-rule-card { padding: 14px; }
   .sc-rule-card-actions > * { flex: 1; text-align: center; }
 }
+
+/* Final scale overrides follow the baseline page rules so every workspace shares the same readable rhythm. */
+.sc-live-card-heading h2 { font-size: 19px; }
+.sc-live-card-heading span { font-size: 12px; }
+.sc-live-metrics dt { font-size: 12px; }
+.sc-live-metrics dd { font-size: 17px; }
+.sc-live-actions a { min-height: 42px; font-size: 13px; line-height: 42px; }
+.sc-rules-header h1 { font-size: 28px; }
+.sc-rules-header p:last-child { font-size: 14px; }
+.sc-rules-overview span { font-size: 12px; }
+.sc-rules-overview strong { font-size: 24px; }
+.sc-rule-editor label { font-size: 13px; }
+.sc-rule-editor input, .sc-rule-editor textarea { font-size: 14px; }
+.sc-rule-card-main h2 { font-size: 16px; }
+.sc-rule-card-main p { font-size: 13px; }
+.sc-rule-status, .sc-rule-toggle, .sc-rule-publish, .sc-rule-detail-button { font-size: 12px; }
+.sc-rules-empty { font-size: 14px; }
+
+@media (max-width: 640px) {
+  .sc-rules-header h1 { font-size: 22px; }
+  .sc-live-metrics dd { font-size: 15px; }
+}
