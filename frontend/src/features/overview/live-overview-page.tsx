@@ -25,7 +25,7 @@ export function LiveOverviewPage({ snapshot: providedSnapshot, status: providedS
     if (status === 'error') {
       return <section className="sc-live-error-state"><p className="sc-eyebrow">真实行情 · 阿里云后端</p><h1>真实行情暂不可用</h1><MarketFeedback errorMessage={errorMessage} onRetry={retry} status={status} /><Link className="sc-link" href="/chart">进入 K 线工作区 →</Link></section>
     }
-    return <section className="sc-live-empty" aria-live="polite"><p className="sc-eyebrow">真实行情 · 阿里云后端</p><h1>真实行情暂不可用</h1><p>{errorMessage ?? (status === 'loading' ? '正在从行情服务加载数据。' : '请检查阿里云行情服务和行情 API 配置。')}</p><Link className="sc-link" href="/chart">进入 K 线工作区 →</Link></section>
+    return <section className="sc-live-empty" aria-live="polite"><p className="sc-eyebrow">真实行情 · 阿里云后端</p><h1>真实行情暂不可用</h1><p>{errorMessage ?? '请检查阿里云行情服务和行情 API 配置。'}</p><Link className="sc-link" href="/chart">进入 K 线工作区 →</Link></section>
   }
 
   const change = snapshot.quote.previousClose ? snapshot.quote.price - snapshot.quote.previousClose : null
