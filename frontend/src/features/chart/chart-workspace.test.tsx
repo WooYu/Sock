@@ -1,7 +1,7 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, test } from 'vitest'
-import { ChartWorkspace } from './chart-workspace'
+import { ChartWorkspace, aggregateCandles } from './chart-workspace'
 import type { MarketSnapshot } from '../workspace/stock-workspace-types'
 
 const snapshot: MarketSnapshot = {
@@ -74,6 +74,28 @@ describe('ChartWorkspace', () => {
     await userEvent.click(screen.getByRole('tab', { name: '周线' }))
     expect(screen.getByRole('tab', { name: '周线' })).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByRole('tab', { name: '日线' })).toHaveAttribute('aria-selected', 'false')
+  })
+
+  test('aggregates weekly and monthly candles on calendar boundaries', () => {
+    const candles = [
+      { day: '2026-08-28', open: 10, high: 12, low: 9, close: 11, volume: 1 },
+      { day: '2026-08-31', open: 11, high: 13, low: 10, close: 12, volume: 2 },
+      { day: '2026-09-01', open: 12, high: 14, low: 11, close: 13, volume: 3 },
+    ]
+
+    expect(aggregateCandles(candles, 'week')).toHaveLength(2)
+    expect(aggregateCandles(candles, 'month')).toHaveLength(2)
+    expect(aggregateCandles(candles, 'week')[1]).toMatchObject({ day: '2026-08-31', open: 11, close: 13, volume: 5 })
+  })
+
+  test('follows the pointer with a crosshair data tooltip', async () => {
+    renderChart()
+    await userEvent.click(screen.getByRole('button', { name: '十字光标' }))
+    fireEvent.pointerMove(screen.getByRole('img', { name: 'K线主图' }), { clientX: 420, clientY: 180 })
+
+    expect(screen.getByTestId('crosshair-layer')).toBeInTheDocument()
+    expect(screen.getByTestId('crosshair-tooltip')).toHaveTextContent('开')
+    expect(screen.getByTestId('crosshair-tooltip')).toHaveTextContent('BOLL')
   })
 
   test('toggles indicators independently', async () => {

@@ -18,11 +18,14 @@ const periods: Array<[ChartPeriod, string]> = [['day', '日线'], ['week', '周�
 const indicatorOptions: Array<[IndicatorKey, string]> = [['ma5', 'MA5'], ['ma10', 'MA10'], ['ma20', 'MA20'], ['boll', 'BOLL']]
 const indicatorColors: Record<IndicatorKey, string> = { ma5: '#d6a12a', ma10: '#4e9bd6', ma20: '#a46ee8', boll: '#6f7fd8' }
 
-function aggregateCandles(candles: Candle[], period: ChartPeriod) {
-  const groupSize = period === 'day' ? 1 : period === 'week' ? 5 : 20
+export function aggregateCandles(candles: Candle[], period: ChartPeriod) {
   const groups: Candle[] = []
-  for (let index = 0; index < candles.length; index += groupSize) {
-    const group = candles.slice(index, index + groupSize)
+  const buckets = new Map<string, Candle[]>()
+  for (const candle of candles) {
+    const key = candlePeriodKey(candle.day, period)
+    buckets.set(key, [...(buckets.get(key) ?? []), candle])
+  }
+  for (const group of buckets.values()) {
     if (!group.length) continue
     groups.push({
       day: group[0].day,
@@ -34,6 +37,15 @@ function aggregateCandles(candles: Candle[], period: ChartPeriod) {
     })
   }
   return groups
+}
+
+function candlePeriodKey(day: string, period: ChartPeriod) {
+  if (period === 'day') return day
+  if (period === 'month') return day.slice(0, 7)
+  const [year, month, dateOfMonth] = day.split('-').map(Number)
+  const date = new Date(Date.UTC(year, month - 1, dateOfMonth))
+  date.setUTCDate(date.getUTCDate() - ((date.getUTCDay() + 6) % 7))
+  return date.toISOString().slice(0, 10)
 }
 
 function movingAverage(candles: Candle[], size: number) {
@@ -71,6 +83,7 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
   const [indicators, setIndicators] = useState<Record<IndicatorKey, boolean>>({ ma5: true, ma10: true, ma20: true, boll: true })
   const [zoom, setZoom] = useState(100)
   const [crosshair, setCrosshair] = useState(false)
+  const [crosshairPoint, setCrosshairPoint] = useState<{ x: number; y: number } | null>(null)
   const [layers, setLayers] = useState<ChartLayerState>({ keyLevels: true, annotations: true })
   const [annotations, setAnnotations] = useState<ChartAnnotation[]>([])
   const [syncStatus, setSyncStatus] = useState<'本机保存' | '同步中' | '已同步' | '待同步'>('本机保存')
@@ -125,9 +138,14 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
     event.currentTarget.releasePointerCapture?.(event.pointerId)
   }
 
+  const handleChartPointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
+    if (crosshair) setCrosshairPoint(chartPoint(event))
+  }
+
   const resetView = () => {
     setZoom(100)
     setCrosshair(false)
+    setCrosshairPoint(null)
   }
 
   const chartLeft = 58
@@ -149,6 +167,9 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
   const minPrice = Math.min(...values, lastClose) - 0.25
   const xForIndex = (index: number) => chartLeft + ((index + 0.5) / Math.max(candles.length, 1)) * chartWidth
   const yForValue = (value: number) => chartTop + ((maxPrice - value) / (maxPrice - minPrice)) * chartHeight
+  const crosshairIndex = crosshairPoint ? Math.max(0, Math.min(candles.length - 1, Math.floor(((crosshairPoint.x - chartLeft) / chartWidth) * candles.length))) : null
+  const crosshairCandle = crosshairIndex === null ? null : candles[crosshairIndex]
+  const crosshairPrice = crosshairPoint ? maxPrice - ((crosshairPoint.y - chartTop) / chartHeight) * (maxPrice - minPrice) : null
 
   const workspaceSnapshot: ChartWorkspaceSnapshot = {
     version: 1,
@@ -291,7 +312,7 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
             </div>
             <div className="sc-kline-chart-scroll">
               <div className="sc-kline-chart-surface" data-zoom={zoom} style={{ width: `${zoom}%` }}>
-                <svg aria-label="K线主图" className="sc-kline-svg" onClick={createPointAnnotation} onPointerDown={handleChartPointerDown} onPointerUp={handleChartPointerUp} role="img" viewBox="0 0 960 430">
+                <svg aria-label="K线主图" className="sc-kline-svg" onClick={createPointAnnotation} onPointerDown={handleChartPointerDown} onPointerMove={handleChartPointerMove} onPointerUp={handleChartPointerUp} role="img" viewBox="0 0 960 430">
                   <rect fill="#fbfcff" height="430" width="960" x="0" y="0" />
                   <g className="sc-kline-grid">
                     {[0, 1, 2, 3, 4].map((line) => <line key={`h-${line}`} x1={chartLeft} x2={chartLeft + chartWidth} y1={chartTop + line * (chartHeight / 4)} y2={chartTop + line * (chartHeight / 4)} />)}
@@ -316,7 +337,7 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
                   {layers.keyLevels && <g data-testid="key-level-layer">{keyLevels.map((price, index) => <g key={price}><line className="sc-key-level-line" x1={chartLeft} x2={chartLeft + chartWidth} y1={yForValue(price)} y2={yForValue(price)} /><text className="sc-key-level-label" x={chartLeft + chartWidth - 78} y={yForValue(price) - 5}>{index === 0 ? '近20日高点' : '近20日低点'} {priceText(price)}</text></g>)}</g>}
                   <g className="sc-volume-bars">{candles.map((candle, index) => <rect key={index} height={Math.max(3, (candle.volume / Math.max(...candles.map((item) => item.volume))) * volumeHeight)} width={Math.max(5, Math.min(14, chartWidth / candles.length * 0.56))} x={xForIndex(index) - 5} y={volumeTop + volumeHeight - Math.max(3, (candle.volume / Math.max(...candles.map((item) => item.volume))) * volumeHeight)} />)}</g>
                   <text className="sc-volume-label" x={chartLeft} y={volumeTop + volumeHeight + 23}>成交量</text>
-                  {crosshair && <g data-testid="crosshair-layer"><line className="sc-crosshair" x1={xForIndex(Math.max(0, candles.length - 4))} x2={xForIndex(Math.max(0, candles.length - 4))} y1={chartTop} y2={volumeTop + volumeHeight} /><line className="sc-crosshair" x1={chartLeft} x2={chartLeft + chartWidth} y1={yForValue(lastClose)} y2={yForValue(lastClose)} /></g>}
+                  {crosshair && crosshairPoint && crosshairCandle && crosshairPrice !== null && <g data-testid="crosshair-layer"><line className="sc-crosshair" x1={xForIndex(crosshairIndex ?? 0)} x2={xForIndex(crosshairIndex ?? 0)} y1={chartTop} y2={volumeTop + volumeHeight} /><line className="sc-crosshair" x1={chartLeft} x2={chartLeft + chartWidth} y1={yForValue(crosshairPrice)} y2={yForValue(crosshairPrice)} /><g data-testid="crosshair-tooltip"><rect fill="#17213c" height="66" opacity="0.94" rx="5" width="188" x={Math.min(chartLeft + chartWidth - 190, Math.max(chartLeft + 6, xForIndex(crosshairIndex ?? 0) + 8))} y={chartTop + 8} /><text fill="#fff" fontSize="11" x={Math.min(chartLeft + chartWidth - 182, Math.max(chartLeft + 14, xForIndex(crosshairIndex ?? 0) + 16))} y={chartTop + 26}>{crosshairCandle.day} · 开 {priceText(crosshairCandle.open)} 高 {priceText(crosshairCandle.high)}</text><text fill="#fff" fontSize="11" x={Math.min(chartLeft + chartWidth - 182, Math.max(chartLeft + 14, xForIndex(crosshairIndex ?? 0) + 16))} y={chartTop + 43}>低 {priceText(crosshairCandle.low)} 收 {priceText(crosshairCandle.close)} · 光标 {priceText(crosshairPrice)}</text><text fill="#dfe6ff" fontSize="10" x={Math.min(chartLeft + chartWidth - 182, Math.max(chartLeft + 14, xForIndex(crosshairIndex ?? 0) + 16))} y={chartTop + 58}>MA5 {priceText(movingAverages.ma5[crosshairIndex ?? 0])} · BOLL {priceText(boll.middle[crosshairIndex ?? 0])}</text></g></g>}
                 </svg>
                 {layers.annotations && annotations.map((annotation) => <div className="sc-kline-annotation" data-testid={`annotation-${annotation.kind}`} key={annotation.id} style={{ left: annotation.start.x, top: annotation.start.y, width: (annotation.end?.x ?? annotation.start.x) - annotation.start.x, height: (annotation.end?.y ?? annotation.start.y) - annotation.start.y }} />)}
               </div>

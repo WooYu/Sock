@@ -1,6 +1,7 @@
 package com.stockcal.knowledge;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.nio.file.Path;
 import java.time.Instant;
@@ -70,5 +71,22 @@ class StructuredRuleWorkflowTest {
         workflow.updateSource(source.id(), "规则：收盘站上 MA20。");
 
         assertThat(workflow.drafts(null)).isEmpty();
+    }
+
+    @Test
+    void rejectsPublicationWhenAnApprovedRuleHasNoComputableConditions() {
+        var extractor = (KnowledgeExtractor) source -> List.of(new KnowledgeDraft(
+            "draft-empty", source.id(), KnowledgeKind.RULE, "无条件规则", "只有描述", "只有描述",
+            1, 1, ExtractionMethod.AI, ApprovalStatus.PENDING, null, null,
+            List.of(), "ENTER", "BASE_GRANVILLE", "日线", 10, List.of(), List.of(), "PRINCIPLE"
+        ));
+        var workflow = new KnowledgeWorkflow(new InMemoryKnowledgeRepository(), extractor, Instant::now);
+        var source = workflow.importNote(Path.of("空条件.md"), "只有描述");
+        var draft = workflow.extract(source.id()).getFirst();
+        workflow.approve(draft.id(), "user-1");
+
+        assertThatThrownBy(() -> workflow.publishRule(draft.id()))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("条件");
     }
 }

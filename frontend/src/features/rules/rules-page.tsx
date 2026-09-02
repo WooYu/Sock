@@ -8,7 +8,8 @@ import { RecordSyncButton } from '../records/record-sync-button'
 import { builtInRules } from './default-rules'
 import { MarkdownImportPanel } from './markdown-import-panel'
 import { KnowledgeReviewPanel } from './knowledge-review-panel'
-import { getPublishedKnowledgeRules } from '@/lib/api/knowledge-client'
+import { getPublishedKnowledgeRules, togglePublishedKnowledgeRule, type PublishedKnowledgeRule } from '@/lib/api/knowledge-client'
+import type { RuleCondition } from '../workspace/stock-workspace-types'
 
 export type RuleRecord = {
   id: string
@@ -21,9 +22,17 @@ export type RuleRecord = {
   action?: string
   timeframe?: string
   priority?: number
+  conditions?: RuleCondition[]
 }
 
-export function RulesPage({ initialRules = [] }: { initialRules?: RuleRecord[] }) {
+export type RulesClient = {
+  list: () => Promise<PublishedKnowledgeRule[]>
+  toggle: (id: string, enabled: boolean) => Promise<Pick<PublishedKnowledgeRule, 'enabled'>>
+}
+
+const defaultClient: RulesClient = { list: getPublishedKnowledgeRules, toggle: togglePublishedKnowledgeRule }
+
+export function RulesPage({ initialRules = [], client = defaultClient }: { initialRules?: RuleRecord[]; client?: RulesClient }) {
   const [rules, setRules] = useState(() => initialRules.length ? initialRules : initialRulesWithBuiltIns())
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState('')
@@ -36,7 +45,7 @@ export function RulesPage({ initialRules = [] }: { initialRules?: RuleRecord[] }
 
   useEffect(() => {
     let active = true
-    void getPublishedKnowledgeRules().then((remoteRules) => {
+    void client.list().then((remoteRules) => {
       if (!active || !remoteRules.length) return
       const remote = remoteRules.map((rule) => ({
         id: String(rule.id),
@@ -49,16 +58,28 @@ export function RulesPage({ initialRules = [] }: { initialRules?: RuleRecord[] }
         timeframe: typeof rule.timeframe === 'string' ? rule.timeframe : undefined,
       }))
       setRules(remote)
-      setEnabledRules(Object.fromEntries(remote.map((rule) => [rule.id, true])))
+      setEnabledRules(Object.fromEntries(remoteRules.map((rule) => [String(rule.id), rule.enabled !== false])))
     }).catch(() => undefined)
     return () => { active = false }
-  }, [])
+  }, [client])
 
-  const toggleRule = (rule: RuleRecord) => {
-    setEnabledRules((current) => ({ ...current, [rule.id]: !(current[rule.id] ?? rule.status === 'published') }))
+  const toggleRule = async (rule: RuleRecord) => {
+    const enabled = !(enabledRules[rule.id] ?? rule.status === 'published')
+    try {
+      const updated = await client.toggle(rule.id, enabled)
+      setEnabledRules((current) => ({ ...current, [rule.id]: updated.enabled }))
+      setMessage(updated.enabled ? '规则已启用并参与分析' : '规则已停用，不再参与分析')
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : '规则状态保存失败')
+    }
   }
 
   const publish = (id: string) => {
+    const draft = rules.find((item) => item.id === id)
+    if (!draft?.conditions?.length) {
+      setMessage('规则缺少可计算条件，请通过知识导入并审核后发布')
+      return
+    }
     const next = rules.map((item) => item.id === id ? { ...item, status: 'published' as const } : item)
     const published = next.find((item) => item.id === id)
     saveRecords('rules', next)
@@ -139,7 +160,7 @@ export function RulesPage({ initialRules = [] }: { initialRules?: RuleRecord[] }
             {rule.status === 'published' && (rule.timeframe || rule.mode) ? <p className="mt-1 text-xs text-[var(--sc-muted)]">{enabledRules[rule.id] ? '已启用' : '未启用'}{rule.timeframe ? ` · ${rule.timeframe}` : ''}{rule.mode ? ` · ${rule.mode}` : ''}</p> : null}
           </div>
           <div className="sc-rule-card-actions">
-            {rule.status === 'published' ? <><span className="sc-rule-status published">已发布</span><button aria-label={`${enabledRules[rule.id] ? '停用' : '启用'}规则 ${rule.title}`} aria-pressed={enabledRules[rule.id] ?? true} className={`sc-rule-toggle ${enabledRules[rule.id] ? 'enabled' : ''}`} onClick={() => toggleRule(rule)} type="button">{enabledRules[rule.id] ? '已启用' : '已停用'}</button></> : <button className="sc-rule-publish" onClick={() => publish(rule.id)} type="button" aria-label={`发布${rule.title}`}>发布</button>}
+            {rule.status === 'published' ? <><span className="sc-rule-status published">已发布</span><button aria-label={`${enabledRules[rule.id] ? '停用' : '启用'}规则 ${rule.title}`} aria-pressed={enabledRules[rule.id] ?? true} className={`sc-rule-toggle ${enabledRules[rule.id] ? 'enabled' : ''}`} onClick={() => void toggleRule(rule)} type="button">{enabledRules[rule.id] ? '已启用' : '已停用'}</button></> : <button className="sc-rule-publish" onClick={() => publish(rule.id)} type="button" aria-label={`发布${rule.title}`}>发布</button>}
             <button aria-label={`查看规则详情 ${rule.title}`} className="sc-rule-detail-button" onClick={() => setSelectedRule(rule)} type="button">查看详情</button>
           </div>
         </article>)}

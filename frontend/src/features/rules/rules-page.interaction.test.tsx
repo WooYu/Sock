@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, test } from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { RulesPage } from './rules-page'
 
 describe('RulesPage interactions', () => {
@@ -22,7 +22,7 @@ describe('RulesPage interactions', () => {
     expect(screen.getByText('破位5日线不做')).toBeInTheDocument()
   })
 
-  test('creates a draft and publishes it from the rule workspace', async () => {
+  test('creates a draft but prevents publishing without computable conditions', async () => {
     const user = userEvent.setup()
     render(<RulesPage />)
 
@@ -34,12 +34,12 @@ describe('RulesPage interactions', () => {
     expect(screen.getByText('回踩 MA5 不追高')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '发布回踩 MA5 不追高' }))
 
-    expect(screen.getByRole('status')).toHaveTextContent('规则已发布')
+    expect(screen.getByRole('status')).toHaveTextContent('缺少可计算条件')
   })
 
   test('toggles a rule and opens its detail panel', async () => {
     const user = userEvent.setup()
-    render(<RulesPage />)
+    render(<RulesPage client={{ list: async () => [], toggle: async (_id, enabled) => ({ enabled }) }} />)
 
     const toggle = screen.getByRole('button', { name: '停用规则 5日线上方优先参与' })
     expect(toggle).toHaveAttribute('aria-pressed', 'true')
@@ -48,5 +48,16 @@ describe('RulesPage interactions', () => {
 
     await user.click(screen.getByRole('button', { name: '查看规则详情 5日线上方优先参与' }))
     expect(screen.getByRole('dialog', { name: '规则详情 5日线上方优先参与' })).toBeInTheDocument()
+  })
+
+  test('persists a published rule enablement change before showing it as active', async () => {
+    const user = userEvent.setup()
+    const toggle = vi.fn(async (_id: string, enabled: boolean) => ({ enabled }))
+    render(<RulesPage client={{ list: async () => [], toggle }} />)
+
+    await user.click(screen.getByRole('button', { name: '停用规则 5日线上方优先参与' }))
+
+    expect(toggle).toHaveBeenCalledWith('builtin-5ma-priority', false)
+    expect(screen.getByRole('button', { name: '启用规则 5日线上方优先参与' })).toHaveAttribute('aria-pressed', 'false')
   })
 })
