@@ -19,14 +19,14 @@ export const browserMarketClient: BrowserMarketClient = {
     const rules = await browserRequest<Array<Record<string, unknown>>>('/api/knowledge/rules', signal)
     return rules
       .filter((rule) => rule.enabled !== false)
-      .map(toDecisionRule)
-      .filter((rule) => (rule.conditions?.length ?? 0) > 0)
+      .flatMap((rule) => toDecisionRule(rule) ?? [])
   },
 }
 
-function toDecisionRule(rule: Record<string, unknown>): DecisionRule {
+function toDecisionRule(rule: Record<string, unknown>): DecisionRule | null {
   const rawConditions = Array.isArray(rule.conditions) ? rule.conditions : []
-  const conditions = rawConditions.flatMap((item) => isRuleCondition(item) ? [item] : [])
+  if (!rawConditions.length || rawConditions.some((item) => !isRuleCondition(item))) return null
+  const conditions = rawConditions
   return {
     ruleId: String(rule.id),
     version: 1,
