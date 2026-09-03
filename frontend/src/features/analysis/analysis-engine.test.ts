@@ -102,4 +102,13 @@ describe('analyzeMarketSnapshot', () => {
     expect(result.decision.missingFacts).toContain('marketPanic')
     expect(result.matchedRules).toHaveLength(0)
   })
+
+  test('recalculates future indicators under the displayed flat-close baseline', () => {
+    const result = analyzeMarketSnapshot(snapshot(Array.from({ length: 30 }, (_, index) => 10 + index)), 'swing')
+
+    expect(result.future).toHaveLength(3)
+    expect(result.future[0].maValues['5']).toBeGreaterThan(28)
+    expect(result.future[1].maValues['5']).toBeGreaterThan(result.future[0].maValues['5'])
+    expect(result.future[2].bollMiddle).not.toBe(result.future[0].bollMiddle)
+  })
 })
