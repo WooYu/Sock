@@ -78,6 +78,15 @@ describe('analyzeMarketSnapshot', () => {
     expect(result.target).toBeNull()
   })
 
+  test('waits when opposing rules have different priorities', () => {
+    const rules: DecisionRule[] = [
+      { ruleId: 'enter', version: 1, name: '高优先级看多', action: 'ENTER', priority: 90, conditions: [{ field: 'closeAboveMa5', operator: 'equals', value: 1 }], evidence: [] },
+      { ruleId: 'exit', version: 1, name: '低优先级退出', action: 'EXIT', priority: 10, conditions: [{ field: 'closeAboveMa5', operator: 'equals', value: 1 }], evidence: [] },
+    ]
+
+    expect(analyzeMarketSnapshot(snapshot(Array.from({ length: 30 }, (_, i) => 10 + i * 0.5)), 'swing', rules).decision.action).toBe('WAIT')
+  })
+
   test('waits instead of matching a rule with unavailable facts', () => {
     const result = analyzeMarketSnapshot(snapshot(Array.from({ length: 30 }, (_, i) => 10 + i * 0.5)), 'swing', [{
       ruleId: 'market-state',
