@@ -94,10 +94,8 @@ function findConflict(rules: DecisionRule[]) {
   const bullish = rules.filter((rule) => rule.action === 'ENTER' || rule.action === 'HOLD')
   const bearish = rules.filter((rule) => rule.action === 'REDUCE' || rule.action === 'EXIT' || rule.action === 'AVOID')
   if (!bullish.length || !bearish.length) return null
-  const highestBullish = Math.max(...bullish.map((rule) => rule.priority))
-  const highestBearish = Math.max(...bearish.map((rule) => rule.priority))
   const names = [...bullish, ...bearish].sort((left, right) => right.priority - left.priority).map((rule) => rule.name)
-  return { names, blocking: Math.abs(highestBullish - highestBearish) <= 10 }
+  return { names, blocking: true }
 }
 
 function strategyMode(mode?: string): StrategyMode | undefined {
