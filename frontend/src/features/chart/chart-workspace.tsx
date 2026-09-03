@@ -94,6 +94,7 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
 
   const sourceCandles = useMemo(() => snapshot?.dailyCandles ?? [], [snapshot?.dailyCandles])
   const candles = useMemo(() => aggregateCandles(sourceCandles, activePeriod), [activePeriod, sourceCandles])
+  const scenarioCandles = useMemo(() => activePeriod === 'day' && candles.length ? Array.from({ length: 3 }, () => ({ close: candles[candles.length - 1].close })) : [], [activePeriod, candles])
   const movingAverages = useMemo(() => ({ ma5: movingAverage(candles, 5), ma10: movingAverage(candles, 10), ma20: movingAverage(candles, 20) }), [candles])
   const boll = useMemo(() => bollinger(candles), [candles])
   const keyLevels = useMemo(() => candles.length ? [Math.max(...candles.slice(-20).map((candle) => candle.high)), Math.min(...candles.slice(-20).map((candle) => candle.low))] : [], [candles])
@@ -178,6 +179,7 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
   const chartHeight = 300
   const volumeTop = 345
   const volumeHeight = 55
+  const displayedCandleCount = candles.length + scenarioCandles.length
   const currentPrice = snapshot?.quote.price ?? lastClose
   const values = [
     ...candles.flatMap((candle) => [candle.high, candle.low]),
@@ -189,7 +191,7 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
   ]
   const maxPrice = Math.max(...values, lastClose) + 0.25
   const minPrice = Math.min(...values, lastClose) - 0.25
-  const xForIndex = (index: number) => chartLeft + ((index + 0.5) / Math.max(candles.length, 1)) * chartWidth
+  const xForIndex = (index: number) => chartLeft + ((index + 0.5) / Math.max(displayedCandleCount, 1)) * chartWidth
   const yForValue = (value: number) => chartTop + ((maxPrice - value) / (maxPrice - minPrice)) * chartHeight
   const crosshairIndex = crosshairPoint ? Math.max(0, Math.min(candles.length - 1, Math.floor(((crosshairPoint.x - chartLeft) / chartWidth) * candles.length))) : null
   const crosshairCandle = crosshairIndex === null ? null : candles[crosshairIndex]
@@ -333,6 +335,7 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
                 {indicators.ma10 && <span><i style={{ background: indicatorColors.ma10 }} />MA10</span>}
                 {indicators.ma20 && <span><i style={{ background: indicatorColors.ma20 }} />MA20</span>}
                 {indicators.boll && <span><i style={{ background: indicatorColors.boll }} />BOLL</span>}
+                {scenarioCandles.length > 0 && <span><i className="sc-candle-scenario" />基准情景 K 线</span>}
               </div>
             <span className="sc-kline-data-badge">{snapshot.source.online ? '实时接口' : '行情缓存'}</span>
             </div>
@@ -353,9 +356,10 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
                       const openY = yForValue(candle.open)
                       const closeY = yForValue(candle.close)
                       const rising = candle.close >= candle.open
-                      return <g key={`${candle.day}-${index}`}><line className={rising ? 'sc-rise-stroke' : 'sc-fall-stroke'} x1={x} x2={x} y1={yForValue(candle.high)} y2={yForValue(candle.low)} /><rect className={rising ? 'sc-rise-fill' : 'sc-fall-fill'} height={Math.max(3, Math.abs(closeY - openY))} width={Math.max(5, Math.min(14, chartWidth / candles.length * 0.56))} x={x - 5} y={Math.min(openY, closeY)} /></g>
+                      return <g key={`${candle.day}-${index}`}><line className={rising ? 'sc-rise-stroke' : 'sc-fall-stroke'} x1={x} x2={x} y1={yForValue(candle.high)} y2={yForValue(candle.low)} /><rect className={rising ? 'sc-rise-fill' : 'sc-fall-fill'} height={Math.max(3, Math.abs(closeY - openY))} width={Math.max(5, Math.min(14, chartWidth / displayedCandleCount * 0.56))} x={x - 5} y={Math.min(openY, closeY)} /></g>
                     })}
                   </g>
+                  {scenarioCandles.length > 0 && <g data-testid="scenario-candlestick-layer"><line className="sc-scenario-divider" x1={xForIndex(candles.length) - 10} x2={xForIndex(candles.length) - 10} y1={chartTop} y2={volumeTop + volumeHeight} />{scenarioCandles.map((candle, index) => { const x = xForIndex(candles.length + index); const y = yForValue(candle.close); return <g key={`scenario-${index}`}><line className="sc-scenario-stroke" x1={x} x2={x} y1={y - 7} y2={y + 7} /><rect className="sc-scenario-fill" height="4" width={Math.max(5, Math.min(14, chartWidth / displayedCandleCount * 0.56))} x={x - 5} y={y - 2} /></g> })}<text className="sc-scenario-label" x={xForIndex(candles.length)} y={chartTop + 12}>基准</text></g>}
                   {indicators.ma5 && <path d={linePath(movingAverages.ma5, xForIndex, yForValue)} fill="none" stroke={indicatorColors.ma5} strokeWidth="2" />}
                   {indicators.ma10 && <path d={linePath(movingAverages.ma10, xForIndex, yForValue)} fill="none" stroke={indicatorColors.ma10} strokeWidth="2" />}
                   {indicators.ma20 && <path d={linePath(movingAverages.ma20, xForIndex, yForValue)} fill="none" stroke={indicatorColors.ma20} strokeWidth="2" />}
