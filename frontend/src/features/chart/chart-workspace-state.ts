@@ -37,6 +37,7 @@ export function deserializeChartWorkspace(raw: string): ChartWorkspaceSnapshot |
 }
 
 export function mergeChartWorkspace(local: ChartWorkspaceSnapshot, remote: ChartWorkspaceSnapshot): ChartWorkspaceSnapshot {
+  if (local.stockCode !== remote.stockCode || local.period !== remote.period) return local
   const drawings = new Map(local.drawings.map((drawing) => [drawing.id, drawing]))
   for (const drawing of remote.drawings) {
     const current = drawings.get(drawing.id)
