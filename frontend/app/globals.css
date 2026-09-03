@@ -2195,8 +2195,11 @@ footer p { margin: 0; }
 .sc-trade-label { fill: #4868ff; font-size: 10px; font-weight: 700; }
 .sc-crosshair { stroke: #8d95a6; stroke-dasharray: 3 3; stroke-width: 1; }
 .sc-kline-statusbar { display: flex; flex-wrap: wrap; gap: 16px; min-height: 34px; align-items: center; color: #9aa1ae; font-size: 9px; }
-.sc-kline-annotation { position: absolute; border: 2px solid #e0b95c; background: #fff8e933; pointer-events: none; }
-.sc-kline-chart-panel .sc-kline-chart-surface { position: relative; }
+.sc-chart-rectangle { fill: #fff8e955; stroke: #e0b95c; stroke-width: 2; }
+.sc-chart-trend-line { stroke: #4868ff; stroke-width: 2.5; }
+.sc-chart-horizontal-line { stroke: #e0b95c; stroke-dasharray: 6 4; stroke-width: 2; }
+.sc-chart-marker { fill: #4868ff; stroke: #fff; stroke-width: 2; }
+.sc-chart-marker-label, .sc-chart-note { fill: #35415e; font-size: 12px; font-weight: 700; paint-order: stroke; stroke: #fff; stroke-width: 3; }
 .sc-kline-add-annotation { width: fit-content; min-height: 31px; border: 1px dashed #aeb8ed; border-radius: 6px; background: #f8f9ff; padding: 4px 10px; color: #4868ff; font-size: 10px; font-weight: 700; }
 .sc-kline-layer-panel { padding: 13px; }
 .sc-kline-panel-heading legend { padding: 0; color: #3d4860; font-size: 13px; font-weight: 750; }
