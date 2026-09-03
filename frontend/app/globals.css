@@ -2202,6 +2202,8 @@ footer p { margin: 0; }
 .sc-chart-marker-label, .sc-chart-note { fill: #35415e; font-size: 12px; font-weight: 700; paint-order: stroke; stroke: #fff; stroke-width: 3; }
 .sc-kline-annotation-editor { display: flex; align-items: center; justify-content: space-between; gap: 10px; border-top: 1px solid #edf0f4; padding: 10px 0; color: #68738a; font-size: 11px; }
 .sc-kline-annotation-editor button { min-height: 30px; border: 1px solid #f0c8ce; border-radius: 6px; background: #fff7f8; padding: 4px 9px; color: #c74652; font-size: 11px; font-weight: 700; }
+.sc-kline-annotation-editor input { min-width: 0; flex: 1; min-height: 30px; border: 1px solid #dfe3ed; border-radius: 6px; padding: 4px 8px; color: #35415e; font-size: 12px; }
+@media (max-width: 640px) { .sc-kline-annotation-editor { flex-wrap: wrap; }.sc-kline-annotation-editor input { flex-basis: 100%; width: 100%; } }
 .sc-kline-add-annotation { width: fit-content; min-height: 31px; border: 1px dashed #aeb8ed; border-radius: 6px; background: #f8f9ff; padding: 4px 10px; color: #4868ff; font-size: 10px; font-weight: 700; }
 .sc-kline-layer-panel { padding: 13px; }
 .sc-kline-panel-heading legend { padding: 0; color: #3d4860; font-size: 13px; font-weight: 750; }
