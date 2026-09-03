@@ -190,14 +190,15 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
   useEffect(() => {
     if (!snapshot) return
     const saved = loadChartWorkspace(snapshot.quote.security.code, activePeriod)
-    if (!saved) return
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setAnnotations(saved.drawings as ChartAnnotation[])
-    store.current.replace(saved.drawings as ChartAnnotation[])
-    setIndicators(saved.indicators as Record<IndicatorKey, boolean>)
-    setLayers(saved.layers as ChartLayerState)
-    setZoom(saved.view.zoom)
-    setCrosshair(saved.crosshair)
+    setAnnotations(saved?.drawings as ChartAnnotation[] ?? [])
+    store.current.replace(saved?.drawings as ChartAnnotation[] ?? [])
+    if (saved) {
+      setIndicators(saved.indicators as Record<IndicatorKey, boolean>)
+      setLayers(saved.layers as ChartLayerState)
+      setZoom(saved.view.zoom)
+      setCrosshair(saved.crosshair)
+    }
   }, [activePeriod, snapshot])
 
   useEffect(() => {
