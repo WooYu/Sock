@@ -108,6 +108,19 @@ describe('ChartWorkspace', () => {
     expect(screen.getByText('突破后观察')).toBeInTheDocument()
   })
 
+  test('moves a selected annotation with the pointer tool', async () => {
+    const { container } = renderChart()
+    await userEvent.click(screen.getByRole('button', { name: '矩形' }))
+    await userEvent.click(screen.getByRole('button', { name: '添加矩形标注' }))
+    await userEvent.click(screen.getByRole('button', { name: '指针' }))
+    const annotation = screen.getAllByTestId('annotation-rectangle').at(-1)!
+    fireEvent.pointerDown(annotation, { pointerId: 1, clientX: 20, clientY: 20 })
+    fireEvent.pointerMove(screen.getByRole('img', { name: 'K线主图' }), { pointerId: 1, clientX: 60, clientY: 50 })
+    fireEvent.pointerUp(screen.getByRole('img', { name: 'K线主图' }), { pointerId: 1, clientX: 60, clientY: 50 })
+
+    expect([...container.querySelectorAll('svg [data-testid="annotation-rectangle"] rect')].at(-1)).toHaveAttribute('x', '60')
+  })
+
   test('switches the active K-line period', async () => {
     renderChart()
     await userEvent.click(screen.getByRole('tab', { name: '周线' }))
