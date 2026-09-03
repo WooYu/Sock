@@ -113,7 +113,7 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
 
   const createPointAnnotation = (event: ReactPointerEvent<SVGSVGElement>) => {
     const point = chartPoint(event)
-    if (activeTool === 'pointer' || activeTool === 'trend-line' || activeTool === 'rectangle' || activeTool === 'marker') return
+    if (activeTool === 'pointer' || activeTool === 'trend-line' || activeTool === 'rectangle') return
     const next = store.current.create({
       id: `${activeTool}-${Date.now()}`,
       kind: activeTool,
@@ -338,8 +338,18 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
                   <g className="sc-volume-bars">{candles.map((candle, index) => <rect key={index} height={Math.max(3, (candle.volume / Math.max(...candles.map((item) => item.volume))) * volumeHeight)} width={Math.max(5, Math.min(14, chartWidth / candles.length * 0.56))} x={xForIndex(index) - 5} y={volumeTop + volumeHeight - Math.max(3, (candle.volume / Math.max(...candles.map((item) => item.volume))) * volumeHeight)} />)}</g>
                   <text className="sc-volume-label" x={chartLeft} y={volumeTop + volumeHeight + 23}>成交量</text>
                   {crosshair && crosshairPoint && crosshairCandle && crosshairPrice !== null && <g data-testid="crosshair-layer"><line className="sc-crosshair" x1={xForIndex(crosshairIndex ?? 0)} x2={xForIndex(crosshairIndex ?? 0)} y1={chartTop} y2={volumeTop + volumeHeight} /><line className="sc-crosshair" x1={chartLeft} x2={chartLeft + chartWidth} y1={yForValue(crosshairPrice)} y2={yForValue(crosshairPrice)} /><g data-testid="crosshair-tooltip"><rect fill="#17213c" height="66" opacity="0.94" rx="5" width="188" x={Math.min(chartLeft + chartWidth - 190, Math.max(chartLeft + 6, xForIndex(crosshairIndex ?? 0) + 8))} y={chartTop + 8} /><text fill="#fff" fontSize="11" x={Math.min(chartLeft + chartWidth - 182, Math.max(chartLeft + 14, xForIndex(crosshairIndex ?? 0) + 16))} y={chartTop + 26}>{crosshairCandle.day} · 开 {priceText(crosshairCandle.open)} 高 {priceText(crosshairCandle.high)}</text><text fill="#fff" fontSize="11" x={Math.min(chartLeft + chartWidth - 182, Math.max(chartLeft + 14, xForIndex(crosshairIndex ?? 0) + 16))} y={chartTop + 43}>低 {priceText(crosshairCandle.low)} 收 {priceText(crosshairCandle.close)} · 光标 {priceText(crosshairPrice)}</text><text fill="#dfe6ff" fontSize="10" x={Math.min(chartLeft + chartWidth - 182, Math.max(chartLeft + 14, xForIndex(crosshairIndex ?? 0) + 16))} y={chartTop + 58}>MA5 {priceText(movingAverages.ma5[crosshairIndex ?? 0])} · BOLL {priceText(boll.middle[crosshairIndex ?? 0])}</text></g></g>}
+                  {layers.annotations && annotations.map((annotation) => {
+                    const end = annotation.end ?? annotation.start
+                    const label = annotation.kind === 'buy' ? '买' : annotation.kind === 'sell' ? '卖' : annotation.kind === 'target' ? '目标' : annotation.kind === 'stop-loss' ? '止损' : ''
+                    return <g data-testid={\`annotation-\${annotation.kind}\`} key={annotation.id}>
+                      {annotation.kind === 'rectangle' && <rect className="sc-chart-rectangle" height={Math.abs(end.y - annotation.start.y)} width={Math.abs(end.x - annotation.start.x)} x={Math.min(annotation.start.x, end.x)} y={Math.min(annotation.start.y, end.y)} />}
+                      {annotation.kind === 'trend-line' && <line className="sc-chart-trend-line" x1={annotation.start.x} x2={end.x} y1={annotation.start.y} y2={end.y} />}
+                      {annotation.kind === 'horizontal-line' && <line className="sc-chart-horizontal-line" x1={chartLeft} x2={chartLeft + chartWidth} y1={annotation.start.y} y2={annotation.start.y} />}
+                      {annotation.kind === 'text' && <text className="sc-chart-note" x={annotation.start.x} y={annotation.start.y}>{annotation.text ?? '文字备注'}</text>}
+                      {!['rectangle', 'trend-line', 'horizontal-line', 'text'].includes(annotation.kind) && <><circle className="sc-chart-marker" cx={annotation.start.x} cy={annotation.start.y} r="8" /><text className="sc-chart-marker-label" x={annotation.start.x + 11} y={annotation.start.y + 4}>{label || '标记'}</text></>}
+                    </g>
+                  })}
                 </svg>
-                {layers.annotations && annotations.map((annotation) => <div className="sc-kline-annotation" data-testid={`annotation-${annotation.kind}`} key={annotation.id} style={{ left: annotation.start.x, top: annotation.start.y, width: (annotation.end?.x ?? annotation.start.x) - annotation.start.x, height: (annotation.end?.y ?? annotation.start.y) - annotation.start.y }} />)}
               </div>
             </div>
             <div className="sc-kline-statusbar"><span>共 {candles.length} 根 K 线</span><span>当前周期：{periods.find(([period]) => period === activePeriod)?.[1]}</span><span>数据源：{snapshot.source.name}</span><span>{getAuthorizationHeader() ? syncStatus : '本机保存 · 登录后跨设备同步'}</span></div>
