@@ -26,4 +26,11 @@ describe('chart workspace state', () => {
     expect(merged.drawings.map((drawing) => drawing.id)).toEqual(['local', 'remote'])
     expect(merged.view.zoom).toBe(120)
   })
+  test('never merges drawings from another stock or period', () => {
+    const otherStock = { ...local, stockCode: '000001', drawings: [{ id: 'wrong-stock', kind: 'marker' as const, start: { x: 1, y: 2 } }] }
+    const otherPeriod = { ...local, period: 'week' as const, drawings: [{ id: 'wrong-period', kind: 'marker' as const, start: { x: 1, y: 2 } }] }
+
+    expect(mergeChartWorkspace(local, otherStock)).toEqual(local)
+    expect(mergeChartWorkspace(local, otherPeriod)).toEqual(local)
+  })
 })
