@@ -71,7 +71,7 @@ export function analyzeMarketSnapshot(market: MarketSnapshot, cycle: OperationCy
     directionStrength: action === 'WAIT' ? 0 : topRule?.score ?? 0,
     matchedRules,
     ruleEvaluations,
-    future: buildFuture(candles, cycle, ma5, ma20, currentBoll),
+    future: buildFuture(candles, cycle),
     decision,
   }
 }
@@ -122,13 +122,17 @@ function bollinger(candles: Candle[], period: number) {
   return { middle, upper: middle + deviation * 2, lower: middle - deviation * 2 }
 }
 
-function buildFuture(candles: Candle[], cycle: OperationCycle, ma5: number, ma20: number, boll: { upper: number; middle: number; lower: number }) {
+function buildFuture(candles: Candle[], cycle: OperationCycle) {
   const sessions = cycle === 'short' ? 1 : cycle === 'long' ? 5 : 3
   const result: StockAnalysis['future'] = []
+  const projectedCandles = [...candles]
+  const latest = candles[candles.length - 1]
   let day = new Date(candles[candles.length - 1].day)
   for (let index = 0; index < sessions; index += 1) {
     day = nextWeekday(day)
-    result.push({ day: day.toISOString(), maValues: { '5': ma5, '20': ma20 }, bollUpper: boll.upper, bollMiddle: boll.middle, bollLower: boll.lower })
+    projectedCandles.push({ ...latest, day: day.toISOString(), open: latest.close, high: latest.close, low: latest.close, close: latest.close, volume: 0 })
+    const boll = bollinger(projectedCandles, 20)
+    result.push({ day: day.toISOString(), maValues: { '5': sma(projectedCandles, 5), '20': sma(projectedCandles, 20) }, bollUpper: boll.upper, bollMiddle: boll.middle, bollLower: boll.lower })
   }
   return result
 }
