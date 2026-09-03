@@ -69,6 +69,23 @@ describe('ChartWorkspace', () => {
     expect(screen.getByTestId('annotation-buy')).toBeInTheDocument()
   })
 
+  test('creates a marker by clicking the chart', async () => {
+    renderChart()
+    await userEvent.click(screen.getByRole('button', { name: '标记' }))
+    await userEvent.click(screen.getByRole('img', { name: 'K线主图' }))
+
+    expect(screen.getByTestId('annotation-marker')).toBeInTheDocument()
+  })
+
+  test('renders chart annotations as visible SVG geometry', async () => {
+    const { container } = renderChart()
+    await userEvent.click(screen.getByRole('button', { name: '矩形' }))
+    await userEvent.click(screen.getByRole('button', { name: '添加矩形标注' }))
+
+    expect(container.querySelector('svg [data-testid="annotation-rectangle"] rect')).toBeInTheDocument()
+    expect(container.querySelector('.sc-kline-annotation')).not.toBeInTheDocument()
+  })
+
   test('switches the active K-line period', async () => {
     renderChart()
     await userEvent.click(screen.getByRole('tab', { name: '周线' }))
