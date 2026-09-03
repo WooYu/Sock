@@ -86,6 +86,15 @@ describe('ChartWorkspace', () => {
     expect(container.querySelector('.sc-kline-annotation')).not.toBeInTheDocument()
   })
 
+  test('selects an annotation and exposes delete controls', async () => {
+    renderChart()
+    await userEvent.click(screen.getByRole('button', { name: '矩形' }))
+    await userEvent.click(screen.getByRole('button', { name: '添加矩形标注' }))
+    await userEvent.click(screen.getAllByTestId('annotation-rectangle').at(-1)!)
+
+    expect(screen.getByRole('button', { name: '删除标注' })).toBeInTheDocument()
+  })
+
   test('switches the active K-line period', async () => {
     renderChart()
     await userEvent.click(screen.getByRole('tab', { name: '周线' }))
