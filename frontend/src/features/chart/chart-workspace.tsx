@@ -171,6 +171,7 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
   const crosshairIndex = crosshairPoint ? Math.max(0, Math.min(candles.length - 1, Math.floor(((crosshairPoint.x - chartLeft) / chartWidth) * candles.length))) : null
   const crosshairCandle = crosshairIndex === null ? null : candles[crosshairIndex]
   const crosshairPrice = crosshairPoint ? maxPrice - ((crosshairPoint.y - chartTop) / chartHeight) * (maxPrice - minPrice) : null
+  const selectedAnnotation = annotations.find((annotation) => annotation.id === selectedAnnotationId)
 
   const workspaceSnapshot: ChartWorkspaceSnapshot = {
     version: 1,
@@ -353,7 +354,7 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
                 </svg>
               </div>
             </div>
-            {selectedAnnotationId && <div className="sc-kline-annotation-editor"><span>已选中标注</span><button onClick={() => { setAnnotations(store.current.delete(selectedAnnotationId)); setSelectedAnnotationId(null) }} type="button">删除标注</button></div>}
+            {selectedAnnotationId && <div className="sc-kline-annotation-editor"><span>已选中标注</span>{selectedAnnotation?.kind === 'text' && <input aria-label="标注文字" onChange={(event) => setAnnotations(store.current.update(selectedAnnotationId, { text: event.target.value }))} value={selectedAnnotation.text ?? ''} />}<button onClick={() => { setAnnotations(store.current.delete(selectedAnnotationId)); setSelectedAnnotationId(null) }} type="button">删除标注</button></div>}
             <div className="sc-kline-statusbar"><span>共 {candles.length} 根 K 线</span><span>当前周期：{periods.find(([period]) => period === activePeriod)?.[1]}</span><span>数据源：{snapshot.source.name}</span><span>{getAuthorizationHeader() ? syncStatus : '本机保存 · 登录后跨设备同步'}</span></div>
           </div>
           {(activeTool === 'rectangle' || activeTool === 'trend-line') && <button className="sc-kline-add-annotation" onClick={addRectangle} type="button">添加矩形标注</button>}
