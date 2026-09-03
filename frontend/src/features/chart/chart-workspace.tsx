@@ -86,6 +86,7 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
   const [crosshairPoint, setCrosshairPoint] = useState<{ x: number; y: number } | null>(null)
   const [layers, setLayers] = useState<ChartLayerState>({ keyLevels: true, annotations: true })
   const [annotations, setAnnotations] = useState<ChartAnnotation[]>([])
+  const [selectedAnnotationId, setSelectedAnnotationId] = useState<string | null>(null)
   const [syncStatus, setSyncStatus] = useState<'本机保存' | '同步中' | '已同步' | '待同步'>('本机保存')
   const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null)
   const store = useRef(new ChartAnnotationStore())
@@ -352,6 +353,7 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
                 </svg>
               </div>
             </div>
+            {selectedAnnotationId && <div className="sc-kline-annotation-editor"><span>已选中标注</span><button onClick={() => { setAnnotations(store.current.delete(selectedAnnotationId)); setSelectedAnnotationId(null) }} type="button">删除标注</button></div>}
             <div className="sc-kline-statusbar"><span>共 {candles.length} 根 K 线</span><span>当前周期：{periods.find(([period]) => period === activePeriod)?.[1]}</span><span>数据源：{snapshot.source.name}</span><span>{getAuthorizationHeader() ? syncStatus : '本机保存 · 登录后跨设备同步'}</span></div>
           </div>
           {(activeTool === 'rectangle' || activeTool === 'trend-line') && <button className="sc-kline-add-annotation" onClick={addRectangle} type="button">添加矩形标注</button>}
