@@ -2178,6 +2178,7 @@ footer p { margin: 0; }
 .sc-kline-legend .sc-candle-rise, .sc-kline-legend .sc-candle-fall { width: 8px; height: 8px; border-radius: 2px; }
 .sc-candle-rise { background: #d24a55 !important; }
 .sc-candle-fall { background: #27875d !important; }
+.sc-candle-scenario { height: 8px !important; width: 8px !important; border: 1px dashed #7181a4; background: #fff !important; }
 .sc-kline-data-badge { border-radius: 5px; background: #fff8e9; padding: 4px 7px; color: #a47b2d; font-size: 9px; white-space: nowrap; }
 .sc-kline-chart-scroll { overflow-x: auto; margin-top: 8px; }
 .sc-kline-chart-surface { min-width: 680px; transform-origin: left top; }
@@ -2187,6 +2188,10 @@ footer p { margin: 0; }
 .sc-rise-stroke, .sc-rise-fill { stroke: #d24a55; fill: #d24a55; }
 .sc-fall-stroke, .sc-fall-fill { stroke: #27875d; fill: #27875d; }
 .sc-rise-stroke, .sc-fall-stroke { stroke-width: 1.3; }
+.sc-scenario-stroke { stroke: #7181a4; stroke-dasharray: 3 2; stroke-width: 1.3; }
+.sc-scenario-fill { fill: #ffffff; stroke: #7181a4; stroke-dasharray: 3 2; stroke-width: 1.3; }
+.sc-scenario-divider { stroke: #aab4ca; stroke-dasharray: 3 4; stroke-width: 1; }
+.sc-scenario-label { fill: #7181a4; font-size: 9px; }
 .sc-volume-bars rect { fill: #d9dff2; opacity: .8; }
 .sc-key-level-line { stroke: #e0b95c; stroke-dasharray: 5 4; stroke-width: 1; }
 .sc-key-level-label { fill: #a47b2d; font-size: 9px; }
