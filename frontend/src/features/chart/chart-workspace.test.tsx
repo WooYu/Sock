@@ -95,6 +95,19 @@ describe('ChartWorkspace', () => {
     expect(screen.getByRole('button', { name: '删除标注' })).toBeInTheDocument()
   })
 
+  test('edits the text of a selected note annotation', async () => {
+    renderChart()
+    await userEvent.click(screen.getByText('更多绘图', { selector: 'summary' }))
+    await userEvent.click(screen.getByRole('button', { name: '文字' }))
+    await userEvent.click(screen.getByRole('img', { name: 'K线主图' }))
+    await userEvent.click(screen.getAllByTestId('annotation-text').at(-1)!)
+
+    const input = screen.getByRole('textbox', { name: '标注文字' })
+    await userEvent.clear(input)
+    await userEvent.type(input, '突破后观察')
+    expect(screen.getByText('突破后观察')).toBeInTheDocument()
+  })
+
   test('switches the active K-line period', async () => {
     renderChart()
     await userEvent.click(screen.getByRole('tab', { name: '周线' }))
