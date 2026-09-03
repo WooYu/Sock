@@ -87,6 +87,7 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
   const [layers, setLayers] = useState<ChartLayerState>({ keyLevels: true, annotations: true })
   const [annotations, setAnnotations] = useState<ChartAnnotation[]>([])
   const [selectedAnnotationId, setSelectedAnnotationId] = useState<string | null>(null)
+  const annotationDrag = useRef<{ annotation: ChartAnnotation; start: { x: number; y: number } } | null>(null)
   const [syncStatus, setSyncStatus] = useState<'本机保存' | '同步中' | '已同步' | '待同步'>('本机保存')
   const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null)
   const store = useRef(new ChartAnnotationStore())
@@ -102,15 +103,17 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
     setAnnotations(next)
   }
 
-  const chartPoint = (event: ReactPointerEvent<SVGSVGElement>) => {
-    const bounds = event.currentTarget.getBoundingClientRect()
+  const chartPointFromClient = (svg: SVGSVGElement, clientX: number, clientY: number) => {
+    const bounds = svg.getBoundingClientRect()
     const width = bounds.width || 960
     const height = bounds.height || 430
     return {
-      x: Math.max(0, Math.min(960, ((event.clientX - bounds.left) / width) * 960)),
-      y: Math.max(0, Math.min(430, ((event.clientY - bounds.top) / height) * 430)),
+      x: Math.max(0, Math.min(960, ((clientX - bounds.left) / width) * 960)),
+      y: Math.max(0, Math.min(430, ((clientY - bounds.top) / height) * 430)),
     }
   }
+
+  const chartPoint = (event: ReactPointerEvent<SVGSVGElement>) => chartPointFromClient(event.currentTarget, event.clientX, event.clientY)
 
   const createPointAnnotation = (event: ReactPointerEvent<SVGSVGElement>) => {
     const point = chartPoint(event)
@@ -140,7 +143,27 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
   }
 
   const handleChartPointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
+    if (annotationDrag.current) {
+      const point = chartPoint(event)
+      const dx = point.x - annotationDrag.current.start.x
+      const dy = point.y - annotationDrag.current.start.y
+      const origin = annotationDrag.current.annotation
+      setAnnotations(store.current.update(origin.id, {
+        start: { x: origin.start.x + dx, y: origin.start.y + dy },
+        end: origin.end && { x: origin.end.x + dx, y: origin.end.y + dy },
+      }))
+      return
+    }
     if (crosshair) setCrosshairPoint(chartPoint(event))
+  }
+
+  const handleChartPointerRelease = (event: ReactPointerEvent<SVGSVGElement>) => {
+    if (annotationDrag.current) {
+      annotationDrag.current = null
+      event.currentTarget.releasePointerCapture?.(event.pointerId)
+      return
+    }
+    handleChartPointerUp(event)
   }
 
   const resetView = () => {
@@ -315,7 +338,7 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
             </div>
             <div className="sc-kline-chart-scroll">
               <div className="sc-kline-chart-surface" data-zoom={zoom} style={{ width: `${zoom}%` }}>
-                <svg aria-label="K线主图" className="sc-kline-svg" onClick={createPointAnnotation} onPointerDown={handleChartPointerDown} onPointerMove={handleChartPointerMove} onPointerUp={handleChartPointerUp} role="img" viewBox="0 0 960 430">
+                <svg aria-label="K线主图" className="sc-kline-svg" onClick={createPointAnnotation} onPointerDown={handleChartPointerDown} onPointerMove={handleChartPointerMove} onPointerUp={handleChartPointerRelease} role="img" viewBox="0 0 960 430">
                   <rect fill="#fbfcff" height="430" width="960" x="0" y="0" />
                   <g className="sc-kline-grid">
                     {[0, 1, 2, 3, 4].map((line) => <line key={`h-${line}`} x1={chartLeft} x2={chartLeft + chartWidth} y1={chartTop + line * (chartHeight / 4)} y2={chartTop + line * (chartHeight / 4)} />)}
@@ -344,7 +367,7 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
                   {layers.annotations && annotations.map((annotation) => {
                     const end = annotation.end ?? annotation.start
                     const label = annotation.kind === 'buy' ? '买' : annotation.kind === 'sell' ? '卖' : annotation.kind === 'target' ? '目标' : annotation.kind === 'stop-loss' ? '止损' : ''
-                    return <g data-testid={\`annotation-\${annotation.kind}\`} key={annotation.id}>
+                    return <g aria-label={`选择${label || annotation.kind}标注`} data-testid={`annotation-${annotation.kind}`} key={annotation.id} onClick={(event) => { event.stopPropagation(); setSelectedAnnotationId(annotation.id) }} onPointerDown={(event) => { if (activeTool !== 'pointer') return; event.stopPropagation(); const svg = event.currentTarget.ownerSVGElement; if (!svg) return; svg.setPointerCapture?.(event.pointerId); setSelectedAnnotationId(annotation.id); annotationDrag.current = { annotation, start: chartPointFromClient(svg, event.clientX, event.clientY) } }} role="button" tabIndex={0}>
                       {annotation.kind === 'rectangle' && <rect className="sc-chart-rectangle" height={Math.abs(end.y - annotation.start.y)} width={Math.abs(end.x - annotation.start.x)} x={Math.min(annotation.start.x, end.x)} y={Math.min(annotation.start.y, end.y)} />}
                       {annotation.kind === 'trend-line' && <line className="sc-chart-trend-line" x1={annotation.start.x} x2={end.x} y1={annotation.start.y} y2={end.y} />}
                       {annotation.kind === 'horizontal-line' && <line className="sc-chart-horizontal-line" x1={chartLeft} x2={chartLeft + chartWidth} y1={annotation.start.y} y2={annotation.start.y} />}
@@ -355,7 +378,11 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
                 </svg>
               </div>
             </div>
-            {selectedAnnotationId && <div className="sc-kline-annotation-editor"><span>已选中标注</span>{selectedAnnotation?.kind === 'text' && <input aria-label="标注文字" onChange={(event) => setAnnotations(store.current.update(selectedAnnotationId, { text: event.target.value }))} value={selectedAnnotation.text ?? ''} />}<button onClick={() => { setAnnotations(store.current.delete(selectedAnnotationId)); setSelectedAnnotationId(null) }} type="button">删除标注</button></div>}
+            {selectedAnnotationId && <div className="sc-kline-annotation-editor">
+              <span>已选中标注</span>
+              {selectedAnnotation?.kind === 'text' && <input aria-label="标注文字" onChange={(event) => setAnnotations(store.current.update(selectedAnnotationId, { text: event.target.value }))} value={selectedAnnotation.text ?? ''} />}
+              <button onClick={() => { setAnnotations(store.current.delete(selectedAnnotationId)); setSelectedAnnotationId(null) }} type="button">删除标注</button>
+            </div>}
             <div className="sc-kline-statusbar"><span>共 {candles.length} 根 K 线</span><span>当前周期：{periods.find(([period]) => period === activePeriod)?.[1]}</span><span>数据源：{snapshot.source.name}</span><span>{getAuthorizationHeader() ? syncStatus : '本机保存 · 登录后跨设备同步'}</span></div>
           </div>
           {(activeTool === 'rectangle' || activeTool === 'trend-line') && <button className="sc-kline-add-annotation" onClick={addRectangle} type="button">添加矩形标注</button>}
