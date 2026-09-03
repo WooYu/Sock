@@ -86,6 +86,13 @@ describe('ChartWorkspace', () => {
     expect(container.querySelector('.sc-kline-annotation')).not.toBeInTheDocument()
   })
 
+  test('renders a clearly labelled baseline K-line scenario separately from real candles', () => {
+    const { container } = renderChart()
+
+    expect(screen.getByText('基准情景 K 线')).toBeInTheDocument()
+    expect(container.querySelectorAll('[data-testid="scenario-candlestick-layer"] rect')).toHaveLength(3)
+  })
+
   test('selects an annotation and exposes delete controls', async () => {
     renderChart()
     await userEvent.click(screen.getByRole('button', { name: '矩形' }))
