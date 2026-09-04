@@ -17,7 +17,10 @@ export const browserMarketClient: BrowserMarketClient = {
   snapshot: (symbol, signal) => browserRequest(`/api/market/stocks/${encodeURIComponent(symbol)}/snapshot`, signal),
   publishedRules: async (signal) => {
     const rules = await browserRequest<Array<Record<string, unknown>>>('/api/knowledge/rules', signal)
-    return rules.filter((rule) => rule.enabled !== false).map(toDecisionRule)
+    return rules
+      .filter((rule) => rule.enabled !== false)
+      .map(toDecisionRule)
+      .filter((rule) => (rule.conditions?.length ?? 0) > 0)
   },
 }
 

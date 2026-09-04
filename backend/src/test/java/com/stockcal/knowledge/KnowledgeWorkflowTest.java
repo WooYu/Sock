@@ -44,11 +44,9 @@ class KnowledgeWorkflowTest {
             .hasMessageContaining("批准");
 
         workflow.approve(rule.id(), "user-1");
-        var published = workflow.publishRule(rule.id());
-
-        assertThat(published.sourceDocumentId()).isEqualTo(source.id());
-        assertThat(published.sourceExcerpt()).contains("触达目标位");
-        assertThat(published.approvedBy()).isEqualTo("user-1");
+        assertThatThrownBy(() -> workflow.publishRule(rule.id()))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("条件");
     }
 
     @Test

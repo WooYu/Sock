@@ -26,7 +26,7 @@ describe('交易、复盘与规则库', () => {
   })
 
   it('规则库只有发布后的规则进入分析', () => {
-    render(<RulesPage initialRules={[{ id: 'r1', title: '突破回踩', status: 'draft' }]} />)
+    render(<RulesPage initialRules={[{ id: 'r1', title: '突破回踩', status: 'draft', conditions: [{ field: 'closeAboveMa5', operator: 'equals', value: 1 }] }]} />)
     expect(screen.getByText('草稿')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: '发布突破回踩' }))
     expect(screen.getByText('已发布')).toBeInTheDocument()

@@ -16,6 +16,7 @@ export type KnowledgeReviewClient = {
 }
 
 type ReviewDraft = Omit<KnowledgeDraft, 'status'> & { status: KnowledgeDraft['status'] | 'PUBLISHED' }
+type DraftView = 'pending' | 'concept' | 'rejected'
 
 const defaultClient: KnowledgeReviewClient = {
   listDrafts: () => getKnowledgeDrafts(),
@@ -29,6 +30,8 @@ export function KnowledgeReviewPanel({ client = defaultClient, onPublished }: { 
   const [busyId, setBusyId] = useState<string | null>(null)
   const [message, setMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
+  const [view, setView] = useState<DraftView>('pending')
+  const visibleDrafts = drafts.filter((draft) => view === 'pending' ? draft.status === 'PENDING' || draft.status === 'APPROVED' : view === 'concept' ? draft.kind !== 'RULE' && draft.status !== 'REJECTED' : draft.status === 'REJECTED')
 
   useEffect(() => {
     let active = true
@@ -70,8 +73,9 @@ export function KnowledgeReviewPanel({ client = defaultClient, onPublished }: { 
 
   return <section className="sc-review-panel" aria-labelledby="knowledge-review-title">
     <div><p className="sc-eyebrow">AI 提取 · 人工确认</p><h2 id="knowledge-review-title">待审核知识草稿</h2><p>只有批准并发布的 RULE 才会参与分析；其他经验和概念仅作为解释依据保留。</p></div>
-    {loading ? <p className="sc-review-empty" role="status">正在加载知识草稿…</p> : drafts.length === 0 ? <p className="sc-review-empty">暂无待审核草稿</p> : <div className="sc-review-list">
-      {drafts.map((draft) => <article className="sc-review-card" key={draft.id}>
+    <div aria-label="知识草稿视图" className="sc-review-tabs" role="tablist">{([['pending', '待审核'], ['concept', '经验概念'], ['rejected', '已拒绝']] as Array<[DraftView, string]>).map(([key, label]) => <button aria-selected={view === key} key={key} onClick={() => setView(key)} role="tab" type="button">{label}</button>)}</div>
+    {loading ? <p className="sc-review-empty" role="status">正在加载知识草稿…</p> : visibleDrafts.length === 0 ? <p className="sc-review-empty">当前视图暂无草稿</p> : <div className="sc-review-list">
+      {visibleDrafts.map((draft) => <article className="sc-review-card" key={draft.id}>
         <div className="sc-review-card-heading"><div><span className="sc-review-kind">{draft.kind}</span><h3>{draft.title}</h3></div><span className={`sc-review-status ${draft.status.toLowerCase()}`}>{reviewStatus(draft.status)}</span></div>
         <p className="sc-review-summary">{draft.summary || '暂无摘要'}</p>
         <blockquote>{draft.sourceExcerpt || '暂无原文摘录'}</blockquote>

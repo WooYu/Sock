@@ -5,6 +5,9 @@ export type PrimarySection =
   | 'trading'
   | 'review'
   | 'rules'
+  | 'settings'
+
+export type WorkspaceTone = 'cyber' | 'chart' | 'feed' | 'neutral'
 
 export type AnalysisTab = 'key-levels' | 'patterns' | 'future' | 'ai'
 export type TradingTab = 'positions' | 'ledger' | 'predictions' | 'statistics'
@@ -18,19 +21,17 @@ export type NavigationItem = {
 }
 
 export const desktopNavigation: NavigationItem[] = [
-  { section: 'overview', label: '总览', href: '/overview', icon: '◈' },
-  { section: 'analysis', label: '个股分析', href: '/analysis/key-levels', icon: '↗' },
-  { section: 'chart', label: '专业 K 线', href: '/chart', icon: '⌁' },
-  { section: 'trading', label: '交易', href: '/trading/positions', icon: '￥' },
+  { section: 'overview', label: '首页', href: '/overview', icon: '◈' },
+  { section: 'analysis', label: '分析', href: '/analysis/key-levels', icon: '↗' },
+  { section: 'rules', label: '规则', href: '/rules', icon: '◇' },
   { section: 'review', label: '复盘', href: '/review/daily', icon: '✓' },
-  { section: 'rules', label: '规则库', href: '/rules', icon: '◇' },
+  { section: 'settings', label: '设置', href: '/settings', icon: '⚙' },
 ]
 
 export const mobileNavigation: NavigationItem[] = [
-  { section: 'overview', label: '总览', href: '/overview', icon: '◈' },
+  { section: 'overview', label: '首页', href: '/overview', icon: '◈' },
   { section: 'analysis', label: '分析', href: '/analysis/key-levels', icon: '↗' },
-  { section: 'chart', label: 'K线', href: '/chart', icon: '▥' },
-  { section: 'trading', label: '交易', href: '/trading/positions', icon: '￥' },
-  { section: 'review', label: '复盘', href: '/review/daily', icon: '↺' },
   { section: 'rules', label: '规则', href: '/rules', icon: '◇' },
+  { section: 'review', label: '复盘', href: '/review/daily', icon: '↺' },
+  { section: 'settings', label: '设置', href: '/settings', icon: '⚙' },
 ]

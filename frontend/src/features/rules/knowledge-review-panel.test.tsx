@@ -49,6 +49,16 @@ describe('KnowledgeReviewPanel', () => {
 
     await user.click(await screen.findByRole('button', { name: '发布回踩 MA5 后再参与' }))
     expect(await screen.findByText('规则已发布')).toBeInTheDocument()
-    expect(screen.getByText('已发布')).toBeInTheDocument()
+    expect(screen.getByText('当前视图暂无草稿')).toBeInTheDocument()
+  })
+
+  test('filters rejected drafts without mixing them into pending review', async () => {
+    const user = userEvent.setup()
+    render(<KnowledgeReviewPanel client={{ ...createClient(), listDrafts: async () => [draft, { ...draft, id: 'draft-2', title: '已拒绝概念', kind: 'CONCEPT', status: 'REJECTED' }] }} />)
+
+    await screen.findByText('回踩 MA5 后再参与')
+    await user.click(screen.getByRole('tab', { name: '已拒绝' }))
+    expect(screen.getByText('已拒绝概念')).toBeVisible()
+    expect(screen.queryByText('回踩 MA5 后再参与')).not.toBeInTheDocument()
   })
 })

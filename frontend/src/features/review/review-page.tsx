@@ -9,6 +9,18 @@ import { RecordSyncButton } from '../records/record-sync-button'
 
 export type ReviewTab = 'daily' | 'trade' | 'history' | 'backtest'
 const tabs: Array<[ReviewTab, string]> = [['daily', '当日总结'], ['trade', '单笔复盘'], ['history', '历史复盘'], ['backtest', '规则回测']]
+const dailySections = ['市场判断', '执行情况', '改进点'] as const
+type DailySection = typeof dailySections[number]
+type DailyDraft = Record<DailySection, string>
+
+function emptyDailyDraft(): DailyDraft { return { 市场判断: '', 执行情况: '', 改进点: '' } }
+
+function parseDailyDraft(content: string): DailyDraft {
+  const match = /^## 市场判断\n([\s\S]*?)\n\n## 执行情况\n([\s\S]*?)\n\n## 改进点\n([\s\S]*)$/.exec(content)
+  return match ? { 市场判断: match[1], 执行情况: match[2], 改进点: match[3] } : { ...emptyDailyDraft(), 市场判断: content }
+}
+
+function serializeDailyDraft(draft: DailyDraft) { return dailySections.map((section) => `## ${section}\n${draft[section]}`).join('\n\n') }
 
 export function ReviewPage({ initialTab = 'daily', tradeId, predictionId }: { initialTab?: ReviewTab; tradeId?: string | null; predictionId?: string | null }) {
   const [tab, setTab] = useState<ReviewTab>(initialTab)
@@ -17,13 +29,13 @@ export function ReviewPage({ initialTab = 'daily', tradeId, predictionId }: { in
 }
 
 function DailyReview() {
-  const [content, setContent] = useState(() => {
+  const [draft, setDraft] = useState<DailyDraft>(() => {
     const today = new Date().toISOString().slice(0, 10)
-    return loadRecords<ReviewRecord>('reviews').find((review) => review.date === today && !review.tradeId)?.content ?? ''
+    return parseDailyDraft(loadRecords<ReviewRecord>('reviews').find((review) => review.date === today && !review.tradeId)?.content ?? '')
   })
   const [message, setMessage] = useState('')
-  const save = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); const today = new Date().toISOString().slice(0, 10); const records = loadRecords<ReviewRecord>('reviews').filter((review) => !(review.date === today && !review.tradeId)); const review: ReviewRecord = { id: createRecordId('review'), date: today, content, createdAt: new Date().toISOString() }; saveRecords('reviews', [...records, review]); void syncRecord('reviews', review).catch(() => undefined); setMessage('当日总结已保存') }
-  return <form className="sc-daily-review-form" onSubmit={save}><textarea aria-label="当日复盘内容" className="sc-daily-review-input" onChange={(event) => setContent(event.target.value)} placeholder="记录今天的市场判断、执行情况和改进点" value={content} /><button className="sc-review-primary-action" type="submit">保存当日总结</button>{message ? <p className="text-sm text-emerald-700" role="status">{message}</p> : null}</form>
+  const save = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); const today = new Date().toISOString().slice(0, 10); const records = loadRecords<ReviewRecord>('reviews').filter((review) => !(review.date === today && !review.tradeId)); const review: ReviewRecord = { id: createRecordId('review'), date: today, content: serializeDailyDraft(draft), createdAt: new Date().toISOString() }; saveRecords('reviews', [...records, review]); void syncRecord('reviews', review).catch(() => undefined); setMessage('当日总结已保存') }
+  return <form className="sc-daily-review-form" onSubmit={save}><div className="sc-daily-review-sections">{dailySections.map((section) => <label className="sc-daily-review-field" key={section}><span>{section}</span><textarea aria-label={section} className="sc-daily-review-input" onChange={(event) => setDraft((current) => ({ ...current, [section]: event.target.value }))} placeholder={section === '市场判断' ? '今天的市场结构、风险与关键位' : section === '执行情况' ? '实际执行、偏差与原因' : '下一次要保留或修正的动作'} value={draft[section]} /></label>)}</div><button className="sc-review-primary-action" type="submit">保存当日总结</button>{message ? <p className="text-sm text-emerald-700" role="status">{message}</p> : null}</form>
 }
 
 function TradeReview({ tradeId, predictionId }: { tradeId?: string | null; predictionId?: string | null }) {

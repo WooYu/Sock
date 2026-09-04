@@ -1,4 +1,5 @@
 import { getAuthorizationHeader } from '@/features/records/record-sync'
+import type { RuleCondition } from '@/features/workspace/stock-workspace-types'
 
 export type KnowledgeSource = { id: string; path: string; title: string; contentHash: string; originalContent: string; importedAt: string }
 export type KnowledgeDraft = {
@@ -17,7 +18,7 @@ export type KnowledgeDraft = {
   timeframe?: string
   priority?: number
 }
-export type PublishedKnowledgeRule = { id: string; name: string; description?: string; sourceDocumentId?: string; enabled: boolean; action?: string; mode?: string; timeframe?: string; priority?: number }
+export type PublishedKnowledgeRule = { id: string; name: string; description?: string; sourceDocumentId?: string; enabled: boolean; conditions?: RuleCondition[]; action?: string; mode?: string; timeframe?: string; priority?: number }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, { ...init, cache: 'no-store', headers: { Accept: 'application/json', ...init?.headers } })
@@ -37,7 +38,16 @@ export function extractKnowledgeSource(id: string) {
 
 export function getPublishedKnowledgeRules() {
   const authorization = typeof window === 'undefined' ? undefined : getAuthorizationHeader()
-  return request<Array<Record<string, unknown>>>('/api/knowledge/rules', { headers: authorization ? { Authorization: authorization } : undefined })
+  return request<PublishedKnowledgeRule[]>('/api/knowledge/rules', { headers: authorization ? { Authorization: authorization } : undefined })
+}
+
+export function togglePublishedKnowledgeRule(id: string, enabled: boolean) {
+  const authorization = typeof window === 'undefined' ? undefined : getAuthorizationHeader()
+  return request<PublishedKnowledgeRule>(`/api/knowledge/rules/${encodeURIComponent(id)}/enabled`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...(authorization ? { Authorization: authorization } : {}) },
+    body: JSON.stringify({ enabled }),
+  })
 }
 
 export function getKnowledgeDrafts(status?: KnowledgeDraft['status']) {

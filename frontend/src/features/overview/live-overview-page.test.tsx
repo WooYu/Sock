@@ -23,6 +23,14 @@ describe('LiveOverviewPage', () => {
     expect(screen.getByText(/Tushare Pro/)).toBeInTheDocument()
   })
 
+  test('groups the live workflow into attention, key-level and next-action regions', () => {
+    render(<LiveOverviewPage snapshot={snapshot} />)
+
+    expect(screen.getByRole('region', { name: '今日关注' })).toBeVisible()
+    expect(screen.getByRole('region', { name: '关键位' })).toBeVisible()
+    expect(screen.getByRole('region', { name: '下一步' })).toBeVisible()
+  })
+
   test('renders unavailable state without demo identity', () => {
     render(<LiveOverviewPage snapshot={null} status="error" errorMessage="后端不可达" />)
     expect(screen.getByText(/真实行情暂不可用/)).toBeInTheDocument()

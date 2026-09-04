@@ -20,23 +20,7 @@ export function analyzeMarketSnapshot(market: MarketSnapshot, cycle: OperationCy
     { id: 'indicator:ma5', label: 'MA5 斜率向上', detail: `当前 ${ma5.toFixed(2)}，上一值 ${previousMa5.toFixed(2)}` },
     { id: 'indicator:boll-middle', label: '收盘站上 BOLL 中轨', detail: `收盘 ${last.close.toFixed(2)}，中轨 ${currentBoll.middle.toFixed(2)}` },
   ]
-  const localRule: DecisionRule = {
-    ruleId: 'local-trend-confirmation',
-    version: 1,
-    name: '趋势、MA5 与 BOLL 中轨确认',
-    score: 86,
-    band: 'primary',
-    action: 'ENTER',
-    priority: 50,
-    conditions: [
-      { field: 'closeAboveMa20', operator: 'equals', value: 1 },
-      { field: 'closeAboveMa5', operator: 'equals', value: 1 },
-      { field: 'ma5SlopePositive', operator: 'equals', value: 1 },
-      { field: 'closeAboveBollMiddle', operator: 'equals', value: 1 },
-    ],
-    evidence,
-  }
-  const candidateRules = rules.length ? rules : [localRule]
+  const candidateRules = rules
   const ruleEvaluations = candidateRules.map((rule) => {
     const result = evaluateRuleConditions(rule.conditions, facts)
     return {

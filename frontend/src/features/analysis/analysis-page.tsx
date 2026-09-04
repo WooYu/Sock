@@ -44,6 +44,7 @@ export function AnalysisPage({ tab }: { tab: AnalysisTab }) {
   }
   return <div className="sc-analysis-page">
     <StockHeader />
+    {!initialLoading && !initialError ? <section aria-label="规则结论" className="sc-analysis-decision"><p className="sc-eyebrow">规则结论</p><strong>{decisionLabel(analysis?.decision.action)}</strong><p>{analysis?.decision.reason ?? '正在等待可计算的规则与行情条件。'}</p>{analysis?.decision.missingFacts.length ? <p>待补充：{analysis.decision.missingFacts.join('、')}</p> : null}<Link href={`/chart${workspace.selectedSymbol ? `?symbol=${workspace.selectedSymbol}` : ''}`}>查看 K 线与预测路径</Link></section> : null}
     <nav aria-label="分析页签" className="sc-analysis-tabs">
       {tabs.map(([value, label]) => <Link aria-current={tab === value ? 'page' : undefined} className={tab === value ? 'is-active' : ''} href={`/analysis/${value}${workspace.selectedSymbol ? `?symbol=${workspace.selectedSymbol}` : ''}`} key={value}>{label}</Link>)}
     </nav>
@@ -61,4 +62,8 @@ export function AnalysisPage({ tab }: { tab: AnalysisTab }) {
     </div>
     {saved ? <p className="sc-analysis-saved" role="status">预测快照已保存</p> : null}
   </div>
+}
+
+function decisionLabel(action?: 'ENTER' | 'EXIT' | 'HOLD' | 'REDUCE' | 'AVOID' | 'WAIT') {
+  return ({ ENTER: '买入', EXIT: '卖出', HOLD: '持有', REDUCE: '减仓', AVOID: '回避', WAIT: '等待' } as const)[action ?? 'WAIT']
 }

@@ -68,6 +68,7 @@ describe('AnalysisPage interactions', () => {
     )
 
     await screen.findByText('关键位分析')
+    expect(screen.getByRole('region', { name: '规则结论' })).toBeVisible()
     await user.click(screen.getByRole('button', { name: '保存预测快照' }))
 
     expect(screen.getByText('预测快照已保存')).toBeInTheDocument()

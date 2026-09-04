@@ -4,5 +4,5 @@ import { StockWorkspaceProvider } from '@/features/workspace/stock-workspace-pro
 
 export default async function OverviewRoute({ searchParams }: { searchParams: Promise<{ symbol?: string }> }) {
   const { symbol } = await searchParams
-  return <StockWorkspaceProvider initialSymbol={symbol ?? '600519'}><ProductShell activeHref="/overview" section="overview"><LiveOverviewPage /></ProductShell></StockWorkspaceProvider>
+  return <StockWorkspaceProvider initialSymbol={symbol ?? '600519'}><ProductShell activeHref="/overview" section="overview" tone="cyber"><LiveOverviewPage /></ProductShell></StockWorkspaceProvider>
 }

@@ -40,12 +40,12 @@ describe('analyzeMarketSnapshot', () => {
     expect(result.decision.reason).toContain('过期')
   })
 
-  test('returns ENTER only after deterministic trend conditions match', () => {
+  test('returns WAIT when no enabled published rule is supplied', () => {
     const result = analyzeMarketSnapshot(snapshot(Array.from({ length: 30 }, (_, i) => 10 + i * 0.5)))
 
-    expect(result.decision.action).toBe('ENTER')
-    expect(result.decision.matchedRules.length).toBeGreaterThan(0)
-    expect(result.decision.evidence.length).toBeGreaterThan(0)
+    expect(result.decision.action).toBe('WAIT')
+    expect(result.decision.reason).toContain('没有已确认')
+    expect(result.decision.matchedRules).toHaveLength(0)
   })
 
   test('matches supplied rules from their conditions', () => {

@@ -57,6 +57,9 @@ final class KnowledgeWorkflow {
         if (draft.kind() != KnowledgeKind.RULE || draft.status() != ApprovalStatus.APPROVED) {
             throw new IllegalStateException("规则必须先由用户批准");
         }
+        if (!hasComputableConditions(draft.conditions())) {
+            throw new IllegalStateException("规则缺少可计算条件，不能发布或参与分析");
+        }
         var rule = new PublishedRule(UUID.randomUUID().toString(), draft.sourceDocumentId(), draft.title(),
             draft.summary(), draft.sourceExcerpt(), draft.sourceLineStart(), draft.sourceLineEnd(),
             draft.approvedBy(), clock.get(), true, draft.conditions(), draft.action(), draft.mode(),
@@ -85,6 +88,14 @@ final class KnowledgeWorkflow {
     PublishedRule toggleRule(String id, boolean enabled) {
         return repository.setRuleEnabled(id, enabled)
             .orElseThrow(() -> new IllegalArgumentException("规则不存在"));
+    }
+
+    private boolean hasComputableConditions(List<RuleConditionSpec> conditions) {
+        return !conditions.isEmpty() && conditions.stream().allMatch(condition ->
+            condition.field() != null && !condition.field().isBlank()
+                && condition.operator() != null && !condition.operator().isBlank()
+                && Double.isFinite(condition.value())
+        );
     }
 
     private String sha256(String value) {

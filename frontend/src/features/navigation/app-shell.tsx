@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import type { PrimarySection } from './navigation-config'
+import type { PrimarySection, WorkspaceTone } from './navigation-config'
 import { desktopNavigation, mobileNavigation } from './navigation-config'
 import { WebAccountButton } from '../account/web-account-button'
 
@@ -11,6 +11,7 @@ type AppShellProps = {
   onSectionChange: (section: PrimarySection) => void
   activeHref?: string
   currentStockLabel?: string
+  tone?: WorkspaceTone
   children?: React.ReactNode
 }
 
@@ -19,6 +20,7 @@ export function AppShell({
   onSectionChange,
   activeHref,
   currentStockLabel,
+  tone = 'neutral',
   children,
 }: AppShellProps) {
   const [searchOpen, setSearchOpen] = useState(false)
@@ -40,15 +42,21 @@ export function AppShell({
     window.addEventListener('keydown', onShortcut)
     return () => window.removeEventListener('keydown', onShortcut)
   }, [])
+  const primarySection = section === 'chart' ? 'analysis' : section === 'trading' ? 'review' : section
   const renderNavigation = (items: typeof desktopNavigation, testId: string) => {
-    const activeIndex = items.findIndex((item) => item.section === section)
+    const activeIndex = items.findIndex((item) => item.section === primarySection)
+    const hasConcreteActiveDestination = activeHref ? items.some((item) => {
+      const itemPath = item.href.split('#')[0]
+      const itemRoot = itemPath.split('/').slice(0, 2).join('/') || itemPath
+      return itemPath === activeHref || activeHref.startsWith(`${itemRoot}/`)
+    }) : false
     const isMobile = testId === 'mobile-primary-nav'
     return (
       <nav aria-label="主导航" className={isMobile ? 'sc-main-nav sc-main-nav-mobile' : 'sc-main-nav sc-main-nav-desktop'} data-testid={testId}>
         {items.map((item, index) => {
           const itemPath = item.href.split('#')[0]
           const itemRoot = itemPath.split('/').slice(0, 2).join('/') || itemPath
-          const isActive = activeHref ? itemPath === activeHref || activeHref.startsWith(`${itemRoot}/`) : activeIndex === index
+          const isActive = activeHref ? itemPath === activeHref || activeHref.startsWith(`${itemRoot}/`) || (!hasConcreteActiveDestination && item.section === primarySection) : activeIndex === index
           return (
           <Link
             aria-current={isActive ? 'page' : undefined}
@@ -67,7 +75,7 @@ export function AppShell({
   }
 
   return (
-    <div className="sc-shell">
+    <div className={`sc-shell sc-tone-${tone}`} data-testid="app-shell">
       <header className="sc-shell-header">
         <div className="sc-shell-header-inner">
           <Link className="sc-brand" href="/overview" aria-label="回到总览">
