@@ -74,7 +74,7 @@ describe('ChartWorkspace', () => {
     await userEvent.click(screen.getByRole('button', { name: '买入点' }))
     await userEvent.click(screen.getByRole('img', { name: 'K线主图' }))
 
-    expect(screen.getByTestId('annotation-buy')).toBeInTheDocument()
+    expect(screen.getByTestId('annotation-buy')).toHaveTextContent('价格')
   })
 
   test('switches the active K-line period', async () => {

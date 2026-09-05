@@ -2238,6 +2238,11 @@ footer p { margin: 0; }
 .sc-crosshair { stroke: #8d95a6; stroke-dasharray: 3 3; stroke-width: 1; }
 .sc-kline-statusbar { display: flex; flex-wrap: wrap; gap: 16px; min-height: 34px; align-items: center; color: #9aa1ae; font-size: 9px; }
 .sc-kline-annotation { position: absolute; border: 2px solid #e0b95c; background: #fff8e933; pointer-events: none; }
+.sc-chart-annotation-rectangle { fill: #fff8e933; stroke: #e0b95c; stroke-width: 2; }
+.sc-chart-annotation-line { stroke: #e0b95c; stroke-width: 2.5; }
+.sc-chart-annotation-price, .sc-chart-marker-label { fill: #7a5310; font-size: 11px; font-weight: 700; paint-order: stroke; stroke: #fffdf6; stroke-width: 3px; stroke-linejoin: round; }
+.sc-chart-marker { fill: #fff; stroke: #1f8f62; stroke-width: 3; }
+.sc-chart-note { fill: #4f5a73; font-size: 12px; font-weight: 700; }
 .sc-kline-chart-panel .sc-kline-chart-surface { position: relative; }
 .sc-kline-add-annotation { width: fit-content; min-height: 31px; border: 1px dashed #aeb8ed; border-radius: 6px; background: #f8f9ff; padding: 4px 10px; color: #4868ff; font-size: 10px; font-weight: 700; }
 .sc-kline-layer-panel { padding: 13px; }
