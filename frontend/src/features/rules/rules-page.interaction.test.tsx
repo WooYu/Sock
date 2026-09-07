@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { RulesPage } from './rules-page'
@@ -22,6 +22,14 @@ describe('RulesPage interactions', () => {
     expect(screen.getByText('5日线上方优先参与')).toBeInTheDocument()
     expect(screen.getByText('大盘暴跌时优先看海龟')).toBeInTheDocument()
     expect(screen.getByText('破位5日线不做')).toBeInTheDocument()
+  })
+
+  test('does not present built-in counts as live statistics while the server request is pending', () => {
+    render(<RulesPage client={{ list: () => new Promise(() => undefined), toggle: async (_id, enabled) => ({ enabled }) }} />)
+
+    const statistics = within(screen.getByLabelText('规则统计'))
+    expect(statistics.getAllByText('—')).toHaveLength(4)
+    expect(statistics.queryByText('10')).not.toBeInTheDocument()
   })
 
   test('filters the information-flow list by rule name', async () => {

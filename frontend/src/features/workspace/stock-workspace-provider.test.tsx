@@ -28,6 +28,7 @@ function Probe() {
     <div>
       <p>当前股票：{workspace.selectedSymbol ?? '未选择'}</p>
       <p>状态：{workspace.status}</p>
+      <p>周期：{workspace.cycle}</p>
       <button type="button" onClick={() => workspace.selectStock('600519')}>
         选择 600519
       </button>
@@ -42,6 +43,16 @@ function Probe() {
 }
 
 describe('StockWorkspaceProvider', () => {
+  test('defaults analysis to the short operation cycle', () => {
+    render(
+      <StockWorkspaceProvider client={{ snapshot: async (symbol) => demoMarketSnapshot(symbol) }}>
+        <Probe />
+      </StockWorkspaceProvider>,
+    )
+
+    expect(screen.getByText('周期：short')).toBeInTheDocument()
+  })
+
   test('a newer stock selection wins when requests resolve out of order', async () => {
     const market = new DeferredMarketClient()
     render(

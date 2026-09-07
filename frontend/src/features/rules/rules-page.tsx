@@ -43,12 +43,13 @@ export function RulesPage({ initialRules = [], client = defaultClient }: { initi
   )
   const [selectedRule, setSelectedRule] = useState<RuleRecord | null>(null)
   const [query, setQuery] = useState('')
+  const [serverStatistics, setServerStatistics] = useState<{ total: number; published: number; enabled: number; drafts: number } | null>(null)
   const visibleRules = rules.filter((rule) => `${rule.title} ${rule.description ?? ''}`.toLowerCase().includes(query.trim().toLowerCase()))
 
   useEffect(() => {
     let active = true
     void client.list().then((remoteRules) => {
-      if (!active || !remoteRules.length) return
+      if (!active) return
       const remote = remoteRules.map((rule) => ({
         id: String(rule.id),
         title: String(rule.name ?? '未命名规则'),
@@ -59,8 +60,14 @@ export function RulesPage({ initialRules = [], client = defaultClient }: { initi
         action: typeof rule.action === 'string' ? rule.action : undefined,
         timeframe: typeof rule.timeframe === 'string' ? rule.timeframe : undefined,
       }))
-      setRules(remote)
+      if (remote.length) setRules(remote)
       setEnabledRules(Object.fromEntries(remoteRules.map((rule) => [String(rule.id), rule.enabled !== false])))
+      setServerStatistics({
+        total: remote.length,
+        published: remote.length,
+        enabled: remoteRules.filter((rule) => rule.enabled !== false).length,
+        drafts: 0,
+      })
     }).catch(() => undefined)
     return () => { active = false }
   }, [client])
@@ -128,10 +135,10 @@ export function RulesPage({ initialRules = [], client = defaultClient }: { initi
         </div>
       </header>
       <div className="sc-rules-overview" aria-label="规则统计">
-        <div><span>规则总数</span><strong>{rules.length}</strong></div>
-        <div><span>已上线</span><strong>{rules.filter((rule) => rule.status === 'published').length}</strong></div>
-        <div><span>已启用</span><strong>{rules.filter((rule) => rule.status === 'published' && enabledRules[rule.id]).length}</strong></div>
-        <div><span>待处理草稿</span><strong>{rules.filter((rule) => rule.status === 'draft').length}</strong></div>
+        <div><span>规则总数</span><strong>{serverStatistics?.total ?? '—'}</strong></div>
+        <div><span>已上线</span><strong>{serverStatistics?.published ?? '—'}</strong></div>
+        <div><span>已启用</span><strong>{serverStatistics?.enabled ?? '—'}</strong></div>
+        <div><span>待处理草稿</span><strong>{serverStatistics?.drafts ?? '—'}</strong></div>
       </div>
       <div className="sc-rules-filter"><input aria-label="搜索规则" onChange={(event) => setQuery(event.target.value)} placeholder="搜索规则名称或条件" role="searchbox" value={query} /><span>{visibleRules.length} 条结果</span></div>
       <MarkdownImportPanel />

@@ -33,7 +33,7 @@ export function StockHeader() {
         {cycles.map(([value, label]) => (
           <button
             aria-pressed={workspace.cycle === value}
-            className={`min-h-12 rounded-xl px-4 text-sm font-semibold ${workspace.cycle === value ? 'bg-[var(--sc-primary)] text-white' : 'bg-[var(--sc-surface-muted)] text-[var(--sc-muted)]'}`}
+            className={`sc-cycle-button ${workspace.cycle === value ? 'is-active' : ''}`}
             key={value}
             onClick={() => void workspace.setCycle(value)}
             type="button"

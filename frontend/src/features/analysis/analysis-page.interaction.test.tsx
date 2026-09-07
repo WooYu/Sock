@@ -46,6 +46,8 @@ describe('AnalysisPage interactions', () => {
     expect(container.querySelector('.sc-analysis-page')).toBeInTheDocument()
     expect(container.querySelector('.sc-analysis-tabs')).toBeInTheDocument()
     expect(screen.getByRole('complementary', { name: '分析操作' })).toHaveClass('sc-context-rail')
+    expect(screen.getByRole('button', { name: '短线' })).toHaveClass('sc-cycle-button', 'is-active')
+    expect(screen.getByRole('button', { name: '波段' })).toHaveClass('sc-cycle-button')
   })
 
   test('shows loading feedback while analysis data is pending', () => {
