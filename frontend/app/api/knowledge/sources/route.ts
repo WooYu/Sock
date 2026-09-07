@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server'
-import { importKnowledgeSource } from '@/lib/api/backend-client'
+import { getKnowledgeSources, importKnowledgeSource } from '@/lib/api/backend-client'
+
+export async function GET(request: Request) {
+  try { return NextResponse.json(await getKnowledgeSources(request.headers.get('authorization') ?? undefined)) } catch { return NextResponse.json({ message: '知识来源暂时不可用' }, { status: 502 }) }
+}
 
 export async function POST(request: Request) {
   const body = await request.json()

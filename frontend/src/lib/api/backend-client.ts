@@ -120,6 +120,12 @@ export function importKnowledgeSource(path: string, content: string, authorizati
   })
 }
 
+export function getKnowledgeSources(authorization?: string) {
+  return request<Array<Record<string, unknown>>>('/api/v1/knowledge/sources', {
+    headers: authorization ? { Authorization: authorization } : undefined,
+  })
+}
+
 export function extractKnowledgeSource(id: string, authorization?: string) {
   return request<unknown[]>(`/api/v1/knowledge/sources/${encodeURIComponent(id)}/extract`, {
     method: 'POST',

@@ -31,6 +31,11 @@ export function importKnowledgeSource(path: string, content: string) {
   return request<KnowledgeSource>('/api/knowledge/sources', { method: 'POST', headers: { 'Content-Type': 'application/json', ...(authorization ? { Authorization: authorization } : {}) }, body: JSON.stringify({ path, content }) })
 }
 
+export function getKnowledgeSources() {
+  const authorization = typeof window === 'undefined' ? undefined : getAuthorizationHeader()
+  return request<KnowledgeSource[]>('/api/knowledge/sources', { headers: authorization ? { Authorization: authorization } : undefined })
+}
+
 export function extractKnowledgeSource(id: string) {
   const authorization = typeof window === 'undefined' ? undefined : getAuthorizationHeader()
   return request<unknown[]>(`/api/knowledge/sources/${encodeURIComponent(id)}/extract`, { method: 'POST', headers: authorization ? { Authorization: authorization } : undefined })
