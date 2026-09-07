@@ -13,13 +13,16 @@ describe('TradingPage interactions', () => {
     expect(container.querySelector('.sc-trading-header')).toBeInTheDocument()
     expect(container.querySelector('.sc-workspace-tabs')).toBeInTheDocument()
     expect(container.querySelector('.sc-trading-content')).toBeInTheDocument()
+    expect(screen.getByRole('table', { name: '持仓列表' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: '持仓' })).toHaveAttribute('aria-selected', 'true')
   })
 
   test('records a trade from the ledger action', async () => {
     const user = userEvent.setup()
     render(<TradingPage initialTab="ledger" symbol="600519" />)
 
-    await user.click(screen.getByRole('button', { name: '记录第一笔交易' }))
+    expect(screen.getByRole('dialog', { name: '新增交易' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: '记录交易' }))
     await user.selectOptions(screen.getByLabelText('交易方向'), 'buy')
     await user.type(screen.getByLabelText('交易数量'), '100')
     await user.type(screen.getByLabelText('成交价格'), '1290')

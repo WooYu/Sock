@@ -242,7 +242,7 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
   }
 
   return (
-    <section className="sc-kline-workspace">
+    <section className="sc-kline-workspace sc-kline-terminal">
       <MarketFeedback errorMessage={errorMessage} hasSnapshot onRetry={onRetry} status={status} />
       <header className="sc-kline-header sc-kline-summary">
         <div>
@@ -258,10 +258,10 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
           <strong>{priceText(currentPrice)}</strong>
           <span className={snapshot?.quote.price && snapshot.quote.price >= (snapshot.quote.previousClose ?? snapshot.quote.price) ? 'is-rise' : ''}>收盘参考价</span>
         </div>
-        <button aria-expanded={toolsOpen} className="sc-kline-mobile-tools-trigger" onClick={() => setToolsOpen(true)} type="button">工具</button>
+        <button aria-expanded={toolsOpen} className="sc-kline-mobile-tools-trigger" onClick={() => setToolsOpen(true)} type="button">图表工具</button>
       </header>
 
-      {toolsOpen ? <div className="sc-kline-tools-overlay" onMouseDown={(event) => event.target === event.currentTarget && setToolsOpen(false)} role="presentation"><section aria-label="K线工具" aria-modal="true" className="sc-kline-tool-sheet" role="dialog"><button aria-label="关闭工具" className="sc-kline-tool-sheet-close" onClick={() => setToolsOpen(false)} type="button">×</button><h2>工具</h2><ChartToolbar activeTool={activeTool} onToolChange={(tool) => { setActiveTool(tool); setToolsOpen(false) }} /><section aria-label="指标设置"><h3>指标设置</h3>{indicatorOptions.map(([key, label]) => <label className="sc-kline-indicator" key={key}><input aria-label={label} checked={indicators[key]} onChange={(event) => setIndicators((old) => ({ ...old, [key]: event.target.checked }))} role="switch" type="checkbox" /><span>{label}</span></label>)}</section></section></div> : null}
+      {toolsOpen ? <div className="sc-kline-tools-overlay" onMouseDown={(event) => event.target === event.currentTarget && setToolsOpen(false)} role="presentation"><section aria-label="图表工具" aria-modal="true" className="sc-kline-tool-sheet" role="dialog"><button aria-label="关闭图表工具" className="sc-kline-tool-sheet-close" onClick={() => setToolsOpen(false)} type="button">×</button><h2>图表工具</h2><ChartToolbar activeTool={activeTool} onToolChange={(tool) => { setActiveTool(tool); setToolsOpen(false) }} /><section aria-label="指标设置"><h3>指标设置</h3>{indicatorOptions.map(([key, label]) => <label className="sc-kline-indicator" key={key}><input aria-label={label} checked={indicators[key]} onChange={(event) => setIndicators((old) => ({ ...old, [key]: event.target.checked }))} role="switch" type="checkbox" /><span>{label}</span></label>)}</section></section></div> : null}
 
       <div className="sc-kline-controls sc-kline-control-card">
         <div className="sc-kline-control-row" aria-label="K线周期">

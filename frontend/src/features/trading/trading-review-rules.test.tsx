@@ -7,7 +7,7 @@ import { RulesPage } from '../rules/rules-page'
 describe('交易、复盘与规则库', () => {
   it('交易页切换页签并保留当前股票上下文', () => {
     render(<TradingPage symbol="600519" initialTab="positions" />)
-    expect(screen.getByRole('heading', { name: '持仓与交易' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '持仓' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('tab', { name: '预测记录' }))
     expect(screen.getByRole('heading', { name: '预测记录' })).toBeInTheDocument()
     expect(screen.getByText('当前股票：600519')).toBeInTheDocument()

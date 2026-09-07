@@ -23,10 +23,10 @@ describe('LiveOverviewPage', () => {
     expect(screen.getByText(/Tushare Pro/)).toBeInTheDocument()
   })
 
-  test('groups the live workflow into attention, key-level and next-action regions', () => {
+  test('groups the live workflow into decision, key-level and next-action regions', () => {
     render(<LiveOverviewPage snapshot={snapshot} />)
 
-    expect(screen.getByRole('region', { name: '今日关注' })).toBeVisible()
+    expect(screen.getByRole('region', { name: '投资决策' })).toHaveClass('sc-decision-primary')
     expect(screen.getByRole('region', { name: '关键位' })).toBeVisible()
     expect(screen.getByRole('region', { name: '下一步' })).toBeVisible()
   })

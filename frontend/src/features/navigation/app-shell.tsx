@@ -15,12 +15,23 @@ type AppShellProps = {
   children?: React.ReactNode
 }
 
+const navIconPaths = {
+  home: <><path d="M3 10.5 12 3l9 7.5" /><path d="M5.5 9.5V21h13V9.5M9 21v-7h6v7" /></>,
+  analysis: <><path d="M4 19V9m6 10V5m6 14v-7m4 7H2" /><path d="m3 7 6-4 6 6 6-5" /></>,
+  rules: <><path d="M6 3h12v18H6z" /><path d="M9 8h6M9 12h6M9 16h4" /></>,
+  review: <><path d="M4 5h16v16H4z" /><path d="M8 3v4m8-4v4M7 11h10M8 15l2 2 5-5" /></>,
+  settings: <><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6 1.7 1.7 0 0 0 10 3V2.8h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z" /></>,
+} satisfies Record<string, React.ReactNode>
+
+function NavigationIcon({ name }: { name: keyof typeof navIconPaths }) {
+  return <svg aria-hidden="true" className="sc-nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8">{navIconPaths[name]}</svg>
+}
+
 export function AppShell({
   section,
   onSectionChange,
   activeHref,
   currentStockLabel,
-  tone = 'neutral',
   children,
 }: AppShellProps) {
   const [searchOpen, setSearchOpen] = useState(false)
@@ -65,7 +76,7 @@ export function AppShell({
             key={`${item.section}-${item.label}`}
             onClick={() => onSectionChange(item.section)}
           >
-            <span aria-hidden="true" className="sc-nav-icon">{item.icon}</span>
+            <NavigationIcon name={item.icon} />
             <span>{item.label}</span>
           </Link>
           )
@@ -75,12 +86,12 @@ export function AppShell({
   }
 
   return (
-    <div className={`sc-shell sc-tone-${tone}`} data-testid="app-shell">
+    <div className="sc-shell sc-shell-unified" data-testid="app-shell">
       <header className="sc-shell-header">
         <div className="sc-shell-header-inner">
           <Link className="sc-brand" href="/overview" aria-label="回到总览">
             <span className="sc-brand-mark"><i /><i /><i /></span>
-            <span>位界 <em>KEYLINE</em></span>
+            <span>StockCal</span>
           </Link>
           <div className="sc-desktop-nav">
             {renderNavigation(desktopNavigation, 'desktop-primary-nav')}

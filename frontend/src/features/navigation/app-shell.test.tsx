@@ -14,10 +14,12 @@ describe('AppShell', () => {
     expect(screen.getByTestId('desktop-primary-nav').querySelector('a[aria-current="page"]')).toHaveTextContent('首页')
   })
 
-  test('applies the requested workspace tone to the shell', () => {
+  test('uses one visual system regardless of the compatibility tone', () => {
     render(<AppShell section="rules" onSectionChange={vi.fn()} tone="feed" />)
 
-    expect(screen.getByTestId('app-shell')).toHaveClass('sc-tone-feed')
+    expect(screen.getByTestId('app-shell')).toHaveClass('sc-shell-unified')
+    expect(screen.getByTestId('app-shell')).not.toHaveClass('sc-tone-feed')
+    expect(screen.getByRole('link', { name: '回到总览' })).toHaveTextContent('StockCal')
   })
 
   test('keeps the primary navigation focused on five workspaces', () => {
@@ -66,6 +68,8 @@ describe('AppShell', () => {
     expect(links).toHaveLength(5)
     for (const link of links) {
       expect(link.className).toContain('min-h-12')
+      expect(link.querySelector('.sc-nav-icon')).toHaveAttribute('aria-hidden', 'true')
+      expect(link.textContent?.trim().length).toBeGreaterThan(1)
     }
   })
 
@@ -93,8 +97,7 @@ describe('AppShell', () => {
     expect(styles).toContain('.sc-shell-header')
     expect(styles).toContain('.sc-shell-main')
     expect(styles).toContain('.sc-live-empty')
-    expect(styles).toContain('.sc-tone-cyber')
-    expect(styles).toContain('.sc-tone-chart')
-    expect(styles).toContain('.sc-tone-feed')
+    expect(styles).toContain('.sc-shell-unified')
+    expect(styles).not.toContain('.sc-tone-cyber .sc-shell-main')
   })
 })

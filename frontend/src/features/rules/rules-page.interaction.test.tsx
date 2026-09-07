@@ -11,7 +11,9 @@ describe('RulesPage interactions', () => {
 
     expect(container.querySelector('.sc-rules-page')).toBeInTheDocument()
     expect(container.querySelector('.sc-rules-overview')).toBeInTheDocument()
-    expect(container.querySelector('.sc-rules-list')).toBeInTheDocument()
+    expect(screen.getByRole('table', { name: '规则表格' })).toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: '规则名称' })).toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: '条件完整性' })).toBeInTheDocument()
   })
 
   test('shows built-in rules when no local rules exist', () => {

@@ -154,20 +154,20 @@ export function RulesPage({ initialRules = [], client = defaultClient }: { initi
         <div className="flex gap-3"><button className="min-h-12 rounded-xl bg-[var(--sc-primary)] px-4 text-sm font-semibold text-white" type="submit">保存规则草稿</button><button className="min-h-12 rounded-xl border border-[var(--sc-border)] px-4" onClick={() => setOpen(false)} type="button">取消</button></div>
       </form> : null}
       {message ? <p className="text-sm text-emerald-700" role="status">{message}</p> : null}
-      {visibleRules.length === 0 ? <div className="sc-rules-empty">没有匹配的规则。</div> : <div className="sc-rules-list">
-        {visibleRules.map((rule) => <article className="sc-rule-card" key={rule.id}>
-          <div className="sc-rule-card-main">
-            <div className="flex flex-wrap items-center gap-2"><h2 className="font-medium">{rule.title}</h2>{rule.source ? <span className="rounded-full bg-[var(--sc-surface-muted)] px-2 py-1 text-xs text-[var(--sc-muted)]">{rule.source}</span> : null}</div>
-            {rule.description ? <p className="mt-1 text-sm text-[var(--sc-muted)]">{rule.description}</p> : null}
-            <p className="mt-1 text-sm text-[var(--sc-muted)]">{rule.status === 'published' ? (enabledRules[rule.id] ? '参与分析' : '已停用') : '草稿'}</p>
-            {rule.status === 'published' && (rule.timeframe || rule.mode) ? <p className="mt-1 text-xs text-[var(--sc-muted)]">{enabledRules[rule.id] ? '已启用' : '未启用'}{rule.timeframe ? ` · ${rule.timeframe}` : ''}{rule.mode ? ` · ${rule.mode}` : ''}</p> : null}
-          </div>
-          <div className="sc-rule-card-actions">
-            {rule.status === 'published' ? <><span className="sc-rule-status published">已发布</span><button aria-label={`${enabledRules[rule.id] ? '停用' : '启用'}规则 ${rule.title}`} aria-pressed={enabledRules[rule.id] ?? true} className={`sc-rule-toggle ${enabledRules[rule.id] ? 'enabled' : ''}`} onClick={() => void toggleRule(rule)} type="button">{enabledRules[rule.id] ? '已启用' : '已停用'}</button></> : <button className="sc-rule-publish" onClick={() => publish(rule.id)} type="button" aria-label={`发布${rule.title}`}>发布</button>}
+      {visibleRules.length === 0 ? <div className="sc-rules-empty">没有匹配的规则。</div> : <div className="sc-rules-table-wrap"><table aria-label="规则表格" className="sc-rules-table">
+        <thead><tr><th>规则名称</th><th>周期</th><th>模式</th><th>条件完整性</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody>{visibleRules.map((rule) => <tr className="sc-rule-card" key={rule.id}>
+          <td className="sc-rule-card-main" data-label="规则名称"><div><h2>{rule.title}</h2>{rule.source ? <span>{rule.source}</span> : null}</div>{rule.description ? <p>{rule.description}</p> : null}</td>
+          <td data-label="周期">{rule.timeframe ?? '—'}</td>
+          <td data-label="模式">{rule.mode ?? rule.action ?? '—'}</td>
+          <td data-label="条件完整性"><span className={`sc-rule-completeness ${rule.conditions?.length ? 'complete' : 'missing'}`}>{rule.conditions?.length ? '完整' : '缺失'}</span></td>
+          <td data-label="状态">{rule.status === 'published' ? <><span className="sc-rule-status published">已发布</span><span className="sc-rule-participation">{enabledRules[rule.id] ? '参与分析' : '不参与分析'}</span></> : <span className="sc-rule-status draft">草稿</span>}</td>
+          <td data-label="操作"><div className="sc-rule-card-actions">
+            {rule.status === 'published' ? <button aria-label={`${enabledRules[rule.id] ? '停用' : '启用'}规则 ${rule.title}`} aria-pressed={enabledRules[rule.id] ?? true} className={`sc-rule-toggle ${enabledRules[rule.id] ? 'enabled' : ''}`} onClick={() => void toggleRule(rule)} type="button">{enabledRules[rule.id] ? '已启用' : '已停用'}</button> : <button className="sc-rule-publish" onClick={() => publish(rule.id)} type="button" aria-label={`发布${rule.title}`}>发布</button>}
             <button aria-label={`查看规则详情 ${rule.title}`} className="sc-rule-detail-button" onClick={() => setSelectedRule(rule)} type="button">查看详情</button>
-          </div>
-        </article>)}
-      </div>}
+          </div></td>
+        </tr>)}</tbody>
+      </table></div>}
       {selectedRule ? <div className="modal-layer" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setSelectedRule(null)}><section aria-label={`规则详情 ${selectedRule.title}`} aria-modal="true" className="rule-detail-panel" role="dialog"><button aria-label="关闭规则详情" className="modal-close" onClick={() => setSelectedRule(null)} type="button">×</button><p className="text-sm text-[var(--sc-muted)]">规则详情 · {selectedRule.status === 'published' ? '已发布' : '草稿'}</p><h2 className="mt-2 text-xl font-semibold">{selectedRule.title}</h2><p className="mt-3 text-sm text-[var(--sc-muted)]">{selectedRule.description || '暂无规则说明。'}</p><dl className="mt-4 space-y-2 text-sm"><div className="flex justify-between gap-4"><dt className="text-[var(--sc-muted)]">状态</dt><dd>{selectedRule.status === 'published' && enabledRules[selectedRule.id] ? '已启用' : selectedRule.status === 'published' ? '已停用' : '草稿'}</dd></div>{selectedRule.timeframe ? <div className="flex justify-between gap-4"><dt className="text-[var(--sc-muted)]">周期</dt><dd>{selectedRule.timeframe}</dd></div> : null}{selectedRule.mode ? <div className="flex justify-between gap-4"><dt className="text-[var(--sc-muted)]">模式</dt><dd>{selectedRule.mode}</dd></div> : null}</dl><div className="mt-5 flex justify-end"><button className="min-h-12 rounded-xl bg-[var(--sc-primary)] px-4 text-sm font-semibold text-white" onClick={() => setSelectedRule(null)} type="button">返回规则列表</button></div></section></div> : null}
     </section>
   )

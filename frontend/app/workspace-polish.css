@@ -322,3 +322,143 @@
   .sc-kline-svg { min-height: 265px; }
   .sc-kline-statusbar { flex-wrap: wrap; gap: 5px 10px; font-size: 10px; }
 }
+
+/* Unified light trading-terminal composition. */
+.sc-shell-unified .sc-shell-main { background: var(--sc-background); color: var(--sc-foreground); }
+.sc-shell-unified .sc-shell-header { border-color: var(--sc-border); background: rgb(255 255 255 / 96%); }
+.sc-shell-unified .sc-brand { color: var(--sc-primary); font-size: 19px; font-weight: 800; }
+.sc-shell-unified .sc-brand-mark { background: var(--sc-primary); }
+.sc-shell-unified .sc-nav-icon { width: 19px; height: 19px; flex: 0 0 auto; }
+.sc-shell-unified .sc-nav-link { min-height: 44px; color: var(--sc-muted); font-size: 14px; }
+.sc-shell-unified .sc-nav-link:hover, .sc-shell-unified .sc-nav-link.active { color: var(--sc-primary); }
+.sc-shell-unified .sc-search-box, .sc-shell-unified .sc-search-box input { font-size: 14px; }
+.sc-shell-unified .sc-account-sync { min-height: 40px; font-size: 14px; }
+
+.sc-decision-workspace { grid-template-columns: minmax(0, 1.35fr) minmax(360px, .9fr); align-items: stretch; }
+.sc-decision-workspace > .sc-market-feedback { grid-column: 1 / -1; }
+.sc-decision-workspace .sc-decision-primary { min-height: 188px; border-color: var(--sc-border); border-radius: 10px; background: var(--sc-surface); box-shadow: none; }
+.sc-decision-workspace .sc-live-card { border-color: var(--sc-border); border-radius: 10px; box-shadow: none; }
+.sc-decision-workspace .sc-live-actions { grid-column: 1 / -1; }
+.sc-decision-workspace .sc-live-actions a { min-height: 44px; border-radius: 7px; font-size: 14px; line-height: 42px; }
+
+.sc-analysis-page { grid-template-columns: minmax(0, 1fr) 230px; align-items: start; }
+.sc-analysis-page > .sc-stock-header, .sc-analysis-page > .sc-analysis-decision, .sc-analysis-page > .sc-analysis-tabs { grid-column: 1 / -1; }
+.sc-analysis-content { grid-column: 1; }
+.sc-context-rail { grid-column: 2; display: grid; position: sticky; top: 92px; gap: 10px; border: 1px solid var(--sc-border); border-radius: 10px; background: var(--sc-surface); padding: 14px; }
+.sc-context-rail > * { width: 100%; min-height: 44px; font-size: 14px; }
+.sc-stock-header, .sc-analysis-decision, .sc-analysis-panel { border-color: var(--sc-border) !important; border-radius: 10px !important; box-shadow: none; }
+.sc-analysis-tabs a { min-height: 44px; font-size: 14px; }
+
+@media (max-width: 900px) {
+  .sc-decision-workspace, .sc-analysis-page { grid-template-columns: 1fr; }
+  .sc-decision-workspace > .sc-market-feedback, .sc-decision-workspace .sc-live-actions, .sc-analysis-page > .sc-stock-header, .sc-analysis-page > .sc-analysis-decision, .sc-analysis-page > .sc-analysis-tabs, .sc-analysis-content, .sc-context-rail { grid-column: 1; }
+  .sc-context-rail { position: static; display: flex; flex-wrap: wrap; }
+  .sc-context-rail > * { flex: 1 1 180px; }
+}
+
+@media (max-width: 640px) {
+  .sc-decision-workspace { gap: 12px; }
+  .sc-decision-workspace .sc-decision-primary { min-height: 0; padding: 18px; }
+  .sc-shell-unified .sc-main-nav-mobile .sc-nav-link { min-height: 60px; font-size: 12px; }
+  .sc-shell-unified .sc-main-nav-mobile .sc-nav-icon { width: 22px; height: 22px; }
+  .sc-context-rail { padding: 12px; }
+  .sc-context-rail > * { flex-basis: 100%; }
+}
+
+.sc-kline-terminal { border: 1px solid var(--sc-border); border-radius: 10px; background: var(--sc-background); box-shadow: none; }
+.sc-kline-terminal .sc-kline-control-card, .sc-kline-terminal .sc-kline-control-row, .sc-kline-terminal .sc-kline-tool-row, .sc-kline-terminal .sc-kline-chart-panel, .sc-kline-terminal .sc-kline-layer-panel, .sc-kline-terminal .sc-kline-side-card { border-color: var(--sc-border); border-radius: 8px; background: var(--sc-surface); box-shadow: none; }
+.sc-kline-terminal .sc-kline-group-label, .sc-kline-terminal .sc-kline-hint, .sc-kline-terminal .sc-kline-subtitle { font-size: 12px; }
+.sc-kline-terminal .sc-kline-segmented button, .sc-kline-terminal .sc-kline-tool-button, .sc-kline-terminal .sc-kline-control-button, .sc-kline-terminal .sc-kline-indicator { min-height: 36px; font-size: 13px; }
+.sc-kline-terminal .sc-kline-segmented button.is-active, .sc-kline-terminal .sc-kline-tool-button.is-active, .sc-kline-terminal .sc-kline-control-button.is-active { background: var(--sc-primary-soft); color: var(--sc-primary); }
+.sc-kline-terminal .sc-kline-chart-heading, .sc-kline-terminal .sc-kline-statusbar { font-size: 12px; }
+
+@media (max-width: 640px) {
+  .sc-kline-terminal { border: 0; border-radius: 0; padding: 0; }
+  .sc-kline-terminal .sc-kline-control-card { padding: 8px; }
+  .sc-kline-terminal .sc-kline-segmented button, .sc-kline-terminal .sc-kline-tool-button, .sc-kline-terminal .sc-kline-control-button, .sc-kline-terminal .sc-kline-indicator { min-height: 44px; font-size: 14px; }
+  .sc-kline-mobile-tools-trigger { min-height: 44px; font-size: 14px; }
+  .sc-kline-tool-sheet { border: 1px solid var(--sc-border); border-bottom: 0; border-radius: 16px 16px 0 0; }
+}
+
+.sc-rules-page { border-color: var(--sc-border); border-radius: 10px; box-shadow: none; }
+.sc-rules-actions > button, .sc-rules-actions > a, .sc-rules-filter input, .sc-import-button, .sc-import-field, .sc-import-editors > button, .sc-review-actions button { min-height: 40px; border-radius: 7px; font-size: 14px; }
+.sc-rules-overview { border-color: var(--sc-border); border-radius: 8px; background: var(--sc-border); }
+.sc-rules-overview > div { background: var(--sc-surface); }
+.sc-rules-table-wrap { overflow-x: auto; border: 1px solid var(--sc-border); border-radius: 8px; }
+.sc-rules-table { width: 100%; border-collapse: collapse; background: var(--sc-surface); font-size: 14px; }
+.sc-rules-table th { padding: 12px 14px; border-bottom: 1px solid var(--sc-border); background: var(--sc-surface-muted); color: var(--sc-muted); font-size: 12px; font-weight: 700; text-align: left; white-space: nowrap; }
+.sc-rules-table td { padding: 13px 14px; border-bottom: 1px solid var(--sc-border); vertical-align: middle; }
+.sc-rules-table tbody tr:last-child td { border-bottom: 0; }
+.sc-rules-table .sc-rule-card { display: table-row; background: var(--sc-surface); }
+.sc-rules-table .sc-rule-card:hover { background: var(--sc-primary-soft); box-shadow: none; }
+.sc-rules-table .sc-rule-card-main h2 { margin: 0; color: var(--sc-foreground); font-size: 14px; font-weight: 650; }
+.sc-rules-table .sc-rule-card-main > div { display: flex; align-items: center; gap: 8px; }
+.sc-rules-table .sc-rule-card-main > div span { color: var(--sc-text-muted); font-size: 12px; }
+.sc-rules-table .sc-rule-card-main p { max-width: 440px; margin: 4px 0 0; overflow: hidden; color: var(--sc-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.sc-rule-completeness { font-size: 12px; font-weight: 700; }
+.sc-rule-completeness.complete { color: var(--sc-loss); }
+.sc-rule-completeness.missing { color: var(--sc-danger); }
+.sc-rule-participation { display: block; margin-top: 4px; color: var(--sc-text-muted); font-size: 12px; }
+.sc-rule-status, .sc-rule-toggle, .sc-rule-publish, .sc-rule-detail-button { min-height: 34px; border-radius: 6px; font-size: 12px; }
+
+@media (max-width: 640px) {
+  .sc-rules-page { border: 0; padding: 0; }
+  .sc-rules-table-wrap { overflow: visible; border: 0; }
+  .sc-rules-table, .sc-rules-table tbody { display: grid; gap: 10px; }
+  .sc-rules-table thead { display: none; }
+  .sc-rules-table .sc-rule-card { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; border: 1px solid var(--sc-border); border-radius: 8px; padding: 14px; }
+  .sc-rules-table td { display: grid; grid-template-columns: 80px 1fr; align-items: center; padding: 0; border: 0; }
+  .sc-rules-table td::before { color: var(--sc-text-muted); font-size: 12px; content: attr(data-label); }
+  .sc-rules-table .sc-rule-card-main, .sc-rules-table td:last-child { grid-column: 1 / -1; }
+  .sc-rules-table .sc-rule-card-main { display: block; }
+  .sc-rules-table .sc-rule-card-main::before { display: none; }
+  .sc-rule-card-actions { justify-content: stretch; }
+  .sc-rule-card-actions button { min-height: 44px; flex: 1; font-size: 14px; }
+}
+
+.sc-trading-page, .sc-review-workspace, .sc-settings-workspace { border-color: var(--sc-border); border-radius: 10px; background: var(--sc-surface); box-shadow: none; }
+.sc-trading-stat-card { border-color: var(--sc-border); border-radius: 8px !important; background: var(--sc-surface-muted) !important; }
+.sc-position-table-wrap { overflow-x: auto; border: 1px solid var(--sc-border); border-radius: 8px; }
+.sc-position-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.sc-position-table th { padding: 12px 14px; background: var(--sc-surface-muted); color: var(--sc-muted); font-size: 12px; text-align: left; }
+.sc-position-table td { padding: 14px; border-top: 1px solid var(--sc-border); }
+.sc-position-table a { color: var(--sc-primary); font-weight: 700; }
+.sc-table-empty { color: var(--sc-text-muted); text-align: center; }
+.sc-trade-dialog-layer { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; background: rgb(15 23 42 / 42%); padding: 20px; }
+.sc-trade-dialog { display: grid; width: min(560px, 100%); gap: 18px; border: 1px solid var(--sc-border); border-radius: 10px; background: var(--sc-surface); padding: 22px; box-shadow: 0 18px 50px rgb(15 23 42 / 18%); }
+.sc-trade-dialog-heading { display: flex; align-items: center; justify-content: space-between; }
+.sc-trade-dialog-heading h2 { margin: 0; font-size: 20px; }
+.sc-trade-dialog-heading button { min-width: 44px; min-height: 44px; background: transparent; font-size: 22px; }
+.sc-trade-dialog input, .sc-trade-dialog select { min-height: 44px; border-radius: 7px; font-size: 14px; }
+.sc-trade-dialog-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.sc-trade-dialog-actions button { min-height: 44px; border: 1px solid var(--sc-border); border-radius: 7px; padding: 0 16px; background: var(--sc-surface); font-size: 14px; font-weight: 700; }
+.sc-trade-dialog-actions button:first-child { border-color: var(--sc-primary); background: var(--sc-primary); color: #fff; }
+.sc-review-primary-action { border-radius: 7px; background: var(--sc-primary); box-shadow: none; }
+.sc-review-primary-action:hover { background: var(--sc-primary-hover); }
+
+/* Keep business copy readable across legacy workspace components. Chart-axis labels are exempt. */
+.sc-shell-unified .sc-shell-main button,
+.sc-shell-unified .sc-shell-main input,
+.sc-shell-unified .sc-shell-main select,
+.sc-shell-unified .sc-shell-main textarea { font-size: max(13px, 1em); }
+.sc-shell-unified .sc-analysis-panel-heading > span,
+.sc-shell-unified .sc-decision-status p:not(:first-child),
+.sc-shell-unified .sc-key-level-card > div:first-child > span,
+.sc-shell-unified .sc-key-level-card .mt-3,
+.sc-shell-unified .sc-analysis-saved { font-size: 12px; }
+
+@media (max-width: 640px) {
+  .sc-trading-page, .sc-review-workspace, .sc-settings-workspace { border: 0; padding: 0; }
+  .sc-position-table-wrap { border: 0; }
+  .sc-position-table, .sc-position-table tbody { display: grid; gap: 10px; }
+  .sc-position-table thead { display: none; }
+  .sc-position-table tr { display: grid; gap: 8px; border: 1px solid var(--sc-border); border-radius: 8px; padding: 14px; }
+  .sc-position-table td { display: grid; grid-template-columns: 92px 1fr; padding: 0; border: 0; }
+  .sc-position-table td::before { color: var(--sc-text-muted); font-size: 12px; content: attr(data-label); }
+  .sc-position-table .sc-table-empty { display: block; }
+  .sc-position-table .sc-table-empty::before { display: none; }
+  .sc-trade-dialog-layer { align-items: end; padding: 0; }
+  .sc-trade-dialog { max-height: 86vh; overflow-y: auto; border-radius: 16px 16px 0 0; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+  .sc-trade-dialog-actions { position: sticky; bottom: 0; padding-top: 8px; background: var(--sc-surface); }
+  .sc-trade-dialog-actions button { flex: 1; }
+}

@@ -17,21 +17,21 @@ export type NavigationItem = {
   section: PrimarySection
   label: string
   href: string
-  icon: string
+  icon: 'home' | 'analysis' | 'rules' | 'review' | 'settings'
 }
 
 export const desktopNavigation: NavigationItem[] = [
-  { section: 'overview', label: '首页', href: '/overview', icon: '◈' },
-  { section: 'analysis', label: '分析', href: '/analysis/key-levels', icon: '↗' },
-  { section: 'rules', label: '规则', href: '/rules', icon: '◇' },
-  { section: 'review', label: '复盘', href: '/review/daily', icon: '✓' },
-  { section: 'settings', label: '设置', href: '/settings', icon: '⚙' },
+  { section: 'overview', label: '首页', href: '/overview', icon: 'home' },
+  { section: 'analysis', label: '分析', href: '/analysis/key-levels', icon: 'analysis' },
+  { section: 'rules', label: '规则', href: '/rules', icon: 'rules' },
+  { section: 'review', label: '复盘', href: '/review/daily', icon: 'review' },
+  { section: 'settings', label: '设置', href: '/settings', icon: 'settings' },
 ]
 
 export const mobileNavigation: NavigationItem[] = [
-  { section: 'overview', label: '首页', href: '/overview', icon: '◈' },
-  { section: 'analysis', label: '分析', href: '/analysis/key-levels', icon: '↗' },
-  { section: 'rules', label: '规则', href: '/rules', icon: '◇' },
-  { section: 'review', label: '复盘', href: '/review/daily', icon: '↺' },
-  { section: 'settings', label: '设置', href: '/settings', icon: '⚙' },
+  { section: 'overview', label: '首页', href: '/overview', icon: 'home' },
+  { section: 'analysis', label: '分析', href: '/analysis/key-levels', icon: 'analysis' },
+  { section: 'rules', label: '规则', href: '/rules', icon: 'rules' },
+  { section: 'review', label: '复盘', href: '/review/daily', icon: 'review' },
+  { section: 'settings', label: '设置', href: '/settings', icon: 'settings' },
 ]

@@ -23,6 +23,7 @@ describe('ChartWorkspace', () => {
   test('exposes the redesigned chart workspace regions', () => {
     const { container } = renderChart()
 
+    expect(container.querySelector('.sc-kline-terminal')).toBeInTheDocument()
     expect(container.querySelector('.sc-kline-summary')).toBeInTheDocument()
     expect(container.querySelector('.sc-kline-control-card')).toBeInTheDocument()
     expect(container.querySelector('.sc-kline-content')).toBeInTheDocument()
@@ -62,10 +63,10 @@ describe('ChartWorkspace', () => {
 
   test('opens a compact mobile tools sheet with the existing drawing controls', async () => {
     renderChart()
-    await userEvent.click(screen.getByRole('button', { name: '工具' }))
+    await userEvent.click(screen.getByRole('button', { name: '图表工具' }))
 
-    expect(screen.getByRole('dialog', { name: 'K线工具' })).toBeVisible()
-    expect(screen.getByRole('dialog', { name: 'K线工具' })).toHaveTextContent('指标设置')
+    expect(screen.getByRole('dialog', { name: '图表工具' })).toBeVisible()
+    expect(screen.getByRole('dialog', { name: '图表工具' })).toHaveTextContent('指标设置')
   })
 
   test('creates a point annotation by clicking the chart', async () => {

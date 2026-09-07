@@ -24,7 +24,7 @@ describe('ReviewPage interactions', () => {
     expect(screen.getByLabelText('执行情况')).toBeInTheDocument()
     expect(screen.getByLabelText('改进点')).toBeInTheDocument()
     await user.type(screen.getByLabelText('市场判断'), '今天等待回踩，没有追高。')
-    await user.click(screen.getByRole('button', { name: '保存当日总结' }))
+    await user.click(screen.getByRole('button', { name: '保存复盘' }))
 
     expect(screen.getByText('当日总结已保存')).toBeInTheDocument()
     first.unmount()

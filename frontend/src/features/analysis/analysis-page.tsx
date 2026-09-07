@@ -55,11 +55,11 @@ export function AnalysisPage({ tab }: { tab: AnalysisTab }) {
       {!initialLoading && !initialError && tab === 'future' ? <FutureIndicatorsPanel analysis={analysis} /> : null}
       {!initialLoading && !initialError && tab === 'ai' ? <AiStrategyPanel analysis={analysis} /> : null}
     </div>
-    <div className="sc-analysis-actions">
+    <aside aria-label="分析操作" className="sc-analysis-actions sc-context-rail">
       <button disabled={!analysis} onClick={savePrediction} type="button">保存预测快照</button>
       <Link href={`/trading/predictions${workspace.selectedSymbol ? `?symbol=${workspace.selectedSymbol}` : ''}`}>查看预测记录</Link>
       <Link href={`/chart${workspace.selectedSymbol ? `?symbol=${workspace.selectedSymbol}` : ''}`}>在专业 K 线中查看</Link>
-    </div>
+    </aside>
     {saved ? <p className="sc-analysis-saved" role="status">预测快照已保存</p> : null}
   </div>
 }

@@ -45,7 +45,7 @@ describe('AnalysisPage interactions', () => {
 
     expect(container.querySelector('.sc-analysis-page')).toBeInTheDocument()
     expect(container.querySelector('.sc-analysis-tabs')).toBeInTheDocument()
-    expect(container.querySelector('.sc-analysis-actions')).toBeInTheDocument()
+    expect(screen.getByRole('complementary', { name: '分析操作' })).toHaveClass('sc-context-rail')
   })
 
   test('shows loading feedback while analysis data is pending', () => {

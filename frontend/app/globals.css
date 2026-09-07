@@ -1,54 +1,39 @@
 @import 'tailwindcss';
 
 :root {
-  --sc-background: #f5f6f8;
-  --sc-foreground: #182033;
+  --sc-background: #f5f7fa;
+  --sc-foreground: #172033;
   --sc-surface: #ffffff;
-  --sc-surface-muted: #eef1f7;
-  --sc-border: #dfe3ec;
-  --sc-muted: #697386;
-  --sc-primary: #4057e8;
-  --sc-primary-soft: #eef1ff;
-  --sc-gain: #d94b5b;
-  --sc-loss: #15946f;
+  --sc-surface-muted: #f8fafc;
+  --sc-border: #d8dee8;
+  --sc-border-strong: #c6ceda;
+  --sc-muted: #526079;
+  --sc-text-muted: #718096;
+  --sc-primary: #4f46e5;
+  --sc-primary-hover: #4338ca;
+  --sc-primary-soft: #eef2ff;
+  --sc-gain: #dc2626;
+  --sc-loss: #059669;
+  --sc-warning: #d97706;
+  --sc-danger: #dc2626;
 }
 
-.sc-tone-cyber {
-  --sc-background: #07111f;
-  --sc-foreground: #eef6ff;
-  --sc-surface: #0c1a2c;
-  --sc-surface-muted: #10233b;
-  --sc-border: #203b5e;
-  --sc-muted: #9fb3ca;
-  --sc-primary: #31a7ff;
-  --sc-primary-soft: #11385c;
+.sc-shell-unified {
+  --ink: var(--sc-foreground);
+  --muted: var(--sc-muted);
+  --line: var(--sc-border);
+  --soft-line: #e8edf3;
+  --surface: var(--sc-surface);
+  --canvas: var(--sc-background);
+  --blue: var(--sc-primary);
+  --blue-soft: var(--sc-primary-soft);
+  --rise: var(--sc-gain);
+  --rise-soft: #fef2f2;
+  --fall: var(--sc-loss);
+  --fall-soft: #ecfdf5;
+  --amber: var(--sc-warning);
+  --amber-soft: #fffbeb;
 }
-
-.sc-tone-chart {
-  --sc-background: #f4f6f8;
-  --sc-foreground: #17212b;
-  --sc-surface: #ffffff;
-  --sc-surface-muted: #f5f7fa;
-  --sc-border: #d9e0e8;
-  --sc-muted: #64748b;
-  --sc-primary: #246bfe;
-  --sc-primary-soft: #eaf1ff;
-}
-
-.sc-tone-feed {
-  --sc-background: #ffffff;
-  --sc-foreground: #0f1419;
-  --sc-surface: #ffffff;
-  --sc-surface-muted: #f7f9f9;
-  --sc-border: #eff3f4;
-  --sc-muted: #536471;
-  --sc-primary: #1d9bf0;
-  --sc-primary-soft: #e8f5fd;
-}
-
-.sc-tone-cyber .sc-shell-header { background: rgba(7, 17, 31, .88); border-color: var(--sc-border); }
-.sc-tone-cyber .sc-shell-main { background: radial-gradient(circle at 50% 0, #102d4b 0, var(--sc-background) 42rem); }
-.sc-tone-chart .sc-shell-main, .sc-tone-feed .sc-shell-main { background: var(--sc-background); }
 .sc-kline-mobile-tools-trigger { display: none; min-height: 44px; border: 1px solid var(--sc-border); border-radius: 8px; background: var(--sc-surface); padding: 0 14px; color: var(--sc-foreground); font-weight: 700; }
 .sc-kline-tools-overlay { position: fixed; inset: 0; z-index: 70; display: grid; align-items: end; background: rgb(5 12 22 / 42%); }
 .sc-kline-tool-sheet { position: relative; display: grid; gap: 14px; max-height: 78vh; overflow-y: auto; border-radius: 20px 20px 0 0; background: var(--sc-surface); padding: 22px 18px calc(22px + env(safe-area-inset-bottom)); color: var(--sc-foreground); }
