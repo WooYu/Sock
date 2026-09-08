@@ -1,183 +1,147 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
-import type { Candle, MarketSnapshot } from '../workspace/stock-workspace-types'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import type { MarketSnapshot } from '../workspace/stock-workspace-types'
 import type { WorkspaceStatus } from '../workspace/stock-workspace-types'
 import { MarketFeedback, MarketLoadingState } from '../workspace/market-state'
-import { ChartAnnotationStore, type ChartAnnotation, type ChartTool } from './chart-annotation-store'
+import type { ChartTool } from './chart-annotation-store'
 import { ChartLayerPanel, type ChartLayerState } from './chart-layer-panel'
 import { ChartToolbar } from './chart-toolbar'
 import { mergeChartWorkspace, type ChartWorkspaceSnapshot } from './chart-workspace-state'
 import { loadChartSyncCursor, loadChartWorkspace, pullChartWorkspace, pushChartWorkspace, saveChartSyncCursor, saveChartWorkspace } from './chart-workspace-sync'
 import { getAuthorizationHeader, getClientId } from '../records/record-sync'
+import { createChartTransform } from './chart-coordinates'
+import { aggregateCandles, bollinger, movingAverage } from './chart-math'
+import type { ChartPeriod, DrawingObject, PredictionSnapshot, TimePricePoint } from './chart-types'
+import { DrawingEngine, type DrawingMove } from './drawing-engine'
+import { ChartCanvas } from './chart-canvas'
 
-type ChartPeriod = 'day' | 'week' | 'month'
+export { aggregateCandles } from './chart-math'
+
 type IndicatorKey = 'ma5' | 'ma10' | 'ma20' | 'boll'
 
 const periods: Array<[ChartPeriod, string]> = [['day', '日线'], ['week', '周线'], ['month', '月线']]
 const indicatorOptions: Array<[IndicatorKey, string]> = [['ma5', 'MA5'], ['ma10', 'MA10'], ['ma20', 'MA20'], ['boll', 'BOLL']]
 const indicatorColors: Record<IndicatorKey, string> = { ma5: '#d6a12a', ma10: '#4e9bd6', ma20: '#a46ee8', boll: '#6f7fd8' }
 
-export function aggregateCandles(candles: Candle[], period: ChartPeriod) {
-  const groups: Candle[] = []
-  const buckets = new Map<string, Candle[]>()
-  for (const candle of candles) {
-    const key = candlePeriodKey(candle.day, period)
-    buckets.set(key, [...(buckets.get(key) ?? []), candle])
-  }
-  for (const group of buckets.values()) {
-    if (!group.length) continue
-    groups.push({
-      day: group[0].day,
-      open: group[0].open,
-      high: Math.max(...group.map((candle) => candle.high)),
-      low: Math.min(...group.map((candle) => candle.low)),
-      close: group[group.length - 1].close,
-      volume: group.reduce((total, candle) => total + candle.volume, 0),
-    })
-  }
-  return groups
-}
-
-function candlePeriodKey(day: string, period: ChartPeriod) {
-  if (period === 'day') return day
-  if (period === 'month') return day.slice(0, 7)
-  const [year, month, dateOfMonth] = day.split('-').map(Number)
-  const date = new Date(Date.UTC(year, month - 1, dateOfMonth))
-  date.setUTCDate(date.getUTCDate() - ((date.getUTCDay() + 6) % 7))
-  return date.toISOString().slice(0, 10)
-}
-
-function movingAverage(candles: Candle[], size: number) {
-  return candles.map((_, index) => {
-    const values = candles.slice(Math.max(0, index - size + 1), index + 1).map((candle) => candle.close)
-    return values.reduce((total, value) => total + value, 0) / values.length
-  })
-}
-
-function bollinger(candles: Candle[]) {
-  const middle = movingAverage(candles, 20)
-  const upper: number[] = []
-  const lower: number[] = []
-  candles.forEach((_, index) => {
-    const values = candles.slice(Math.max(0, index - 19), index + 1).map((candle) => candle.close)
-    const mean = middle[index]
-    const deviation = Math.sqrt(values.reduce((total, value) => total + (value - mean) ** 2, 0) / values.length)
-    upper.push(mean + deviation * 2)
-    lower.push(mean - deviation * 2)
-  })
-  return { upper, middle, lower }
-}
-
-function linePath(values: number[], xForIndex: (index: number) => number, yForValue: (value: number) => number) {
-  return values.map((value, index) => `${index === 0 ? 'M' : 'L'} ${xForIndex(index).toFixed(2)} ${yForValue(value).toFixed(2)}`).join(' ')
-}
-
 function priceText(value: number) {
   return value.toFixed(2)
 }
 
-export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRetry }: { snapshot?: MarketSnapshot | null; status?: WorkspaceStatus; errorMessage?: string | null; onRetry?: () => void }) {
+export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', errorMessage, onRetry }: { snapshot?: MarketSnapshot | null; prediction?: PredictionSnapshot | null; status?: WorkspaceStatus; errorMessage?: string | null; onRetry?: () => void }) {
   const [activeTool, setActiveTool] = useState<ChartTool>('pointer')
   const [activePeriod, setActivePeriod] = useState<ChartPeriod>('day')
   const [indicators, setIndicators] = useState<Record<IndicatorKey, boolean>>({ ma5: true, ma10: true, ma20: true, boll: true })
   const [zoom, setZoom] = useState(100)
   const [crosshair, setCrosshair] = useState(false)
-  const [crosshairPoint, setCrosshairPoint] = useState<{ x: number; y: number } | null>(null)
   const [layers, setLayers] = useState<ChartLayerState>({ keyLevels: true, annotations: true })
-  const [annotations, setAnnotations] = useState<ChartAnnotation[]>([])
+  const [drawings, setDrawings] = useState<DrawingObject[]>([])
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [hoveredDay, setHoveredDay] = useState<string | null>(null)
   const [syncStatus, setSyncStatus] = useState<'本机保存' | '同步中' | '已同步' | '待同步'>('本机保存')
-  const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null)
   const [toolsOpen, setToolsOpen] = useState(false)
-  const store = useRef(new ChartAnnotationStore())
+  const store = useRef(new DrawingEngine())
 
   const sourceCandles = useMemo(() => snapshot?.dailyCandles ?? [], [snapshot?.dailyCandles])
   const candles = useMemo(() => aggregateCandles(sourceCandles, activePeriod), [activePeriod, sourceCandles])
+  const activePrediction = prediction?.period === activePeriod ? prediction : null
   const movingAverages = useMemo(() => ({ ma5: movingAverage(candles, 5), ma10: movingAverage(candles, 10), ma20: movingAverage(candles, 20) }), [candles])
-  const boll = useMemo(() => bollinger(candles), [candles])
+  const boll = useMemo(() => bollinger(candles, 20, 2), [candles])
+  const indicatorValues = useMemo(() => ({
+    ma5: [...movingAverages.ma5, ...(activePrediction?.days.map((day) => day.ma5) ?? [])],
+    ma10: [...movingAverages.ma10, ...(activePrediction?.days.map((day) => day.ma10) ?? [])],
+    ma20: [...movingAverages.ma20, ...(activePrediction?.days.map((day) => day.ma20) ?? [])],
+    boll: {
+      upper: [...boll.upper, ...(activePrediction?.days.map((day) => day.bollUpper) ?? [])],
+      middle: [...boll.middle, ...(activePrediction?.days.map((day) => day.bollMiddle) ?? [])],
+      lower: [...boll.lower, ...(activePrediction?.days.map((day) => day.bollLower) ?? [])],
+    },
+  }), [activePrediction, boll, movingAverages])
   const keyLevels = useMemo(() => candles.length ? [Math.max(...candles.slice(-20).map((candle) => candle.high)), Math.min(...candles.slice(-20).map((candle) => candle.low))] : [], [candles])
   const lastClose = candles[candles.length - 1]?.close ?? snapshot?.quote.price ?? 0
   const addRectangle = () => {
-    const next = store.current.create({ id: `rectangle-${Date.now()}`, kind: 'rectangle', start: { x: 20, y: 20 }, end: { x: 130, y: 90 } })
-    setAnnotations(next)
-  }
-
-  const chartPoint = (event: ReactPointerEvent<SVGSVGElement>) => {
-    const bounds = event.currentTarget.getBoundingClientRect()
-    const width = bounds.width || 960
-    const height = bounds.height || 430
-    return {
-      x: Math.max(0, Math.min(960, ((event.clientX - bounds.left) / width) * 960)),
-      y: Math.max(0, Math.min(430, ((event.clientY - bounds.top) / height) * 430)),
+    const end = candles.at(-1)
+    const start = candles.at(-2) ?? end
+    if (!start || !end) return
+    const drawing: DrawingObject = {
+      id: `rectangle-${Date.now()}`,
+      symbol: snapshot?.quote.security.code ?? '',
+      period: activePeriod,
+      kind: 'rectangle',
+      points: [{ time: start.day, price: start.low }, { time: end.day, price: end.high }],
+      style: { color: '#ef4444', width: 2, lineStyle: 'solid', opacity: 1 },
+      locked: false,
+      visible: true,
+      version: 0,
+      updatedAt: new Date().toISOString(),
     }
-  }
-
-  const createPointAnnotation = (event: ReactPointerEvent<SVGSVGElement>) => {
-    const point = chartPoint(event)
-    if (activeTool === 'pointer' || activeTool === 'trend-line' || activeTool === 'rectangle' || activeTool === 'marker') return
-    const next = store.current.create({
-      id: `${activeTool}-${Date.now()}`,
-      kind: activeTool,
-      start: point,
-      text: activeTool === 'text' ? '文字备注' : undefined,
-    })
-    setAnnotations(next)
-  }
-
-  const handleChartPointerDown = (event: ReactPointerEvent<SVGSVGElement>) => {
-    if (activeTool !== 'trend-line' && activeTool !== 'rectangle') return
-    event.currentTarget.setPointerCapture?.(event.pointerId)
-    setDragStart(chartPoint(event))
-  }
-
-  const handleChartPointerUp = (event: ReactPointerEvent<SVGSVGElement>) => {
-    if (!dragStart || (activeTool !== 'trend-line' && activeTool !== 'rectangle')) return
-    const end = chartPoint(event)
-    const next = store.current.create({ id: `${activeTool}-${Date.now()}`, kind: activeTool, start: dragStart, end })
-    setAnnotations(next)
-    setDragStart(null)
-    event.currentTarget.releasePointerCapture?.(event.pointerId)
-  }
-
-  const handleChartPointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
-    if (crosshair) setCrosshairPoint(chartPoint(event))
+    store.current.select(null)
+    setDrawings(store.current.create(drawing))
+    setSelectedId(drawing.id)
   }
 
   const resetView = () => {
     setZoom(100)
     setCrosshair(false)
-    setCrosshairPoint(null)
   }
 
   const chartLeft = 58
   const chartTop = 22
   const chartWidth = 850
   const chartHeight = 300
-  const volumeTop = 345
-  const volumeHeight = 55
   const currentPrice = snapshot?.quote.price ?? lastClose
   const values = [
     ...candles.flatMap((candle) => [candle.high, candle.low]),
-    ...(indicators.ma5 ? movingAverages.ma5 : []),
-    ...(indicators.ma10 ? movingAverages.ma10 : []),
-    ...(indicators.ma20 ? movingAverages.ma20 : []),
-    ...(indicators.boll ? [...boll.upper, ...boll.lower] : []),
+    ...(activePrediction?.days.flatMap((day) => [day.high, day.low, day.rangeHigh, day.rangeLow]) ?? []),
+    ...(indicators.ma5 ? indicatorValues.ma5 : []),
+    ...(indicators.ma10 ? indicatorValues.ma10 : []),
+    ...(indicators.ma20 ? indicatorValues.ma20 : []),
+    ...(indicators.boll ? [...indicatorValues.boll.upper, ...indicatorValues.boll.lower] : []),
     currentPrice,
   ]
   const maxPrice = Math.max(...values, lastClose) + 0.25
   const minPrice = Math.min(...values, lastClose) - 0.25
-  const xForIndex = (index: number) => chartLeft + ((index + 0.5) / Math.max(candles.length, 1)) * chartWidth
-  const yForValue = (value: number) => chartTop + ((maxPrice - value) / (maxPrice - minPrice)) * chartHeight
-  const priceForY = (y: number) => maxPrice - ((Math.max(chartTop, Math.min(chartTop + chartHeight, y)) - chartTop) / chartHeight) * (maxPrice - minPrice)
-  const crosshairIndex = crosshairPoint ? Math.max(0, Math.min(candles.length - 1, Math.floor(((crosshairPoint.x - chartLeft) / chartWidth) * candles.length))) : null
-  const crosshairCandle = crosshairIndex === null ? null : candles[crosshairIndex]
-  const crosshairPrice = crosshairPoint ? maxPrice - ((crosshairPoint.y - chartTop) / chartHeight) * (maxPrice - minPrice) : null
+  const times = [...candles.map((candle) => candle.day), ...(activePrediction?.days.map((day) => day.day) ?? [])]
+  const transform = createChartTransform({ times: times.length ? times : [''], minPrice, maxPrice, rect: { left: chartLeft, top: chartTop, width: chartWidth, height: chartHeight } })
+
+  const createDrawing = (drawing: DrawingObject) => {
+    setDrawings(store.current.create(drawing))
+    setSelectedId(drawing.id)
+  }
+  const selectDrawing = (id: string | null) => {
+    store.current.select(id)
+    setSelectedId(id)
+  }
+  const moveDrawingPoint = (id: string, index: number, point: TimePricePoint) => {
+    store.current.select(id)
+    setSelectedId(id)
+    setDrawings(store.current.movePoint(index, point))
+  }
+  const moveDrawing = (id: string, delta: DrawingMove) => {
+    store.current.select(id)
+    setSelectedId(id)
+    setDrawings(store.current.move(delta))
+  }
+  const deleteSelectedDrawing = () => {
+    if (!selectedId) return
+    store.current.select(selectedId)
+    setDrawings(store.current.remove(selectedId))
+    setSelectedId(null)
+  }
+  const undoDrawing = () => {
+    setDrawings(store.current.undo())
+    setSelectedId(null)
+  }
+  const redoDrawing = () => {
+    setDrawings(store.current.redo())
+    setSelectedId(null)
+  }
 
   const workspaceSnapshot: ChartWorkspaceSnapshot = {
     version: 1,
     stockCode: snapshot?.quote.security.code ?? '',
     period: activePeriod,
-    drawings: annotations,
+    drawings: drawings as unknown as ChartWorkspaceSnapshot['drawings'],
     indicators,
     indicatorConfig: {},
     layers,
@@ -191,9 +155,10 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
     if (!snapshot) return
     const saved = loadChartWorkspace(snapshot.quote.security.code, activePeriod)
     if (!saved) return
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setAnnotations(saved.drawings as ChartAnnotation[])
-    store.current.replace(saved.drawings as ChartAnnotation[])
+    const savedDrawings = saved.drawings.filter((drawing) => 'points' in drawing).map((drawing) => drawing as unknown as DrawingObject)
+    store.current = new DrawingEngine(savedDrawings)
+    setDrawings(store.current.current())
+    setSelectedId(null)
     setIndicators(saved.indicators as Record<IndicatorKey, boolean>)
     setLayers(saved.layers as ChartLayerState)
     setZoom(saved.view.zoom)
@@ -213,7 +178,7 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
     }, 350)
     return () => window.clearTimeout(timer)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activePeriod, annotations, crosshair, indicators, layers, snapshot, zoom])
+  }, [activePeriod, crosshair, drawings, indicators, layers, snapshot, zoom])
 
   useEffect(() => {
     if (!snapshot || !getAuthorizationHeader()) return
@@ -225,8 +190,10 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
       if (!remote) return
       const merged = mergeChartWorkspace(workspaceSnapshot, remote)
       saveChartWorkspace(merged)
-      setAnnotations(merged.drawings as ChartAnnotation[])
-      store.current.replace(merged.drawings as ChartAnnotation[])
+      const mergedDrawings = merged.drawings.filter((drawing) => 'points' in drawing).map((drawing) => drawing as unknown as DrawingObject)
+      store.current = new DrawingEngine(mergedDrawings)
+      setDrawings(store.current.current())
+      setSelectedId(null)
       setIndicators(merged.indicators as Record<IndicatorKey, boolean>)
       setLayers(merged.layers as ChartLayerState)
       setZoom(merged.view.zoom)
@@ -296,8 +263,8 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
           <button className="sc-kline-control-button" aria-label="放大" onClick={() => setZoom((value) => Math.min(150, value + 10))} type="button">＋</button>
           <button className="sc-kline-control-button" onClick={resetView} type="button">复位视图</button>
           <button aria-pressed={crosshair} className={`sc-kline-control-button ${crosshair ? 'is-active' : ''}`} onClick={() => setCrosshair((value) => !value)} type="button">十字光标</button>
-          <button className="sc-kline-control-button" onClick={() => setAnnotations(store.current.undo())} type="button">撤销</button>
-          <button className="sc-kline-control-button" onClick={() => setAnnotations(store.current.redo())} type="button">重做</button>
+          <button className="sc-kline-control-button" onClick={undoDrawing} type="button">撤销</button>
+          <button className="sc-kline-control-button" onClick={redoDrawing} type="button">重做</button>
         </div>
       </div>
 
@@ -317,43 +284,7 @@ export function ChartWorkspace({ snapshot, status = 'ready', errorMessage, onRet
             </div>
             <div className="sc-kline-chart-scroll">
               <div className="sc-kline-chart-surface" data-zoom={zoom} style={{ width: `${zoom}%` }}>
-                <svg aria-label="K线主图" className="sc-kline-svg" onClick={createPointAnnotation} onPointerDown={handleChartPointerDown} onPointerMove={handleChartPointerMove} onPointerUp={handleChartPointerUp} role="img" viewBox="0 0 960 430">
-                  <rect fill="#fbfcff" height="430" width="960" x="0" y="0" />
-                  <g className="sc-kline-grid">
-                    {[0, 1, 2, 3, 4].map((line) => <line key={`h-${line}`} x1={chartLeft} x2={chartLeft + chartWidth} y1={chartTop + line * (chartHeight / 4)} y2={chartTop + line * (chartHeight / 4)} />)}
-                    {[0, 1, 2, 3, 4, 5].map((line) => <line key={`v-${line}`} x1={chartLeft + line * (chartWidth / 5)} x2={chartLeft + line * (chartWidth / 5)} y1={chartTop} y2={volumeTop + volumeHeight} />)}
-                  </g>
-                  <g className="sc-kline-axis-labels">
-                    {[0, 1, 2, 3, 4].map((line) => <text key={line} x="920" y={chartTop + line * (chartHeight / 4) + 4}>{priceText(maxPrice - line * ((maxPrice - minPrice) / 4))}</text>)}
-                  </g>
-                  <g data-testid="candlestick-layer">
-                    {candles.map((candle, index) => {
-                      const x = xForIndex(index)
-                      const openY = yForValue(candle.open)
-                      const closeY = yForValue(candle.close)
-                      const rising = candle.close >= candle.open
-                      return <g key={`${candle.day}-${index}`}><line className={rising ? 'sc-rise-stroke' : 'sc-fall-stroke'} x1={x} x2={x} y1={yForValue(candle.high)} y2={yForValue(candle.low)} /><rect className={rising ? 'sc-rise-fill' : 'sc-fall-fill'} height={Math.max(3, Math.abs(closeY - openY))} width={Math.max(5, Math.min(14, chartWidth / candles.length * 0.56))} x={x - 5} y={Math.min(openY, closeY)} /></g>
-                    })}
-                  </g>
-                  {indicators.ma5 && <path d={linePath(movingAverages.ma5, xForIndex, yForValue)} fill="none" stroke={indicatorColors.ma5} strokeWidth="2" />}
-                  {indicators.ma10 && <path d={linePath(movingAverages.ma10, xForIndex, yForValue)} fill="none" stroke={indicatorColors.ma10} strokeWidth="2" />}
-                  {indicators.ma20 && <path d={linePath(movingAverages.ma20, xForIndex, yForValue)} fill="none" stroke={indicatorColors.ma20} strokeWidth="2" />}
-                  {indicators.boll && <><path d={linePath(boll.upper, xForIndex, yForValue)} fill="none" stroke={indicatorColors.boll} strokeDasharray="5 4" strokeWidth="1.5" /><path d={linePath(boll.middle, xForIndex, yForValue)} fill="none" stroke="#9aa5c4" strokeWidth="1.5" /><path d={linePath(boll.lower, xForIndex, yForValue)} fill="none" stroke={indicatorColors.boll} strokeDasharray="5 4" strokeWidth="1.5" /></>}
-                  {layers.keyLevels && <g data-testid="key-level-layer">{keyLevels.map((price, index) => <g key={price}><line className="sc-key-level-line" x1={chartLeft} x2={chartLeft + chartWidth} y1={yForValue(price)} y2={yForValue(price)} /><text className="sc-key-level-label" x={chartLeft + chartWidth - 78} y={yForValue(price) - 5}>{index === 0 ? '近20日高点' : '近20日低点'} {priceText(price)}</text></g>)}</g>}
-                  {layers.annotations && annotations.map((annotation) => {
-                    const price = priceText(priceForY(annotation.start.y))
-                    const end = annotation.end ?? annotation.start
-                    const priceLabel = `价格 ${price}`
-                    if (annotation.kind === 'rectangle') return <g data-testid="annotation-rectangle" key={annotation.id}><rect className="sc-chart-annotation-rectangle" height={Math.abs(end.y - annotation.start.y)} width={Math.abs(end.x - annotation.start.x)} x={Math.min(annotation.start.x, end.x)} y={Math.min(annotation.start.y, end.y)} /><text className="sc-chart-annotation-price" x={Math.min(annotation.start.x, end.x) + 5} y={Math.min(annotation.start.y, end.y) - 6}>{priceLabel}</text></g>
-                    if (annotation.kind === 'trend-line') return <g data-testid="annotation-trend-line" key={annotation.id}><line className="sc-chart-annotation-line" x1={annotation.start.x} x2={end.x} y1={annotation.start.y} y2={end.y} /><text className="sc-chart-annotation-price" x={annotation.start.x + 6} y={annotation.start.y - 6}>{priceLabel}</text></g>
-                    if (annotation.kind === 'horizontal-line') return <g data-testid="annotation-horizontal-line" key={annotation.id}><line className="sc-chart-annotation-line" x1={chartLeft} x2={chartLeft + chartWidth} y1={annotation.start.y} y2={annotation.start.y} /><text className="sc-chart-annotation-price" x={chartLeft + chartWidth - 76} y={annotation.start.y - 6}>{priceLabel}</text></g>
-                    if (annotation.kind === 'text') return <g data-testid="annotation-text" key={annotation.id}><text className="sc-chart-note" x={annotation.start.x} y={annotation.start.y}>{annotation.text ?? '文字备注'}</text><text className="sc-chart-annotation-price" x={annotation.start.x} y={annotation.start.y + 16}>{priceLabel}</text></g>
-                    return <g data-testid={`annotation-${annotation.kind}`} key={annotation.id}><circle className="sc-chart-marker" cx={annotation.start.x} cy={annotation.start.y} r="8" /><text className="sc-chart-marker-label" x={annotation.start.x + 11} y={annotation.start.y + 4}>{annotation.kind === 'buy' ? '买入' : annotation.kind === 'sell' ? '卖出' : annotation.kind === 'target' ? '目标' : '止损'} · {priceLabel}</text></g>
-                  })}
-                  <g className="sc-volume-bars">{candles.map((candle, index) => <rect key={index} height={Math.max(3, (candle.volume / Math.max(...candles.map((item) => item.volume))) * volumeHeight)} width={Math.max(5, Math.min(14, chartWidth / candles.length * 0.56))} x={xForIndex(index) - 5} y={volumeTop + volumeHeight - Math.max(3, (candle.volume / Math.max(...candles.map((item) => item.volume))) * volumeHeight)} />)}</g>
-                  <text className="sc-volume-label" x={chartLeft} y={volumeTop + volumeHeight + 23}>成交量</text>
-                  {crosshair && crosshairPoint && crosshairCandle && crosshairPrice !== null && <g data-testid="crosshair-layer"><line className="sc-crosshair" x1={xForIndex(crosshairIndex ?? 0)} x2={xForIndex(crosshairIndex ?? 0)} y1={chartTop} y2={volumeTop + volumeHeight} /><line className="sc-crosshair" x1={chartLeft} x2={chartLeft + chartWidth} y1={yForValue(crosshairPrice)} y2={yForValue(crosshairPrice)} /><g data-testid="crosshair-tooltip"><rect fill="#17213c" height="66" opacity="0.94" rx="5" width="188" x={Math.min(chartLeft + chartWidth - 190, Math.max(chartLeft + 6, xForIndex(crosshairIndex ?? 0) + 8))} y={chartTop + 8} /><text fill="#fff" fontSize="11" x={Math.min(chartLeft + chartWidth - 182, Math.max(chartLeft + 14, xForIndex(crosshairIndex ?? 0) + 16))} y={chartTop + 26}>{crosshairCandle.day} · 开 {priceText(crosshairCandle.open)} 高 {priceText(crosshairCandle.high)}</text><text fill="#fff" fontSize="11" x={Math.min(chartLeft + chartWidth - 182, Math.max(chartLeft + 14, xForIndex(crosshairIndex ?? 0) + 16))} y={chartTop + 43}>低 {priceText(crosshairCandle.low)} 收 {priceText(crosshairCandle.close)} · 光标 {priceText(crosshairPrice)}</text><text fill="#dfe6ff" fontSize="10" x={Math.min(chartLeft + chartWidth - 182, Math.max(chartLeft + 14, xForIndex(crosshairIndex ?? 0) + 16))} y={chartTop + 58}>MA5 {priceText(movingAverages.ma5[crosshairIndex ?? 0])} · BOLL {priceText(boll.middle[crosshairIndex ?? 0])}</text></g></g>}
-                </svg>
+                <ChartCanvas activeTool={activeTool} candles={candles} crosshair={crosshair} drawings={drawings} hoveredDay={hoveredDay} indicatorValues={indicatorValues} indicators={indicators} keyLevels={keyLevels} onCreateDrawing={createDrawing} onDeleteSelected={deleteSelectedDrawing} onHoverDay={setHoveredDay} onMoveDrawing={moveDrawing} onMovePoint={moveDrawingPoint} onRedo={redoDrawing} onSelectDrawing={selectDrawing} onUndo={undoDrawing} period={activePeriod} prediction={activePrediction} selectedId={selectedId} showDrawings={layers.annotations} showKeyLevels={layers.keyLevels} symbol={snapshot.quote.security.code} transform={transform} />
               </div>
             </div>
             <div className="sc-kline-statusbar"><span>共 {candles.length} 根 K 线</span><span>当前周期：{periods.find(([period]) => period === activePeriod)?.[1]}</span><span>数据源：{snapshot.source.name}</span><span>{getAuthorizationHeader() ? syncStatus : '本机保存 · 登录后跨设备同步'}</span></div>

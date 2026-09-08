@@ -5,5 +5,6 @@ import { useStockWorkspace } from '../workspace/stock-workspace-provider'
 
 export function ChartPage() {
   const { current, lastSuccessful, status, errorMessage, refresh } = useStockWorkspace()
-  return <ChartWorkspace errorMessage={errorMessage} onRetry={() => void refresh()} snapshot={(current ?? lastSuccessful)?.market ?? null} status={status} />
+  const workspace = current ?? lastSuccessful
+  return <ChartWorkspace errorMessage={errorMessage} onRetry={() => void refresh()} prediction={workspace?.prediction ?? null} snapshot={workspace?.market ?? null} status={status} />
 }

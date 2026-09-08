@@ -1,4 +1,12 @@
 import type { MarketSnapshot, Security } from '@/features/workspace/stock-workspace-types'
+import type { ChartPeriod, PredictionSnapshot } from '@/features/chart/chart-types'
+
+export class BackendRequestError extends Error {
+  constructor(public readonly status: number, public readonly body: unknown) {
+    super(`后端请求失败：${status}`)
+    this.name = 'BackendRequestError'
+  }
+}
 
 function backendUrl(path: string) {
   const baseUrl = process.env.STOCKCAL_API_BASE_URL
@@ -12,7 +20,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     cache: 'no-store',
     headers: { Accept: 'application/json', ...init?.headers },
   })
-  if (!response.ok) throw new Error(`后端请求失败：${response.status}`)
+  if (!response.ok) throw new BackendRequestError(response.status, await response.json().catch(() => null))
   return response.json() as Promise<T>
 }
 
@@ -22,6 +30,12 @@ export function searchSecurities(query: string) {
 
 export function getMarketSnapshot(symbol: string) {
   return request<MarketSnapshot>(`/api/v1/market/stocks/${encodeURIComponent(symbol)}/snapshot`)
+}
+
+export function getPredictionSnapshot(symbol: string, period: ChartPeriod, authorization?: string): Promise<PredictionSnapshot> {
+  return request<PredictionSnapshot>(`/api/v1/market/stocks/${encodeURIComponent(symbol)}/prediction?period=${period}`, {
+    headers: authorization ? { Authorization: authorization } : undefined,
+  })
 }
 
 export type SyncMutation = {

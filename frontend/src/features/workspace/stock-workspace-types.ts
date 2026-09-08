@@ -1,3 +1,5 @@
+import type { PredictionSnapshot } from '../chart/chart-types'
+
 export type OperationCycle = 'short' | 'swing' | 'long'
 
 export type WorkspaceStatus =
@@ -156,4 +158,5 @@ export type StockWorkspaceSnapshot = {
   analysis: StockAnalysis | null
   cycle: OperationCycle
   generatedAt: string
+  prediction?: PredictionSnapshot | null
 }

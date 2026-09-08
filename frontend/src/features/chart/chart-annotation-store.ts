@@ -1,3 +1,6 @@
+import { DrawingEngine, type DrawingMove } from './drawing-engine'
+import type { DrawingObject, DrawingStyle, TimePricePoint } from './chart-types'
+
 export type ChartTool =
   | 'pointer'
   | 'trend-line'
@@ -10,67 +13,81 @@ export type ChartTool =
   | 'stop-loss'
   | 'text'
 
-export type ChartAnnotation = {
-  id: string
-  kind: Exclude<ChartTool, 'pointer'>
-  start: { x: number; y: number }
-  end?: { x: number; y: number }
-  text?: string
-  hidden?: boolean
+function isDrawingObject(item: DrawingObject): boolean {
+  return typeof item === 'object' && item !== null && Array.isArray(item.points)
 }
 
+/** Compatibility module path backed exclusively by time-price drawings. */
 export class ChartAnnotationStore {
-  private current: ChartAnnotation[] = []
-  private past: ChartAnnotation[][] = []
-  private future: ChartAnnotation[][] = []
+  private engine: DrawingEngine
 
-  list() {
-    return this.current.map((item) => ({ ...item, start: { ...item.start }, end: item.end && { ...item.end } }))
+  constructor(initial: DrawingObject[] = []) {
+    if (!initial.every(isDrawingObject)) throw new Error('ChartAnnotationStore accepts only time-price drawings')
+    this.engine = new DrawingEngine(initial)
   }
 
-  replace(annotations: ChartAnnotation[]) {
-    this.current = annotations.map((item) => ({ ...item, start: { ...item.start }, end: item.end && { ...item.end } }))
-    this.past = []
-    this.future = []
-    return this.list()
+  current(): DrawingObject[] {
+    return this.engine.current()
   }
 
-  create(annotation: ChartAnnotation) {
-    this.record()
-    this.current = [...this.current, annotation]
-    this.future = []
-    return this.list()
+  list(): DrawingObject[] {
+    return this.current()
   }
 
-  update(id: string, patch: Partial<ChartAnnotation>) {
-    this.record()
-    this.current = this.current.map((item) => item.id === id ? { ...item, ...patch } : item)
-    this.future = []
-    return this.list()
+  replace(items: DrawingObject[]): DrawingObject[] {
+    if (!items.every(isDrawingObject)) throw new Error('ChartAnnotationStore accepts only time-price drawings')
+    this.engine = new DrawingEngine(items)
+    return this.current()
   }
 
-  delete(id: string) {
-    this.record()
-    this.current = this.current.filter((item) => item.id !== id)
-    this.future = []
-    return this.list()
+  create(item: DrawingObject): DrawingObject[] {
+    return this.engine.create(item)
   }
 
-  undo() {
-    if (!this.past.length) return this.list()
-    this.future = [this.list(), ...this.future]
-    this.current = this.past.pop()!
-    return this.list()
+  select(id: string | null): void {
+    this.engine.select(id)
   }
 
-  redo() {
-    if (!this.future.length) return this.list()
-    this.past = [...this.past, this.list()]
-    this.current = this.future.shift()!
-    return this.list()
+  move(delta: DrawingMove): DrawingObject[] {
+    return this.engine.move(delta)
   }
 
-  private record() {
-    this.past = [...this.past, this.list()]
+  movePoint(index: number, point: TimePricePoint): DrawingObject[] {
+    return this.engine.movePoint(index, point)
+  }
+
+  copy(sourceId: string, newId: string): DrawingObject[] {
+    return this.engine.copy(sourceId, newId)
+  }
+
+  updateStyle(patch: Partial<DrawingStyle>): DrawingObject[] {
+    return this.engine.updateStyle(patch)
+  }
+
+  updateText(text: string | undefined): DrawingObject[] {
+    return this.engine.updateText(text)
+  }
+
+  setVisible(visible: boolean): DrawingObject[] {
+    return this.engine.setVisible(visible)
+  }
+
+  setLocked(locked: boolean): DrawingObject[] {
+    return this.engine.setLocked(locked)
+  }
+
+  remove(id?: string): DrawingObject[] {
+    return this.engine.remove(id)
+  }
+
+  undo(): DrawingObject[] {
+    return this.engine.undo()
+  }
+
+  redo(): DrawingObject[] {
+    return this.engine.redo()
   }
 }
+
+export { DrawingEngine }
+export type { DrawingMove }

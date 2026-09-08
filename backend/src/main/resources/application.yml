@@ -18,6 +18,9 @@ server:
   port: ${PORT:8080}
 
 stockcal:
+  prediction:
+    # Comma-separated exchange closure dates (YYYY-MM-DD); weekends are always excluded.
+    exchange-holidays: ${STOCKCAL_PREDICTION_EXCHANGE_HOLIDAYS:}
   auth:
     required: ${STOCKCAL_AUTH_REQUIRED:true}
   ai:
