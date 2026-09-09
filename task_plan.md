@@ -1,6 +1,6 @@
 # StockCal Product Delivery Plan
 
-> Historical Flutter delivery plan. The active frontend is Next.js. For the current K-line branch, use [the 2026-09-09 continuation handoff](docs/handoff/2026-09-09-kline-redesign.md) and the linked September design/implementation documents.
+> Historical Flutter delivery plan. The active frontend is Next.js. For the K-line redesign scope, use [the September design specification](docs/superpowers/specs/2026-09-07-kline-drawing-prediction-redesign.md), including its confirmed scope adjustments.
 
 ## Goal
 Deliver the complete Flutter StockCal product described in the referenced conversation: account and local-first sync, portfolio dashboard, A-share analysis, professional charts and annotations, rules/predictions/backtests, watchlists/trades/import, reviews/AI explanations, settings/admin, and verified mobile/Web builds.
