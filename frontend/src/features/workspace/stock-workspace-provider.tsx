@@ -11,7 +11,7 @@ import type {
   WorkspaceStatus,
 } from './stock-workspace-types'
 
-export type MarketClient = Pick<BrowserMarketClient, 'snapshot'> & Pick<BrowserMarketClient, 'publishedRules'>
+export type MarketClient = Pick<BrowserMarketClient, 'snapshot' | 'publishedRules'> & Partial<Pick<BrowserMarketClient, 'prediction'>>
 
 type WorkspaceContextValue = {
   selectedSymbol: string | null
@@ -54,9 +54,26 @@ export function StockWorkspaceProvider({ children, client = browserMarketClient,
     abortController.current?.abort()
     const controller = new AbortController()
     abortController.current = controller
+    let publishedSnapshot: StockWorkspaceSnapshot | null = null
+    let resolvedPrediction: StockWorkspaceSnapshot['prediction'] = null
     setStatus(preserving ? 'refreshing' : 'loading')
     setErrorMessage(null)
     if (!preserving) setCurrent(null)
+    if (client.prediction) {
+      void Promise.resolve()
+        .then(() => client.prediction?.(symbol, controller.signal))
+        .then((prediction) => {
+          if (!prediction || version !== requestVersion.current || controller.signal.aborted) return
+          resolvedPrediction = prediction
+          if (!publishedSnapshot) return
+          const previousSnapshot = publishedSnapshot
+          const enrichedSnapshot = { ...previousSnapshot, prediction }
+          publishedSnapshot = enrichedSnapshot
+          setCurrent((snapshot) => snapshot === previousSnapshot ? enrichedSnapshot : snapshot)
+          setLastSuccessful((snapshot) => snapshot === previousSnapshot ? enrichedSnapshot : snapshot)
+        })
+        .catch(() => undefined)
+    }
     try {
       const market = await client.snapshot(symbol, controller.signal)
       const rules = client.publishedRules ? await client.publishedRules(controller.signal).catch(() => []) : []
@@ -68,7 +85,9 @@ export function StockWorkspaceProvider({ children, client = browserMarketClient,
         analysis: analyzeMarketSnapshot(market, nextCycle, rules),
         cycle: nextCycle,
         generatedAt: new Date().toISOString(),
+        prediction: resolvedPrediction,
       }
+      publishedSnapshot = snapshot
       setCurrent(snapshot)
       setLastSuccessful(snapshot)
       setStatus(market.source?.online === false ? 'offline' : 'ready')
@@ -119,6 +138,12 @@ export function StockWorkspaceProvider({ children, client = browserMarketClient,
     setSelectedSecurity(security)
     void load(initialSymbol, security, cycle, false)
   }, [cycle, initialSymbol, load])
+
+  useEffect(() => () => {
+    initialLoadSymbol.current = null
+    requestVersion.current += 1
+    abortController.current?.abort()
+  }, [])
 
   const value = useMemo<WorkspaceContextValue>(() => ({
     selectedSymbol,

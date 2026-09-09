@@ -1,8 +1,10 @@
 import type { DecisionAction, DecisionRule, MarketSnapshot, RuleCondition, Security } from '@/features/workspace/stock-workspace-types'
+import { isPredictionSnapshot, type PredictionSnapshot } from '@/features/chart/chart-types'
 
 export type BrowserMarketClient = {
   search(query: string, signal?: AbortSignal): Promise<Security[]>
   snapshot(symbol: string, signal?: AbortSignal): Promise<MarketSnapshot>
+  prediction(symbol: string, signal?: AbortSignal): Promise<PredictionSnapshot>
   publishedRules?(signal?: AbortSignal): Promise<DecisionRule[]>
 }
 
@@ -15,6 +17,13 @@ async function browserRequest<T>(url: string, signal?: AbortSignal): Promise<T> 
 export const browserMarketClient: BrowserMarketClient = {
   search: (query, signal) => browserRequest(`/api/market/search?q=${encodeURIComponent(query)}`, signal),
   snapshot: (symbol, signal) => browserRequest(`/api/market/stocks/${encodeURIComponent(symbol)}/snapshot`, signal),
+  prediction: async (symbol, signal) => {
+    const prediction = await browserRequest<unknown>(`/api/market/stocks/${encodeURIComponent(symbol)}/prediction?period=day`, signal)
+    if (!isPredictionSnapshot(prediction) || prediction.symbol !== symbol || prediction.period !== 'day') {
+      throw new Error('Invalid prediction response')
+    }
+    return prediction
+  },
   publishedRules: async (signal) => {
     const rules = await browserRequest<Array<Record<string, unknown>>>('/api/knowledge/rules', signal)
     return rules
