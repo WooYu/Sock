@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import tools.jackson.databind.ObjectMapper;
 import java.util.Map;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ class KnowledgeApiTest {
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper json;
     @Autowired JdbcClient jdbc;
+    @Autowired KnowledgeRepository repository;
 
     @BeforeEach
     void reset() {
@@ -34,7 +36,7 @@ class KnowledgeApiTest {
     }
 
     @Test
-    void importsExtractsApprovesAndPublishesTraceableRule() throws Exception {
+    void approvedLocalExcerptWithoutComputableConditionsCannotBePublished() throws Exception {
         var body = json.writeValueAsString(Map.of("path", "股票/关键点.md", "content",
             "关键点规则：股价触达目标位时减仓。经验：不要因为涨停改变纪律。"));
         var sourceJson = mvc.perform(post("/api/v1/knowledge/sources").with(user("user-1"))
@@ -54,8 +56,9 @@ class KnowledgeApiTest {
         mvc.perform(post("/api/v1/knowledge/drafts/{id}/approve", ruleId).with(user("user-1")))
             .andExpect(status().isOk()).andExpect(jsonPath("$.approvedBy").value("user-1"));
         mvc.perform(post("/api/v1/knowledge/drafts/{id}/publish", ruleId).with(user("user-1")))
-            .andExpect(status().isCreated()).andExpect(jsonPath("$.sourceDocumentId").value(sourceId))
-            .andExpect(jsonPath("$.sourceExcerpt").value("关键点规则：股价触达目标位时减仓。"));
+            .andExpect(status().isConflict());
+        mvc.perform(get("/api/v1/knowledge/rules").with(user("user-1")))
+            .andExpect(status().isOk()).andExpect(jsonPath("$").isEmpty());
 
         mvc.perform(get("/api/v1/knowledge/drafts?status=APPROVED").with(user("user-1")))
             .andExpect(status().isOk()).andExpect(jsonPath("$[0].sourceLineStart").value(1));
@@ -69,7 +72,7 @@ class KnowledgeApiTest {
     @Test
     void managesSourcesDraftsAndRules() throws Exception {
         var body = json.writeValueAsString(Map.of("path", "股票/均线.md", "content",
-            "均线金叉规则：5日线上穿20日线时买入。"));
+            "均线规则：收盘价站上20日线时买入。"));
         var sourceJson = mvc.perform(post("/api/v1/knowledge/sources").with(user("user-1"))
                 .contentType(MediaType.APPLICATION_JSON).content(body))
             .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
@@ -79,10 +82,24 @@ class KnowledgeApiTest {
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         var draftId = json.readTree(draftsJson).get(0).get("id").asText();
 
+        // Arrange a structured extraction result: the local excerpt extractor
+        // intentionally never invents executable conditions from prose.
+        var draft = repository.draft(draftId).orElseThrow();
+        repository.saveDraft(new KnowledgeDraft(draft.id(), draft.sourceDocumentId(),
+            draft.kind(), draft.title(), draft.summary(), draft.sourceExcerpt(),
+            draft.sourceLineStart(), draft.sourceLineEnd(), ExtractionMethod.AI,
+            draft.status(), draft.approvedBy(), draft.reviewedAt(),
+            List.of(new RuleConditionSpec("closeAboveMa20", "equals", 1)),
+            "ENTER", "BASE_GRANVILLE", "日线", 50, List.of("source:1-1")));
+
         mvc.perform(post("/api/v1/knowledge/drafts/{id}/approve", draftId).with(user("user-1")))
             .andExpect(status().isOk());
         var ruleJson = mvc.perform(post("/api/v1/knowledge/drafts/{id}/publish", draftId).with(user("user-1")))
-            .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.conditions[0].field").value("closeAboveMa20"))
+            .andExpect(jsonPath("$.action").value("ENTER"))
+            .andExpect(jsonPath("$.sourceDocumentId").value(sourceId))
+            .andReturn().getResponse().getContentAsString();
         var ruleId = json.readTree(ruleJson).get("id").asText();
 
         mvc.perform(get("/api/v1/knowledge/rules").with(user("user-1")))

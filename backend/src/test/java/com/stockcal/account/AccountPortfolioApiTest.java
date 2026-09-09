@@ -56,7 +56,7 @@ class AccountPortfolioApiTest {
             .andExpect(status().isOk());
         mvc.perform(post("/api/v1/account/trades").header("X-Client-Id", "browser-1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(body.replace(""revision":2", ""revision":1")))
+                .content(body.replace("\"revision\":2", "\"revision\":1")))
             .andExpect(status().isConflict());
     }
 }

@@ -11,30 +11,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest
+@SpringBootTest(properties = "stockcal.market-api-key=")
 @AutoConfigureMockMvc
 class MarketApiTest {
     @Autowired MockMvc mvc;
 
     @Test
-    void searchesAshareByCodeNameAndPinyin() throws Exception {
+    void unconfiguredMarketDoesNotReturnInventedSearchResults() throws Exception {
         mvc.perform(get("/api/v1/market/search?q=gzmt").with(user("user-1")))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].code").value("600519"))
-            .andExpect(jsonPath("$[0].name").value("贵州茅台"));
+            .andExpect(jsonPath("$").isEmpty());
     }
 
     @Test
-    void quoteSnapshotIncludesCandlesLimitsAndSourceFreshness() throws Exception {
+    void unconfiguredMarketReportsUnavailableInsteadOfDemoCandles() throws Exception {
         mvc.perform(get("/api/v1/market/stocks/600519/snapshot").with(user("user-1")))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.quote.price").isNumber())
-            .andExpect(jsonPath("$.quote.limitRatio").value(0.10))
-            .andExpect(jsonPath("$.dailyCandles.length()").value(40))
-            .andExpect(jsonPath("$.source.name").isNotEmpty())
-            .andExpect(jsonPath("$.source.fetchedAt").isNotEmpty())
-            .andExpect(jsonPath("$.source.name").value("StockCal 离线样例"))
-            .andExpect(jsonPath("$.source.state").value("OFFLINE_CACHE"))
-            .andExpect(jsonPath("$.source.online").value(false));
+            .andExpect(status().isServiceUnavailable());
     }
 }
