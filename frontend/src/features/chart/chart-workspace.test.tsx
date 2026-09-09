@@ -138,6 +138,7 @@ describe('ChartWorkspace', () => {
   })
 
   test('deletes, restores and re-deletes the selected drawing with keyboard shortcuts', async () => {
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValueOnce(false).mockReturnValueOnce(true)
     renderChart()
     await userEvent.click(screen.getByText('更多绘图', { selector: 'summary' }))
     await userEvent.click(screen.getByRole('button', { name: '买入点' }))
@@ -145,11 +146,30 @@ describe('ChartWorkspace', () => {
     const chart = screen.getByRole('img', { name: 'K线主图' })
 
     fireEvent.keyDown(chart, { key: 'Delete' })
+    expect(screen.getByTestId('annotation-buy')).toBeInTheDocument()
+    fireEvent.keyDown(chart, { key: 'Backspace' })
     expect(screen.queryByTestId('annotation-buy')).not.toBeInTheDocument()
     fireEvent.keyDown(chart, { key: 'z', ctrlKey: true })
     expect(screen.getByTestId('annotation-buy')).toBeInTheDocument()
     fireEvent.keyDown(chart, { key: 'y', metaKey: true })
     expect(screen.queryByTestId('annotation-buy')).not.toBeInTheDocument()
+    expect(confirm).toHaveBeenCalledTimes(2)
+    confirm.mockRestore()
+  })
+
+  test('uses the same confirmation handler for inspector deletion', async () => {
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValueOnce(false).mockReturnValueOnce(true)
+    renderChart()
+    await userEvent.click(screen.getByRole('button', { name: '买入点' }))
+    fireEvent.click(screen.getByRole('img', { name: 'K线主图' }), { clientX: 100, clientY: 170 })
+
+    await userEvent.click(screen.getByRole('button', { name: '删除对象' }))
+    expect(screen.getByTestId('annotation-buy')).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: '删除对象' }))
+
+    expect(screen.queryByTestId('annotation-buy')).not.toBeInTheDocument()
+    expect(confirm).toHaveBeenCalledTimes(2)
+    confirm.mockRestore()
   })
 
   test('switches the active K-line period', async () => {

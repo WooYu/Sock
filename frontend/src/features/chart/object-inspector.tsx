@@ -51,7 +51,7 @@ export function ObjectInspector({ drawing, onChange, onDelete }: ObjectInspector
         {drawing.kind === 'text' ? <label className="sc-inspector-field-wide"><span>绘图文字</span><input aria-label="绘图文字" disabled={disabled} onChange={(event) => onChange({ type: 'text', text: event.currentTarget.value })} type="text" value={drawing.text ?? ''} /></label> : null}
         {drawing.points.map((point, index) => <label className="sc-inspector-field-wide" key={`${point.time}-${index}`}><span>控制点 {index + 1} 价格</span><input aria-label={`控制点 ${index + 1} 价格`} disabled={disabled} onChange={(event) => finiteInput(event.currentTarget.valueAsNumber, () => true, (price) => onChange({ type: 'point', index, point: { ...point, price } }))} step="0.01" type="number" value={point.price} /></label>)}
       </div>
-      <button className="sc-inspector-delete" disabled={disabled} onClick={() => { if (window.confirm('确认删除此绘图对象？')) onDelete() }} type="button">删除对象</button>
+      <button className="sc-inspector-delete" disabled={disabled} onClick={onDelete} type="button">删除对象</button>
     </section>
   )
 }

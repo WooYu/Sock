@@ -43,4 +43,20 @@ describe('PredictionLayer', () => {
     fireEvent.mouseLeave(screen.getAllByTestId('prediction-candle')[1])
     expect(onHoverDay).toHaveBeenLastCalledWith(null)
   })
+
+  test('exposes named keyboard controls for selecting a prediction day', () => {
+    const onSelectDay = vi.fn()
+    render(<svg><PredictionLayer hoveredDay={null} onHoverDay={() => {}} onSelectDay={onSelectDay} prediction={prediction} selectedDay="2026-09-08" transform={transform} /></svg>)
+
+    const selected = screen.getByRole('button', { name: '选择预测日期 2026-09-08' })
+    const second = screen.getByRole('button', { name: '选择预测日期 2026-09-09' })
+    expect(selected).toHaveAttribute('aria-pressed', 'true')
+    expect(second).toHaveAttribute('tabindex', '0')
+    fireEvent.keyDown(second, { key: 'Enter' })
+    fireEvent.keyDown(second, { key: ' ' })
+    fireEvent.click(second)
+
+    expect(onSelectDay).toHaveBeenCalledTimes(3)
+    expect(onSelectDay).toHaveBeenLastCalledWith('2026-09-09')
+  })
 })

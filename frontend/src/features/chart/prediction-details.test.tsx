@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expect, test, vi } from 'vitest'
@@ -75,6 +76,34 @@ test('uses controlled date tabs and one selected-day value list in the mobile sh
 
   await userEvent.click(screen.getByRole('tab', { name: /第3日/ }))
   expect(onSelectDay).toHaveBeenCalledWith('2026-09-10')
+})
+
+test('uses one shared tab panel and moves selection with roving keyboard focus', async () => {
+  function ControlledDetails() {
+    const [selectedDay, setSelectedDay] = useState(prediction.days[1].day)
+    return <PredictionDetails mode="mobile-sheet" onSelectDay={setSelectedDay} prediction={prediction} selectedDay={selectedDay} />
+  }
+  render(<ControlledDetails />)
+
+  const tabs = screen.getAllByRole('tab')
+  const panel = screen.getByRole('tabpanel')
+  for (const tab of tabs) expect(tab).toHaveAttribute('aria-controls', panel.id)
+  expect(tabs[0]).toHaveAttribute('tabindex', '-1')
+  expect(tabs[1]).toHaveAttribute('tabindex', '0')
+  expect(tabs[2]).toHaveAttribute('tabindex', '-1')
+
+  tabs[1].focus()
+  await userEvent.keyboard('{ArrowRight}')
+  expect(tabs[2]).toHaveFocus()
+  expect(tabs[2]).toHaveAttribute('aria-selected', 'true')
+  await userEvent.keyboard('{Home}')
+  expect(tabs[0]).toHaveFocus()
+  expect(tabs[0]).toHaveAttribute('aria-selected', 'true')
+  await userEvent.keyboard('{End}')
+  expect(tabs[2]).toHaveFocus()
+  expect(tabs[2]).toHaveAttribute('aria-selected', 'true')
+  await userEvent.keyboard('{ArrowRight}')
+  expect(tabs[0]).toHaveFocus()
 })
 
 test('identifies forecast values as simulated rather than market data', () => {

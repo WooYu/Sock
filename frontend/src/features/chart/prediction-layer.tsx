@@ -43,14 +43,24 @@ export function PredictionLayer({ prediction, transform, hoveredDay, onHoverDay,
         const selected = selectedDay === day.day
         return (
           <g
+            aria-label={`选择预测日期 ${day.day}`}
+            aria-pressed={selected}
             data-active={selected || undefined}
             data-testid="prediction-candle"
             key={day.day}
             onClick={(event) => { event.stopPropagation(); onSelectDay?.(day.day) }}
+            onKeyDown={(event) => {
+              if (event.key !== 'Enter' && event.key !== ' ') return
+              event.preventDefault()
+              event.stopPropagation()
+              onSelectDay?.(day.day)
+            }}
             onMouseEnter={() => onHoverDay(day.day)}
             onMouseLeave={() => onHoverDay(null)}
             opacity="0.55"
+            role="button"
             strokeDasharray="4 3"
+            tabIndex={0}
           >
             {highlighted || selected ? <rect fill="#bfdbfe" height={transform.rect.height} opacity={selected ? '0.8' : '0.65'} width={step} x={x - step / 2} y={transform.rect.top} /> : null}
             <line stroke={rising ? '#dc2626' : '#16a34a'} strokeWidth="1.5" x1={x} x2={x} y1={transform.yForPrice(day.high)} y2={transform.yForPrice(day.low)} />

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useId, useRef, useState, type KeyboardEvent } from 'react'
 import type { PredictionDay, PredictionSnapshot } from './chart-types'
 
 type PredictionDetailsProps = {
@@ -37,23 +37,36 @@ function WarningCopy() {
 
 export function PredictionDetails({ prediction, selectedDay, onSelectDay, mode }: PredictionDetailsProps) {
   const [expanded, setExpanded] = useState(true)
+  const mobilePanelId = `${useId()}-prediction-panel`
+  const mobileTabRefs = useRef<Array<HTMLButtonElement | null>>([])
   const selectedIndex = Math.max(0, prediction.days.findIndex((day) => day.day === selectedDay))
   const rowsByDay = prediction.days.map(predictionRows)
 
+  const handleMobileTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+    let nextIndex: number | null = null
+    if (event.key === 'ArrowRight') nextIndex = (index + 1) % prediction.days.length
+    if (event.key === 'ArrowLeft') nextIndex = (index - 1 + prediction.days.length) % prediction.days.length
+    if (event.key === 'Home') nextIndex = 0
+    if (event.key === 'End') nextIndex = prediction.days.length - 1
+    if (nextIndex === null) return
+    event.preventDefault()
+    onSelectDay(prediction.days[nextIndex].day)
+    mobileTabRefs.current[nextIndex]?.focus()
+  }
+
   if (mode === 'mobile-sheet') {
-    const day = prediction.days[selectedIndex]
     const rows = rowsByDay[selectedIndex]
     return (
       <section aria-label="未来三日推演详情" className="sc-prediction-details sc-prediction-mobile-sheet">
         <header><div><p className="sc-eyebrow">未来三日</p><h2>推演详情</h2></div><span>{prediction.modelVersion}</span></header>
         <div aria-label="预测日期" className="sc-prediction-tabs" role="tablist">
           {prediction.days.map((candidate, index) => (
-            <button aria-controls={`prediction-day-${candidate.day}`} aria-selected={selectedIndex === index} id={`prediction-tab-${candidate.day}`} key={candidate.day} onClick={() => onSelectDay(candidate.day)} role="tab" type="button">
+            <button aria-controls={mobilePanelId} aria-selected={selectedIndex === index} id={`${mobilePanelId}-tab-${index}`} key={candidate.day} onClick={() => onSelectDay(candidate.day)} onKeyDown={(event) => handleMobileTabKeyDown(event, index)} ref={(node) => { mobileTabRefs.current[index] = node }} role="tab" tabIndex={selectedIndex === index ? 0 : -1} type="button">
               <strong>第{index + 1}日</strong><span>{candidate.day}</span>
             </button>
           ))}
         </div>
-        <dl aria-labelledby={`prediction-tab-${day.day}`} className="sc-prediction-values" id={`prediction-day-${day.day}`} role="tabpanel">
+        <dl aria-labelledby={`${mobilePanelId}-tab-${selectedIndex}`} className="sc-prediction-values" id={mobilePanelId} role="tabpanel">
           {rows.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{predictionValue(value)}</dd></div>)}
         </dl>
         <WarningCopy />

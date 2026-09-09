@@ -74,18 +74,13 @@ test('prevents edits, visibility changes and deletion while locked but allows un
   expect(onDelete).not.toHaveBeenCalled()
 })
 
-test('deletes only after confirmation', async () => {
+test('requests deletion through the parent handler', async () => {
   const onDelete = vi.fn()
-  const confirm = vi.spyOn(window, 'confirm').mockReturnValueOnce(false).mockReturnValueOnce(true)
   render(<ObjectInspector drawing={drawing} onChange={() => {}} onDelete={onDelete} />)
 
   await userEvent.click(screen.getByRole('button', { name: '删除对象' }))
-  expect(onDelete).not.toHaveBeenCalled()
-  await userEvent.click(screen.getByRole('button', { name: '删除对象' }))
 
-  expect(confirm).toHaveBeenCalledWith('确认删除此绘图对象？')
   expect(onDelete).toHaveBeenCalledOnce()
-  confirm.mockRestore()
 })
 
 test('renders an empty inspector until a drawing is selected', () => {

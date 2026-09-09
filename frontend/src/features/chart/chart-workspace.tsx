@@ -115,7 +115,10 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
     commands.select(id)
     commands.move(delta)
   }
-  const deleteSelectedDrawing = () => commands.remove(selectedId)
+  const deleteSelectedDrawing = () => {
+    if (!selectedId || !window.confirm('确认删除此绘图对象？')) return
+    commands.remove(selectedId)
+  }
   const changeSelectedDrawing = (change: DrawingInspectorChange) => {
     if (!selectedId) return
     commands.select(selectedId)
