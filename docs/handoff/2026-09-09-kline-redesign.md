@@ -60,3 +60,7 @@ npm.cmd run dev -- --hostname 127.0.0.1
 交易日期沿用现有后端日历逻辑：排除周末与 `STOCKCAL_PREDICTION_EXCHANGE_HOLIDAYS` 配置的休市日。部署时必须维护覆盖预测日期的交易所休市配置；默认空配置不能保证排除法定节假日。当前 `baseline-v1` 为确定性技术推演，置信度是启发式值，未经过概率校准。
 
 本地生产预览使用 Next.js standalone 输出；浏览器验收命令为在 `frontend` 中设置 `PLAYWRIGHT_BASE_URL=http://127.0.0.1:3000` 和 `PLAYWRIGHT_CHANNEL=chrome` 后执行 `npm.cmd run test:e2e`。
+
+## Git 交接
+
+本地 `feature/kline-redesign` 已接回真实远端提交 `ba65100`，并跟踪 `origin/feature/kline-redesign`。整理前的完整本地历史保存在 `backup/kline-snapshot-20260909`。整理前后代码树核对仅多出原远端已有的 `frontend/.env.example` 两行示例配置，已验证的业务代码未改变。本轮提交保留在本机，未推送 GitHub、未部署。
