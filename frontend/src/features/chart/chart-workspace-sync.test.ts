@@ -112,4 +112,73 @@ describe('chart workspace v2 persistence and sync', () => {
     expect(loadChartSyncQueue()).toHaveLength(1)
     expect(loadChartSyncQueue()[0].workspace.revision).toBeGreaterThan(5)
   })
+
+  test('preserves both appends when another tab writes during a stale queue-index write', () => {
+    const write = Storage.prototype.setItem
+    let interleaved = false
+    const spy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(function (this: Storage, key, value) {
+      if (key === 'stockcal:chart-sync-queue:v2' && !interleaved) {
+        interleaved = true
+        enqueueChartWorkspace(workspaceFixture({ revision: 2 }))
+      }
+      write.call(this, key, value)
+    })
+    enqueueChartWorkspace(workspaceFixture({ revision: 1 }))
+    spy.mockRestore()
+    expect(loadChartSyncQueue().map((entry) => entry.workspace.revision).sort()).toEqual([1, 2])
+  })
+
+  test('replay cannot erase a concurrent append while acknowledging the previous head', async () => {
+    enqueueChartWorkspace(workspaceFixture({ revision: 1 }))
+    const write = Storage.prototype.setItem
+    let interleaved = false
+    const spy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(function (this: Storage, key, value) {
+      if (key === 'stockcal:chart-sync-queue:v2' && value === '[]' && !interleaved) {
+        interleaved = true
+        enqueueChartWorkspace(workspaceFixture({ revision: 2 }))
+      }
+      write.call(this, key, value)
+    })
+    vi.mocked(fetch).mockImplementation(async () => response({ applied: true, cursor: 1 }))
+    await replayChartSyncQueue('browser-1')
+    spy.mockRestore()
+    expect(interleaved).toBe(true)
+    expect(vi.mocked(fetch).mock.calls.map(([, init]) => JSON.parse(init!.body as string).revision)).toEqual([1, 2])
+    expect(loadChartSyncQueue()).toEqual([])
+  })
+
+  test.each(['{broken', JSON.stringify([{ id: 'bad', workspace: { version: 2 } }])])('quarantines corrupt queue data without blocking later commands: %s', (raw) => {
+    localStorage.setItem('stockcal:chart-sync-queue:v2', raw)
+    expect(() => enqueueChartWorkspace(workspaceFixture())).not.toThrow()
+    expect(loadChartSyncQueue()).toHaveLength(1)
+    const copies = Object.keys(localStorage).filter((key) => key.startsWith('stockcal:chart-sync-recovery:v2:')).map((key) => JSON.parse(localStorage.getItem(key)!))
+    expect(copies).toContainEqual(expect.objectContaining({ sourceKey: 'stockcal:chart-sync-queue:v2', raw }))
+  })
+
+  test('retains valid legacy entries when an adjacent entry is corrupt', () => {
+    localStorage.setItem('stockcal:chart-sync-queue:v2', JSON.stringify([{ id: 'valid', workspace: workspaceFixture() }, { id: 'bad', workspace: null }]))
+    expect(() => loadChartSyncQueue()).not.toThrow()
+    expect(loadChartSyncQueue().map((entry) => entry.id)).toEqual(['valid'])
+  })
+
+  test('does not resurrect an acknowledged mutation from a stale compatibility index', async () => {
+    enqueueChartWorkspace(workspaceFixture())
+    const stale = localStorage.getItem('stockcal:chart-sync-queue:v2')!
+    vi.mocked(fetch).mockImplementation(async () => response({ applied: true, cursor: 1 }))
+    await replayChartSyncQueue('browser-1')
+    localStorage.setItem('stockcal:chart-sync-queue:v2', stale)
+    expect(loadChartSyncQueue()).toEqual([])
+    enqueueChartWorkspace(workspaceFixture({ revision: 2 }))
+    expect(loadChartSyncQueue().map((entry) => entry.workspace.revision)).toEqual([2])
+  })
+
+  test('corrupt journal records are quarantined independently of intact commands', () => {
+    const first = enqueueChartWorkspace(workspaceFixture())
+    enqueueChartWorkspace(workspaceFixture({ revision: 2 }))
+    const key = Object.keys(localStorage).find((key) => key.startsWith('stockcal:chart-sync-mutation:v2:') && JSON.parse(localStorage.getItem(key)!).id === first.id)!
+    localStorage.setItem(key, '{broken journal')
+    expect(loadChartSyncQueue().map((entry) => entry.workspace.revision)).toEqual([2])
+    const copies = Object.keys(localStorage).filter((key) => key.startsWith('stockcal:chart-sync-recovery:v2:')).map((key) => JSON.parse(localStorage.getItem(key)!))
+    expect(copies).toContainEqual(expect.objectContaining({ sourceKey: key, raw: '{broken journal' }))
+  })
 })

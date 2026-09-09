@@ -130,4 +130,28 @@ describe('chart workspace command persistence', () => {
     expect(result.current.drawings[0].text).toBeUndefined()
     expect(loadChartSyncQueue()).toHaveLength(1)
   })
+
+  test('corrupt queued data stays visibly pending while new drawing commands remain durable', async () => {
+    localStorage.setItem('stockcal:chart-sync-queue:v2', '{broken')
+    const { result } = renderHook(() => useChartWorkspace({ symbol: '600519', period: 'day' }))
+    expect(result.current.syncStatus).toBe('待同步')
+    act(() => result.current.commands.create(drawingFixture()))
+    expect(loadChartWorkspace('600519', 'day')?.drawings).toHaveLength(1)
+    expect(loadChartSyncQueue()).toHaveLength(1)
+    localStorage.setItem('stockcal.accessToken', 'token')
+    await act(() => result.current.flush())
+    expect(loadChartSyncQueue()).toEqual([])
+    expect(result.current.syncStatus).toBe('待同步')
+  })
+
+  test('deterministic merge ordering does not discard undo history after acknowledging multiple drawings', async () => {
+    const { result } = renderHook(() => useChartWorkspace({ symbol: '600519', period: 'day' }))
+    localStorage.setItem('stockcal.accessToken', 'token')
+    act(() => result.current.commands.create(drawingFixture({ id: 'z' })))
+    act(() => result.current.commands.create(drawingFixture({ id: 'a' })))
+    act(() => result.current.commands.updateText('edit'))
+    await act(() => result.current.flush())
+    act(() => result.current.commands.undo())
+    expect(result.current.drawings.find((item) => item.id === 'a')?.text).toBeUndefined()
+  })
 })

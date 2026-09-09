@@ -65,4 +65,22 @@ describe('chart workspace v2 state', () => {
   test('refuses merges across symbols or periods', () => {
     expect(() => mergeChartWorkspace(workspaceFixture(), workspaceFixture({ period: 'week' }))).toThrow()
   })
+
+  test('converges on exact version and timestamp ties including settings and recovery order', () => {
+    const a = workspaceFixture({ drawings: [drawingFixture({ id: 'z', text: 'alpha' }), drawingFixture({ id: 'a' })], view: { zoom: 90, panX: 0, panY: 0 }, indicatorConfig: { nested: { z: 1, a: 2 } }, recovery: [{ id: 'history-z', reason: 'VERSION_CONFLICT', drawing: drawingFixture({ id: 'history-z' }) }] })
+    const b = workspaceFixture({ drawings: [drawingFixture({ id: 'b' }), drawingFixture({ id: 'z', text: 'omega' })], view: { zoom: 120, panX: 0, panY: 0 }, indicatorConfig: { nested: { a: 2, z: 1 } }, recovery: [{ id: 'history-a', reason: 'VERSION_CONFLICT', drawing: drawingFixture({ id: 'history-a' }) }] })
+    const ab = mergeChartWorkspace(a, b)
+    const ba = mergeChartWorkspace(b, a)
+    expect(ab).toEqual(ba)
+    expect(serializeChartWorkspace(ab)).toBe(serializeChartWorkspace(ba))
+    expect(ab.drawings.find((item) => item.id === 'z')?.text).toBe('omega')
+    expect(ab.recovery).toContainEqual({ id: 'z', reason: 'VERSION_CONFLICT', drawing: a.drawings[0] })
+    expect(mergeChartWorkspace(ab, ba)).toEqual(ab)
+  })
+
+  test('canonicalizes record key order and equivalent timestamp tie representations', () => {
+    const a = workspaceFixture({ indicators: { ma5: true, boll: false }, updatedAt: '2026-09-07T08:00:00+08:00', deletions: [{ id: 'line-1', version: 3, updatedAt: '2026-09-07T08:00:00+08:00' }] })
+    const b = workspaceFixture({ indicators: { boll: false, ma5: true }, updatedAt: '2026-09-07T00:00:00Z', deletions: [{ id: 'line-1', version: 3, updatedAt: '2026-09-07T00:00:00Z' }] })
+    expect(serializeChartWorkspace(mergeChartWorkspace(a, b))).toBe(serializeChartWorkspace(mergeChartWorkspace(b, a)))
+  })
 })

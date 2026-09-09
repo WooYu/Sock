@@ -52,9 +52,18 @@ function canonicalDrawing(value: DrawingObject): DrawingObject {
   return { id: value.id, symbol: value.symbol, period: value.period, kind: value.kind, points: value.points.map(({ time, price }) => ({ time, price })), style: { color: value.style.color, width: value.style.width, lineStyle: value.style.lineStyle, opacity: value.style.opacity }, ...(value.text !== undefined ? { text: value.text } : {}), locked: value.locked, visible: value.visible, version: value.version, updatedAt: value.updatedAt, ...(value.restoredFromVersion !== undefined ? { restoredFromVersion: value.restoredFromVersion } : {}) }
 }
 
+/** Object insertion order is not part of the persistence or conflict protocol. */
+function canonicalJson(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(canonicalJson)
+  if (record(value)) return Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonicalJson(value[key])]))
+  return value
+}
+
+const canonicalContent = (value: unknown) => JSON.stringify(canonicalJson(value))
+
 export function serializeChartWorkspace(value: ChartWorkspaceV2): string {
   if (!isChartWorkspaceV2(value)) throw new Error('Invalid chart workspace v2')
-  return JSON.stringify({ version: 2, symbol: value.symbol, period: value.period, drawings: value.drawings.map(canonicalDrawing), deletions: (value.deletions ?? []).map(({ id, version, updatedAt }) => ({ id, version, updatedAt })), recovery: (value.recovery ?? []).map(({ id, reason, drawing: item }) => ({ id, reason, drawing: canonicalDrawing(item) })), indicators: value.indicators, indicatorConfig: value.indicatorConfig, layers: value.layers, view: { zoom: value.view.zoom, panX: value.view.panX, panY: value.view.panY }, crosshair: value.crosshair, updatedAt: value.updatedAt, revision: value.revision })
+  return JSON.stringify({ version: 2, symbol: value.symbol, period: value.period, drawings: value.drawings.map(canonicalDrawing), deletions: (value.deletions ?? []).map(({ id, version, updatedAt }) => ({ id, version, updatedAt })), recovery: (value.recovery ?? []).map(({ id, reason, drawing: item }) => ({ id, reason, drawing: canonicalDrawing(item) })), indicators: canonicalJson(value.indicators), indicatorConfig: canonicalJson(value.indicatorConfig), layers: canonicalJson(value.layers), view: { zoom: value.view.zoom, panX: value.view.panX, panY: value.view.panY }, crosshair: value.crosshair, updatedAt: value.updatedAt, revision: value.revision })
 }
 
 export function deserializeChartWorkspace(raw: string): ChartWorkspaceV2 | null {
@@ -64,22 +73,25 @@ export function deserializeChartWorkspace(raw: string): ChartWorkspaceV2 | null 
   } catch { return null }
 }
 
-function newer<T extends { version: number; updatedAt: string }>(left: T, right: T): T {
-  return right.version > left.version || (right.version === left.version && Date.parse(right.updatedAt) > Date.parse(left.updatedAt)) ? right : left
+function newer<T extends { version: number; updatedAt: string }>(left: T, right: T, content: (value: T) => unknown): T {
+  const byVersion = right.version - left.version
+  const byTime = Date.parse(right.updatedAt) - Date.parse(left.updatedAt)
+  return byVersion > 0 || (byVersion === 0 && (byTime > 0 || (byTime === 0 && canonicalContent(content(right)) > canonicalContent(content(left))))) ? right : left
 }
 
 export function mergeChartWorkspace(local: ChartWorkspaceV2, remote: ChartWorkspaceV2): ChartWorkspaceV2 {
   if (!isChartWorkspaceV2(local) || !isChartWorkspaceV2(remote) || local.symbol !== remote.symbol || local.period !== remote.period) throw new Error('Cannot merge invalid or unrelated chart workspaces')
-  const settings = remote.revision > local.revision || (remote.revision === local.revision && Date.parse(remote.updatedAt) > Date.parse(local.updatedAt)) ? remote : local
+  const settingsContent = (value: ChartWorkspaceV2) => ({ indicators: value.indicators, indicatorConfig: value.indicatorConfig, layers: value.layers, view: value.view, crosshair: value.crosshair, updatedAt: value.updatedAt })
+  const settings = newer({ ...local, version: local.revision }, { ...remote, version: remote.revision }, (value) => settingsContent({ ...value, version: 2 }))
   const drawings = new Map<string, DrawingObject>()
   const deletions = new Map<string, DrawingTombstone>()
   const recovery = new Map<string, DrawingRecoveryRecord>()
-  const recover = (item: DrawingRecoveryRecord) => recovery.set(JSON.stringify({ ...item, drawing: canonicalDrawing(item.drawing) }), item)
+  const recover = (item: DrawingRecoveryRecord) => recovery.set(canonicalContent({ id: item.id, reason: item.reason, drawing: canonicalDrawing(item.drawing) }), item)
   for (const item of [...(local.recovery ?? []), ...(remote.recovery ?? [])]) recover(item)
-  for (const item of [...(local.deletions ?? []), ...(remote.deletions ?? [])]) deletions.set(item.id, deletions.has(item.id) ? newer(deletions.get(item.id)!, item) : item)
+  for (const item of [...(local.deletions ?? []), ...(remote.deletions ?? [])]) deletions.set(item.id, deletions.has(item.id) ? newer(deletions.get(item.id)!, item, ({ id, version, updatedAt }) => ({ id, version, updatedAt })) : item)
   for (const item of [...local.drawings, ...remote.drawings]) {
     const current = drawings.get(item.id)
-    const winner = current ? newer(current, item) : item
+    const winner = current ? newer(current, item, canonicalDrawing) : item
     if (current && !deletions.has(item.id)) {
       const content = (candidate: DrawingObject) => JSON.stringify({ ...canonicalDrawing(candidate), version: 0, updatedAt: '' })
       if (content(current) !== content(item)) recover({ id: item.id, reason: 'VERSION_CONFLICT', drawing: winner === current ? item : current })
@@ -93,5 +105,6 @@ export function mergeChartWorkspace(local: ChartWorkspaceV2, remote: ChartWorksp
       drawings.delete(id)
     }
   }
-  return deserializeChartWorkspace(serializeChartWorkspace({ ...settings, drawings: [...drawings.values()], deletions: [...deletions.values()], recovery: [...recovery.values()], revision: Math.max(local.revision, remote.revision) }))!
+  const byId = (a: { id: string }, b: { id: string }) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0
+  return deserializeChartWorkspace(serializeChartWorkspace({ ...settings, version: 2, drawings: [...drawings.values()].sort(byId), deletions: [...deletions.values()].sort(byId), recovery: [...recovery.entries()].sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([, item]) => item), revision: Math.max(local.revision, remote.revision) }))!
 }

@@ -4,7 +4,7 @@ import { useMemo, useSyncExternalStore } from 'react'
 import type { ChartPeriod, ChartWorkspaceV2, DrawingObject, DrawingStyle, TimePricePoint } from './chart-types'
 import { DrawingEngine, type DrawingMove } from './drawing-engine'
 import { deserializeChartWorkspace, serializeChartWorkspace } from './chart-workspace-state'
-import { chartWorkspaceChangedEvent, enqueueChartWorkspace, loadChartSyncCursor, loadChartSyncQueue, loadChartWorkspace, pullChartWorkspace, replayChartSyncQueue, saveChartWorkspace } from './chart-workspace-sync'
+import { chartWorkspaceChangedEvent, enqueueChartWorkspace, hasChartSyncRecovery, loadChartSyncCursor, loadChartSyncQueue, loadChartWorkspace, pullChartWorkspace, replayChartSyncQueue, saveChartWorkspace } from './chart-workspace-sync'
 
 export type ChartSyncStatus = '本机保存' | '同步中' | '已同步' | '待同步' | '离线'
 type WorkspaceState = { workspace: ChartWorkspaceV2; selectedId: string | null; syncStatus: ChartSyncStatus }
@@ -79,23 +79,30 @@ class ChartWorkspaceController {
   }
 
   private idleStatus(): ChartSyncStatus {
+    const pending = loadChartSyncQueue().length
     if (!navigator.onLine) return '离线'
+    if (hasChartSyncRecovery()) return '待同步'
     if (!authorization()) return '本机保存'
-    return loadChartSyncQueue().length ? '待同步' : '已同步'
+    return pending ? '待同步' : '已同步'
   }
 
   private refresh() {
     if (!this.symbol || this.saving) return
     const saved = loadChartWorkspace(this.symbol, this.period)
     if (!saved || serializeChartWorkspace(saved) === serializeChartWorkspace(this.state.workspace)) return
-    if (JSON.stringify(saved.drawings) !== JSON.stringify(this.state.workspace.drawings) || JSON.stringify(saved.deletions ?? []) !== JSON.stringify(this.state.workspace.deletions ?? [])) {
+    const byId = (a: { id: string }, b: { id: string }) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0
+    const drawingContent = (value: ChartWorkspaceV2) => JSON.stringify({ drawings: [...value.drawings].sort(byId), deletions: [...(value.deletions ?? [])].sort(byId) })
+    if (drawingContent(saved) !== drawingContent(this.state.workspace)) {
       this.engine = new DrawingEngine(saved.drawings, saved.deletions)
       this.engine.select(this.state.selectedId)
     }
     this.publish({ workspace: saved, selectedId: this.engine.currentSelectedId() })
   }
 
-  private onStored = () => this.refresh()
+  private onStored = () => {
+    this.refresh()
+    if (this.state.syncStatus !== '同步中') this.setStatus(this.idleStatus())
+  }
   private onOffline = () => { clearTimeout(this.timer); this.setStatus('离线') }
   private onOnline = () => { void this.flush(); void this.pull() }
 
@@ -119,7 +126,7 @@ class ChartWorkspaceController {
     clearTimeout(this.timer)
     const auth = authorization()
     if (!navigator.onLine || !auth) { this.setStatus(this.idleStatus()); return }
-    if (!loadChartSyncQueue().length) { this.setStatus('已同步'); return }
+    if (!loadChartSyncQueue().length) { this.setStatus(this.idleStatus()); return }
     this.setStatus('同步中')
     try {
       await replayChartSyncQueue(clientId(), auth)
