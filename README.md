@@ -20,6 +20,7 @@ StockCal 是一个面向手机浏览器和桌面浏览器的 A 股决策与复�
 
 完整设计与阶段状态见：
 
+- [K 线重设计最新接续记录（2026-09-09）](docs/handoff/2026-09-09-kline-redesign.md)
 - [生产设计](docs/superpowers/specs/2026-08-14-stockcal-production-design.md)
 - [实施路线图](docs/superpowers/plans/2026-08-14-stockcal-production-roadmap.md)
 - [当前交接说明](docs/handoff/2026-08-14-stockcal-current-status.md)
