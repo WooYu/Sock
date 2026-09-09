@@ -1,19 +1,17 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { MarketSnapshot } from '../workspace/stock-workspace-types'
 import type { WorkspaceStatus } from '../workspace/stock-workspace-types'
 import { MarketFeedback, MarketLoadingState } from '../workspace/market-state'
 import type { ChartTool } from './chart-annotation-store'
 import { ChartLayerPanel, type ChartLayerState } from './chart-layer-panel'
 import { ChartToolbar } from './chart-toolbar'
-import { mergeChartWorkspace, type ChartWorkspaceSnapshot } from './chart-workspace-state'
-import { loadChartSyncCursor, loadChartWorkspace, pullChartWorkspace, pushChartWorkspace, saveChartSyncCursor, saveChartWorkspace } from './chart-workspace-sync'
-import { getAuthorizationHeader, getClientId } from '../records/record-sync'
+import { useChartWorkspace } from './use-chart-workspace'
 import { createChartTransform } from './chart-coordinates'
 import { aggregateCandles, bollinger, movingAverage } from './chart-math'
 import type { ChartPeriod, DrawingObject, PredictionSnapshot, TimePricePoint } from './chart-types'
-import { DrawingEngine, type DrawingMove } from './drawing-engine'
+import type { DrawingMove } from './drawing-engine'
 import { ChartCanvas } from './chart-canvas'
 import { PredictionDetails } from './prediction-details'
 import { ObjectInspector, type DrawingInspectorChange } from './object-inspector'
@@ -33,17 +31,18 @@ function priceText(value: number) {
 export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', errorMessage, onRetry }: { snapshot?: MarketSnapshot | null; prediction?: PredictionSnapshot | null; status?: WorkspaceStatus; errorMessage?: string | null; onRetry?: () => void }) {
   const [activeTool, setActiveTool] = useState<ChartTool>('pointer')
   const [activePeriod, setActivePeriod] = useState<ChartPeriod>('day')
-  const [indicators, setIndicators] = useState<Record<IndicatorKey, boolean>>({ ma5: true, ma10: true, ma20: true, boll: true })
-  const [zoom, setZoom] = useState(100)
-  const [crosshair, setCrosshair] = useState(false)
-  const [layers, setLayers] = useState<ChartLayerState>({ keyLevels: true, annotations: true, prediction: true })
-  const [drawings, setDrawings] = useState<DrawingObject[]>([])
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const { workspace, drawings, selectedId, syncStatus, commands } = useChartWorkspace({ symbol: snapshot?.quote.security.code ?? '', period: activePeriod })
+  const indicators = { ma5: true, ma10: true, ma20: true, boll: true, ...workspace.indicators }
+  const layers: ChartLayerState = { keyLevels: true, annotations: true, prediction: true, ...workspace.layers }
+  const zoom = workspace.view.zoom
+  const crosshair = workspace.crosshair
+  const setIndicators = commands.setIndicators
+  const setLayers = commands.setLayers
+  const setCrosshair = commands.setCrosshair
+  const setZoom = (update: number | ((value: number) => number)) => commands.setView((view) => ({ ...view, zoom: typeof update === 'function' ? update(view.zoom) : update }))
   const [hoveredDay, setHoveredDay] = useState<string | null>(null)
   const [selectedPredictionDay, setSelectedPredictionDay] = useState<string | null>(null)
-  const [syncStatus, setSyncStatus] = useState<'本机保存' | '同步中' | '已同步' | '待同步'>('本机保存')
   const [toolsOpen, setToolsOpen] = useState(false)
-  const store = useRef(new DrawingEngine())
 
   const sourceCandles = useMemo(() => snapshot?.dailyCandles ?? [], [snapshot?.dailyCandles])
   const candles = useMemo(() => aggregateCandles(sourceCandles, activePeriod), [activePeriod, sourceCandles])
@@ -79,9 +78,7 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
       version: 0,
       updatedAt: new Date().toISOString(),
     }
-    store.current.select(null)
-    setDrawings(store.current.create(drawing))
-    setSelectedId(drawing.id)
+    commands.create(drawing)
   }
 
   const resetView = () => {
@@ -108,118 +105,31 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
   const times = [...candles.map((candle) => candle.day), ...(activePrediction?.days.map((day) => day.day) ?? [])]
   const transform = createChartTransform({ times: times.length ? times : [''], minPrice, maxPrice, rect: { left: chartLeft, top: chartTop, width: chartWidth, height: chartHeight } })
 
-  const createDrawing = (drawing: DrawingObject) => {
-    setDrawings(store.current.create(drawing))
-    setSelectedId(drawing.id)
-  }
-  const selectDrawing = (id: string | null) => {
-    store.current.select(id)
-    setSelectedId(id)
-  }
+  const createDrawing = commands.create
+  const selectDrawing = commands.select
   const moveDrawingPoint = (id: string, index: number, point: TimePricePoint) => {
-    store.current.select(id)
-    setSelectedId(id)
-    setDrawings(store.current.movePoint(index, point))
+    commands.select(id)
+    commands.movePoint(index, point)
   }
   const moveDrawing = (id: string, delta: DrawingMove) => {
-    store.current.select(id)
-    setSelectedId(id)
-    setDrawings(store.current.move(delta))
+    commands.select(id)
+    commands.move(delta)
   }
-  const deleteSelectedDrawing = () => {
-    if (!selectedId) return
-    store.current.select(selectedId)
-    setDrawings(store.current.remove(selectedId))
-    setSelectedId(null)
-  }
+  const deleteSelectedDrawing = () => commands.remove(selectedId)
   const changeSelectedDrawing = (change: DrawingInspectorChange) => {
     if (!selectedId) return
-    store.current.select(selectedId)
-    const next = change.type === 'style'
-      ? store.current.updateStyle(change.patch)
-      : change.type === 'text'
-        ? store.current.updateText(change.text)
-        : change.type === 'point'
-          ? store.current.movePoint(change.index, change.point)
-          : change.type === 'visible'
-            ? store.current.setVisible(change.visible)
-            : store.current.setLocked(change.locked)
-    setDrawings(next)
+    commands.select(selectedId)
+    switch (change.type) {
+      case 'style': commands.updateStyle(change.patch); break
+      case 'text': commands.updateText(change.text); break
+      case 'point': commands.movePoint(change.index, change.point); break
+      case 'visible': commands.setVisible(change.visible); break
+      case 'locked': commands.setLocked(change.locked); break
+    }
   }
-  const undoDrawing = () => {
-    setDrawings(store.current.undo())
-    setSelectedId(null)
-  }
-  const redoDrawing = () => {
-    setDrawings(store.current.redo())
-    setSelectedId(null)
-  }
+  const undoDrawing = commands.undo
+  const redoDrawing = commands.redo
 
-  const workspaceSnapshot: ChartWorkspaceSnapshot = {
-    version: 1,
-    stockCode: snapshot?.quote.security.code ?? '',
-    period: activePeriod,
-    drawings: drawings as unknown as ChartWorkspaceSnapshot['drawings'],
-    indicators,
-    indicatorConfig: {},
-    layers,
-    view: { zoom, panX: 0, panY: 0 },
-    crosshair,
-    updatedAt: new Date().toISOString(),
-    revision: 1,
-  }
-
-  useEffect(() => {
-    if (!snapshot) return
-    const saved = loadChartWorkspace(snapshot.quote.security.code, activePeriod)
-    if (!saved) return
-    const savedDrawings = saved.drawings.filter((drawing) => 'points' in drawing).map((drawing) => drawing as unknown as DrawingObject)
-    store.current = new DrawingEngine(savedDrawings)
-    setDrawings(store.current.current())
-    setSelectedId(null)
-    setIndicators(saved.indicators as Record<IndicatorKey, boolean>)
-    setLayers(saved.layers as ChartLayerState)
-    setZoom(saved.view.zoom)
-    setCrosshair(saved.crosshair)
-  }, [activePeriod, snapshot])
-
-  useEffect(() => {
-    if (!snapshot) return
-    const previous = loadChartWorkspace(workspaceSnapshot.stockCode, workspaceSnapshot.period)
-    const outgoing = { ...workspaceSnapshot, revision: Math.max(previous?.revision ?? 0, Date.now()) }
-    saveChartWorkspace(outgoing)
-    const authorization = getAuthorizationHeader()
-    if (!authorization) return
-    const timer = window.setTimeout(() => {
-      setSyncStatus('同步中')
-      void pushChartWorkspace(outgoing, getClientId(), authorization).then(() => setSyncStatus('已同步')).catch(() => setSyncStatus('待同步'))
-    }, 350)
-    return () => window.clearTimeout(timer)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activePeriod, crosshair, drawings, indicators, layers, snapshot, zoom])
-
-  useEffect(() => {
-    if (!snapshot || !getAuthorizationHeader()) return
-    let cancelled = false
-    void pullChartWorkspace(loadChartSyncCursor(), getClientId(), getAuthorizationHeader()).then((result) => {
-      if (cancelled) return
-      saveChartSyncCursor(result.nextCursor)
-      const remote = result.snapshots.find((item) => item.stockCode === snapshot.quote.security.code && item.period === activePeriod)
-      if (!remote) return
-      const merged = mergeChartWorkspace(workspaceSnapshot, remote)
-      saveChartWorkspace(merged)
-      const mergedDrawings = merged.drawings.filter((drawing) => 'points' in drawing).map((drawing) => drawing as unknown as DrawingObject)
-      store.current = new DrawingEngine(mergedDrawings)
-      setDrawings(store.current.current())
-      setSelectedId(null)
-      setIndicators(merged.indicators as Record<IndicatorKey, boolean>)
-      setLayers(merged.layers as ChartLayerState)
-      setZoom(merged.view.zoom)
-      setCrosshair(merged.crosshair)
-    }).catch(() => undefined)
-    return () => { cancelled = true }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activePeriod, snapshot?.quote.security.code])
   if (!snapshot || !sourceCandles.length) {
     if (!snapshot && (status === 'loading' || status === 'refreshing')) return <MarketLoadingState variant="chart" />
     if (!snapshot && status === 'error') return <section className="sc-chart-error-state"><MarketFeedback errorMessage={errorMessage} onRetry={onRetry} status={status} /></section>
@@ -305,7 +215,7 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
                 <ChartCanvas activeTool={activeTool} candles={candles} crosshair={crosshair} drawings={drawings} hoveredDay={hoveredDay} indicatorValues={indicatorValues} indicators={indicators} keyLevels={keyLevels} onCreateDrawing={createDrawing} onDeleteSelected={deleteSelectedDrawing} onHoverDay={setHoveredDay} onMoveDrawing={moveDrawing} onMovePoint={moveDrawingPoint} onRedo={redoDrawing} onSelectDrawing={selectDrawing} onSelectPredictionDay={setSelectedPredictionDay} onUndo={undoDrawing} period={activePeriod} prediction={layers.prediction ? activePrediction : null} selectedId={selectedId} selectedPredictionDay={activePredictionDay} showDrawings={layers.annotations} showKeyLevels={layers.keyLevels} symbol={snapshot.quote.security.code} transform={transform} />
               </div>
             </div>
-            <div className="sc-kline-statusbar"><span>共 {candles.length} 根 K 线</span><span>当前周期：{periods.find(([period]) => period === activePeriod)?.[1]}</span><span>数据源：{snapshot.source.name}</span><span>{getAuthorizationHeader() ? syncStatus : '本机保存 · 登录后跨设备同步'}</span></div>
+            <div className="sc-kline-statusbar"><span>共 {candles.length} 根 K 线</span><span>当前周期：{periods.find(([period]) => period === activePeriod)?.[1]}</span><span>数据源：{snapshot.source.name}</span><span>{syncStatus === '本机保存' ? '本机保存 · 登录后跨设备同步' : syncStatus}</span></div>
           </div>
           {(activeTool === 'rectangle' || activeTool === 'trend-line') && <button className="sc-kline-add-annotation" onClick={addRectangle} type="button">添加矩形标注</button>}
           {activePrediction && layers.prediction ? <><PredictionDetails mode="desktop-table" onSelectDay={setSelectedPredictionDay} prediction={activePrediction} selectedDay={activePredictionDay} /><PredictionDetails mode="mobile-sheet" onSelectDay={setSelectedPredictionDay} prediction={activePrediction} selectedDay={activePredictionDay} /></> : null}

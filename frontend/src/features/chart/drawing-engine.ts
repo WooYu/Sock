@@ -1,4 +1,4 @@
-import type { DrawingObject, DrawingStyle, TimePricePoint } from './chart-types'
+import type { DrawingObject, DrawingStyle, DrawingTombstone, TimePricePoint } from './chart-types'
 
 export type DrawingMove = {
   /** Number of entries in timeDomain. This is a trading-session delta, not calendar days. */
@@ -51,26 +51,30 @@ function boundedTimeIndexDelta(drawing: DrawingObject, move: DrawingMove): numbe
   return Math.max(-minimum, Math.min(domain.length - 1 - maximum, move.timeIndexDelta))
 }
 
-function touched(drawing: DrawingObject): DrawingObject {
-  return {
-    ...drawing,
-    version: drawing.version + 1,
-    updatedAt: new Date().toISOString(),
-  }
-}
-
 export class DrawingEngine {
   private drawings: DrawingObject[]
+  private deletions = new Map<string, DrawingTombstone>()
+  private versions = new Map<string, number>()
   private selectedId: string | null = null
   private past: EngineSnapshot[] = []
   private future: EngineSnapshot[] = []
 
-  constructor(initial: DrawingObject[] = []) {
+  constructor(initial: DrawingObject[] = [], deletions: DrawingTombstone[] = []) {
     this.drawings = cloneDrawings(initial).map(normalizeRectangle)
+    for (const item of deletions) this.deletions.set(item.id, { ...item })
+    for (const item of [...initial, ...deletions]) this.versions.set(item.id, Math.max(item.version, this.versions.get(item.id) ?? 0))
   }
 
   current(): DrawingObject[] {
     return cloneDrawings(this.drawings)
+  }
+
+  currentDeletions(): DrawingTombstone[] {
+    return [...this.deletions.values()].map((item) => ({ ...item }))
+  }
+
+  currentSelectedId(): string | null {
+    return this.selectedId
   }
 
   select(id: string | null): void {
@@ -81,7 +85,7 @@ export class DrawingEngine {
     if (this.drawings.some((candidate) => candidate.id === drawing.id)) throw new Error(`Drawing id already exists: ${drawing.id}`)
     if (drawing.points.some((point) => !Number.isFinite(point.price))) throw new Error('Drawing point price must be finite')
     this.record()
-    this.drawings = [...this.drawings, normalizeRectangle(touched(cloneDrawing(drawing)))]
+    this.drawings = [...this.drawings, normalizeRectangle(this.touched(cloneDrawing(drawing)))]
     this.selectedId = drawing.id
     return this.current()
   }
@@ -92,7 +96,7 @@ export class DrawingEngine {
     if (source.locked) return this.current()
     if (this.drawings.some((drawing) => drawing.id === newId)) throw new Error(`Drawing id already exists: ${newId}`)
     this.record()
-    this.drawings = [...this.drawings, touched({ ...cloneDrawing(source), id: newId })]
+    this.drawings = [...this.drawings, this.touched({ ...cloneDrawing(source), id: newId })]
     this.selectedId = newId
     return this.current()
   }
@@ -159,6 +163,7 @@ export class DrawingEngine {
     const drawing = this.drawings.find((candidate) => candidate.id === id)
     if (!drawing || drawing.locked) return this.current()
     this.record()
+    this.markDeleted(drawing)
     this.drawings = this.drawings.filter((candidate) => candidate.id !== id)
     if (this.selectedId === id) this.selectedId = null
     return this.current()
@@ -190,7 +195,7 @@ export class DrawingEngine {
   ): DrawingObject[] {
     const selected = this.selectedDrawing()
     if (!selected || (selected.locked && !allowLocked)) return this.current()
-    const next = touched(update(cloneDrawing(selected)))
+    const next = this.touched(update(cloneDrawing(selected)))
     this.record()
     this.drawings = this.drawings.map((drawing) => drawing.id === selected.id ? next : drawing)
     return this.current()
@@ -206,7 +211,26 @@ export class DrawingEngine {
   }
 
   private restore(snapshot: EngineSnapshot): void {
-    this.drawings = cloneDrawings(snapshot.drawings)
+    const targetIds = new Set(snapshot.drawings.map((item) => item.id))
+    for (const current of this.drawings) if (!targetIds.has(current.id)) this.markDeleted(current)
+    this.drawings = snapshot.drawings.map((item) => {
+      const current = this.drawings.find((candidate) => candidate.id === item.id)
+      const content = (drawing: DrawingObject) => JSON.stringify({ ...drawing, version: 0, updatedAt: '', restoredFromVersion: undefined })
+      if (current && content(current) === content(item)) return cloneDrawing(current)
+      const deleted = this.deletions.get(item.id)
+      return this.touched({ ...cloneDrawing(item), ...(deleted ? { restoredFromVersion: deleted.version } : {}) })
+    })
     this.selectedId = snapshot.selectedId
+  }
+
+  private touched(drawing: DrawingObject): DrawingObject {
+    const version = Math.max(drawing.version, this.versions.get(drawing.id) ?? 0) + 1
+    this.versions.set(drawing.id, version)
+    return { ...drawing, version, updatedAt: new Date().toISOString() }
+  }
+
+  private markDeleted(drawing: DrawingObject): void {
+    const { id, version, updatedAt } = this.touched(drawing)
+    this.deletions.set(id, { id, version, updatedAt })
   }
 }

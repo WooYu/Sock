@@ -22,6 +22,30 @@ function drawing(overrides: Partial<DrawingObject> = {}): DrawingObject {
 }
 
 describe('DrawingEngine', () => {
+  test('emits durable tombstones and treats undo redo as newer mutations', () => {
+    const engine = new DrawingEngine([drawing()])
+    engine.select('line-1')
+    engine.remove()
+    expect(engine.currentDeletions()).toEqual([{ id: 'line-1', version: 2, updatedAt: expect.any(String) }])
+    engine.undo()
+    expect(engine.current()[0]).toMatchObject({ version: 3, restoredFromVersion: 2 })
+    engine.redo()
+    expect(engine.current()).toEqual([])
+    expect(engine.currentDeletions()[0].version).toBe(4)
+    engine.undo()
+    expect(engine.current()[0]).toMatchObject({ version: 5, restoredFromVersion: 4 })
+  })
+
+  test('undo edit advances only the changed drawing beyond all previously observed versions', () => {
+    const engine = new DrawingEngine([drawing(), drawing({ id: 'untouched', version: 9 })])
+    engine.select('line-1')
+    engine.updateText('edit')
+    engine.undo()
+    expect(engine.current()[0]).toMatchObject({ version: 3 })
+    expect(engine.current()[1].version).toBe(9)
+    engine.redo()
+    expect(engine.current()[0]).toMatchObject({ version: 4, text: 'edit' })
+  })
   test('moves a selected horizontal line in price space and undoes it', () => {
     const engine = new DrawingEngine([drawing()])
     engine.select('line-1')

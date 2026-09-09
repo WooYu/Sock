@@ -36,6 +36,8 @@ export type DrawingObject = {
   visible: boolean
   version: number
   updatedAt: string
+  /** Explicit undo/restoration acknowledges a specific durable deletion. */
+  restoredFromVersion?: number
 }
 
 export type PredictionDay = {
@@ -63,6 +65,9 @@ export type PredictionSnapshot = {
   days: [PredictionDay, PredictionDay, PredictionDay]
 }
 
+export type DrawingTombstone = { id: string; version: number; updatedAt: string }
+export type DrawingRecoveryRecord = { id: string; reason: 'DELETE_EDIT_CONFLICT' | 'VERSION_CONFLICT'; drawing: DrawingObject }
+
 export type ChartWorkspaceV2 = {
   version: 2
   symbol: string
@@ -75,7 +80,8 @@ export type ChartWorkspaceV2 = {
   crosshair: boolean
   updatedAt: string
   revision: number
-  recovery?: Array<{ id: string; reason: string; drawing?: DrawingObject }>
+  deletions?: DrawingTombstone[]
+  recovery?: DrawingRecoveryRecord[]
   /** Source data is optional so this contract can be used by chart-only callers. */
   candles?: Candle[]
   market?: MarketSnapshot

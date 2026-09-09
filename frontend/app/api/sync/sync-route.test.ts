@@ -1,13 +1,27 @@
 import { describe, expect, test, vi } from 'vitest'
 import { GET } from './changes/route'
 import { POST } from './mutations/route'
+import { BackendRequestError } from '@/lib/api/backend-client'
 
 const applySyncMutation = vi.hoisted(() => vi.fn(async () => ({ applied: true, cursor: 4 })))
 const pullSyncChanges = vi.hoisted(() => vi.fn(async () => ({ nextCursor: 5, changes: [] })))
 
-vi.mock('@/lib/api/backend-client', () => ({ applySyncMutation, pullSyncChanges }))
+vi.mock('@/lib/api/backend-client', async (importOriginal) => ({ ...await importOriginal<typeof import('@/lib/api/backend-client')>(), applySyncMutation, pullSyncChanges }))
 
 describe('sync BFF', () => {
+  test('preserves backend 409 so browser can recover revision conflicts', async () => {
+    applySyncMutation.mockRejectedValueOnce(new BackendRequestError(409, { message: 'revision conflict' }))
+    const response = await POST(new Request('http://localhost/api/sync/mutations', { method: 'POST', body: JSON.stringify({ idempotencyKey: 'conflict', entityType: 'CHART_WORKSPACE', entityId: '600519:day', operation: 'UPSERT', revision: 1 }) }))
+    expect(response.status).toBe(409)
+    expect(await response.json()).toEqual({ message: 'revision conflict' })
+  })
+
+  test('preserves backend authentication errors on pull', async () => {
+    pullSyncChanges.mockRejectedValueOnce(new BackendRequestError(401, { message: 'expired' }))
+    const response = await GET(new Request('http://localhost/api/sync/changes?cursor=0'))
+    expect(response.status).toBe(401)
+    expect(await response.json()).toEqual({ message: 'expired' })
+  })
   test('forwards client identity and mutation', async () => {
     const response = await POST(new Request('http://localhost/api/sync/mutations', {
       method: 'POST',

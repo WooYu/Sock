@@ -5,10 +5,11 @@ import { ChartWorkspace, aggregateCandles } from './chart-workspace'
 import type { MarketSnapshot } from '../workspace/stock-workspace-types'
 import type { PredictionSnapshot } from './chart-types'
 import { DrawingEngine } from './drawing-engine'
+import { loadChartSyncQueue, loadChartWorkspace } from './chart-workspace-sync'
 
 const snapshot: MarketSnapshot = {
   quote: { security: { code: '600519', name: '贵州茅台' }, price: 1450, previousClose: 1440 },
-  dailyCandles: Array.from({ length: 42 }, (_, index) => ({ day: `2026-08-${String(index + 1).padStart(2, '0')}`, open: 1400 + index, high: 1410 + index, low: 1390 + index, close: 1405 + index, volume: 1000 + index })),
+  dailyCandles: Array.from({ length: 42 }, (_, index) => ({ day: new Date(Date.UTC(2026, 6, 20 + index)).toISOString().slice(0, 10), open: 1400 + index, high: 1410 + index, low: 1390 + index, close: 1405 + index, volume: 1000 + index })),
   source: { name: 'test-market', fetchedAt: '2026-09-01T00:00:00Z', state: 'LIVE', online: true },
 }
 
@@ -24,6 +25,24 @@ const prediction: PredictionSnapshot = {
 const renderChart = () => render(<ChartWorkspace prediction={prediction} snapshot={snapshot} />)
 
 describe('ChartWorkspace', () => {
+  test('persists only completed commands and keeps an empty switched period isolated', async () => {
+    const { rerender } = renderChart()
+    expect(loadChartWorkspace('600519', 'day')).toBeNull()
+    await userEvent.click(screen.getByRole('button', { name: '买入点' }))
+    fireEvent.click(screen.getByRole('img', { name: 'K线主图' }), { clientX: 100, clientY: 170 })
+    const saved = localStorage.getItem('stockcal:chart-workspace:600519:day')
+    expect(loadChartSyncQueue()).toHaveLength(1)
+    fireEvent.pointerMove(screen.getByRole('img', { name: 'K线主图' }), { clientX: 120, clientY: 170 })
+    rerender(<ChartWorkspace prediction={prediction} snapshot={{ ...snapshot }} />)
+    expect(localStorage.getItem('stockcal:chart-workspace:600519:day')).toBe(saved)
+    expect(loadChartSyncQueue()).toHaveLength(1)
+    await userEvent.click(screen.getByRole('tab', { name: '周线' }))
+    expect(screen.queryByTestId('annotation-buy')).not.toBeInTheDocument()
+    expect(loadChartWorkspace('600519', 'week')).toBeNull()
+    await userEvent.click(screen.getByRole('tab', { name: '日线' }))
+    expect(screen.getByTestId('annotation-buy')).toBeInTheDocument()
+    expect(loadChartSyncQueue()).toHaveLength(1)
+  })
   beforeEach(() => {
     window.localStorage.clear()
   })
