@@ -40,8 +40,11 @@ class DeferredPredictionClient implements MarketClient {
     })
   }
 
-  resolve(index: number, prediction: PredictionSnapshot) {
-    act(() => this.pending[index]?.(prediction))
+  async resolve(index: number, prediction: PredictionSnapshot) {
+    await act(async () => {
+      this.pending[index]?.(prediction)
+      await Promise.resolve()
+    })
   }
 }
 
@@ -183,7 +186,7 @@ describe('StockWorkspaceProvider', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Select 600519' }))
     await screen.findByText('Status: ready')
-    market.resolve(0, predictionSnapshot('600519'))
+    await market.resolve(0, predictionSnapshot('600519'))
 
     expect(await screen.findByText('Prediction: 600519/baseline-v1')).toBeInTheDocument()
   })
@@ -215,10 +218,10 @@ describe('StockWorkspaceProvider', () => {
     await screen.findByText('Status: ready')
     await userEvent.click(screen.getByRole('button', { name: 'Select 000001' }))
     await screen.findByText('Status: ready')
-    market.resolve(0, predictionSnapshot('600519', 'superseded'))
+    await market.resolve(0, predictionSnapshot('600519', 'superseded'))
 
     expect(screen.getByText('Prediction: none')).toBeInTheDocument()
-    market.resolve(1, predictionSnapshot('000001', 'current'))
+    await market.resolve(1, predictionSnapshot('000001', 'current'))
     expect(await screen.findByText('Prediction: 000001/current')).toBeInTheDocument()
   })
 
@@ -230,10 +233,10 @@ describe('StockWorkspaceProvider', () => {
     await screen.findByText('Status: ready')
     await userEvent.click(screen.getByRole('button', { name: 'Refresh' }))
     await screen.findByText('Status: ready')
-    market.resolve(0, predictionSnapshot('600519', 'superseded'))
+    await market.resolve(0, predictionSnapshot('600519', 'superseded'))
 
     expect(screen.getByText('Prediction: none')).toBeInTheDocument()
-    market.resolve(1, predictionSnapshot('600519', 'current'))
+    await market.resolve(1, predictionSnapshot('600519', 'current'))
     expect(await screen.findByText('Prediction: 600519/current')).toBeInTheDocument()
   })
 
