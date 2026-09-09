@@ -3,10 +3,10 @@ import type { DrawingObject, DrawingStyle, TimePricePoint } from './chart-types'
 
 export type ChartTool =
   | 'pointer'
+  | 'pan'
   | 'trend-line'
   | 'horizontal-line'
   | 'rectangle'
-  | 'marker'
   | 'buy'
   | 'sell'
   | 'target'

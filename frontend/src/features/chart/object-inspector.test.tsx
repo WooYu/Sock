@@ -47,6 +47,13 @@ test('commits numeric values only when the input is finite and valid', () => {
   expect(onChange).toHaveBeenNthCalledWith(3, { type: 'point', index: 0, point: { time: '2026-09-08', price: 12.5 } })
 })
 
+test('does not expose raw floating-point precision in price controls', () => {
+  render(<ObjectInspector drawing={{ ...drawing, points: [{ ...drawing.points[0], price: 112.79834662188473 }] }} onChange={() => {}} onDelete={() => {}} />)
+
+  expect(screen.getByLabelText('控制点 1 价格')).toHaveValue(112.8)
+  expect(screen.queryByText('text-1')).not.toBeInTheDocument()
+})
+
 test('changes visibility and lock state through accessible switches', async () => {
   const onChange = vi.fn()
   render(<ObjectInspector drawing={drawing} onChange={onChange} onDelete={() => {}} />)

@@ -35,6 +35,15 @@ function WarningCopy() {
   return <p className="sc-prediction-warning"><strong>推演数据，不是实际行情</strong><span>结果仅供参考，不构成投资建议。</span></p>
 }
 
+function PredictionMetadata({ prediction }: { prediction: PredictionSnapshot }) {
+  return (
+    <div className="sc-prediction-metadata">
+      <span>{prediction.modelVersion}</span>
+      <time dateTime={prediction.generatedAt}>{prediction.generatedAt}</time>
+    </div>
+  )
+}
+
 export function PredictionDetails({ prediction, selectedDay, onSelectDay, mode }: PredictionDetailsProps) {
   const [expanded, setExpanded] = useState(true)
   const mobilePanelId = `${useId()}-prediction-panel`
@@ -58,7 +67,7 @@ export function PredictionDetails({ prediction, selectedDay, onSelectDay, mode }
     const rows = rowsByDay[selectedIndex]
     return (
       <section aria-label="未来三日推演详情" className="sc-prediction-details sc-prediction-mobile-sheet">
-        <header><div><p className="sc-eyebrow">未来三日</p><h2>推演详情</h2></div><span>{prediction.modelVersion}</span></header>
+        <header><div><p className="sc-eyebrow">未来三日</p><h2>推演详情</h2></div><PredictionMetadata prediction={prediction} /></header>
         <div aria-label="预测日期" className="sc-prediction-tabs" role="tablist">
           {prediction.days.map((candidate, index) => (
             <button aria-controls={mobilePanelId} aria-selected={selectedIndex === index} id={`${mobilePanelId}-tab-${index}`} key={candidate.day} onClick={() => onSelectDay(candidate.day)} onKeyDown={(event) => handleMobileTabKeyDown(event, index)} ref={(node) => { mobileTabRefs.current[index] = node }} role="tab" tabIndex={selectedIndex === index ? 0 : -1} type="button">
@@ -78,7 +87,7 @@ export function PredictionDetails({ prediction, selectedDay, onSelectDay, mode }
     <section aria-label="未来三日推演详情" className="sc-prediction-details sc-prediction-desktop-table">
       <header>
         <div><p className="sc-eyebrow">未来三日</p><h2>推演详情</h2></div>
-        <button aria-expanded={expanded} onClick={() => setExpanded((value) => !value)} type="button">{expanded ? '收起预测详情' : '展开预测详情'}</button>
+        <div className="sc-prediction-header-actions"><PredictionMetadata prediction={prediction} /><button aria-expanded={expanded} onClick={() => setExpanded((value) => !value)} type="button">{expanded ? '收起预测详情' : '展开预测详情'}</button></div>
       </header>
       {expanded ? (
         <div className="sc-prediction-table-scroll">

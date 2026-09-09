@@ -10,6 +10,7 @@ type DrawingLayerProps = {
   onFocusEditor?: () => void
   onMoveDrawing?: (drawingId: string, event: ReactPointerEvent<SVGElement>) => void
   onMovePoint: (drawingId: string, pointIndex: number, event: ReactPointerEvent<SVGElement>) => void
+  interactionsDisabled?: boolean
 }
 
 function markerLabel(kind: DrawingObject['kind']) {
@@ -24,9 +25,9 @@ function labelWidth(text: string) {
   return Math.max(44, estimatedGlyphWidth + 8)
 }
 
-export function DrawingLayer({ drawings, transform, selectedId, onSelect, onFocusEditor, onMoveDrawing, onMovePoint }: DrawingLayerProps) {
+export function DrawingLayer({ drawings, transform, selectedId, onSelect, onFocusEditor, onMoveDrawing, onMovePoint, interactionsDisabled = false }: DrawingLayerProps) {
   return (
-    <g data-testid="drawing-layer">
+    <g data-testid="drawing-layer" pointerEvents={interactionsDisabled ? 'none' : undefined}>
       {drawings.map((drawing) => {
         if (!drawing.visible || !drawing.points.length || drawing.points.some((point) => !transform.hasTime(point.time))) return null
 
@@ -44,14 +45,14 @@ export function DrawingLayer({ drawings, transform, selectedId, onSelect, onFocu
           select(event)
           if (!drawing.locked) onMoveDrawing?.(drawing.id, event)
         }
-        const interaction = { onClick: select, onPointerDown: beginMove }
+        const interaction = interactionsDisabled ? {} : { onClick: select, onPointerDown: beginMove }
         let visible: ReactNode
         let hitArea: ReactNode
 
         if (drawing.kind === 'horizontal-line') {
           const y = points[0].y
           visible = <line data-testid="drawing-visible-line" {...common} {...interaction} x1={transform.rect.left} x2={transform.rect.left + transform.rect.width} y1={y} y2={y} />
-          hitArea = <line data-testid="drawing-hit-area" onClick={select} onPointerDown={beginMove} pointerEvents="stroke" stroke="transparent" strokeWidth={hitWidth} x1={transform.rect.left} x2={transform.rect.left + transform.rect.width} y1={y} y2={y} />
+          hitArea = <line data-testid="drawing-hit-area" {...interaction} pointerEvents="stroke" stroke="transparent" strokeWidth={hitWidth} x1={transform.rect.left} x2={transform.rect.left + transform.rect.width} y1={y} y2={y} />
         } else if (drawing.kind === 'rectangle' && points.length >= 2) {
           const x = Math.min(points[0].x, points[1].x)
           const y = Math.min(points[0].y, points[1].y)
@@ -61,7 +62,7 @@ export function DrawingLayer({ drawings, transform, selectedId, onSelect, onFocu
           hitArea = <rect data-testid="drawing-hit-area" fill="transparent" height={Math.max(height, hitWidth)} {...interaction} pointerEvents="all" stroke="transparent" strokeWidth={hitWidth} width={Math.max(width, hitWidth)} x={x} y={y} />
         } else if (drawing.kind === 'trend-line' && points.length >= 2) {
           visible = <line data-testid="drawing-visible-line" {...common} {...interaction} x1={points[0].x} x2={points[1].x} y1={points[0].y} y2={points[1].y} />
-          hitArea = <line data-testid="drawing-hit-area" onClick={select} onPointerDown={beginMove} pointerEvents="stroke" stroke="transparent" strokeWidth={hitWidth} x1={points[0].x} x2={points[1].x} y1={points[0].y} y2={points[1].y} />
+          hitArea = <line data-testid="drawing-hit-area" {...interaction} pointerEvents="stroke" stroke="transparent" strokeWidth={hitWidth} x1={points[0].x} x2={points[1].x} y1={points[0].y} y2={points[1].y} />
         } else if (drawing.kind === 'text') {
           const text = drawing.text ?? '文字备注'
           visible = <text fill={drawing.style.color} opacity={drawing.style.opacity} {...interaction} x={points[0].x} y={points[0].y}>{text}</text>
@@ -78,7 +79,7 @@ export function DrawingLayer({ drawings, transform, selectedId, onSelect, onFocu
             {visible}
             {drawing.kind === 'horizontal-line' ? <text data-testid="drawing-price-label" fill={drawing.style.color} fontSize="11" textAnchor="end" x={transform.rect.left + transform.rect.width - 4} y={points[0].y - 5}>{drawing.points[0].price.toFixed(2)}</text> : null}
             {hitArea}
-            {selected && !drawing.locked ? points.map((point, index) => (
+            {selected && !drawing.locked && !interactionsDisabled ? points.map((point, index) => (
               <circle
                 data-testid="drawing-handle"
                 fill="#fff"

@@ -61,6 +61,35 @@ describe('ChartCanvas', () => {
     ])
   })
 
+  test('reports drag distance while panning and commits once on release', () => {
+    const onPan = vi.fn()
+    const onPanEnd = vi.fn()
+    render(<ChartCanvas {...baseProps} activeTool="pan" onPan={onPan} onPanEnd={onPanEnd} />)
+    const chart = screen.getByRole('img', { name: 'K线主图' })
+    Object.assign(chart, { setPointerCapture: vi.fn(), releasePointerCapture: vi.fn() })
+
+    fireEvent.pointerDown(chart, { pointerId: 5, clientX: 240, clientY: 120 })
+    fireEvent.pointerMove(chart, { pointerId: 5, clientX: 190, clientY: 120 })
+    fireEvent.pointerUp(chart, { pointerId: 5, clientX: 170, clientY: 120 })
+
+    expect(onPan).toHaveBeenCalledWith(50)
+    expect(onPanEnd).toHaveBeenCalledOnce()
+  })
+
+  test('pans from a drawing hit area without moving the drawing', () => {
+    const onMoveDrawing = vi.fn()
+    const onPan = vi.fn()
+    render(<ChartCanvas {...baseProps} activeTool="pan" drawings={[line]} onMoveDrawing={onMoveDrawing} onPan={onPan} />)
+    const chart = screen.getByRole('img', { name: 'K线主图' })
+    Object.assign(chart, { setPointerCapture: vi.fn(), releasePointerCapture: vi.fn() })
+
+    fireEvent.pointerDown(screen.getByTestId('drawing-hit-area'), { pointerId: 6, clientX: 240, clientY: 120 })
+    fireEvent.pointerMove(chart, { pointerId: 6, clientX: 190, clientY: 120 })
+
+    expect(onPan).toHaveBeenCalledWith(50)
+    expect(onMoveDrawing).not.toHaveBeenCalled()
+  })
+
   test('converts pointer coordinates into a time-price drawing', () => {
     const onCreateDrawing = vi.fn()
     render(<ChartCanvas {...baseProps} activeTool="buy" onCreateDrawing={onCreateDrawing} />)
@@ -249,5 +278,15 @@ describe('ChartCanvas', () => {
 
     expect(onCreateDrawing).toHaveBeenCalledOnce()
     expect(onCreateDrawing.mock.calls[0][0]).toMatchObject({ kind: 'buy' })
+  })
+
+  test('shows crosshair values over a prediction session', () => {
+    render(<ChartCanvas {...baseProps} crosshair />)
+    const chart = screen.getByRole('img', { name: 'K线主图' })
+
+    fireEvent.pointerMove(chart, { pointerId: 3, clientX: transform.xForTime('2026-09-09'), clientY: 172 })
+
+    expect(screen.getByTestId('crosshair-tooltip')).toHaveTextContent('2026-09-09')
+    expect(screen.getByTestId('crosshair-tooltip')).toHaveTextContent('开 104.00')
   })
 })

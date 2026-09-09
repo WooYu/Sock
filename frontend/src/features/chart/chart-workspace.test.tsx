@@ -1,11 +1,12 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { ChartWorkspace, aggregateCandles } from './chart-workspace'
 import type { MarketSnapshot } from '../workspace/stock-workspace-types'
 import type { PredictionSnapshot } from './chart-types'
 import { DrawingEngine } from './drawing-engine'
-import { loadChartSyncQueue, loadChartWorkspace } from './chart-workspace-sync'
+import { loadChartSyncQueue, loadChartWorkspace, saveChartWorkspace } from './chart-workspace-sync'
+import { drawingFixture, workspaceFixture } from './chart-workspace-test-fixtures'
 
 const snapshot: MarketSnapshot = {
   quote: { security: { code: '600519', name: '贵州茅台' }, price: 1450, previousClose: 1440 },
@@ -46,6 +47,9 @@ describe('ChartWorkspace', () => {
   beforeEach(() => {
     window.localStorage.clear()
   })
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
 
   test('shows loading feedback before chart data arrives', () => {
     render(<ChartWorkspace snapshot={null} status="loading" />)
@@ -59,16 +63,84 @@ describe('ChartWorkspace', () => {
 
     expect(container.querySelector('.sc-kline-terminal')).toBeInTheDocument()
     expect(container.querySelector('.sc-kline-summary')).toBeInTheDocument()
-    expect(container.querySelector('.sc-kline-control-card')).toBeInTheDocument()
-    expect(container.querySelector('.sc-kline-content')).toBeInTheDocument()
+    expect(container.querySelector('.sc-chart-left-tools')).toBeInTheDocument()
+    expect(container.querySelector('.sc-chart-inspector')).toBeInTheDocument()
+    expect(container.querySelector('.sc-prediction-details')).toBeInTheDocument()
+    expect(screen.getByRole('switch', { name: '未来推演' })).toBeChecked()
+    expect(screen.getByText('推演数据，不是实际行情')).toBeInTheDocument()
+  })
+
+  test('exposes five fixed mobile actions backed by real tools', () => {
+    renderChart()
+    const toolbar = screen.getByTestId('chart-mobile-toolbar')
+
+    for (const name of ['选择', '趋势线', '水平线', '标记', '更多']) {
+      expect(within(toolbar).getByRole('button', { name })).toBeInTheDocument()
+    }
+  })
+
+  test('reveals a prediction that arrives after the historical chart', () => {
+    vi.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockReturnValue(960)
+    vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(320)
+    const { container, rerender } = render(<ChartWorkspace snapshot={snapshot} />)
+    const scroll = container.querySelector<HTMLElement>('.sc-kline-chart-scroll')!
+
+    rerender(<ChartWorkspace prediction={prediction} snapshot={snapshot} />)
+
+    expect(scroll.scrollLeft).toBe(640)
+  })
+
+  test('respects an explicitly persisted zero pan position', () => {
+    vi.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockReturnValue(960)
+    vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(320)
+    saveChartWorkspace(workspaceFixture({ revision: 4, view: { zoom: 100, panX: 0, panY: 0 } }))
+    const { container } = renderChart()
+
+    expect(container.querySelector<HTMLElement>('.sc-kline-chart-scroll')!.scrollLeft).toBe(0)
+  })
+
+  test('reveals a selected prediction day after the user pans away', async () => {
+    vi.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockReturnValue(960)
+    vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(320)
+    const { container } = renderChart()
+    const scroll = container.querySelector<HTMLElement>('.sc-kline-chart-scroll')!
+    scroll.scrollLeft = 0
+
+    await userEvent.click(screen.getByRole('button', { name: /第2日/ }))
+
+    expect(scroll.scrollLeft).toBeGreaterThan(500)
+  })
+
+  test('does not recenter a selected drawing when a completed pan persists', async () => {
+    vi.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockReturnValue(960)
+    vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(320)
+    const drawing = drawingFixture({ points: [{ time: snapshot.dailyCandles[0].day, price: snapshot.dailyCandles[0].close }] })
+    saveChartWorkspace(workspaceFixture({ drawings: [drawing], revision: 2 }))
+    const { container, rerender } = renderChart()
+    const scroll = container.querySelector<HTMLElement>('.sc-kline-chart-scroll')!
+    fireEvent.click(screen.getByTestId('drawing-hit-area'))
+    scroll.scrollLeft = 100
+    await userEvent.click(within(screen.getByRole('complementary', { name: '桌面绘图工具' })).getByRole('button', { name: '平移' }))
+    const chart = screen.getByRole('img', { name: 'K线主图' })
+    Object.assign(chart, { setPointerCapture: vi.fn(), releasePointerCapture: vi.fn() })
+
+    fireEvent.pointerDown(screen.getByTestId('drawing-hit-area'), { pointerId: 22, clientX: 220, clientY: 140 })
+    fireEvent.pointerMove(chart, { pointerId: 22, clientX: 170, clientY: 140 })
+    fireEvent.pointerUp(chart, { pointerId: 22, clientX: 170, clientY: 140 })
+
+    expect(scroll.scrollLeft).toBe(150)
+    expect(loadChartWorkspace('600519', 'day')?.view.panX).toBe(150)
+    rerender(<ChartWorkspace prediction={prediction} snapshot={{ ...snapshot, dailyCandles: snapshot.dailyCandles.map((candle) => ({ ...candle })) }} />)
+    expect(scroll.scrollLeft).toBe(150)
   })
 
   test('selecting a drawing tool clears the previous drawing tool', async () => {
     renderChart()
-    await userEvent.click(screen.getByRole('button', { name: '趋势线' }))
-    await userEvent.click(screen.getByRole('button', { name: '矩形' }))
-    expect(screen.getByRole('button', { name: '矩形' })).toHaveAttribute('aria-pressed', 'true')
-    expect(screen.getByRole('button', { name: '趋势线' })).toHaveAttribute('aria-pressed', 'false')
+    const desktopTools = screen.getByRole('complementary', { name: '桌面绘图工具' })
+    await userEvent.click(within(desktopTools).getByRole('button', { name: '趋势线' }))
+    await userEvent.click(within(desktopTools).getByRole('button', { name: '矩形' }))
+    expect(within(desktopTools).getByRole('button', { name: '矩形' })).toHaveAttribute('aria-pressed', 'true')
+    expect(within(desktopTools).getByRole('button', { name: '趋势线' })).toHaveAttribute('aria-pressed', 'false')
   })
 
   test('hides derived key levels without changing real candles', async () => {
@@ -89,10 +161,11 @@ describe('ChartWorkspace', () => {
 
   test('offers secondary drawing tools in the sample-style menu', async () => {
     renderChart()
+    const desktopTools = screen.getByRole('complementary', { name: '桌面绘图工具' })
     await userEvent.click(screen.getByText('更多绘图', { selector: 'summary' }))
-    await userEvent.click(screen.getByRole('button', { name: '水平线' }))
+    await userEvent.click(within(desktopTools).getByRole('button', { name: '水平线' }))
 
-    expect(screen.getByRole('button', { name: '水平线' })).toHaveAttribute('aria-pressed', 'true')
+    expect(within(desktopTools).getByRole('button', { name: '水平线' })).toHaveAttribute('aria-pressed', 'true')
   })
 
   test('offers trade markers as explicit toolbar actions', () => {
@@ -104,12 +177,36 @@ describe('ChartWorkspace', () => {
     expect(screen.getByRole('button', { name: '止损位' })).toBeVisible()
   })
 
-  test('opens a compact mobile tools sheet with the existing drawing controls', async () => {
+  test('opens an accessible mobile tools sheet and restores focus on Escape', async () => {
     renderChart()
-    await userEvent.click(screen.getByRole('button', { name: '图表工具' }))
+    const trigger = within(screen.getByTestId('chart-mobile-toolbar')).getByRole('button', { name: '更多' })
+    await userEvent.click(trigger)
 
-    expect(screen.getByRole('dialog', { name: '图表工具' })).toBeVisible()
-    expect(screen.getByRole('dialog', { name: '图表工具' })).toHaveTextContent('指标设置')
+    expect(screen.getByRole('dialog', { name: '更多图表工具' })).toBeVisible()
+    expect(screen.getByRole('dialog', { name: '更多图表工具' })).toHaveTextContent('指标设置')
+    await userEvent.keyboard('{Escape}')
+    expect(screen.queryByRole('dialog', { name: '更多图表工具' })).not.toBeInTheDocument()
+    expect(trigger).toHaveFocus()
+  })
+
+  test('opens prediction details in a mobile dialog', async () => {
+    renderChart()
+    await userEvent.click(screen.getByRole('button', { name: '预测详情' }))
+
+    const dialog = screen.getByRole('dialog', { name: '预测详情' })
+    expect(dialog).toHaveAttribute('aria-modal', 'true')
+    expect(within(dialog).getByRole('tabpanel')).toBeInTheDocument()
+    expect(within(dialog).getByRole('button', { name: '拖动关闭预测详情' })).toBeInTheDocument()
+  })
+
+  test('uses the marker action to choose and create a real trade marker', async () => {
+    renderChart()
+    await userEvent.click(within(screen.getByTestId('chart-mobile-toolbar')).getByRole('button', { name: '标记' }))
+    const picker = screen.getByRole('dialog', { name: '标记类型' })
+    await userEvent.click(within(picker).getByRole('button', { name: '买入点' }))
+    await userEvent.click(screen.getByRole('img', { name: 'K线主图' }))
+
+    expect(screen.getByTestId('annotation-buy')).toBeInTheDocument()
   })
 
   test('creates a point annotation by clicking the chart', async () => {
@@ -172,11 +269,29 @@ describe('ChartWorkspace', () => {
     confirm.mockRestore()
   })
 
+  test('copies the selected drawing from the inspector', async () => {
+    renderChart()
+    await userEvent.click(screen.getByRole('button', { name: '买入点' }))
+    fireEvent.click(screen.getByRole('img', { name: 'K线主图' }), { clientX: 100, clientY: 170 })
+
+    await userEvent.click(screen.getByRole('button', { name: '复制对象' }))
+
+    expect(screen.getAllByTestId('annotation-buy')).toHaveLength(2)
+  })
+
   test('switches the active K-line period', async () => {
     renderChart()
     await userEvent.click(screen.getByRole('tab', { name: '周线' }))
     expect(screen.getByRole('tab', { name: '周线' })).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByRole('tab', { name: '日线' })).toHaveAttribute('aria-selected', 'false')
+  })
+
+  test('shows an honest unavailable state for non-daily predictions', async () => {
+    renderChart()
+    await userEvent.click(screen.getByRole('tab', { name: '周线' }))
+
+    expect(screen.getByText('未来推演仅支持日线周期')).toBeInTheDocument()
+    expect(screen.queryByTestId('prediction-candle')).not.toBeInTheDocument()
   })
 
   test('aggregates weekly and monthly candles on calendar boundaries', () => {
@@ -193,7 +308,7 @@ describe('ChartWorkspace', () => {
 
   test('follows the pointer with a crosshair data tooltip', async () => {
     renderChart()
-    await userEvent.click(screen.getByRole('button', { name: '十字光标' }))
+    await userEvent.click(within(screen.getByLabelText('视图控制')).getByRole('button', { name: '十字光标' }))
     fireEvent.pointerMove(screen.getByRole('img', { name: 'K线主图' }), { clientX: 420, clientY: 180 })
 
     expect(screen.getByTestId('crosshair-layer')).toBeInTheDocument()
@@ -234,5 +349,33 @@ describe('ChartWorkspace', () => {
     await userEvent.click(screen.getByRole('button', { name: /第2日/ }))
 
     expect(screen.getAllByTestId('prediction-candle')[1]).toHaveAttribute('data-active', 'true')
+  })
+
+  test('links a hovered prediction candle to the matching detail day', () => {
+    renderChart()
+    const secondCandle = screen.getAllByTestId('prediction-candle')[1]
+
+    fireEvent.mouseEnter(secondCandle)
+
+    expect(screen.getByRole('button', { name: /第2日/ })).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  test('restores a conflict recovery record as a fresh copy without removing evidence', async () => {
+    const recovered = drawingFixture({ id: 'deleted-line', text: '冲突副本', version: 7, restoredFromVersion: 6 })
+    saveChartWorkspace(workspaceFixture({
+      deletions: [{ id: 'deleted-line', version: 8, updatedAt: '2026-09-08T00:00:00Z' }],
+      recovery: [{ id: 'deleted-line', reason: 'DELETE_EDIT_CONFLICT', drawing: recovered }],
+    }))
+    renderChart()
+
+    await userEvent.click(screen.getByRole('button', { name: '恢复副本' }))
+
+    const saved = loadChartWorkspace('600519', 'day')!
+    expect(saved.drawings).toHaveLength(1)
+    expect(saved.drawings[0]).toMatchObject({ text: '冲突副本', locked: false, visible: true })
+    expect(saved.drawings[0].id).not.toBe('deleted-line')
+    expect(saved.drawings[0]).not.toHaveProperty('restoredFromVersion')
+    expect(saved.recovery).toEqual([{ id: 'deleted-line', reason: 'DELETE_EDIT_CONFLICT', drawing: recovered }])
+    expect(saved.deletions).toEqual([{ id: 'deleted-line', version: 8, updatedAt: '2026-09-08T00:00:00Z' }])
   })
 })

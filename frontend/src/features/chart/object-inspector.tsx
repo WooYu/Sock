@@ -12,6 +12,7 @@ export type DrawingInspectorChange =
 type ObjectInspectorProps = {
   drawing: DrawingObject | null
   onChange: (change: DrawingInspectorChange) => void
+  onCopy?: () => void
   onDelete: () => void
 }
 
@@ -30,7 +31,7 @@ function finiteInput(value: number, isValid: (value: number) => boolean, commit:
   if (Number.isFinite(value) && isValid(value)) commit(value)
 }
 
-export function ObjectInspector({ drawing, onChange, onDelete }: ObjectInspectorProps) {
+export function ObjectInspector({ drawing, onChange, onCopy, onDelete }: ObjectInspectorProps) {
   if (!drawing) {
     return <section aria-label="对象属性" className="sc-chart-inspector"><header><p className="sc-eyebrow">对象属性</p><h2>绘图检查器</h2></header><p className="sc-inspector-empty">选择图中对象以编辑属性。</p></section>
   }
@@ -38,7 +39,7 @@ export function ObjectInspector({ drawing, onChange, onDelete }: ObjectInspector
   const disabled = drawing.locked
   return (
     <section aria-label="对象属性" className="sc-chart-inspector">
-      <header><div><p className="sc-eyebrow">对象属性</p><h2>{kindLabels[drawing.kind]}</h2></div><code>{drawing.id}</code></header>
+      <header><div><p className="sc-eyebrow">对象属性</p><h2>{kindLabels[drawing.kind]}</h2></div></header>
       <div className="sc-inspector-switches">
         <label><input aria-label="显示对象" checked={drawing.visible} disabled={disabled} onChange={(event) => onChange({ type: 'visible', visible: event.currentTarget.checked })} role="switch" type="checkbox" /><span>显示</span></label>
         <label><input aria-label="锁定对象" checked={drawing.locked} onChange={(event) => onChange({ type: 'locked', locked: event.currentTarget.checked })} role="switch" type="checkbox" /><span>锁定</span></label>
@@ -49,9 +50,12 @@ export function ObjectInspector({ drawing, onChange, onDelete }: ObjectInspector
         <label><span>线型</span><select aria-label="线型" disabled={disabled} onChange={(event) => onChange({ type: 'style', patch: { lineStyle: event.currentTarget.value as DrawingStyle['lineStyle'] } })} value={drawing.style.lineStyle}><option value="solid">实线</option><option value="dashed">虚线</option></select></label>
         <label><span>不透明度</span><input aria-label="不透明度" disabled={disabled} max="1" min="0" onChange={(event) => finiteInput(event.currentTarget.valueAsNumber, (value) => value >= 0 && value <= 1, (opacity) => onChange({ type: 'style', patch: { opacity } }))} step="0.1" type="number" value={drawing.style.opacity} /></label>
         {drawing.kind === 'text' ? <label className="sc-inspector-field-wide"><span>绘图文字</span><input aria-label="绘图文字" disabled={disabled} onChange={(event) => onChange({ type: 'text', text: event.currentTarget.value })} type="text" value={drawing.text ?? ''} /></label> : null}
-        {drawing.points.map((point, index) => <label className="sc-inspector-field-wide" key={`${point.time}-${index}`}><span>控制点 {index + 1} 价格</span><input aria-label={`控制点 ${index + 1} 价格`} disabled={disabled} onChange={(event) => finiteInput(event.currentTarget.valueAsNumber, () => true, (price) => onChange({ type: 'point', index, point: { ...point, price } }))} step="0.01" type="number" value={point.price} /></label>)}
+        {drawing.points.map((point, index) => <label className="sc-inspector-field-wide" key={`${point.time}-${index}`}><span>控制点 {index + 1} 价格</span><input aria-label={`控制点 ${index + 1} 价格`} disabled={disabled} onChange={(event) => finiteInput(event.currentTarget.valueAsNumber, () => true, (price) => onChange({ type: 'point', index, point: { ...point, price } }))} step="0.01" type="number" value={Number(point.price.toFixed(2))} /></label>)}
       </div>
-      <button className="sc-inspector-delete" disabled={disabled} onClick={onDelete} type="button">删除对象</button>
+      <div className="sc-inspector-actions">
+        <button className="sc-inspector-copy" disabled={disabled || !onCopy} onClick={onCopy} type="button">复制对象</button>
+        <button className="sc-inspector-delete" disabled={disabled} onClick={onDelete} type="button">删除对象</button>
+      </div>
     </section>
   )
 }

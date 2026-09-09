@@ -111,3 +111,10 @@ test('identifies forecast values as simulated rather than market data', () => {
 
   expect(screen.getByText('推演数据，不是实际行情')).toBeInTheDocument()
 })
+
+test('exposes the prediction generation time and model version', () => {
+  render(<PredictionDetails mode="desktop-table" onSelectDay={() => {}} prediction={prediction} selectedDay={null} />)
+
+  expect(screen.getByText('baseline-v1')).toBeInTheDocument()
+  expect(screen.getByText('2026-09-07T00:00:00Z')).toHaveAttribute('datetime', '2026-09-07T00:00:00Z')
+})

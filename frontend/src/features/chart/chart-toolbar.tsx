@@ -2,9 +2,9 @@ import type { ChartTool } from './chart-annotation-store'
 
 const primaryDrawingTools: Array<[ChartTool, string]> = [
   ['pointer', '指针'],
+  ['pan', '平移'],
   ['trend-line', '趋势线'],
   ['rectangle', '矩形'],
-  ['marker', '标记'],
   ['buy', '买入点'],
   ['sell', '卖出点'],
   ['target', '目标位'],
@@ -25,22 +25,26 @@ export function ChartToolbar({ activeTool, onToolChange }: { activeTool: ChartTo
           <button
             aria-pressed={activeTool === tool}
             className={`sc-kline-tool-button ${activeTool === tool ? 'is-active' : ''}`}
+            data-tool={tool}
             key={tool}
             onClick={() => onToolChange(tool)}
+            title={label}
             type="button"
           >
             {label}
           </button>
         ))}
         <details className="sc-kline-tool-menu">
-          <summary aria-label="更多绘图工具">更多绘图</summary>
+          <summary aria-label="更多绘图工具" data-tool="more" title="更多绘图工具">更多绘图</summary>
           <div className="sc-kline-tool-menu-panel">
             {secondaryDrawingTools.map(([tool, label]) => (
               <button
                 aria-pressed={activeTool === tool}
                 className={`sc-kline-tool-button ${activeTool === tool ? 'is-active' : ''}`}
+                data-tool={tool}
                 key={tool}
                 onClick={() => onToolChange(tool)}
+                title={label}
                 type="button"
               >
               {label}
