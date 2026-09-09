@@ -1,6 +1,7 @@
-export type ChartLayerState = { keyLevels: boolean; annotations: boolean }
+export type ChartLayerState = { keyLevels: boolean; annotations: boolean; prediction: boolean }
 
 const layerOptions: Array<[keyof ChartLayerState, string]> = [
+  ['prediction', '未来推演'],
   ['keyLevels', '关键位'],
   ['annotations', '标注'],
 ]

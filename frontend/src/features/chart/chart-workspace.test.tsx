@@ -76,6 +76,15 @@ describe('ChartWorkspace', () => {
     expect(screen.getByRole('button', { name: '水平线' })).toHaveAttribute('aria-pressed', 'true')
   })
 
+  test('offers trade markers as explicit toolbar actions', () => {
+    renderChart()
+
+    expect(screen.getByRole('button', { name: '买入点' })).toBeVisible()
+    expect(screen.getByRole('button', { name: '卖出点' })).toBeVisible()
+    expect(screen.getByRole('button', { name: '目标位' })).toBeVisible()
+    expect(screen.getByRole('button', { name: '止损位' })).toBeVisible()
+  })
+
   test('opens a compact mobile tools sheet with the existing drawing controls', async () => {
     renderChart()
     await userEvent.click(screen.getByRole('button', { name: '图表工具' }))
@@ -178,5 +187,13 @@ describe('ChartWorkspace', () => {
     renderChart()
     expect(screen.getAllByTestId('prediction-candle')).toHaveLength(3)
     expect(screen.getByTestId('prediction-boundary')).toBeInTheDocument()
+  })
+
+  test('links prediction detail selection to the matching chart candle', async () => {
+    renderChart()
+
+    await userEvent.click(screen.getByRole('button', { name: /第2日/ }))
+
+    expect(screen.getAllByTestId('prediction-candle')[1]).toHaveAttribute('data-active', 'true')
   })
 })

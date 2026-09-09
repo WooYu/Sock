@@ -30,11 +30,13 @@ type ChartCanvasProps = {
   showDrawings: boolean
   selectedId: string | null
   hoveredDay: string | null
+  selectedPredictionDay?: string | null
   crosshair: boolean
   activeTool: ChartTool
   symbol: string
   period: ChartPeriod
   onHoverDay: (day: string | null) => void
+  onSelectPredictionDay?: (day: string) => void
   onSelectDrawing: (id: string | null) => void
   onCreateDrawing: (drawing: DrawingObject) => void
   onMoveDrawing: (drawingId: string, delta: DrawingMove) => void
@@ -270,7 +272,7 @@ export function ChartCanvas(props: ChartCanvasProps) {
     <svg aria-keyshortcuts="Delete Escape Control+Z Meta+Z Control+Y Meta+Y" aria-label="K线主图" className="sc-kline-svg" onClick={createPointDrawing} onKeyDown={handleKeyDown} onLostPointerCapture={clearLostPointerGesture} onPointerCancel={cancelPointerGesture} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} preserveAspectRatio="xMidYMid meet" ref={svgRef} role="img" tabIndex={0} viewBox={`0 0 ${viewBox.width} ${viewBox.height}`}>
       <HistoricalLayer candles={props.candles} keyLevels={props.keyLevels} showKeyLevels={props.showKeyLevels} transform={props.transform} />
       <IndicatorLayer indicatorValues={props.indicatorValues} indicators={props.indicators} transform={props.transform} />
-      <g data-chart-layer="prediction">{props.prediction ? <PredictionLayer hoveredDay={props.hoveredDay} onHoverDay={props.onHoverDay} prediction={props.prediction} transform={props.transform} /> : null}</g>
+      <g data-chart-layer="prediction">{props.prediction ? <PredictionLayer hoveredDay={props.hoveredDay} onHoverDay={props.onHoverDay} onSelectDay={props.onSelectPredictionDay} prediction={props.prediction} selectedDay={props.selectedPredictionDay} transform={props.transform} /> : null}</g>
       <g data-chart-layer="drawing">{props.showDrawings ? <DrawingLayer drawings={props.drawings} onFocusEditor={() => svgRef.current?.focus()} onMoveDrawing={beginDrawingMove} onMovePoint={beginPointMove} onSelect={props.onSelectDrawing} selectedId={props.selectedId} transform={props.transform} /> : null}</g>
       <g data-chart-layer="crosshair">{props.crosshair && crosshairPoint && crosshairCandle && crosshairPrice !== null ? <g data-testid="crosshair-layer"><line className="sc-crosshair" x1={props.transform.xForTime(crosshairCandle.day)} x2={props.transform.xForTime(crosshairCandle.day)} y1={props.transform.rect.top} y2={volumeTop + volumeHeight} /><line className="sc-crosshair" x1={props.transform.rect.left} x2={props.transform.rect.left + props.transform.rect.width} y1={props.transform.yForPrice(crosshairPrice)} y2={props.transform.yForPrice(crosshairPrice)} /><g data-testid="crosshair-tooltip"><rect fill="#17213c" height="66" opacity="0.94" rx="5" width="188" x={props.transform.rect.left + 6} y={props.transform.rect.top + 8} /><text fill="#fff" fontSize="11" x={props.transform.rect.left + 14} y={props.transform.rect.top + 26}>{crosshairCandle.day} · 开 {priceText(crosshairCandle.open)} 高 {priceText(crosshairCandle.high)}</text><text fill="#fff" fontSize="11" x={props.transform.rect.left + 14} y={props.transform.rect.top + 43}>低 {priceText(crosshairCandle.low)} 收 {priceText(crosshairCandle.close)} · 光标 {priceText(crosshairPrice)}</text><text fill="#dfe6ff" fontSize="10" x={props.transform.rect.left + 14} y={props.transform.rect.top + 58}>MA5 {priceText(props.indicatorValues.ma5[crosshairIndex])} · BOLL {priceText(props.indicatorValues.boll.middle[crosshairIndex])}</text></g></g> : null}</g>
     </svg>

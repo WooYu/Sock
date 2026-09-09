@@ -5,14 +5,14 @@ const primaryDrawingTools: Array<[ChartTool, string]> = [
   ['trend-line', '趋势线'],
   ['rectangle', '矩形'],
   ['marker', '标记'],
+  ['buy', '买入点'],
+  ['sell', '卖出点'],
+  ['target', '目标位'],
+  ['stop-loss', '止损位'],
 ]
 
 const secondaryDrawingTools: Array<[ChartTool, string]> = [
   ['horizontal-line', '水平线'],
-  ['buy', '买入'],
-  ['sell', '卖出'],
-  ['target', '目标'],
-  ['stop-loss', '止损'],
   ['text', '文字'],
 ]
 
@@ -43,7 +43,7 @@ export function ChartToolbar({ activeTool, onToolChange }: { activeTool: ChartTo
                 onClick={() => onToolChange(tool)}
                 type="button"
               >
-                {tool === 'buy' ? '买入点' : tool === 'sell' ? '卖出点' : tool === 'target' ? '目标位' : tool === 'stop-loss' ? '止损位' : label}
+              {label}
               </button>
             ))}
           </div>

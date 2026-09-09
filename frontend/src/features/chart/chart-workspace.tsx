@@ -15,6 +15,8 @@ import { aggregateCandles, bollinger, movingAverage } from './chart-math'
 import type { ChartPeriod, DrawingObject, PredictionSnapshot, TimePricePoint } from './chart-types'
 import { DrawingEngine, type DrawingMove } from './drawing-engine'
 import { ChartCanvas } from './chart-canvas'
+import { PredictionDetails } from './prediction-details'
+import { ObjectInspector, type DrawingInspectorChange } from './object-inspector'
 
 export { aggregateCandles } from './chart-math'
 
@@ -34,10 +36,11 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
   const [indicators, setIndicators] = useState<Record<IndicatorKey, boolean>>({ ma5: true, ma10: true, ma20: true, boll: true })
   const [zoom, setZoom] = useState(100)
   const [crosshair, setCrosshair] = useState(false)
-  const [layers, setLayers] = useState<ChartLayerState>({ keyLevels: true, annotations: true })
+  const [layers, setLayers] = useState<ChartLayerState>({ keyLevels: true, annotations: true, prediction: true })
   const [drawings, setDrawings] = useState<DrawingObject[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [hoveredDay, setHoveredDay] = useState<string | null>(null)
+  const [selectedPredictionDay, setSelectedPredictionDay] = useState<string | null>(null)
   const [syncStatus, setSyncStatus] = useState<'本机保存' | '同步中' | '已同步' | '待同步'>('本机保存')
   const [toolsOpen, setToolsOpen] = useState(false)
   const store = useRef(new DrawingEngine())
@@ -45,6 +48,7 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
   const sourceCandles = useMemo(() => snapshot?.dailyCandles ?? [], [snapshot?.dailyCandles])
   const candles = useMemo(() => aggregateCandles(sourceCandles, activePeriod), [activePeriod, sourceCandles])
   const activePrediction = prediction?.period === activePeriod ? prediction : null
+  const activePredictionDay = activePrediction?.days.some((day) => day.day === selectedPredictionDay) ? selectedPredictionDay : activePrediction?.days[0].day ?? null
   const movingAverages = useMemo(() => ({ ma5: movingAverage(candles, 5), ma10: movingAverage(candles, 10), ma20: movingAverage(candles, 20) }), [candles])
   const boll = useMemo(() => bollinger(candles, 20, 2), [candles])
   const indicatorValues = useMemo(() => ({
@@ -127,6 +131,20 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
     store.current.select(selectedId)
     setDrawings(store.current.remove(selectedId))
     setSelectedId(null)
+  }
+  const changeSelectedDrawing = (change: DrawingInspectorChange) => {
+    if (!selectedId) return
+    store.current.select(selectedId)
+    const next = change.type === 'style'
+      ? store.current.updateStyle(change.patch)
+      : change.type === 'text'
+        ? store.current.updateText(change.text)
+        : change.type === 'point'
+          ? store.current.movePoint(change.index, change.point)
+          : change.type === 'visible'
+            ? store.current.setVisible(change.visible)
+            : store.current.setLocked(change.locked)
+    setDrawings(next)
   }
   const undoDrawing = () => {
     setDrawings(store.current.undo())
@@ -284,15 +302,15 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
             </div>
             <div className="sc-kline-chart-scroll">
               <div className="sc-kline-chart-surface" data-zoom={zoom} style={{ width: `${zoom}%` }}>
-                <ChartCanvas activeTool={activeTool} candles={candles} crosshair={crosshair} drawings={drawings} hoveredDay={hoveredDay} indicatorValues={indicatorValues} indicators={indicators} keyLevels={keyLevels} onCreateDrawing={createDrawing} onDeleteSelected={deleteSelectedDrawing} onHoverDay={setHoveredDay} onMoveDrawing={moveDrawing} onMovePoint={moveDrawingPoint} onRedo={redoDrawing} onSelectDrawing={selectDrawing} onUndo={undoDrawing} period={activePeriod} prediction={activePrediction} selectedId={selectedId} showDrawings={layers.annotations} showKeyLevels={layers.keyLevels} symbol={snapshot.quote.security.code} transform={transform} />
+                <ChartCanvas activeTool={activeTool} candles={candles} crosshair={crosshair} drawings={drawings} hoveredDay={hoveredDay} indicatorValues={indicatorValues} indicators={indicators} keyLevels={keyLevels} onCreateDrawing={createDrawing} onDeleteSelected={deleteSelectedDrawing} onHoverDay={setHoveredDay} onMoveDrawing={moveDrawing} onMovePoint={moveDrawingPoint} onRedo={redoDrawing} onSelectDrawing={selectDrawing} onSelectPredictionDay={setSelectedPredictionDay} onUndo={undoDrawing} period={activePeriod} prediction={layers.prediction ? activePrediction : null} selectedId={selectedId} selectedPredictionDay={activePredictionDay} showDrawings={layers.annotations} showKeyLevels={layers.keyLevels} symbol={snapshot.quote.security.code} transform={transform} />
               </div>
             </div>
             <div className="sc-kline-statusbar"><span>共 {candles.length} 根 K 线</span><span>当前周期：{periods.find(([period]) => period === activePeriod)?.[1]}</span><span>数据源：{snapshot.source.name}</span><span>{getAuthorizationHeader() ? syncStatus : '本机保存 · 登录后跨设备同步'}</span></div>
           </div>
           {(activeTool === 'rectangle' || activeTool === 'trend-line') && <button className="sc-kline-add-annotation" onClick={addRectangle} type="button">添加矩形标注</button>}
-
+          {activePrediction && layers.prediction ? <><PredictionDetails mode="desktop-table" onSelectDay={setSelectedPredictionDay} prediction={activePrediction} selectedDay={activePredictionDay} /><PredictionDetails mode="mobile-sheet" onSelectDay={setSelectedPredictionDay} prediction={activePrediction} selectedDay={activePredictionDay} /></> : null}
         </div>
-        <aside className="sc-kline-side-column"><ChartLayerPanel layers={layers} onChange={(key, value) => setLayers((old) => ({ ...old, [key]: value }))} /><section className="sc-kline-side-card"><p className="sc-eyebrow">当前观察</p><h2>{snapshot.quote.security.name}</h2><dl><div><dt>现价</dt><dd>{priceText(currentPrice)}</dd></div><div><dt>数据源</dt><dd>{snapshot.source.name}</dd></div><div><dt>更新时间</dt><dd>{new Date(snapshot.source.fetchedAt).toLocaleString('zh-CN')}</dd></div></dl><p>先用周期和图层筛选结构，再用绘图工具记录买入、止盈和失效条件。</p></section></aside>
+        <aside className="sc-kline-side-column"><ChartLayerPanel layers={layers} onChange={(key, value) => setLayers((old) => ({ ...old, [key]: value }))} /><ObjectInspector drawing={drawings.find((drawing) => drawing.id === selectedId) ?? null} onChange={changeSelectedDrawing} onDelete={deleteSelectedDrawing} /><section className="sc-kline-side-card"><p className="sc-eyebrow">当前观察</p><h2>{snapshot.quote.security.name}</h2><dl><div><dt>现价</dt><dd>{priceText(currentPrice)}</dd></div><div><dt>数据源</dt><dd>{snapshot.source.name}</dd></div><div><dt>更新时间</dt><dd>{new Date(snapshot.source.fetchedAt).toLocaleString('zh-CN')}</dd></div></dl><p>先用周期和图层筛选结构，再用绘图工具记录买入、止盈和失效条件。</p></section></aside>
       </div>
     </section>
   )

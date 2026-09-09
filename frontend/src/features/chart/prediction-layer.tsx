@@ -6,9 +6,11 @@ type PredictionLayerProps = {
   transform: ChartTransform
   hoveredDay: string | null
   onHoverDay: (day: string | null) => void
+  selectedDay?: string | null
+  onSelectDay?: (day: string) => void
 }
 
-export function PredictionLayer({ prediction, transform, hoveredDay, onHoverDay }: PredictionLayerProps) {
+export function PredictionLayer({ prediction, transform, hoveredDay, onHoverDay, selectedDay = null, onSelectDay }: PredictionLayerProps) {
   const days = prediction.days.filter((day) => transform.hasTime(day.day))
   if (!days.length) return null
 
@@ -38,16 +40,19 @@ export function PredictionLayer({ prediction, transform, hoveredDay, onHoverDay 
         const closeY = transform.yForPrice(day.close)
         const rising = day.close >= day.open
         const highlighted = hoveredDay === day.day
+        const selected = selectedDay === day.day
         return (
           <g
+            data-active={selected || undefined}
             data-testid="prediction-candle"
             key={day.day}
+            onClick={(event) => { event.stopPropagation(); onSelectDay?.(day.day) }}
             onMouseEnter={() => onHoverDay(day.day)}
             onMouseLeave={() => onHoverDay(null)}
             opacity="0.55"
             strokeDasharray="4 3"
           >
-            {highlighted ? <rect fill="#bfdbfe" height={transform.rect.height} opacity="0.65" width={step} x={x - step / 2} y={transform.rect.top} /> : null}
+            {highlighted || selected ? <rect fill="#bfdbfe" height={transform.rect.height} opacity={selected ? '0.8' : '0.65'} width={step} x={x - step / 2} y={transform.rect.top} /> : null}
             <line stroke={rising ? '#dc2626' : '#16a34a'} strokeWidth="1.5" x1={x} x2={x} y1={transform.yForPrice(day.high)} y2={transform.yForPrice(day.low)} />
             <rect
               fill={rising ? '#fecaca' : '#bbf7d0'}
