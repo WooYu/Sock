@@ -1,9 +1,11 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 import { createChartTransform } from './chart-coordinates'
 import { ChartCanvas } from './chart-canvas'
 import type { PredictionSnapshot } from './chart-types'
 import type { DrawingObject } from './chart-types'
+import { MA_COLORS, MA_PERIODS, type IndicatorValues, type MaKey } from './chart-periods'
+import type { Candle } from '../workspace/stock-workspace-types'
 
 const prediction: PredictionSnapshot = {
   symbol: '600519', period: 'day', generatedAt: '2026-09-07T00:00:00Z', modelVersion: 'baseline-v1',
@@ -280,6 +282,18 @@ describe('ChartCanvas', () => {
     expect(onCreateDrawing.mock.calls[0][0]).toMatchObject({ kind: 'buy' })
   })
 
+  test('consumes the synthetic click after a completed gesture even when the tool switches to pointer', () => {
+    const onCreateDrawing = vi.fn(), onSelectDrawing = vi.fn()
+    const view = render(<ChartCanvas {...baseProps} activeTool="trend-line" onCreateDrawing={onCreateDrawing} onSelectDrawing={onSelectDrawing} />)
+    const chart = screen.getByRole('img', { name: 'K线主图' })
+    fireEvent.pointerDown(chart, { pointerId: 31, clientX: 143, clientY: 202 })
+    fireEvent.pointerUp(chart, { pointerId: 31, clientX: 313, clientY: 172 })
+    view.rerender(<ChartCanvas {...baseProps} activeTool="pointer" onCreateDrawing={onCreateDrawing} onSelectDrawing={onSelectDrawing} />)
+    fireEvent.click(chart, { clientX: 313, clientY: 172 })
+    expect(onCreateDrawing).toHaveBeenCalledOnce()
+    expect(onSelectDrawing).not.toHaveBeenCalled()
+  })
+
   test('shows crosshair values over a prediction session', () => {
     render(<ChartCanvas {...baseProps} crosshair />)
     const chart = screen.getByRole('img', { name: 'K线主图' })
@@ -288,5 +302,127 @@ describe('ChartCanvas', () => {
 
     expect(screen.getByTestId('crosshair-tooltip')).toHaveTextContent('2026-09-09')
     expect(screen.getByTestId('crosshair-tooltip')).toHaveTextContent('开 104.00')
+  })
+
+  test('renders all eight enabled moving averages with finite coordinates and shared colors', () => {
+    const values: IndicatorValues = { boll: { upper: [], middle: [], lower: [] } }
+    const flags = { ...baseProps.indicators }
+    for (const period of MA_PERIODS) {
+      const key: MaKey = `ma${period}`
+      values[key] = [99 + period / 100, 100 + period / 100]
+      Object.assign(flags, { [key]: true })
+    }
+    const { container } = render(<ChartCanvas {...baseProps} prediction={null} indicatorValues={values} indicators={flags} />)
+    const paths = container.querySelectorAll('[data-chart-layer="indicator"] [data-indicator] path')
+    expect(paths).toHaveLength(8)
+    for (const period of MA_PERIODS) {
+      const key: MaKey = `ma${period}`
+      const path = container.querySelector(`[data-indicator="${key}"] path`)!
+      expect(path).toHaveAttribute('stroke', MA_COLORS[key])
+      expect(path.getAttribute('d')).toMatch(/^M [-\d.]+ [-\d.]+ L [-\d.]+ [-\d.]+$/)
+      expect(path.getAttribute('d')).not.toMatch(/NaN|Infinity|undefined|null/)
+    }
+  })
+
+  test('treats absent legacy indicator flags as disabled', () => {
+    const values: IndicatorValues = { ma5: [100, 101], ma30: [102, 103], ma250: [104, 105], boll: { upper: [], middle: [], lower: [] } }
+    const { container } = render(<ChartCanvas {...baseProps} prediction={null} indicatorValues={values} indicators={{ ...baseProps.indicators, ma5: true }} />)
+    expect(container.querySelector('[data-indicator="ma5"] path')).toBeInTheDocument()
+    expect(container.querySelector('[data-indicator="ma30"]')).not.toBeInTheDocument()
+    expect(container.querySelector('[data-indicator="ma250"]')).not.toBeInTheDocument()
+  })
+
+  test('omits null warmup points and starts a new segment after missing or non-finite values', () => {
+    const samples = [...candles, ...prediction.days.map((candle) => ({ ...candle, volume: 500 }))]
+    const values: IndicatorValues = { ma5: [null, 101, null, 103, 104], ma250: [null, null, null, null, null], ma60: [Number.NaN, 101, Number.POSITIVE_INFINITY, 103, 104], boll: { upper: [null, null, null, null, null], middle: [null, null, null, null, null], lower: [null, null, null, null, null] } }
+    const { container } = render(<ChartCanvas {...baseProps} candles={samples} prediction={null} indicatorValues={values} indicators={{ ...baseProps.indicators, ma5: true, ma60: true, ma250: true, boll: true }} />)
+    const expected = `M ${transform.xForTime(samples[1].day).toFixed(2)} ${transform.yForPrice(101).toFixed(2)} M ${transform.xForTime(samples[3].day).toFixed(2)} ${transform.yForPrice(103).toFixed(2)} L ${transform.xForTime(samples[4].day).toFixed(2)} ${transform.yForPrice(104).toFixed(2)}`
+    expect(container.querySelector('[data-indicator="ma5"] path')).toHaveAttribute('d', expected)
+    expect(container.querySelector('[data-indicator="ma60"] path')).toHaveAttribute('d', expected)
+    expect(container.querySelector('[data-indicator="ma250"] path')).not.toBeInTheDocument()
+    expect(container.querySelectorAll('[data-chart-layer="indicator"] path')).toHaveLength(2)
+    expect(container.querySelector('[data-chart-layer="indicator"]')?.innerHTML).not.toMatch(/NaN|Infinity/)
+  })
+
+  test('keeps the forecast portion of nullable indicators dashed without joining across a gap', () => {
+    const { container } = render(<ChartCanvas {...baseProps} indicators={{ ...baseProps.indicators, ma5: true }} indicatorValues={{ ma5: [null, 101, 102, null, 104], boll: { upper: [], middle: [], lower: [] } }} />)
+    const predicted = screen.getByTestId('predicted-indicator-line')
+    expect(predicted).toHaveAttribute('stroke-dasharray', '4 4')
+    expect(predicted.getAttribute('d')?.match(/M /g)).toHaveLength(2)
+    expect(container.querySelector('[data-indicator="ma5"] path:not([data-testid])')?.getAttribute('d')).toBe(`M ${transform.xForTime(candles[1].day).toFixed(2)} ${transform.yForPrice(101).toFixed(2)}`)
+  })
+
+  test('wraps all eight MA crosshair values into a bounded tooltip and reports missing values honestly', () => {
+    const values: IndicatorValues = { boll: { upper: [null, 108], middle: [null, 101], lower: [null, 94] } }
+    const flags = { ...baseProps.indicators, boll: true }
+    for (const period of MA_PERIODS) { values[`ma${period}`] = [null, period === 250 ? null : 100 + period]; Object.assign(flags, { [`ma${period}`]: true }) }
+    render(<ChartCanvas {...baseProps} prediction={null} crosshair indicatorValues={values} indicators={flags} />)
+    fireEvent.pointerMove(screen.getByRole('img', { name: 'K线主图' }), { pointerId: 3, clientX: transform.xForTime(candles[1].day), clientY: 172 })
+    const tooltip = screen.getByTestId('crosshair-tooltip')
+    for (const period of MA_PERIODS) expect(tooltip).toHaveTextContent(`MA${period} `)
+    expect(tooltip).toHaveTextContent('MA250 --')
+    const bounds = tooltip.querySelector('rect')!
+    const bottom = Number(bounds.getAttribute('y')) + Number(bounds.getAttribute('height'))
+    for (const text of tooltip.querySelectorAll('text')) expect(Number(text.getAttribute('y'))).toBeLessThan(bottom)
+    expect(Number(bounds.getAttribute('width'))).toBeLessThan(transform.rect.width)
+  })
+
+  const intraday: Candle[] = [
+    { day: '2026-09-16T09:31:00+08:00', open: 10, high: 1000, low: 0, close: 10.1, volume: 1200, averagePrice: 10.05 },
+    { day: '2026-09-16T09:32:00+08:00', open: 10, high: 1000, low: 0, close: 10.2, volume: 0 },
+    { day: '2026-09-16T09:33:00+08:00', open: 10, high: 1000, low: 0, close: 10.15, volume: 800, averagePrice: 10.1 },
+  ]
+  const intradayTransform = createChartTransform({ times: intraday.map((candle) => candle.day), minPrice: 9.9, maxPrice: 10.3, rect: transform.rect })
+
+  test('draws real intraday price and supplied VWAP with volume and previous-close reference instead of candles or MA overlays', () => {
+    const { container } = render(<ChartCanvas {...baseProps} kind="intraday" period="intraday" candles={intraday} transform={intradayTransform} previousClose={10} indicators={{ ma5: true, ma10: true, ma20: true, boll: true }} />)
+    expect(screen.getByRole('img', { name: '分时主图' })).toBeInTheDocument()
+    expect(screen.queryByTestId('candlestick-layer')).not.toBeInTheDocument()
+    expect(container.querySelector('[data-chart-layer="indicator"] path')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('prediction-region')).not.toBeInTheDocument()
+    expect(screen.getByTestId('intraday-price-line')).toHaveAttribute('d', expect.stringContaining(`M ${intradayTransform.xForTime(intraday[0].day).toFixed(2)} ${intradayTransform.yForPrice(10.1).toFixed(2)}`))
+    const average = screen.getByTestId('intraday-average-line')
+    expect(average.getAttribute('d')?.match(/M /g)).toHaveLength(2)
+    expect(average.getAttribute('d')).not.toContain('L ')
+    expect(screen.getByTestId('previous-close-line')).toHaveAttribute('y1', String(intradayTransform.yForPrice(10)))
+    expect(container.querySelectorAll('.sc-volume-bars rect')).toHaveLength(2)
+  })
+
+  test('intraday crosshair shows timestamp, price and supplied average without invented OHLC or VWAP', () => {
+    const { container } = render(<ChartCanvas {...baseProps} kind="intraday" period="intraday" prediction={null} candles={intraday.map((candle) => ({ ...candle, averagePrice: undefined }))} transform={intradayTransform} crosshair />)
+    const chart = screen.getByRole('img', { name: '分时主图' })
+    fireEvent.pointerMove(chart, { pointerId: 3, clientX: intradayTransform.xForTime(intraday[1].day), clientY: 172 })
+    const tooltip = screen.getByTestId('crosshair-tooltip')
+    expect(tooltip).toHaveTextContent('2026-09-16 09:32 +08:00')
+    expect(tooltip).toHaveTextContent('价格 10.20')
+    expect(tooltip).toHaveTextContent('均价 --')
+    expect(tooltip).not.toHaveTextContent(/开 |高 |低 |收 |MA5/)
+    expect(screen.queryByTestId('intraday-average-line')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('previous-close-line')).not.toBeInTheDocument()
+    expect(within(container.querySelector('[aria-label="交易时间"]') as HTMLElement).getByText('09:31')).toBeInTheDocument()
+  })
+
+  test('minute candles retain OHLC and include the Shanghai timestamp in the crosshair', () => {
+    const minutes = intraday.map((candle, index) => ({ ...candle, day: `2026-09-16T09:${35 + index * 5}:00+08:00` }))
+    const minuteTransform = createChartTransform({ times: minutes.map((candle) => candle.day), minPrice: 9.9, maxPrice: 10.3, rect: transform.rect })
+    render(<ChartCanvas {...baseProps} period="5m" prediction={null} candles={minutes} transform={minuteTransform} crosshair />)
+    fireEvent.pointerMove(screen.getByRole('img', { name: 'K线主图' }), { pointerId: 3, clientX: minuteTransform.xForTime(minutes[1].day), clientY: 172 })
+    const tooltip = screen.getByTestId('crosshair-tooltip')
+    expect(tooltip).toHaveTextContent('2026-09-16 09:40 +08:00')
+    expect(tooltip).toHaveTextContent('开 10.00')
+    expect(screen.getByTestId('candlestick-layer')).toBeInTheDocument()
+  })
+
+  test.each([
+    ['month', '2026-09-01', '2026-09'],
+    ['quarter', '2026-07-01', '2026 Q3'],
+    ['year', '2026-01-01', '2026'],
+  ] as const)('formats %s axes and tooltip with the corresponding calendar period', (period, time, label) => {
+    const sample = [{ ...candles[0], day: time }]
+    const calendarTransform = createChartTransform({ times: [time], minPrice: 90, maxPrice: 115, rect: transform.rect })
+    const { container } = render(<ChartCanvas {...baseProps} candles={sample} transform={calendarTransform} period={period} prediction={null} crosshair />)
+    expect(container.querySelector('[aria-label="交易日期"]')).toHaveTextContent(label)
+    fireEvent.pointerMove(screen.getByRole('img', { name: 'K线主图' }), { pointerId: 3, clientX: calendarTransform.xForTime(time), clientY: 172 })
+    expect(screen.getByTestId('crosshair-tooltip')).toHaveTextContent(label)
   })
 })

@@ -1,4 +1,5 @@
 import type { DrawingObject, DrawingStyle, DrawingTombstone, TimePricePoint } from './chart-types'
+import { canonicalPeriodTime } from './chart-periods'
 
 export type DrawingMove = {
   /** Number of entries in timeDomain. This is a trading-session delta, not calendar days. */
@@ -44,11 +45,18 @@ function boundedTimeIndexDelta(drawing: DrawingObject, move: DrawingMove): numbe
   if (move.timeIndexDelta === 0) return 0
   const domain = move.timeDomain
   if (!domain?.length) throw new Error('Drawing session move requires a time domain')
-  const pointIndexes = drawing.points.map((point) => domain.indexOf(point.time))
+  const pointIndexes = drawing.points.map((point) => drawingTimeIndex(drawing, point.time, domain))
   if (pointIndexes.some((index) => index < 0)) throw new Error('Drawing point time must exist in the move time domain')
   const minimum = Math.min(...pointIndexes)
   const maximum = Math.max(...pointIndexes)
   return Math.max(-minimum, Math.min(domain.length - 1 - maximum, move.timeIndexDelta))
+}
+
+function drawingTimeIndex(drawing: DrawingObject, time: string, domain: readonly string[]): number {
+  const exact = domain.indexOf(time)
+  if (exact >= 0) return exact
+  const canonical = canonicalPeriodTime(time, drawing.period)
+  return domain.findIndex((candidate) => canonicalPeriodTime(candidate, drawing.period) === canonical)
 }
 
 export class DrawingEngine {
@@ -114,7 +122,7 @@ export class DrawingEngine {
         if (!Number.isFinite(price)) throw new Error('Drawing point price must be finite')
         const time = timeIndexDelta === 0
           ? point.time
-          : delta.timeDomain![delta.timeDomain!.indexOf(point.time) + timeIndexDelta]
+          : delta.timeDomain![drawingTimeIndex(drawing, point.time, delta.timeDomain!) + timeIndexDelta]
         return { time, price }
       }),
     }))

@@ -1,18 +1,12 @@
 ﻿import type { ChartPeriod, ChartWorkspaceV2, DrawingObject, DrawingRecoveryRecord, DrawingTombstone } from './chart-types'
 
+import { isChartPeriod, isChartTime, isIsoTimestamp } from './chart-periods'
+
 const record = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null && !Array.isArray(value) && Object.getPrototypeOf(value) === Object.prototype
 const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
 const natural = (value: unknown): value is number => typeof value === 'number' && Number.isSafeInteger(value) && value >= 0
 const nonempty = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0
-const period = (value: unknown): value is ChartPeriod => value === 'day' || value === 'week' || value === 'month'
 const boolRecord = (value: unknown) => record(value) && Object.values(value).every((item) => typeof item === 'boolean')
-
-function date(value: unknown, timestamp = false): value is string {
-  if (typeof value !== 'string' || !(timestamp ? /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/ : /^\d{4}-\d{2}-\d{2}$/).test(value)) return false
-  const day = value.slice(0, 10)
-  const parsed = Date.parse(day)
-  return Number.isFinite(parsed) && new Date(parsed).toISOString().slice(0, 10) === day && Number.isFinite(Date.parse(value))
-}
 
 function jsonValue(value: unknown, seen = new Set<object>()): boolean {
   if (value === null || typeof value === 'string' || typeof value === 'boolean' || finite(value)) return true
@@ -26,15 +20,15 @@ function jsonValue(value: unknown, seen = new Set<object>()): boolean {
 function drawing(value: unknown, symbol: string, chartPeriod: ChartPeriod): value is DrawingObject {
   if (!record(value) || !nonempty(value.id) || value.symbol !== symbol || value.period !== chartPeriod || !['trend-line', 'horizontal-line', 'rectangle', 'text', 'buy', 'sell', 'target', 'stop-loss'].includes(String(value.kind))) return false
   const count = value.kind === 'trend-line' || value.kind === 'rectangle' ? 2 : 1
-  if (!Array.isArray(value.points) || value.points.length !== count || !value.points.every((point) => record(point) && date(point.time) && finite(point.price))) return false
+  if (!Array.isArray(value.points) || value.points.length !== count || !value.points.every((point) => record(point) && isChartTime(point.time, chartPeriod) && finite(point.price))) return false
   if (!record(value.style) || !nonempty(value.style.color) || !finite(value.style.width) || value.style.width <= 0 || !['solid', 'dashed'].includes(String(value.style.lineStyle)) || !finite(value.style.opacity) || value.style.opacity < 0 || value.style.opacity > 1) return false
-  return typeof value.locked === 'boolean' && typeof value.visible === 'boolean' && natural(value.version) && date(value.updatedAt, true) && (value.text === undefined || typeof value.text === 'string') && (value.restoredFromVersion === undefined || (natural(value.restoredFromVersion) && value.version > value.restoredFromVersion))
+  return typeof value.locked === 'boolean' && typeof value.visible === 'boolean' && natural(value.version) && isIsoTimestamp(value.updatedAt) && (value.text === undefined || typeof value.text === 'string') && (value.restoredFromVersion === undefined || (natural(value.restoredFromVersion) && value.version > value.restoredFromVersion))
 }
 
 const uniqueIds = (values: Array<{ id: string }>) => new Set(values.map((value) => value.id)).size === values.length
 
 export function isChartWorkspaceV2(value: unknown): value is ChartWorkspaceV2 {
-  if (!record(value) || value.version !== 2 || !nonempty(value.symbol) || !period(value.period) || !natural(value.revision) || !date(value.updatedAt, true)) return false
+  if (!record(value) || value.version !== 2 || !nonempty(value.symbol) || !isChartPeriod(value.period) || !natural(value.revision) || !isIsoTimestamp(value.updatedAt)) return false
   const symbol = value.symbol
   const chartPeriod = value.period
   if (!Array.isArray(value.drawings) || !value.drawings.every((item) => drawing(item, symbol, chartPeriod)) || !uniqueIds(value.drawings)) return false
@@ -44,7 +38,7 @@ export function isChartWorkspaceV2(value: unknown): value is ChartWorkspaceV2 {
     if (/multiplier$/i.test(key) && (!finite(item) || item <= 0)) return false
   }
   if (!record(value.view) || !finite(value.view.zoom) || value.view.zoom <= 0 || !finite(value.view.panX) || !finite(value.view.panY) || typeof value.crosshair !== 'boolean') return false
-  if (value.deletions !== undefined && (!Array.isArray(value.deletions) || !value.deletions.every((item) => record(item) && nonempty(item.id) && natural(item.version) && date(item.updatedAt, true)) || !uniqueIds(value.deletions))) return false
+  if (value.deletions !== undefined && (!Array.isArray(value.deletions) || !value.deletions.every((item) => record(item) && nonempty(item.id) && natural(item.version) && isIsoTimestamp(item.updatedAt)) || !uniqueIds(value.deletions))) return false
   return value.recovery === undefined || (Array.isArray(value.recovery) && value.recovery.every((item) => record(item) && ['DELETE_EDIT_CONFLICT', 'VERSION_CONFLICT'].includes(String(item.reason)) && drawing(item.drawing, symbol, chartPeriod) && item.id === item.drawing.id))
 }
 

@@ -1,0 +1,1792 @@
+{
+  "batch": 1,
+  "extractionMethod": "codex-ai-semantic-review",
+  "documents": [
+    {
+      "file": "20221117-早餐-今天回档五日线.md",
+      "sha256": "18e89cae0f15c021e10be5291fa0256b5b3df64b1605bedf5bebf37091182d3d",
+      "lines": 281,
+      "summary": "长篇广播逐例讨论MA5起步的葛兰碧、第二日卖出、开口四日、照镜子反抽、次日均线/上轨参数、涨停例外与板块相对强弱。转写错字多，日期、价格和均线数字有相互矛盾，不能把案例价格直接变成普适公式。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r05",
+        "b1-r07",
+        "b1-r08",
+        "b1-r10",
+        "b1-r12",
+        "b1-r18",
+        "b1-r20",
+        "b1-r21",
+        "b1-r26",
+        "b1-r30"
+      ]
+    },
+    {
+      "file": "20250904-###为什么没有葛二很重要###.md",
+      "sha256": "3be03ce549e86dc44f608de764bfe5a3b5cf6db318464e30ce9cf51209c5d72a",
+      "lines": 17,
+      "summary": "以汉宇集团等案例说明葛一不能脱离布林位置与三期横盘环境；上轨附近空间不足时不存在机械的葛二/葛三上涨，贴MA5攀升可连续重置葛一，强调强弱及开口失败的条件性。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r09",
+        "b1-r13"
+      ]
+    },
+    {
+      "file": "20250911-科技股三期回升...参数的验证（前三后三，预期的预期）.md",
+      "sha256": "6d28e226471a4948698e9b884090f38e807014d5705fe98f42542aa66e2c207e",
+      "lines": 532,
+      "summary": "科技反弹分中轨以上强势与中轨以下弱势；以启明科技、天赐材料说明提前计算MA5买点、BOLL上轨关键点及后续目标，参数随盘中行情变化，需保存盘前预期。多处确定性/成功率说法只是讲述者主张。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r14",
+        "b1-r18",
+        "b1-r19",
+        "b1-r26"
+      ]
+    },
+    {
+      "file": "20250902-再接再厉再创辉煌.md",
+      "sha256": "594e423f7363b45eba592e51b5021e588d0b84e8bc01fb9b8fdd1614c8f67ada",
+      "lines": 66,
+      "summary": "拓维信息破MA5离场与反抽卖点；茅台葛一/二/三轮换；国轩高科连续强涨后的2.5天回落；按MA5和BOLL上轨预先计划两日交易。文本末尾的整理请求是资料内容，不作为任务指令。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r02",
+        "b1-r03",
+        "b1-r04",
+        "b1-r10",
+        "b1-r11",
+        "b1-r12"
+      ]
+    },
+    {
+      "file": "20250916-晚－三期参数.md",
+      "sha256": "ba5de379b2fc427b3fbb94cb8e684d02a8cb5b69c4171b617a54cc0e3c0ea483",
+      "lines": 10,
+      "summary": "川仪股份和四会富仕失败案例，明确行情终结日不可事前确定；今日高低点与未来1至3日上轨/MA5相联系，照镜子以卖出为主；三花智控等说明板块新闻可使破位后重新突破，按当前信号重新评估。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r02",
+        "b1-r10",
+        "b1-r18",
+        "b1-r21",
+        "b1-r25"
+      ]
+    },
+    {
+      "file": "20250908-晚-5日线破位要走.md",
+      "sha256": "df669a09b7987f3b4d2fcf1d8c52a61177ab3215d4ee93ec841adc6db91a462a",
+      "lines": 332,
+      "summary": "解释MA5止损基本功、海龟板块与落后个股反弹的区别，明确方法非百分之百；保留横盘/螺旋攀升可不按MA5退出的其他体系例外，以及高位海龟失败。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r02",
+        "b1-r13",
+        "b1-r15"
+      ]
+    },
+    {
+      "file": "20221108_晚评_葛兰碧第四天大涨大跌日.md",
+      "sha256": "3f7769647f812062448344db79d0294aa1732b554f7903437bdb9265a57798d3",
+      "lines": 57,
+      "summary": "2022年11月指数观察：MA5不破强攻、破位后寻MA10/20/30支撑和更长震荡；以两处历史高点连线判断压力。为当时场景推演，未给普适的趋势/支撑选择算法。",
+      "classification": "case_study",
+      "ruleIds": [
+        "b1-r04",
+        "b1-r09",
+        "b1-r34"
+      ]
+    },
+    {
+      "file": "20220908_收盘_关于参数的计算.md",
+      "sha256": "481b2e72357d7afcc4c14861e02925aa7342d75739340250559b898cce86dd69",
+      "lines": 45,
+      "summary": "直接讲解MA5日增量外推：3203、3212、3222之后预计3232至3233；另用15分钟BOLL上/下轨解释当日阻力支撑，并强调一期二期三期的位置判断。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r17",
+        "b1-r23"
+      ]
+    },
+    {
+      "file": "20250912晚 顶部怎么确认.md",
+      "sha256": "c0941ad77d638823b203546c52fb90daa2404091898f31349ba2ccbfb18d1cfe",
+      "lines": 114,
+      "summary": "说明盘前参数与盘中重算可能不同、通常沿用盘前计划；候选顶部需要MA5破位确认，未破则保留看多。前半部分是群联系事务，不属于交易规则。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r19"
+      ]
+    },
+    {
+      "file": "四期第五课-摸线八字箴言.md",
+      "sha256": "d7f3f1bf156d700429dc16cf6fa8ca6b121cc784cf33000972b7aebdc40ee821",
+      "lines": 72,
+      "summary": "摸线定义为超跌反弹，主张底线不破坚定看多并预先准备反弹终结；含大量标准/畸形走势图片，仅Markdown正文可提取文字原则，图内参数未读取。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r05"
+      ]
+    },
+    {
+      "file": "20220913_参数的算法.md",
+      "sha256": "610f9a710abe5e4ece2e701fcae5be5760aa94fde2d2bd2bd078425b5aa907a7",
+      "lines": 26,
+      "summary": "30分钟上轨外推与60分钟MA5支撑、250均线/60均线/上轨压力汇合的指数案例；开口四个单位内均可出高点。周期单位随图切换，非可直接套到日线的完整公式。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r08",
+        "b1-r23"
+      ]
+    },
+    {
+      "file": "牛十条.md",
+      "sha256": "e677246f6f5f947984686e5250ec6efd6488ffba839fb04355d17252327b7b6d",
+      "lines": 28,
+      "summary": "牛市十条将牛市视为摸线三期延续，突破BOLL上轨进入三期，以BOLL中轨/MA20为持股底线；120日线一般目标带有大牛股例外，末条又要求止盈止损，不能把任何买入正确当作保证。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r06",
+        "b1-r07"
+      ]
+    },
+    {
+      "file": "学习营课程大纲.md",
+      "sha256": "accaf6e2a7040f264e4593f86c34bbad07e43710162c0a52cbc121e8ebfd79cf",
+      "lines": 26,
+      "summary": "课程目录及图片/旧Evernote链接，题目包含关键点目标位、女鬼/次新/除权/信托/高速公路不做等；链接正文未包含在此Markdown，不能据题名补充公式或类别阈值。",
+      "classification": "context",
+      "ruleIds": []
+    },
+    {
+      "file": "大时代.md",
+      "sha256": "51d06c7533b662105181656cd8002144209b9c72389f426c24ff0bf1cf16e282",
+      "lines": 54,
+      "summary": "记录政策底、市场底及2022/2023摸线事件；美股/A50/美元等外部影响和二期底线原则属于背景，事件后记不构成可事前识别的信号。",
+      "classification": "context",
+      "ruleIds": [
+        "b1-r06"
+      ]
+    },
+    {
+      "file": "盈利模式.md",
+      "sha256": "252a543e3e9ff2e624bfec14882baf646377ec8c1c1edba6df5796b7086f7a71",
+      "lines": 16,
+      "summary": "九类盈利思路概要：葛一板块、逆市海龟、ETF、妖股双高MA5、回调、攀升底线、趋势线区间、照镜子与反弹止损。T+0 ETF提示不适用于新易盛A股现货。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r03",
+        "b1-r06",
+        "b1-r15",
+        "b1-r21"
+      ]
+    },
+    {
+      "file": "买卖模式24678.md",
+      "sha256": "617a9a640de7273b21b89d229eb108c9db4fffe51421a799285e10e8185e08d1",
+      "lines": 40,
+      "summary": "记录上涨葛兰碧2/4/6卖、7买8卖，对照下跌序列1/3买4卖5买6卖，并把数字解释为模式；图中模式定义缺失，不能把数字简单当交易日起算。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r29"
+      ]
+    },
+    {
+      "file": "股市周期0123456789.md",
+      "sha256": "3e01f37f03157bb724ffb477ddd3b80a374842f9f800802772505bee5aee7fc8",
+      "lines": 36,
+      "summary": "数字0到9代表状态模式，突破与失败映射到邻接状态；文字例子给出三期开口后破5、抽5、去20日线过程，具体数字状态定义留在未读取图片中。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r28"
+      ]
+    },
+    {
+      "file": "图片 从 建党节.md",
+      "sha256": "b344eb74d08e2acf8aaeb2de8cd63123be1a03c1f3b245237af651528eb5a7b7",
+      "lines": 10,
+      "summary": "图片和关键点/摸线/女鬼课程链接，无可直接阅读的规则正文；不能把链接标题当作目标位公式。",
+      "classification": "context",
+      "ruleIds": []
+    },
+    {
+      "file": "感悟.md",
+      "sha256": "2c4c03233678c7cb87021502f2eb63fd1c46ed5550fd64676d26d934f8aa0403",
+      "lines": 24,
+      "summary": "感悟条目包含看跌在反弹卖、看涨在支撑买、下跌中MA5卖点、底线起大阳常有次日机会；同时含联特科技/石油及季节口诀等随手记录，后者缺验证与可执行条件。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r03",
+        "b1-r09"
+      ]
+    },
+    {
+      "file": "股票价格.md",
+      "sha256": "43bd9d6fca77150d52d5f81214a06b60a7dd7056acd6db051269d920cee6f014",
+      "lines": 12,
+      "summary": "估值笔记：滚动PE定义、股价=业绩×30倍PE，并分别列大盘股10/12倍、科技50/100倍；需澄清业绩口径与选倍数条件，不能靠OHLCV计算。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r31"
+      ]
+    },
+    {
+      "file": "牛市.md",
+      "sha256": "c0a9391358800db8a094a6f65baea424b1b804d2fc5e446695babec7e1fc6582",
+      "lines": 9,
+      "summary": "讨论牛市定义改变会影响历史牛市计数，列腾讯反弹及若干指数事件；不提供可事前计算的牛市判定规则。",
+      "classification": "context",
+      "ruleIds": []
+    },
+    {
+      "file": "毕业课.md",
+      "sha256": "af6fe0751f6f1aa23d80e2ad6414c3db47d6a2154defc16f96b5a9923f03f3c5",
+      "lines": 11,
+      "summary": "仅两条毕业课/外资音频附件链接，无转写正文；未据音频标题推断交易规则。",
+      "classification": "context",
+      "ruleIds": []
+    },
+    {
+      "file": "十不做.md",
+      "sha256": "956c9f302ec9e208fff96d80fd17e5d58a0200f372765359922a26e2bef16604",
+      "lines": 26,
+      "summary": "十不做清单：MA5/中轨破位、断头铡刀、决战关口、无止损或利润点、跌停、中轨未突破、葛兰碧两天半、照镜子。须结合模式适用范围，部分禁做与其他笔记的专门博弈相冲突。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r26",
+        "b1-r27"
+      ]
+    },
+    {
+      "file": "2025-03-21 三期走势.md",
+      "sha256": "0aff9fb7871a3bdee12781324ca17bedfcae659ce4b86bd09a37c822837fa7ca",
+      "lines": 6,
+      "summary": "单周复盘串联三期主升失败、震荡、照镜子第三天下跌、破MA5、MA10反弹及断头铡刀；为特定一周知识总结而非逐项充分条件。",
+      "classification": "case_study",
+      "ruleIds": [
+        "b1-r04"
+      ]
+    },
+    {
+      "file": "国科微.md",
+      "sha256": "a07d4c95a35613898d022b7e823140fdc3d499cf9470f83e08c18fc8a9d4c1c3",
+      "lines": 13,
+      "summary": "国科微摸线三期结束后反弹，两天报价/竞价记录及支撑关键压力点；未解释这些价格的计算过程，不作为通用目标公式。",
+      "classification": "case_study",
+      "ruleIds": []
+    },
+    {
+      "file": "妖股原则.md",
+      "sha256": "a73cf5f38302796a15b6d75e9a7ed8a0c00be48102af8e1e09bb566e8fa466b8",
+      "lines": 16,
+      "summary": "妖股原则明确定义双高为今日高低点都高于昨日，配合MA5破位卖出、跌停退出及30分钟求参数。双高定义本身完全可用日线验证，其他执行条件仍需补充。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r01",
+        "b1-r02",
+        "b1-r23"
+      ]
+    },
+    {
+      "file": "非典摸线.md",
+      "sha256": "842c88ecd27c13397775a7bc77b06f3ccaf065f0ada35749f56ee6d44ef34bd3",
+      "lines": 9,
+      "summary": "仅两幅截图链接，Markdown无规则正文；未OCR或阅读附件，不据标题推断非典摸线规则。",
+      "classification": "image_only",
+      "ruleIds": []
+    },
+    {
+      "file": "牛市指南.md",
+      "sha256": "789c4bf950576f5a49c8a4b47fee711241d571020b597cfbde4f8e93b323142a",
+      "lines": 14,
+      "summary": "仅四幅图片链接，未读取图内牛市指南内容。",
+      "classification": "image_only",
+      "ruleIds": []
+    },
+    {
+      "file": "海龟.md",
+      "sha256": "9506abe4587d03a47f1c7c9d5a3c55a8704da666469dc1bf74d008ca56d6dc76",
+      "lines": 10,
+      "summary": "海龟指大盘暴跌时仍上涨且MA5起步第一日的个股，筑底者更好；给出两天或两天半操作偏好，需要指数和更明确的筑底/暴跌定义。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r15",
+        "b1-r16"
+      ]
+    },
+    {
+      "file": "5日线.md",
+      "sha256": "216527995e1c4cca3c017e77e4066ea3d37cbc75d12189ae8ce4b9d422bcceac",
+      "lines": 10,
+      "summary": "唯一正文为葛兰碧第二天低点猜MA5，另有图片；这是支撑预期，未提供触及容差和执行价格。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r11"
+      ]
+    },
+    {
+      "file": "20221221-早盘-海龟+二转三等于博弈.md",
+      "sha256": "fa0e377bdd75c49e562021a6d67376127d7867ec15b61846c07e1aa6f0522dd3",
+      "lines": 9,
+      "summary": "仅海龟+二转三音频附件链接；没有可读转写，不从标题补规则。",
+      "classification": "context",
+      "ruleIds": []
+    },
+    {
+      "file": "20220916_午盘_破五断头后反抽五日线.md",
+      "sha256": "cbc025c6b2ce440f891acecf3959355d644c88806a0e2f2530c889d12789f316",
+      "lines": 11,
+      "summary": "一句反抽MA5比较凶险及截图，支持破位反抽风险提示；没有独立目标公式。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r03"
+      ]
+    },
+    {
+      "file": "20221223 午餐 葛兰碧第二天反弹.md",
+      "sha256": "6650b74209330cd898cda94a7c7025adf824529ea3c541ac15cf27f6166ae545",
+      "lines": 9,
+      "summary": "仅葛兰碧第二天反弹音频链接，没有转写正文。",
+      "classification": "context",
+      "ruleIds": []
+    },
+    {
+      "file": "大四喜总结.md",
+      "sha256": "e9d5d5ab433af78fc470bd2ad3273a4b37a91e449278053bd6e2ddfaea747e30",
+      "lines": 8,
+      "summary": "仅截图链接，没有大四喜文字定义。",
+      "classification": "image_only",
+      "ruleIds": []
+    },
+    {
+      "file": "妖股上影线.md",
+      "sha256": "ec31d1d3767067a1a77517d0f4434e90e08ee3d24a7c96a271b9d6d05c7b005d",
+      "lines": 8,
+      "summary": "妖股上影线后次日看跌，尤其葛四；同时保留该跌不跌转为大涨预期的反向条件，未量化上影长度和未跌判据。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r24",
+        "b1-r25"
+      ]
+    },
+    {
+      "file": "凯莱英.md",
+      "sha256": "85df830f14bb43086966f5451e5623e4c4dd44d0343d890437cd6cdbe56b8975",
+      "lines": 10,
+      "summary": "凯莱英2023-05-24反弹报价：压力137、关键136、支撑134，无计算步骤，不能泛化。",
+      "classification": "case_study",
+      "ruleIds": []
+    },
+    {
+      "file": "断头铡刀.md",
+      "sha256": "e91a7c233e3dd50e8929bd0edcf5431dfead728538cbb6fd5404274d7709817a",
+      "lines": 8,
+      "summary": "仅图片链接，断头铡刀的图形条件未在正文给出。",
+      "classification": "image_only",
+      "ruleIds": []
+    },
+    {
+      "file": "关键点.md",
+      "sha256": "09b165d80cdbcd72a0b99d6758278983615bbb356b2e50e69d17655c668e82d2",
+      "lines": 8,
+      "summary": "第二天关键点常为前天冲高回落最高点；前天的时间参照与冲高回落形态需澄清，不能默认为前一日高点。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r22"
+      ]
+    },
+    {
+      "file": "葛兰碧.md",
+      "sha256": "ccbb76102aca83f7a575c8c6b7de48a02c1acb2065b005c2b55f1e7e5315d302",
+      "lines": 6,
+      "summary": "仅葛兰碧图片链接，本文件无可提取文字公式。",
+      "classification": "image_only",
+      "ruleIds": []
+    },
+    {
+      "file": "保险的影响.md",
+      "sha256": "3ac05e1764c354796ae5b2edfbd728854069217dacbfb7025e53116d7d7fae93",
+      "lines": 8,
+      "summary": "保险、银行、券商联动；保险上涨去买券商和小盘银行，需板块数据与小盘定义。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r32"
+      ]
+    },
+    {
+      "file": "摸线示意图.md",
+      "sha256": "d389d10237d759dc6dcafefee2a2dba4c412fe383193cdbe9e4786cab26703b9",
+      "lines": 8,
+      "summary": "仅摸线示意图片，未读取图内规则。",
+      "classification": "image_only",
+      "ruleIds": []
+    },
+    {
+      "file": "地平线原理.md",
+      "sha256": "657a72231879e869e4936dac9c00481c6ed2ad3fac13251a38ae282a699714c7",
+      "lines": 6,
+      "summary": "以换股后的价格为地平线，突破后看多；换股及参照价来源未定义，需要交易记录或额外语义。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r33"
+      ]
+    },
+    {
+      "file": "主力切换.md",
+      "sha256": "97880cf010ec290c597e7aee683d9a84fe62ea44000d04b465dcbbe328bdc0fe",
+      "lines": 6,
+      "summary": "2026年科技牛结束后观察主力布局板块的研究提醒；未定义科技牛结束和主力布局量化标准。",
+      "classification": "context",
+      "ruleIds": []
+    },
+    {
+      "file": "美股.md",
+      "sha256": "1fda39f97ef74d49cf09abb661103c603b4630dcfd5dd081664fc02e7906f728",
+      "lines": 8,
+      "summary": "四年一股灾、2026可能股灾为简短主观周期判断，没有样本、起点或可执行条件，不视作可靠预测公式。",
+      "classification": "context",
+      "ruleIds": []
+    },
+    {
+      "file": "小锤20到大锤80.md",
+      "sha256": "99305306476e17c6b8b1ff9547d92fbc6e74f62306428a337f7c1bc2dd89f594",
+      "lines": 6,
+      "summary": "小锤变大锤要卖的简短经验；锤的定义、20/80含义及形态阈值均未在正文解释。",
+      "classification": "rule_source",
+      "ruleIds": [
+        "b1-r35"
+      ]
+    },
+    {
+      "file": "杭州电热.md",
+      "sha256": "5d8140dd232ee5030159e9c03dbc2e65034ab2106b9216e42f1da9ce589a4004",
+      "lines": 6,
+      "summary": "杭州电热只记32可以卖出，未给交易日期、公式或前提，不能迁移为新易盛价位。",
+      "classification": "case_study",
+      "ruleIds": []
+    },
+    {
+      "file": "四期第二课-第一讲.md",
+      "sha256": "2d590aa3eb4943b56323acd31ba92e262e44e42b3ee9dcd0ae7ab3dee074dd3e",
+      "lines": 6,
+      "summary": "只有元数据和空行，没有课程正文、公式或证据。",
+      "classification": "context",
+      "ruleIds": []
+    }
+  ],
+  "rules": [
+    {
+      "id": "b1-r01",
+      "name": "双高的日线定义",
+      "originalMeaning": "妖股观察要求今日最高价和最低价分别高于昨天。",
+      "kind": "filter",
+      "timeframe": "日线",
+      "computability": "exact_daily",
+      "direction": "bullish",
+      "formalization": "double_high[t] = (High[t] > High[t-1]) AND (Low[t] > Low[t-1])。这是可精确检验的价格状态，不单独构成下单指令。",
+      "assumptions": [
+        "t与t-1是相邻有效交易日；OHLC使用一致、当时可知的复权口径。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "妖股原则.md",
+          "startLine": 10,
+          "endLine": 12,
+          "quote": "今天的高点，低点要比昨天高"
+        }
+      ],
+      "caveats": [
+        "来源未说双高不成立就必须卖；不得擅自把该定义扩展为完整策略。",
+        "日内高低点未完成，若以整日双高生成信号，只能在收盘后确认。"
+      ]
+    },
+    {
+      "id": "b1-r02",
+      "name": "MA5趋势持有、破位退出与重新突破重新判断",
+      "originalMeaning": "主升/妖股以MA5为生命线，不破持有，跌破退出；之后重新突破可再买，不能因后来的上涨否定先前退出。",
+      "kind": "risk",
+      "timeframe": "日线原则，原文包含盘中执行",
+      "computability": "requires_proxy",
+      "direction": "neutral",
+      "formalization": "日线代理：用SMA5[t]=mean(Close[t-4:t])；若Close[t]<SMA5[t]退出/不持有，重新上穿时重新评估。原文未指定用收盘、最低价或盘中价格判定破位，代理需独立命名。",
+      "assumptions": [
+        "日线版本采用收盘确认，最早下一可交易时点执行；非原文规定。",
+        "若使用盘中破位版本，必须另取得分时数据，不可用收盘均线模拟盘中成交。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "妖股原则.md",
+          "startLine": 6,
+          "endLine": 8,
+          "quote": "双高五日线，妖股破位五日线卖出\n\n未跌破五日线，主力还在，跌破了必须走"
+        },
+        {
+          "file": "20250902-再接再厉再创辉煌.md",
+          "startLine": 26,
+          "endLine": 28,
+          "quote": "沿着五日线的，不破位的我们就要，我们要拿得住"
+        },
+        {
+          "file": "20250916-晚－三期参数.md",
+          "startLine": 10,
+          "endLine": 10,
+          "quote": "那破50线你就要走。那突破50线你就买，如果明天再破，你就再走。"
+        },
+        {
+          "file": "20250908-晚-5日线破位要走.md",
+          "startLine": 250,
+          "endLine": 258,
+          "quote": "它可以开展新的行情啊，是此段行情的结束啊"
+        }
+      ],
+      "caveats": [
+        "转写常把五日线写成50线；此处按同段反复出现的五日线上下文解释，保留转写风险。",
+        "横盘/螺旋攀升例外见b1-r13；MA20牛市底线见b1-r06，不能混成单一退出规则。",
+        "涨跌停、T+1和滑点可能使下一时点无法成交。"
+      ]
+    },
+    {
+      "id": "b1-r03",
+      "name": "破MA5后反抽MA5是卖出窗口",
+      "originalMeaning": "原上升行情破MA5后，反弹至MA5或其上方应作为退出机会，不把反抽自动视为趋势恢复。",
+      "kind": "signal",
+      "timeframe": "日线原则/盘中反抽",
+      "computability": "requires_proxy",
+      "direction": "bearish",
+      "formalization": "代理需先确定已破MA5的状态，再检验随后价格触及预先计算的MA5卖出区域；禁止用当日收盘后MA5去假定早盘可成交。",
+      "assumptions": [
+        "固定采用前收盘MA5作为次日静态限价属于回测代理，原文是动态MA5。",
+        "触及/突破定义、等待期限和未反抽时止损须事前固定。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "20250902-再接再厉再创辉煌.md",
+          "startLine": 30,
+          "endLine": 30,
+          "quote": "破位以后反抽是卖点啊"
+        },
+        {
+          "file": "20250902-再接再厉再创辉煌.md",
+          "startLine": 30,
+          "endLine": 30,
+          "quote": "五日线以上都是卖点啊"
+        },
+        {
+          "file": "感悟.md",
+          "startLine": 13,
+          "endLine": 13,
+          "quote": "- 下跌过程，五日线是卖出位置"
+        },
+        {
+          "file": "盈利模式.md",
+          "startLine": 16,
+          "endLine": 16,
+          "quote": "- 反弹止损：下跌中继过程，会反弹5日线，反弹不过5日线是耍流氓"
+        },
+        {
+          "file": "20220916_午盘_破五断头后反抽五日线.md",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "反抽五日线比较凶险"
+        }
+      ],
+      "caveats": [
+        "并非承诺每次都会反抽成功；市场恐慌可直接下跌。",
+        "与b1-r02重新突破再判断必须以预先定义的状态转换分开，不能事后选更有利解释。"
+      ]
+    },
+    {
+      "id": "b1-r04",
+      "name": "破MA5后向MA10及更长均线寻找支撑",
+      "originalMeaning": "破MA5后可能进入MA10反弹模式；MA10/20/30支撑及滑滑梯代表由强转弱、调整时间拉长。",
+      "kind": "forecast_formula",
+      "timeframe": "日线",
+      "computability": "requires_proxy",
+      "direction": "neutral",
+      "formalization": "条件化预测候选支撑集合{MA10,MA20,MA30}，分别记录触及与失守，不能把集合中事后命中的一条当作唯一事前预测。",
+      "assumptions": [
+        "均线用收盘SMA是代理；候选优先级、预测期限、容差原文未固定。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "20250902-再接再厉再创辉煌.md",
+          "startLine": 30,
+          "endLine": 30,
+          "quote": "破五日线，那么第二点颇有五日线将进入十日线反弹模式。"
+        },
+        {
+          "file": "20221108_晚评_葛兰碧第四天大涨大跌日.md",
+          "startLine": 37,
+          "endLine": 41,
+          "quote": "他可能会去踩三十日线或二十日线"
+        },
+        {
+          "file": "2025-03-21 三期走势.md",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "10日线反弹预期；反弹失败5日线断头铡刀"
+        }
+      ],
+      "caveats": [
+        "MA10反弹可能因大盘/板块恐慌失败；不构成无条件抄底。",
+        "滑滑梯在来源中也被说成安慰剂，不能保证盈利。"
+      ]
+    },
+    {
+      "id": "b1-r05",
+      "name": "摸线起止的MA20基础与MA30高阶变体",
+      "originalMeaning": "摸线被描述为超跌反弹；基础起止围绕突破/跌破MA20，高阶或蓝筹案例改看MA30。",
+      "kind": "signal",
+      "timeframe": "日线",
+      "computability": "requires_proxy",
+      "direction": "neutral",
+      "formalization": "分开建模：基础代理=收盘上穿SMA20激活反弹观察，收盘跌破SMA20结束；MA30变体另测试并明确前提。",
+      "assumptions": [
+        "超跌、蓝筹、躺赢式二次探底原文无数值判定；若无法事前识别，不能声称实现原完整模式。",
+        "入场/退出采用收盘穿越为代理；不开启追溯性状态重标。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "20221117-早餐-今天回档五日线.md",
+          "startLine": 61,
+          "endLine": 61,
+          "quote": "突破30日线才算默写。"
+        },
+        {
+          "file": "20221117-早餐-今天回档五日线.md",
+          "startLine": 61,
+          "endLine": 61,
+          "quote": "他20线破了，但是没有破30，你要当心啊。"
+        },
+        {
+          "file": "四期第五课-摸线八字箴言.md",
+          "startLine": 14,
+          "endLine": 14,
+          "quote": "摸线就是超跌反弹，"
+        },
+        {
+          "file": "四期第五课-摸线八字箴言.md",
+          "startLine": 24,
+          "endLine": 24,
+          "quote": "底线不破，坚定看多！坚持底线，胸怀远方！"
+        }
+      ],
+      "caveats": [
+        "该长广播转写误字严重：摸线/默写/墨线混用，20线基础起点所在段残缺，不将其判为exact_daily。",
+        "与主升阶段MA5规则不同层次。"
+      ]
+    },
+    {
+      "id": "b1-r06",
+      "name": "牛市/摸线三期用BOLL中轨MA20守底线",
+      "originalMeaning": "牛市十条认为三期延续中可持有等待上涨，底线为BOLL中轨即MA20，跌破则结束该持股逻辑。",
+      "kind": "risk",
+      "timeframe": "日线、中期",
+      "computability": "requires_proxy",
+      "direction": "neutral",
+      "formalization": "在事前确定的牛市/摸线状态中，以SMA20为持仓底线；日线代理Close[t]<SMA20[t]触发退出。",
+      "assumptions": [
+        "牛市/摸线激活规则需单独固定；本规则不给牛市自动识别法。",
+        "收盘确认与次日成交是代理；BOLL中轨=MA20由此来源明确给出。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "牛十条.md",
+          "startLine": 18,
+          "endLine": 18,
+          "quote": "（五）牛市心态：坚持底线心怀远方（解释：底线是布林线中轨，也就是20日线）"
+        },
+        {
+          "file": "牛十条.md",
+          "startLine": 22,
+          "endLine": 26,
+          "quote": "（七）牛市趋势向上组合趴活最好（解释：牛市也有下跌，很容易卖飞，所以最好是趴 着不动，等待大涨，直到破位20日线）\n\n（八）牛市源于摸线反转死于底线（解释：牛市起源于摸线二期、然后进入三期，通常 上涨至120日线就到顶，死于底线20日线）\n\n（九）牛市不言顶利空猜底必踏空（解释：牛市不知道能涨到什么位置，第八条说的120 日线是一般的牛市，大的牛市没有顶，按底线不破20日线持股就好，出利空或去猜底然 后卖出，必然踏空）"
+        },
+        {
+          "file": "大时代.md",
+          "startLine": 54,
+          "endLine": 54,
+          "quote": "特别是二期要坚持底线不破，坚持持有"
+        },
+        {
+          "file": "盈利模式.md",
+          "startLine": 13,
+          "endLine": 13,
+          "quote": "- 攀升：5日线或Boll线为底线，底线不破，坚决看多。"
+        }
+      ],
+      "caveats": [
+        "原文120日线一般到顶又允许大牛市例外，不可把MA120设为无条件硬目标。",
+        "同文任何买进都正确/卖出都错误与末条止盈止损相冲突，应按条件持有理解而非收益保证。",
+        "不将此中期规则偷偷替代妖股MA5止损。"
+      ]
+    },
+    {
+      "id": "b1-r07",
+      "name": "BOLL上轨突破进入摸线三期",
+      "originalMeaning": "牛市十条把突破BOLL上轨作为摸线三期的文字定义。",
+      "kind": "filter",
+      "timeframe": "日线",
+      "computability": "requires_proxy",
+      "direction": "bullish",
+      "formalization": "候选代理：Close[t]>UpperBOLL[t]且此前未在上轨外，标记上轨突破事件；阶段状态另按规则管理。",
+      "assumptions": [
+        "BOLL窗口、标准差倍数未在本批明示；若用20日/2倍标准差必须标为公共约定代理。",
+        "突破按收盘确认是实现选择，来源未指定。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "牛十条.md",
+          "startLine": 16,
+          "endLine": 16,
+          "quote": "（四）牛市就是摸线行情三期后续（解释：突破布林线上轨就是摸线三期）"
+        },
+        {
+          "file": "20221117-早餐-今天回档五日线.md",
+          "startLine": 121,
+          "endLine": 121,
+          "quote": "突破上轨开口第一天。"
+        }
+      ],
+      "caveats": [
+        "突破不等于持续开口成功，横盘中可假开口。",
+        "不能把当日高点触及上轨与收盘突破无差别合并。"
+      ]
+    },
+    {
+      "id": "b1-r08",
+      "name": "开口四单位内高点的循环预期",
+      "originalMeaning": "开口笑强调四天之内出现高点，并非第四天必为高点；可出现四、八或更长循环。",
+      "kind": "forecast_formula",
+      "timeframe": "原文日线及30分钟图均出现",
+      "computability": "requires_proxy",
+      "direction": "neutral",
+      "formalization": "对事前定义的开口事件，记录后续四个该周期单位内最高价出现位置；这是待检验时间窗口假说，非已知高点交易信号。",
+      "assumptions": [
+        "开口识别标准缺失，需人工标注或预注册代理。",
+        "日线四天和30分钟四根分别测试，不能混合。",
+        "评价窗口含未来数据只用于标签/结果，不能用于选择当时交易。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "20221117-早餐-今天回档五日线.md",
+          "startLine": 121,
+          "endLine": 121,
+          "quote": "开口笑笑四天四天之内出高点，不是第四天说包点啊，四天之内出高点。"
+        },
+        {
+          "file": "20221117-早餐-今天回档五日线.md",
+          "startLine": 173,
+          "endLine": 173,
+          "quote": "一个开口四天结束。"
+        },
+        {
+          "file": "20220913_参数的算法.md",
+          "startLine": 18,
+          "endLine": 18,
+          "quote": "第一天和第二天，第三天、第四天都有可能出高点。"
+        }
+      ],
+      "caveats": [
+        "来源另提四/八/十二天并有妖股延续例外，不能事后挑窗口。",
+        "来源70%等经验比例没有样本支持，不作概率输入。"
+      ]
+    },
+    {
+      "id": "b1-r09",
+      "name": "葛一为MA5起步，重新触线可重置计数",
+      "originalMeaning": "从MA5起步拉出阳线称葛一；连续每天贴MA5上涨也可能每天都是葛一，不是简单按日历递增。",
+      "kind": "signal",
+      "timeframe": "日线形态/盘中起步",
+      "computability": "requires_proxy",
+      "direction": "bullish",
+      "formalization": "需定义touch(MA5)、阳线及起步/远离；每次有效MA5起步事件可重置day=1。日线代理可用Low[t]<=SMA5[t]且Close[t]>SMA5[t]且Close[t]>Open[t]，但这是代理，不是原文充分条件。",
+      "assumptions": [
+        "触线容差、是否用当日/前日MA5、何为大阳/小阳均应预先定义并披露。",
+        "当日SMA5由收盘确认的代理只能事后形成信号，不能假设低点已经买入。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "20250904-###为什么没有葛二很重要###.md",
+          "startLine": 15,
+          "endLine": 15,
+          "quote": "葛兰碧第一天就是从五日线冲上去就是了。"
+        },
+        {
+          "file": "20250904-###为什么没有葛二很重要###.md",
+          "startLine": 17,
+          "endLine": 17,
+          "quote": "只要靠五日线，它就是葛异。"
+        },
+        {
+          "file": "20250904-###为什么没有葛二很重要###.md",
+          "startLine": 17,
+          "endLine": 17,
+          "quote": "只要它贴在50线，它就是，就是葛异啊。"
+        },
+        {
+          "file": "20221108_晚评_葛兰碧第四天大涨大跌日.md",
+          "startLine": 33,
+          "endLine": 33,
+          "quote": "五日线起来就是新的格拉b第一天"
+        },
+        {
+          "file": "感悟.md",
+          "startLine": 24,
+          "endLine": 24,
+          "quote": "- 从底线突然起一个大阳线，一般有第二天"
+        }
+      ],
+      "caveats": [
+        "文中五日线/50线和葛一异体为转写问题。",
+        "不能只凭一根阳线预测次日必涨，位置过滤见b1-r13。"
+      ]
+    },
+    {
+      "id": "b1-r10",
+      "name": "葛一买、葛二优先兑现的基础两日交易",
+      "originalMeaning": "基础偏好是葛一交易前就计划次日退出，葛二冲高按参数卖出；涨停/妖股持有是另一个模式。",
+      "kind": "risk",
+      "timeframe": "跨两日、盘中卖点",
+      "computability": "requires_intraday",
+      "direction": "bearish",
+      "formalization": "在已识别葛一后，次日按事前关键点或冲高卖出计划执行；无法从日线知道冲高顺序/动态参数时，只能另测次日开盘或固定价退出的代理。",
+      "assumptions": [
+        "葛一需按b1-r09先确定。",
+        "日线代理不声称还原原文早盘10分钟/半小时决策。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "20221117-早餐-今天回档五日线.md",
+          "startLine": 73,
+          "endLine": 77,
+          "quote": "卖出的决定是在你买进的时候就做好角色的。"
+        },
+        {
+          "file": "20221117-早餐-今天回档五日线.md",
+          "startLine": 109,
+          "endLine": 109,
+          "quote": "你要记住，老王一定是第二天会卖出的。因为我不贪心。"
+        },
+        {
+          "file": "20250902-再接再厉再创辉煌.md",
+          "startLine": 56,
+          "endLine": 56,
+          "quote": "葛二是卖出"
+        },
+        {
+          "file": "20250916-晚－三期参数.md",
+          "startLine": 10,
+          "endLine": 10,
+          "quote": "我倡导的是葛一和葛二啊"
+        }
+      ],
+      "caveats": [
+        "不保留讲述者八九成赚钱的未经验证概率。",
+        "与b1-r12继续博涨停互为不同分支，不可回测后择优。"
+      ]
+    },
+    {
+      "id": "b1-r11",
+      "name": "一涨二跌三反击或一二涨三跌四反击",
+      "originalMeaning": "葛兰碧循环中把第二或第三日回调至MA5附近作为博弈买点，次日为可能大涨也可能大跌的决策日。",
+      "kind": "signal",
+      "timeframe": "日线节奏，盘中买卖",
+      "computability": "requires_proxy",
+      "direction": "bullish",
+      "formalization": "候选A：已识别葛一后第2日回调，下一日检验反击；候选B：第1、2日上涨后第3日回调，下一日检验反击。MA5附近条件、涨跌定义及重置按事前规则固定。",
+      "assumptions": [
+        "不能把大涨大跌日直接标成上涨概率或买入必赚。",
+        "代理买入最早在回调条件确认后下一可成交时点，盘中MA5低点买入需分时数据。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "20250902-再接再厉再创辉煌.md",
+          "startLine": 50,
+          "endLine": 50,
+          "quote": "一涨二跌二跌是买点，三是卖点。"
+        },
+        {
+          "file": "20250902-再接再厉再创辉煌.md",
+          "startLine": 56,
+          "endLine": 56,
+          "quote": "这是最典型的一涨二涨三跌啊。"
+        },
+        {
+          "file": "20250902-再接再厉再创辉煌.md",
+          "startLine": 60,
+          "endLine": 60,
+          "quote": "一涨二涨三跌啊，今天四踩着五日线啊，暴涨起来啊"
+        },
+        {
+          "file": "5日线.md",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "葛兰碧二天低点猜五日线"
+        }
+      ],
+      "caveats": [
+        "两类节奏可因MA5重置或上轨限制失败。",
+        "20250916失败案例明确第七天进场第八天破位，不能据成功案例遗漏失败。"
+      ]
+    },
+    {
+      "id": "b1-r12",
+      "name": "连续涨停的持有与2.5天回落例外",
+      "originalMeaning": "葛二封涨停可选择继续持有；连续强涨后第三天的早盘冲高回落称2.5天，三天仍不回落可另归妖股模式。",
+      "kind": "risk",
+      "timeframe": "日线序列及盘中涨停/开板",
+      "computability": "requires_intraday",
+      "direction": "neutral",
+      "formalization": "需逐笔/分时识别封板与开板、早盘冲高回落，再把延长持有与基础葛二退出分开比较。",
+      "assumptions": [
+        "需当时适用的涨跌停制度及复权前价格；300502制度随历史规则处理。",
+        "仅日线涨幅达到20%不能判定全天封板或可成交。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "20221117-早餐-今天回档五日线.md",
+          "startLine": 153,
+          "endLine": 153,
+          "quote": "涨停不卖股"
+        },
+        {
+          "file": "20250902-再接再厉再创辉煌.md",
+          "startLine": 56,
+          "endLine": 56,
+          "quote": "他二不跌三一定跌三不跌他妈就是妖股。"
+        },
+        {
+          "file": "20250902-再接再厉再创辉煌.md",
+          "startLine": 56,
+          "endLine": 56,
+          "quote": "为什么加2.5？他就是葛二的加强版，他还是要冲高回落"
+        }
+      ],
+      "caveats": [
+        "经验措辞中的一定不是保证。",
+        "高位/放量/年线压力可与继续持有冲突，需要模式优先级；不能用最终是否涨停决定早盘是否持有。"
+      ]
+    },
+    {
+      "id": "b1-r13",
+      "name": "三期横盘中的上轨空间过滤葛二/葛三",
+      "originalMeaning": "横盘震荡时上轨通常作为阻力；葛一已经到上轨则不机械等待葛二/葛三；从中轨起步且仍有上轨空间则可能有延续。",
+      "kind": "filter",
+      "timeframe": "日线阶段",
+      "computability": "requires_proxy",
+      "direction": "abstain",
+      "formalization": "先以事前规则判定横盘/上斜/下斜震荡，再计算上轨剩余空间UpperBOLL[t]-Close[t]；空间不足时抑制葛兰碧追涨。",
+      "assumptions": [
+        "横盘识别窗口、斜率阈值、空间不足阈值均未给出，只能预注册代理或人工标注。",
+        "BOLL参数需另确认。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "20250904-###为什么没有葛二很重要###.md",
+          "startLine": 15,
+          "endLine": 15,
+          "quote": "你要把葛兰碧要放在位置学里面"
+        },
+        {
+          "file": "20250904-###为什么没有葛二很重要###.md",
+          "startLine": 15,
+          "endLine": 15,
+          "quote": "三七横盘震荡，它的顶部就在上轨"
+        },
+        {
+          "file": "20250904-###为什么没有葛二很重要###.md",
+          "startLine": 17,
+          "endLine": 17,
+          "quote": "目前是从中轨往上走，它离上轨还很远呐。"
+        },
+        {
+          "file": "20250908-晚-5日线破位要走.md",
+          "startLine": 238,
+          "endLine": 244,
+          "quote": "螺旋式攀升，三气震荡也可以不走。"
+        }
+      ],
+      "caveats": [
+        "来源横盘时MA5可不退出，与妖股趋势MA5止损适用环境不同。",
+        "80%/90%不开口是未证实经验数，不能转为模型先验或命中率。"
+      ]
+    },
+    {
+      "id": "b1-r14",
+      "name": "中轨以上三期反弹更强的分层",
+      "originalMeaning": "调整不破BOLL中轨/MA20的个股被视为强于中轨以下、下轨以上反弹个股，前者更接近上轨突破。",
+      "kind": "filter",
+      "timeframe": "日线",
+      "computability": "requires_proxy",
+      "direction": "bullish",
+      "formalization": "在已识别三期调整中，把最低/收盘是否守住MA20作为强弱分层并比较后续上轨到达；不指定概率。",
+      "assumptions": [
+        "不破使用Low还是Close、调整窗口及三期识别均需事前补足。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "20250911-科技股三期回升...参数的验证（前三后三，预期的预期）.md",
+          "startLine": 138,
+          "endLine": 154,
+          "quote": "一种是在布林线中轨以上反弹，一种是在布林线中轨以下反弹，"
+        },
+        {
+          "file": "20250911-科技股三期回升...参数的验证（前三后三，预期的预期）.md",
+          "startLine": 150,
+          "endLine": 150,
+          "quote": "中轨以上的这个三期震荡容易反弹到上轨。"
+        },
+        {
+          "file": "20250911-科技股三期回升...参数的验证（前三后三，预期的预期）.md",
+          "startLine": 252,
+          "endLine": 254,
+          "quote": "我们现在教大家做什么，做五日线和布林线上轨没有中轨的事情"
+        }
+      ],
+      "caveats": [
+        "这是模式适用性分层，不把强势类的上轨参数公式直接套给下轨附近弱股。"
+      ]
+    },
+    {
+      "id": "b1-r15",
+      "name": "海龟为大盘下跌中的逆市强势",
+      "originalMeaning": "海龟不是传统海龟突破系统，而是大盘暴跌时逆市上涨、MA5起步且最好处于筑底的股票/板块。",
+      "kind": "signal",
+      "timeframe": "日线与板块轮动",
+      "computability": "requires_external_data",
+      "direction": "bullish",
+      "formalization": "需同日市场指数与个股/板块数据；先识别市场下跌，再找逆市正收益和MA5起步股票，并另标注筑底/低位。",
+      "assumptions": [
+        "大盘选用哪个指数、暴跌阈值、筑底标准原文未量化，须预先固定。",
+        "历史行业归属与板块指数须使用时点一致资料。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "海龟.md",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "大盘暴跌时，上涨的个股 还是五日线起步第一天，格兰碧第一天，筑底海龟最好"
+        },
+        {
+          "file": "盈利模式.md",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "- 海龟：大盘下跌过程，涨势较好的股票"
+        },
+        {
+          "file": "20250908-晚-5日线破位要走.md",
+          "startLine": 128,
+          "endLine": 134,
+          "quote": "那么只有那个20%的海龟是锂电池，它们在涨。"
+        }
+      ],
+      "caveats": [
+        "不可替换为20/55日Donchian通道的经典海龟策略。",
+        "高位涨幅已大仍可能失败；来源比例不作统计事实。",
+        "只有新易盛单股OHLCV不足以检验市场相对强度。"
+      ]
+    },
+    {
+      "id": "b1-r16",
+      "name": "海龟两天或两天半的短线范围",
+      "originalMeaning": "海龟笔记强调两天或两天半的操作，而非长期无条件持有。",
+      "kind": "risk",
+      "timeframe": "两日/第三日盘中",
+      "computability": "requires_intraday",
+      "direction": "neutral",
+      "formalization": "在已事前识别海龟后的第二日或第三日部分时段执行预定退出；两种期限须分别登记。",
+      "assumptions": [
+        "两天半具体指上午、午盘还是交易小时未给出，不能未经说明假定第三日最高价卖出。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "海龟.md",
+          "startLine": 10,
+          "endLine": 10,
+          "quote": "海龟做两天或者两天半买股原则"
+        }
+      ],
+      "caveats": [
+        "标题买股原则对买/卖时点表达不完整，需与基础两日模式结合审校。"
+      ]
+    },
+    {
+      "id": "b1-r17",
+      "name": "用近期MA5增量外推次日MA5",
+      "originalMeaning": "参数广播用MA5近期从3203到3212再到3222的增量，给出次日3222加10至11的预期。",
+      "kind": "forecast_formula",
+      "timeframe": "日线、次一交易日",
+      "computability": "requires_proxy",
+      "direction": "neutral",
+      "formalization": "原思路为MA5_hat[t+1]=MA5[t]+estimated_increment。可复现代理候选是延续最近增量d[t]=MA5[t]-MA5[t-1]；若延续增量变化，d_hat[t+1]=d[t]+(d[t]-d[t-1])。来源示例允许10至11区间，但未规定两种估计的通用选择法。",
+      "assumptions": [
+        "仅用t及之前的收盘MA5和增量；代理选择须在回测前固定。",
+        "保持与原文区分：固定斜率或加速度公式是对文字例子的操作化，不是原文明确的唯一算法。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "20220908_收盘_关于参数的计算.md",
+          "startLine": 29,
+          "endLine": 29,
+          "quote": "三，二一二减去三二零三，基本上应该是九个点"
+        },
+        {
+          "file": "20220908_收盘_关于参数的计算.md",
+          "startLine": 33,
+          "endLine": 33,
+          "quote": "那么今天对比又差了十个点到十一个点。"
+        },
+        {
+          "file": "20220908_收盘_关于参数的计算.md",
+          "startLine": 37,
+          "endLine": 37,
+          "quote": "应该是在今天的三二二二点当面，应该加十个点到十一个点左右。"
+        }
+      ],
+      "caveats": [
+        "来源含盘中当前MA5与整数四舍五入，严格复现需要盘中数据。",
+        "预测均线与预测股价不是同一指标，不可直接当未来收盘预测。",
+        "三日外推须公开额外递推假设，不可称原文已给完整三日算法。"
+      ]
+    },
+    {
+      "id": "b1-r18",
+      "name": "未来1至3日MA5与BOLL上轨对应今日低高点",
+      "originalMeaning": "三期强势参数把今天低点与明后日MA5、今天高点与明后日乃至大后日BOLL上轨对应；关键点与更远目标是分层预期。",
+      "kind": "target_formula",
+      "timeframe": "日线预期1至3个交易日，盘中使用",
+      "computability": "requires_proxy",
+      "direction": "neutral",
+      "formalization": "候选支撑S_h[t]=forecast_t(MA5[t+h])，阻力/目标R_h[t]=forecast_t(UpperBOLL[t+h])，h∈{1,2,3}。所有forecast_t必须由t时已知信息生成，不能直接读取实际未来指标。",
+      "assumptions": [
+        "MA5可研究b1-r17代理；BOLL未来上轨所需未来收盘路径、标准差与增量方法未完整给出。",
+        "h的选择、关键点到目标对应几日、强弱微调没有统一算法，不能事后挑命中的h。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "20250916-晚－三期参数.md",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "可能说今天的高点是明天的布林线上轨，也可能是后天的布林线上轨，有可能是大后天布林线上轨。五日线也是一样，今天的低点可能就是明天的五日线而已，或者后天的五日线而已。"
+        },
+        {
+          "file": "20250911-科技股三期回升...参数的验证（前三后三，预期的预期）.md",
+          "startLine": 334,
+          "endLine": 338,
+          "quote": "那么还有一个目标位呢，还有目标位呢，就是56块二，\n\n他也给我算出来了，按到零点七五零点七五对吧，左右差价去算算出来是这个56块二。\n\n其实我们按照一块一块往上算，也是大致在56块左右啊，56块左右，所以今天最高也是打了56块二。"
+        },
+        {
+          "file": "20221117-早餐-今天回档五日线.md",
+          "startLine": 193,
+          "endLine": 197,
+          "quote": "你要算明天的5日线呀。"
+        }
+      ],
+      "caveats": [
+        "本批没有通用2H-L式目标公式；0.75/1元属于例中上轨增量，不是普遍常数。",
+        "把实际t+1上轨当t日目标会前视；盘中上轨变动也不能用最终收盘值替代。",
+        "参数限于原文强势三期场景，不是所有股票普适预测。"
+      ]
+    },
+    {
+      "id": "b1-r19",
+      "name": "提前计算并保留盘前参数，区分盘中修订",
+      "originalMeaning": "交易前先算买卖点；通常以盘前计划为准，突发操作变化时才可能盘中另算。",
+      "kind": "risk",
+      "timeframe": "盘前/盘中",
+      "computability": "requires_intraday",
+      "direction": "neutral",
+      "formalization": "为每个预测保存created_at、as_of、forecast_horizon及当时值；盘中修订另建版本，不覆盖盘前记录。纯日线试验锁定前收盘版本。",
+      "assumptions": [
+        "版本记录是落实原意的审计操作化，不是来源交易阈值。",
+        "日线数据无法还原来源动态上轨和盘中调整。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "20250911-科技股三期回升...参数的验证（前三后三，预期的预期）.md",
+          "startLine": 290,
+          "endLine": 290,
+          "quote": "卖点是多少，这一定要提前先算出来"
+        },
+        {
+          "file": "20250912晚 顶部怎么确认.md",
+          "startLine": 66,
+          "endLine": 72,
+          "quote": "**以我们的盘前算的为准啊，虽然也有可能是我们按照盘后算，那看主力他怎么怎么玩的啊？**\n\n**如果盘中主力追加了他的一个操作计划，可能用当时的现有的东西，**\n\n**现在的这个参数来计算，他可能得出一个新的操作计划啊。**\n\n**但是我们正常的一般盘中是不改变，没有突发的情况不会改变啊。**"
+        },
+        {
+          "file": "20250911-科技股三期回升...参数的验证（前三后三，预期的预期）.md",
+          "startLine": 478,
+          "endLine": 486,
+          "quote": "而当天它其实是根据大涨大跌，它而是剧烈变动的。"
+        }
+      ],
+      "caveats": [
+        "来源声称盘前预测百分之百准确未有统计依据；只保留流程，不保留准确率结论。"
+      ]
+    },
+    {
+      "id": "b1-r20",
+      "name": "关键点突破才继续看目标位",
+      "originalMeaning": "关键阻力未突破就没有后续目标交易，突破关键点才转向较高目标；到目标失败又回到关键区域处理。",
+      "kind": "target_formula",
+      "timeframe": "盘中/日线方向条件",
+      "computability": "requires_proxy",
+      "direction": "bullish",
+      "formalization": "必须事前给定K与T且T>K；只有价格按预定义标准突破K才激活T，否则保持原状态。来源只给条件关系，没有一般K/T代数公式。",
+      "assumptions": [
+        "突破确认、回落失效和目标等待期限均需固定。",
+        "同日先达K后达T的执行顺序要分时或保守撮合。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "20221117-早餐-今天回档五日线.md",
+          "startLine": 97,
+          "endLine": 97,
+          "quote": "关键点突破是目标位"
+        },
+        {
+          "file": "20221117-早餐-今天回档五日线.md",
+          "startLine": 229,
+          "endLine": 229,
+          "quote": "关键点不突破就没有目标位。"
+        }
+      ],
+      "caveats": [
+        "不可从最终最高价倒推出当时关键点和目标。"
+      ]
+    },
+    {
+      "id": "b1-r21",
+      "name": "照镜子是反抽卖出模式并有失败/转强分支",
+      "originalMeaning": "价格跌破均线或BOLL上轨后，回抽原线如镜像；原意主要是卖出，两日反抽后常再调整，超预期突破另开新一轮。",
+      "kind": "signal",
+      "timeframe": "日线轮廓、盘中反抽",
+      "computability": "requires_proxy",
+      "direction": "bearish",
+      "formalization": "先确认从线的上方跌到下方，再跟踪由下向上回抽同一条线；该线必须在事件前选定。可分别以MA5/MA60/BOLL上轨作代理，不能事后从多条线选命中者。",
+      "assumptions": [
+        "镜像、反抽的容差与期限未量化；仅作待验证模式。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "20221117-早餐-今天回档五日线.md",
+          "startLine": 21,
+          "endLine": 21,
+          "quote": "从60日线上面来，在左侧，那么右侧跌破60线之后，它有一个反抽"
+        },
+        {
+          "file": "20250916-晚－三期参数.md",
+          "startLine": 10,
+          "endLine": 10,
+          "quote": "超金子理论是一个卖出理论"
+        },
+        {
+          "file": "盈利模式.md",
+          "startLine": 15,
+          "endLine": 15,
+          "quote": "- 照镜子止损：盈利是boll线上轨，一般照镜子2天后是下跌。照镜子是等待5日线的过程。"
+        }
+      ],
+      "caveats": [
+        "十不做把照镜子列为不做，其他案例允许专门两日博弈；保留模式/经验层级冲突。",
+        "该跌不跌转强见b1-r25，必须另定义实时识别条件。"
+      ]
+    },
+    {
+      "id": "b1-r22",
+      "name": "关键点参考前天冲高回落最高价",
+      "originalMeaning": "短笔记称第二天关键点往往是前天冲高回落的最高点。",
+      "kind": "target_formula",
+      "timeframe": "日线/跨日",
+      "computability": "requires_proxy",
+      "direction": "neutral",
+      "formalization": "保留原式K[第二天]≈High[前天冲高回落日]。需要先明确第二天/前天的共同参照日及冲高回落事件定义，才可转换成K[t+h]=High[t-k]。",
+      "assumptions": [
+        "暂不锁定k=0或1；确认时间指代前不得计入已完全可执行规则。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "关键点.md",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "第二天的关键点往往是前天冲高回落的最高点"
+        }
+      ],
+      "caveats": [
+        "往往不是等式保证；冲高回落可能需要盘中路径。"
+      ]
+    },
+    {
+      "id": "b1-r23",
+      "name": "用15/30/60分钟均线与BOLL找参数并看汇合",
+      "originalMeaning": "参数案例在15分钟BOLL内找上下界，30分钟上轨估计早盘高点，60分钟MA5及长均线/上轨构成支撑阻力汇合。",
+      "kind": "target_formula",
+      "timeframe": "15分钟、30分钟、60分钟",
+      "computability": "requires_intraday",
+      "direction": "neutral",
+      "formalization": "按各自周期计算MA/BOLL，在当时K线形成状态下记录候选压力/支撑及汇合；日线不能代替分钟线计算。",
+      "assumptions": [
+        "30/60分钟中的五日线可能指5周期均线，来源措辞不严，需图或音频确认。",
+        "BOLL配置、用未完成还是完成K线、汇合容差均未完全说明。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "20220908_收盘_关于参数的计算.md",
+          "startLine": 17,
+          "endLine": 17,
+          "quote": "首先我们打开十五分钟的k线"
+        },
+        {
+          "file": "20220913_参数的算法.md",
+          "startLine": 14,
+          "endLine": 14,
+          "quote": "首先啊我们打开30分钟的K线"
+        },
+        {
+          "file": "20220913_参数的算法.md",
+          "startLine": 22,
+          "endLine": 26,
+          "quote": "打开60分钟线"
+        },
+        {
+          "file": "妖股原则.md",
+          "startLine": 16,
+          "endLine": 16,
+          "quote": "妖股看参数到30分钟线"
+        }
+      ],
+      "caveats": [
+        "来源数字3272/3278仅当时指数案例；不移植为新易盛参数。",
+        "避免把第三个半小时最终上轨当第一个半小时已知输入。"
+      ]
+    },
+    {
+      "id": "b1-r24",
+      "name": "妖股上影线尤其葛四后次日看跌",
+      "originalMeaning": "妖股拉上影线，尤其葛四上影线，笔记给出次日偏空预期。",
+      "kind": "signal",
+      "timeframe": "日线次日",
+      "computability": "requires_proxy",
+      "direction": "bearish",
+      "formalization": "在预先定义的妖股/葛四状态下，upper_wick=High-max(Open,Close)；需设立显著上影判据后检验次日收益/低点。",
+      "assumptions": [
+        "原文没有上影长度/实体比例/涨幅门槛；任何数值均是代理，不是笔记原规则。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "妖股上影线.md",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "拉上影线，第二天看跌，特别是葛四的上影线。"
+        }
+      ],
+      "caveats": [
+        "妖股与葛四分类不明确时只可做宽泛上影描述，不能冒称原模式。"
+      ]
+    },
+    {
+      "id": "b1-r25",
+      "name": "该跌不跌的转强例外",
+      "originalMeaning": "本来按照镜子或上影线预期下跌，却未跌且重新走强时，笔记转为大涨预期。",
+      "kind": "signal",
+      "timeframe": "跨日/盘中",
+      "computability": "requires_proxy",
+      "direction": "bullish",
+      "formalization": "首先冻结来自b1-r21或b1-r24的下跌预期，再用预先定义的未跌/上破条件识别失败的看跌信号；之后才检验新的上涨结果。",
+      "assumptions": [
+        "未跌观察期限、价位和重新转强标准未给出，须固定代理。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "妖股上影线.md",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "如果该跌不跌必有暴涨"
+        },
+        {
+          "file": "20250916-晚－三期参数.md",
+          "startLine": 10,
+          "endLine": 10,
+          "quote": "大涨的属于该跌不跌，必有大涨啊。"
+        }
+      ],
+      "caveats": [
+        "不能在已发生大涨后才把样本叫该跌不跌；原文必有不是经验证概率。"
+      ]
+    },
+    {
+      "id": "b1-r26",
+      "name": "无止损位或利润点不交易",
+      "originalMeaning": "十不做要求交易前先有止损位和可计算利润点，其他笔记要求先算卖点再决定是否买。",
+      "kind": "risk",
+      "timeframe": "交易前计划",
+      "computability": "subjective",
+      "direction": "abstain",
+      "formalization": "只有预先登记止损S、计划入场E、目标T及对应逻辑后才允许候选交易；来源没有最低盈亏比或统一手续费。",
+      "assumptions": [
+        "不引入1:2等盈亏比门槛。",
+        "示例按约1%成本扣减不代表适用于所有年份与交易。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "十不做.md",
+          "startLine": 16,
+          "endLine": 18,
+          "quote": "没有止损位不做！\n\n没有利润点不做！"
+        },
+        {
+          "file": "20250911-科技股三期回升...参数的验证（前三后三，预期的预期）.md",
+          "startLine": 290,
+          "endLine": 290,
+          "quote": "不是说我买了以后再算，不是一定要提前算"
+        },
+        {
+          "file": "20221117-早餐-今天回档五日线.md",
+          "startLine": 185,
+          "endLine": 185,
+          "quote": "我们要先算利润嘛。"
+        }
+      ],
+      "caveats": [
+        "止损与目标本身尚须由其他规则生成；不能只凭本条完成回测。"
+      ]
+    },
+    {
+      "id": "b1-r27",
+      "name": "十不做的结构性排除项",
+      "originalMeaning": "清单还排除断头铡刀、决战关口、跌停、中轨未突破/破位，以及葛兰碧两天半和照镜子追买。",
+      "kind": "filter",
+      "timeframe": "日线形态/盘中状态",
+      "computability": "requires_proxy",
+      "direction": "abstain",
+      "formalization": "把原清单各项作为单独排除标签；MA20相关可用收盘代理，跌停需制度数据；其余先补形态定义，缺定义时不执行。",
+      "assumptions": [
+        "断头铡刀和决战关口无完整文字判据，不套用外部K线百科定义冒充原文。",
+        "2.5天指模式内状态，不是任意买入后经过2.5天。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "十不做.md",
+          "startLine": 8,
+          "endLine": 26,
+          "quote": "破位5日线不做！\n\n断头铡刀不做！\n\n破位中规不做！\n\n决战关口不做！\n\n没有止损位不做！\n\n没有利润点不做！\n\n跌停个股不做！\n\n中规不突破不做！\n\n葛兰碧两天（半）不做！\n\n照镜子不做！"
+        }
+      ],
+      "caveats": [
+        "与部分允许照镜子或回调博弈的课程存在适用范围冲突，须分策略而非事后开例外。",
+        "本条不重复定义b1-r02的MA5规则，保存的是清单及冲突。"
+      ]
+    },
+    {
+      "id": "b1-r28",
+      "name": "数字0至9是形态状态而非固定天数",
+      "originalMeaning": "周期笔记把数字解释为模式，突破转下一状态、失败退回；例为三期开口后破5、抽5、再到MA20。",
+      "kind": "context",
+      "timeframe": "状态周期未完整定义",
+      "computability": "subjective",
+      "direction": "neutral",
+      "formalization": "仅登记部分状态转换：破MA5→反抽MA5→可能向MA20。数字5/6/7等状态名称需从图或其他完整课程补齐，当前不能自动给日期贴0-9标签。",
+      "assumptions": [],
+      "sourceEvidence": [
+        {
+          "file": "股市周期0123456789.md",
+          "startLine": 16,
+          "endLine": 26,
+          "quote": "5突破是6，6突破是7，这是\n\n语言！5突破失败要回到4，\n\n这也是语言！4没撑住就是破\n\n位，那么下一步就到3。\n\n心法：数字代表的是模式，\n\n每个模式固化他的运行模式"
+        },
+        {
+          "file": "股市周期0123456789.md",
+          "startLine": 28,
+          "endLine": 34,
+          "quote": "比如：摸线三期开口，破5模\n\n式下一个就是抽5模式，再下\n\n个就是去20日\n\n线.....01234567890"
+        }
+      ],
+      "caveats": [
+        "本文件核心图未读；数字不等于葛兰碧第几交易日，也不等于均线周期。"
+      ]
+    },
+    {
+      "id": "b1-r29",
+      "name": "上涨24678买卖序列与下跌序列的区别",
+      "originalMeaning": "笔记将上涨模式写成2卖4卖6卖7买8卖，并把下跌模式1买3买4卖5买6卖作为对照。",
+      "kind": "context",
+      "timeframe": "模式序列，非已定义交易日",
+      "computability": "subjective",
+      "direction": "neutral",
+      "formalization": "保存映射上涨{2:卖,4:卖,6:卖,7:买,8:卖}；下跌对照{1:买,3:买,4:卖,5:买,6:卖}。没有状态识别法前不生成订单。",
+      "assumptions": [],
+      "sourceEvidence": [
+        {
+          "file": "买卖模式24678.md",
+          "startLine": 6,
+          "endLine": 8,
+          "quote": "对的 上涨的葛兰碧 2卖 4卖 6卖 7买 8卖\n\n错的 下跌的葛兰碧 1买 3买 4卖 5买 6卖"
+        },
+        {
+          "file": "买卖模式24678.md",
+          "startLine": 20,
+          "endLine": 28,
+          "quote": "赚钱的数字有24678，\n\n我们只需要在24678模式里\n\n面换钱就好了，偏偏有人选\n\n择-1，-3，-4，-5，-6模式\n\n里面过日子。"
+        }
+      ],
+      "caveats": [
+        "不能把下跌序列标成推荐策略，原文明确称其错的。",
+        "与b1-r28需进一步消歧，不把数字强行拼成机械持有周期。"
+      ]
+    },
+    {
+      "id": "b1-r30",
+      "name": "次日阴线侵蚀前日阳线的强弱观察",
+      "originalMeaning": "广播用次日阴线吞回前一日阳线的比例区分强弱：吃掉一半不算强，约四分之一仍可算强。",
+      "kind": "filter",
+      "timeframe": "日线/板块指数",
+      "computability": "requires_proxy",
+      "direction": "neutral",
+      "formalization": "候选侵蚀比例可用前日阳线实体与次日回撤比较，但须明确分子采用实体重叠、收盘回撤还是跌幅比例。",
+      "assumptions": [
+        "原文同时混用实体和百分比案例，不能直接选一种后标为exact_daily。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "20221117-早餐-今天回档五日线.md",
+          "startLine": 253,
+          "endLine": 253,
+          "quote": "您看实体它阴线吃掉多少？吃掉一半不算强了，他这个路他也就吃掉四之一。"
+        }
+      ],
+      "caveats": [
+        "不是统一的成交量或收益阈值；原段为板块指数示例。"
+      ]
+    },
+    {
+      "id": "b1-r31",
+      "name": "按业绩乘估值倍数的价格参考",
+      "originalMeaning": "笔记给股价=业绩×30倍PE，另列大盘股10或12倍、科技股50或100倍。",
+      "kind": "target_formula",
+      "timeframe": "财报/估值",
+      "computability": "requires_external_data",
+      "direction": "neutral",
+      "formalization": "price_reference=EPS_basis×multiple，multiple按来源列候选{30,10,12,50,100}；需先确认业绩是否每股收益以及对应行业/规模规则。",
+      "assumptions": [
+        "财报必须按实际披露时点可知；TTM/预测EPS口径须确认。",
+        "选择哪一个倍数无公式，不能回看股价后挑倍数。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "股票价格.md",
+          "startLine": 6,
+          "endLine": 12,
+          "quote": "市盈率分布来看，市盈率百倍以上（注：滚动市盈率=每股股价/过去四个季度每股收益，若每股收益为负值，则将滚动市盈率视为超百倍）的公司占比最高，达到32.87%。市盈率低于20倍的公司占比为18.59%。和去年底相比，市盈率超百倍的公司增长121家，占比增长2.16个百分点。\n\n股价=业绩\\*30倍市盈率\n\n大盘股10倍或12倍\n\n科技股50或者100倍"
+        }
+      ],
+      "caveats": [
+        "负EPS原文统计分类为超百倍PE，不代表负业绩可直接乘倍数成为有效目标。",
+        "不是未来三日K线或技术指标预测。"
+      ]
+    },
+    {
+      "id": "b1-r32",
+      "name": "保险上涨带动券商和小盘银行的轮动想法",
+      "originalMeaning": "保险、银行、券商被当成联动整体，保险上涨时考虑券商和小盘银行。",
+      "kind": "signal",
+      "timeframe": "板块日线/盘中",
+      "computability": "requires_external_data",
+      "direction": "bullish",
+      "formalization": "先记录保险板块上涨事件，再观察券商与小盘银行；没有行业/流通市值及事件时点数据无法测试。",
+      "assumptions": [
+        "上涨幅度、领先期限、小盘阈值、退出方式未给出。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "保险的影响.md",
+          "startLine": 6,
+          "endLine": 8,
+          "quote": "保险 银行 券商一体\n\n保险上涨 去买券商和小盘银行"
+        }
+      ],
+      "caveats": [
+        "新易盛不属于此受益对象，不能直接当单股买入规则。"
+      ]
+    },
+    {
+      "id": "b1-r33",
+      "name": "地平线为换股后参照价，突破看多",
+      "originalMeaning": "短笔记把换股后的价格称地平线，主张突破后看多。",
+      "kind": "signal",
+      "timeframe": "未指定",
+      "computability": "requires_external_data",
+      "direction": "bullish",
+      "formalization": "需要先从交易/换股记录得到参照价P_switch，再定义突破P_switch的时点；仅凭单股OHLCV不能推断换股事件。",
+      "assumptions": [
+        "换股可能有特定课程含义，尚待确认；不擅自解释为除权或转仓成本。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "地平线原理.md",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "换股后的价格是地平线。突破坚决看多"
+        }
+      ],
+      "caveats": [
+        "突破用高点/收盘和失败条件都未说明。"
+      ]
+    },
+    {
+      "id": "b1-r34",
+      "name": "历史高点连线作为压力位",
+      "originalMeaning": "指数案例把两个已发生的历史高点连线，用当前价格与这条线判断强攻关口。",
+      "kind": "target_formula",
+      "timeframe": "日线",
+      "computability": "requires_proxy",
+      "direction": "neutral",
+      "formalization": "对事前选定且已确认的两点(i,High_i),(j,High_j)，可用线性延长求t处压力；来源给具体日期，没有通用选点算法。",
+      "assumptions": [
+        "拐点识别必须只用当时可知数据；自动选点/确认延迟为代理。",
+        "日期轴按交易日还是日历日需明确。"
+      ],
+      "sourceEvidence": [
+        {
+          "file": "20221108_晚评_葛兰碧第四天大涨大跌日.md",
+          "startLine": 49,
+          "endLine": 49,
+          "quote": "把八月十六号的高点或八月十七号的高点和七月五号这高点连起来"
+        }
+      ],
+      "caveats": [
+        "不能用事后最贴合行情的两个高点画线。"
+      ]
+    },
+    {
+      "id": "b1-r35",
+      "name": "小锤变大锤卖出的未定义经验",
+      "originalMeaning": "短笔记只说小锤变大锤要卖，标题含20到80但没有解释。",
+      "kind": "risk",
+      "timeframe": "未指定",
+      "computability": "subjective",
+      "direction": "bearish",
+      "formalization": "保留为待审校语义规则，不执行；需要原图/课程定义锤及大小变化。",
+      "assumptions": [],
+      "sourceEvidence": [
+        {
+          "file": "小锤20到大锤80.md",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "小锤变大锤要卖"
+        }
+      ],
+      "caveats": [
+        "不能自行认定为锤子K线、上影线长度或价格20涨到80。"
+      ]
+    }
+  ],
+  "unresolvedTerms": [
+    {
+      "term": "五日线/50线/五仁馅；葛一/葛异/格兰密；摸线/墨线/默写",
+      "issue": "转写大量同音错字，依上下文做语义归并但保留原引文；个别价格和日期不一致需原音频/图人工核对。",
+      "ruleIds": [
+        "b1-r02",
+        "b1-r05",
+        "b1-r09"
+      ]
+    },
+    {
+      "term": "MA/BOLL计算配置",
+      "issue": "本批只明确中轨等于20日线，未给出BOLL标准差倍数、样本/总体方差、复权口径或MA5实时计算细节。BOLL(20,2)是待明示的实现假设。",
+      "ruleIds": [
+        "b1-r06",
+        "b1-r07",
+        "b1-r17",
+        "b1-r18",
+        "b1-r23"
+      ]
+    },
+    {
+      "term": "破位/突破/触线/站住",
+      "issue": "未统一盘中、最低价、收盘或连续确认；不同执行定义会显著改变触发及收益，日线代理不能声称原样复现。",
+      "ruleIds": [
+        "b1-r02",
+        "b1-r03",
+        "b1-r05",
+        "b1-r07",
+        "b1-r09"
+      ]
+    },
+    {
+      "term": "三期/横盘/开口/攀升/飙升/妖股/热点/一二三线股",
+      "issue": "有相对位置描述但缺少完整分类阈值、观察窗口、重置和优先级；需事前人工标签或独立代理，而非按后续涨幅回填。",
+      "ruleIds": [
+        "b1-r08",
+        "b1-r09",
+        "b1-r13",
+        "b1-r14",
+        "b1-r15"
+      ]
+    },
+    {
+      "term": "葛二/葛三/葛四/2.5天与0123456789模式",
+      "issue": "葛一可重复重置，2.5包含盘中含义，数字模式不等于日历计数；图中完整状态定义未提供。",
+      "ruleIds": [
+        "b1-r09",
+        "b1-r10",
+        "b1-r11",
+        "b1-r12",
+        "b1-r28",
+        "b1-r29"
+      ]
+    },
+    {
+      "term": "预期的预期、前三后三、未来上轨/MA5",
+      "issue": "通过既有指标增量推未来的想法明确，但三日完整递推、强弱调整、舍入和取哪一日作为关键点缺失；不得用实际未来指标当输入。",
+      "ruleIds": [
+        "b1-r17",
+        "b1-r18",
+        "b1-r19"
+      ]
+    },
+    {
+      "term": "前天/第二天的关键点",
+      "issue": "短条目的参照日不明确；暂不固定前一日还是前两日最高价。",
+      "ruleIds": [
+        "b1-r22"
+      ]
+    },
+    {
+      "term": "照镜子/断头铡刀/决战关口/双高例外/小锤大锤",
+      "issue": "只有部分文字定义或案例，不能补入外部图形定义冒充作者原规则；尤其断头铡刀与小锤大锤需补图/课程。",
+      "ruleIds": [
+        "b1-r21",
+        "b1-r25",
+        "b1-r27",
+        "b1-r35"
+      ]
+    },
+    {
+      "term": "业绩/小盘/换股/主力布局",
+      "issue": "分别需要财报口径、规模门槛、交易或课程语义、时点行业资金数据；单股日线不能完整提供。",
+      "ruleIds": [
+        "b1-r31",
+        "b1-r32",
+        "b1-r33"
+      ]
+    }
+  ],
+  "findings": [
+    "已逐行完整阅读本批47份Markdown，不仅关键词检索；共178256字节。源仓库HEAD核对为707f4fe0032ff44f309e7f374ba68f16d9e065af。文件校验采用原始字节SHA-256。",
+    "新鲜语义抽取由当前Codex直接完成；没有调用外部LLM API，没有读取回测收益来筛规则，也没有修改UI。",
+    "仅双高的高低点比较在本批达到无需新增形态阈值的exact_daily标准；这仍只是过滤状态，不是完整可交易系统。其他机械化条件明确标注代理、分时或外部数据依赖。",
+    "没有在本批Markdown中发现通用代数目标位公式如2H-L；核心参数方法是近期指标增量外推、未来MA5/上轨位置对应及多周期汇合，不能擅造唯一公式。",
+    "必须保留三类冲突：妖股MA5退出与牛市MA20底线；葛二退出与封板继续持有；十不做禁止照镜子与专门照镜子博弈。按事前模式分支测试，不能按事后盈利挑分支。",
+    "案例有明确失败：葛二/葛三未上涨、连续七日后买入再破位、高位海龟次日跌停、恐慌中MA10反弹失败；这些不能从训练集剔除。",
+    "原文80%/90%/99%/100%及必涨等说法均缺样本分母、成本、定义和时点，作为作者主张保留语义，不作为校准概率或回测结论。",
+    "未来真实MA5/BOLL、事后高低点、最成功阶段标签不能进入当时特征；日线信号收盘后才确定，买入/卖出需按下一实际可成交时点、A股T+1、涨跌停、停牌与费用建模。",
+    "六份纯图片Markdown及多个音频/链接/空正文文档仅按可读正文覆盖，附件未OCR/转写；特别是关键点完整课程和葛兰碧图尚可能包含缺失定义，不能声称已解析附件内容。",
+    "国科微、凯莱英、杭州电热及指数案例中的具体价格没有普适计算来源，不可迁移成新易盛300502的阈值。",
+    "2025/2026笔记用于回看较早三年数据属于事后研究规则集；若宣称历史时点可用策略，须再按文件当时版本与知识可用日期做时间隔离。",
+    "Agent优先需要带引用的规则库、明确状态/冲突优先级、时点行情计算、保守撮合和人工审校集。单只股票三年样本不支持先声称需要或足以训练价格预测大模型；可先用冻结规则与代理验证，再评估标注/图像/分时补充需求。",
+    "逐文件比对固定提交内容已通过；47份Windows检出文件与Git blob仅有CRLF/LF行尾差异，sha256记录检出原始字节，语义与行号比对使用解码后分行。"
+  ]
+}

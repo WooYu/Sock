@@ -2,6 +2,7 @@
 
 import { useId, useRef, useState, type KeyboardEvent } from 'react'
 import type { PredictionDay, PredictionSnapshot } from './chart-types'
+import { MA_PERIODS } from './chart-periods'
 
 type PredictionDetailsProps = {
   prediction: PredictionSnapshot
@@ -10,29 +11,27 @@ type PredictionDetailsProps = {
   mode: 'desktop-table' | 'mobile-sheet'
 }
 
-export function predictionRows(day: PredictionDay): Array<[string, number | string]> {
+export function predictionRows(day: PredictionDay): Array<[string, number | string | null]> {
   return [
     ['预测开盘', day.open],
     ['预测最高', day.high],
     ['预测最低', day.low],
     ['预测收盘', day.close],
     ['预测区间', `${day.rangeLow.toFixed(2)}–${day.rangeHigh.toFixed(2)}`],
-    ['MA5', day.ma5],
-    ['MA10', day.ma10],
-    ['MA20', day.ma20],
+    ...MA_PERIODS.map((period): [string, number | null] => [`MA${period}`, day[`ma${period}`] ?? null]),
     ['BOLL上轨', day.bollUpper],
     ['BOLL中轨', day.bollMiddle],
     ['BOLL下轨', day.bollLower],
-    ['置信度', `${Math.round(day.confidence * 100)}%`],
+    ['模型参考值', `${Math.round(day.confidence * 100)}%`],
   ]
 }
 
-function predictionValue(value: number | string) {
-  return typeof value === 'number' ? value.toFixed(2) : value
+function predictionValue(value: number | string | null) {
+  return value === null ? '—' : typeof value === 'number' ? value.toFixed(2) : value
 }
 
 function WarningCopy() {
-  return <p className="sc-prediction-warning"><strong>推演数据，不是实际行情</strong><span>结果仅供参考，不构成投资建议。</span></p>
+  return <p className="sc-prediction-warning"><strong>推演数据，不是实际行情</strong><span>模型参考值未经回测校准，不代表命中概率。</span></p>
 }
 
 function PredictionMetadata({ prediction }: { prediction: PredictionSnapshot }) {

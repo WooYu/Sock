@@ -1,4 +1,4 @@
-import type { PointerEvent as ReactPointerEvent, ReactNode, SyntheticEvent } from 'react'
+import { useId, type PointerEvent as ReactPointerEvent, type ReactNode, type SyntheticEvent } from 'react'
 import type { ChartTransform } from './chart-coordinates'
 import type { DrawingObject } from './chart-types'
 
@@ -26,8 +26,11 @@ function labelWidth(text: string) {
 }
 
 export function DrawingLayer({ drawings, transform, selectedId, onSelect, onFocusEditor, onMoveDrawing, onMovePoint, interactionsDisabled = false }: DrawingLayerProps) {
+  const clipId = useId()
+  const clipped = transform.domainTimes.length > transform.times.length
   return (
-    <g data-testid="drawing-layer" pointerEvents={interactionsDisabled ? 'none' : undefined}>
+    <g data-testid="drawing-layer" pointerEvents={interactionsDisabled ? 'none' : undefined} clipPath={clipped ? `url(#${clipId})` : undefined}>
+      {clipped ? <defs><clipPath id={clipId}><rect x={transform.rect.left} y={transform.rect.top} width={transform.rect.width} height={transform.rect.height} /></clipPath></defs> : null}
       {drawings.map((drawing) => {
         if (!drawing.visible || !drawing.points.length || drawing.points.some((point) => !transform.hasTime(point.time))) return null
 

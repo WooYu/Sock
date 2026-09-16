@@ -28,6 +28,10 @@ export type Candle = {
   low: number
   close: number
   volume: number
+  /** Optional provider amount and VWAP; intraday prices remain sampled prices, not manufactured OHLC. */
+  turnover?: number
+  averagePrice?: number
+  endTime?: string
 }
 
 export type MarketSnapshot = {
@@ -159,4 +163,6 @@ export type StockWorkspaceSnapshot = {
   cycle: OperationCycle
   generatedAt: string
   prediction?: PredictionSnapshot | null
+  publishedRules?: DecisionRule[]
+  rulesStatus?: 'ready' | 'error'
 }

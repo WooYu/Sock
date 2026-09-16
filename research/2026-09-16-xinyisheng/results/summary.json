@@ -1,0 +1,4552 @@
+{
+  "price": [
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 1,
+      "origins": 724,
+      "close_mape": 3.690753596868555,
+      "ohlc_mape": 2.738131044069827,
+      "direction_accuracy_pct": 44.33701657458563,
+      "always_up_accuracy_pct": 50.966850828729285,
+      "close_interval_coverage_pct": 80.52486187845304,
+      "mean_interval_width_pct": 11.691554794803627
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 2,
+      "origins": 723,
+      "close_mape": 5.57737739777603,
+      "ohlc_mape": 4.861222516374966,
+      "direction_accuracy_pct": 44.951590594744125,
+      "always_up_accuracy_pct": 51.17565698478561,
+      "close_interval_coverage_pct": 77.45504840940526,
+      "mean_interval_width_pct": 16.53180870127639
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 3,
+      "origins": 722,
+      "close_mape": 6.9792075990836056,
+      "ohlc_mape": 6.416229418812182,
+      "direction_accuracy_pct": 47.091412742382275,
+      "always_up_accuracy_pct": 54.84764542936288,
+      "close_interval_coverage_pct": 77.14681440443213,
+      "mean_interval_width_pct": 20.249934793322883
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 4,
+      "origins": 721,
+      "close_mape": 8.279040222568849,
+      "ohlc_mape": 7.719991854422191,
+      "direction_accuracy_pct": 47.156726768377254,
+      "always_up_accuracy_pct": 54.36893203883495,
+      "close_interval_coverage_pct": 74.75728155339806,
+      "mean_interval_width_pct": 23.383332661235343
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 1,
+      "origins": 724,
+      "close_mape": 3.4942779662229864,
+      "ohlc_mape": 2.631784045226016,
+      "direction_accuracy_pct": 1.5193370165745856,
+      "always_up_accuracy_pct": 50.966850828729285,
+      "close_interval_coverage_pct": 79.97237569060773,
+      "mean_interval_width_pct": 11.688973518389346
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 2,
+      "origins": 723,
+      "close_mape": 5.16316041236801,
+      "ohlc_mape": 4.556457245162943,
+      "direction_accuracy_pct": 1.6597510373443984,
+      "always_up_accuracy_pct": 51.17565698478561,
+      "close_interval_coverage_pct": 81.18948824343015,
+      "mean_interval_width_pct": 16.53180870127639
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 3,
+      "origins": 722,
+      "close_mape": 6.311886488614169,
+      "ohlc_mape": 5.868914213878912,
+      "direction_accuracy_pct": 1.10803324099723,
+      "always_up_accuracy_pct": 54.84764542936288,
+      "close_interval_coverage_pct": 79.22437673130193,
+      "mean_interval_width_pct": 20.249934793322883
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 4,
+      "origins": 721,
+      "close_mape": 7.304084891556303,
+      "ohlc_mape": 6.917349886392493,
+      "direction_accuracy_pct": 0.9708737864077669,
+      "always_up_accuracy_pct": 54.36893203883495,
+      "close_interval_coverage_pct": 78.77947295423023,
+      "mean_interval_width_pct": 23.383332661235343
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 1,
+      "origins": 724,
+      "close_mape": 3.5351523507669014,
+      "ohlc_mape": 2.6455058750302864,
+      "direction_accuracy_pct": 45.99447513812155,
+      "always_up_accuracy_pct": 50.966850828729285,
+      "close_interval_coverage_pct": 71.8232044198895,
+      "mean_interval_width_pct": 9.346564235703177
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 2,
+      "origins": 723,
+      "close_mape": 5.284420097028895,
+      "ohlc_mape": 4.632377688534311,
+      "direction_accuracy_pct": 47.441217150760714,
+      "always_up_accuracy_pct": 51.17565698478561,
+      "close_interval_coverage_pct": 72.3374827109267,
+      "mean_interval_width_pct": 13.693184755741928
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 3,
+      "origins": 722,
+      "close_mape": 6.458527597448226,
+      "ohlc_mape": 5.99243087183554,
+      "direction_accuracy_pct": 47.64542936288089,
+      "always_up_accuracy_pct": 54.84764542936288,
+      "close_interval_coverage_pct": 72.4376731301939,
+      "mean_interval_width_pct": 17.725850955619617
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 4,
+      "origins": 721,
+      "close_mape": 7.522926506249789,
+      "ohlc_mape": 7.1068047058255965,
+      "direction_accuracy_pct": 47.01803051317614,
+      "always_up_accuracy_pct": 54.36893203883495,
+      "close_interval_coverage_pct": 70.59639389736478,
+      "mean_interval_width_pct": 21.059681115288143
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 1,
+      "origins": 724,
+      "close_mape": 3.567247169472038,
+      "ohlc_mape": 2.6636328617377365,
+      "direction_accuracy_pct": 45.85635359116022,
+      "always_up_accuracy_pct": 50.966850828729285,
+      "close_interval_coverage_pct": 70.99447513812154,
+      "mean_interval_width_pct": 9.441835230147127
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 2,
+      "origins": 723,
+      "close_mape": 5.367703138567848,
+      "ohlc_mape": 4.6888603290198425,
+      "direction_accuracy_pct": 46.19640387275242,
+      "always_up_accuracy_pct": 51.17565698478561,
+      "close_interval_coverage_pct": 71.64591977869986,
+      "mean_interval_width_pct": 13.733999029146911
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 3,
+      "origins": 722,
+      "close_mape": 6.500531732742997,
+      "ohlc_mape": 6.040876957097226,
+      "direction_accuracy_pct": 46.95290858725762,
+      "always_up_accuracy_pct": 54.84764542936288,
+      "close_interval_coverage_pct": 72.57617728531855,
+      "mean_interval_width_pct": 17.91145655803111
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 4,
+      "origins": 721,
+      "close_mape": 7.557184457602176,
+      "ohlc_mape": 7.160022930517142,
+      "direction_accuracy_pct": 46.601941747572816,
+      "always_up_accuracy_pct": 54.36893203883495,
+      "close_interval_coverage_pct": 73.50901525658807,
+      "mean_interval_width_pct": 21.529175064941807
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 1,
+      "origins": 483,
+      "close_mape": 3.6347273089829333,
+      "ohlc_mape": 2.6861497707439383,
+      "direction_accuracy_pct": 44.927536231884055,
+      "always_up_accuracy_pct": 51.345755693581786,
+      "close_interval_coverage_pct": 80.33126293995859,
+      "mean_interval_width_pct": 10.974941460437616
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 2,
+      "origins": 483,
+      "close_mape": 5.721802422943382,
+      "ohlc_mape": 4.9206267320519625,
+      "direction_accuracy_pct": 44.3064182194617,
+      "always_up_accuracy_pct": 51.5527950310559,
+      "close_interval_coverage_pct": 74.94824016563147,
+      "mean_interval_width_pct": 15.515439124392476
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 3,
+      "origins": 483,
+      "close_mape": 7.364291520517991,
+      "ohlc_mape": 6.713535064303457,
+      "direction_accuracy_pct": 47.4120082815735,
+      "always_up_accuracy_pct": 55.6935817805383,
+      "close_interval_coverage_pct": 73.08488612836439,
+      "mean_interval_width_pct": 19.002454494988086
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 4,
+      "origins": 483,
+      "close_mape": 8.70833481359931,
+      "ohlc_mape": 8.144621207750966,
+      "direction_accuracy_pct": 48.24016563146998,
+      "always_up_accuracy_pct": 54.45134575569358,
+      "close_interval_coverage_pct": 70.80745341614907,
+      "mean_interval_width_pct": 21.942144435889976
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 1,
+      "origins": 483,
+      "close_mape": 3.4252726569796947,
+      "ohlc_mape": 2.5748465453527754,
+      "direction_accuracy_pct": 1.8633540372670807,
+      "always_up_accuracy_pct": 51.345755693581786,
+      "close_interval_coverage_pct": 79.29606625258799,
+      "mean_interval_width_pct": 10.971072217944988
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 2,
+      "origins": 483,
+      "close_mape": 5.214417750452503,
+      "ohlc_mape": 4.568837494097715,
+      "direction_accuracy_pct": 1.6563146997929608,
+      "always_up_accuracy_pct": 51.5527950310559,
+      "close_interval_coverage_pct": 79.29606625258799,
+      "mean_interval_width_pct": 15.515439124392476
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 3,
+      "origins": 483,
+      "close_mape": 6.564919747926911,
+      "ohlc_mape": 6.056417255936494,
+      "direction_accuracy_pct": 1.2422360248447204,
+      "always_up_accuracy_pct": 55.6935817805383,
+      "close_interval_coverage_pct": 75.36231884057972,
+      "mean_interval_width_pct": 19.002454494988086
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 4,
+      "origins": 483,
+      "close_mape": 7.614880375643861,
+      "ohlc_mape": 7.248564036742213,
+      "direction_accuracy_pct": 1.0351966873706004,
+      "always_up_accuracy_pct": 54.45134575569358,
+      "close_interval_coverage_pct": 75.77639751552795,
+      "mean_interval_width_pct": 21.942144435889976
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 1,
+      "origins": 483,
+      "close_mape": 3.489675596670288,
+      "ohlc_mape": 2.5912611995060533,
+      "direction_accuracy_pct": 44.72049689440994,
+      "always_up_accuracy_pct": 51.345755693581786,
+      "close_interval_coverage_pct": 73.70600414078675,
+      "mean_interval_width_pct": 9.360762075534844
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 2,
+      "origins": 483,
+      "close_mape": 5.365344013189404,
+      "ohlc_mape": 4.682136235784665,
+      "direction_accuracy_pct": 46.58385093167702,
+      "always_up_accuracy_pct": 51.5527950310559,
+      "close_interval_coverage_pct": 73.70600414078675,
+      "mean_interval_width_pct": 13.543817207737026
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 3,
+      "origins": 483,
+      "close_mape": 6.734205619115237,
+      "ohlc_mape": 6.214142423359857,
+      "direction_accuracy_pct": 45.75569358178054,
+      "always_up_accuracy_pct": 55.6935817805383,
+      "close_interval_coverage_pct": 71.63561076604555,
+      "mean_interval_width_pct": 17.365567894810997
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 4,
+      "origins": 483,
+      "close_mape": 7.856533450664707,
+      "ohlc_mape": 7.439395763064083,
+      "direction_accuracy_pct": 44.099378881987576,
+      "always_up_accuracy_pct": 54.45134575569358,
+      "close_interval_coverage_pct": 69.15113871635612,
+      "mean_interval_width_pct": 20.7381438017994
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 1,
+      "origins": 483,
+      "close_mape": 3.521206979227553,
+      "ohlc_mape": 2.61312816832529,
+      "direction_accuracy_pct": 44.72049689440994,
+      "always_up_accuracy_pct": 51.345755693581786,
+      "close_interval_coverage_pct": 73.08488612836439,
+      "mean_interval_width_pct": 9.362826410889632
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 2,
+      "origins": 483,
+      "close_mape": 5.4525078454614855,
+      "ohlc_mape": 4.7412710129582045,
+      "direction_accuracy_pct": 44.927536231884055,
+      "always_up_accuracy_pct": 51.5527950310559,
+      "close_interval_coverage_pct": 72.87784679089026,
+      "mean_interval_width_pct": 13.523181341357782
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 3,
+      "origins": 483,
+      "close_mape": 6.804582178937801,
+      "ohlc_mape": 6.284307431064237,
+      "direction_accuracy_pct": 44.3064182194617,
+      "always_up_accuracy_pct": 55.6935817805383,
+      "close_interval_coverage_pct": 71.84265010351967,
+      "mean_interval_width_pct": 17.573072969832808
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 4,
+      "origins": 483,
+      "close_mape": 7.958785148153651,
+      "ohlc_mape": 7.522673891233398,
+      "direction_accuracy_pct": 43.47826086956522,
+      "always_up_accuracy_pct": 54.45134575569358,
+      "close_interval_coverage_pct": 72.46376811594203,
+      "mean_interval_width_pct": 21.1920691514753
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 1,
+      "origins": 241,
+      "close_mape": 3.80303864686339,
+      "ohlc_mape": 2.8423092806524175,
+      "direction_accuracy_pct": 43.15352697095436,
+      "always_up_accuracy_pct": 50.20746887966805,
+      "close_interval_coverage_pct": 80.91286307053942,
+      "mean_interval_width_pct": 13.127754962848377
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 2,
+      "origins": 240,
+      "close_mape": 5.286722034626736,
+      "ohlc_mape": 4.741671532325009,
+      "direction_accuracy_pct": 46.25,
+      "always_up_accuracy_pct": 50.416666666666664,
+      "close_interval_coverage_pct": 82.5,
+      "mean_interval_width_pct": 18.57725247475527
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 3,
+      "origins": 239,
+      "close_mape": 6.200983607230852,
+      "ohlc_mape": 5.815398344451151,
+      "direction_accuracy_pct": 46.44351464435147,
+      "always_up_accuracy_pct": 53.13807531380753,
+      "close_interval_coverage_pct": 85.35564853556485,
+      "mean_interval_width_pct": 22.770993304183573
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 4,
+      "origins": 238,
+      "close_mape": 7.407824729007036,
+      "ohlc_mape": 6.858244049137325,
+      "direction_accuracy_pct": 44.957983193277315,
+      "always_up_accuracy_pct": 54.20168067226891,
+      "close_interval_coverage_pct": 82.77310924369748,
+      "mean_interval_width_pct": 26.308097000906848
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 1,
+      "origins": 241,
+      "close_mape": 3.632574913793569,
+      "ohlc_mape": 2.745895300158693,
+      "direction_accuracy_pct": 0.8298755186721992,
+      "always_up_accuracy_pct": 50.20746887966805,
+      "close_interval_coverage_pct": 81.32780082987551,
+      "mean_interval_width_pct": 13.127754962848375
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 2,
+      "origins": 240,
+      "close_mape": 5.060005019472968,
+      "ohlc_mape": 4.531541994181712,
+      "direction_accuracy_pct": 1.6666666666666667,
+      "always_up_accuracy_pct": 50.416666666666664,
+      "close_interval_coverage_pct": 85.0,
+      "mean_interval_width_pct": 18.57725247475527
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 3,
+      "origins": 239,
+      "close_mape": 5.800526387157876,
+      "ohlc_mape": 5.489985471980114,
+      "direction_accuracy_pct": 0.8368200836820083,
+      "always_up_accuracy_pct": 53.13807531380753,
+      "close_interval_coverage_pct": 87.02928870292888,
+      "mean_interval_width_pct": 22.77099330418357
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 4,
+      "origins": 238,
+      "close_mape": 6.673352879731552,
+      "ohlc_mape": 6.245179993035708,
+      "direction_accuracy_pct": 0.8403361344537815,
+      "always_up_accuracy_pct": 54.20168067226891,
+      "close_interval_coverage_pct": 84.87394957983193,
+      "mean_interval_width_pct": 26.308097000906848
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 1,
+      "origins": 241,
+      "close_mape": 3.6262945591845956,
+      "ohlc_mape": 2.754220307719932,
+      "direction_accuracy_pct": 48.54771784232365,
+      "always_up_accuracy_pct": 50.20746887966805,
+      "close_interval_coverage_pct": 68.04979253112033,
+      "mean_interval_width_pct": 9.31810964384138
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 2,
+      "origins": 240,
+      "close_mape": 5.121560715755872,
+      "ohlc_mape": 4.532238612192972,
+      "direction_accuracy_pct": 49.166666666666664,
+      "always_up_accuracy_pct": 50.416666666666664,
+      "close_interval_coverage_pct": 69.58333333333333,
+      "mean_interval_width_pct": 13.993786946101798
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 3,
+      "origins": 239,
+      "close_mape": 5.90140423148519,
+      "ohlc_mape": 5.544369451809408,
+      "direction_accuracy_pct": 51.46443514644351,
+      "always_up_accuracy_pct": 53.13807531380753,
+      "close_interval_coverage_pct": 74.05857740585773,
+      "mean_interval_width_pct": 18.453954379764227
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 4,
+      "origins": 238,
+      "close_mape": 6.8459006484665705,
+      "ohlc_mape": 6.4318405014298445,
+      "direction_accuracy_pct": 52.94117647058824,
+      "always_up_accuracy_pct": 54.20168067226891,
+      "close_interval_coverage_pct": 73.52941176470588,
+      "mean_interval_width_pct": 21.712212722074124
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 1,
+      "origins": 241,
+      "close_mape": 3.6595185880948007,
+      "ohlc_mape": 2.7648518116058356,
+      "direction_accuracy_pct": 48.13278008298755,
+      "always_up_accuracy_pct": 50.20746887966805,
+      "close_interval_coverage_pct": 66.80497925311202,
+      "mean_interval_width_pct": 9.600180706086421
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 2,
+      "origins": 240,
+      "close_mape": 5.197033665944402,
+      "ohlc_mape": 4.583383827593889,
+      "direction_accuracy_pct": 48.75,
+      "always_up_accuracy_pct": 50.416666666666664,
+      "close_interval_coverage_pct": 69.16666666666667,
+      "mean_interval_width_pct": 14.15826962582253
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 3,
+      "origins": 239,
+      "close_mape": 5.886069952357677,
+      "ohlc_mape": 5.5489233214233105,
+      "direction_accuracy_pct": 52.30125523012552,
+      "always_up_accuracy_pct": 53.13807531380753,
+      "close_interval_coverage_pct": 74.05857740585773,
+      "mean_interval_width_pct": 18.59530288899253
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 4,
+      "origins": 238,
+      "close_mape": 6.7421712914830065,
+      "ohlc_mape": 6.42405480435768,
+      "direction_accuracy_pct": 52.94117647058824,
+      "always_up_accuracy_pct": 54.20168067226891,
+      "close_interval_coverage_pct": 75.63025210084034,
+      "mean_interval_width_pct": 22.21330177168264
+    }
+  ],
+  "indicators": [
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 1,
+      "indicator": "boll_lower",
+      "origins": 724,
+      "mape": 0.5296901821846882
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 1,
+      "indicator": "boll_middle",
+      "origins": 724,
+      "mape": 0.19380855637105737
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 1,
+      "indicator": "boll_upper",
+      "origins": 724,
+      "mape": 0.4634389214342392
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 1,
+      "indicator": "ma10",
+      "origins": 724,
+      "mape": 0.37818034158515956
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 1,
+      "indicator": "ma20",
+      "origins": 724,
+      "mape": 0.19380855637105737
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 1,
+      "indicator": "ma5",
+      "origins": 724,
+      "mape": 0.7464286467971571
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 2,
+      "indicator": "boll_lower",
+      "origins": 723,
+      "mape": 1.1573550285522378
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 2,
+      "indicator": "boll_middle",
+      "origins": 723,
+      "mape": 0.45648797364382054
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 2,
+      "indicator": "boll_upper",
+      "origins": 723,
+      "mape": 1.0340975331137747
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 2,
+      "indicator": "ma10",
+      "origins": 723,
+      "mape": 0.8912451774235212
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 2,
+      "indicator": "ma20",
+      "origins": 723,
+      "mape": 0.45648797364382054
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 2,
+      "indicator": "ma5",
+      "origins": 723,
+      "mape": 1.758236134366509
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 3,
+      "indicator": "boll_lower",
+      "origins": 722,
+      "mape": 1.8756673159631472
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 3,
+      "indicator": "boll_middle",
+      "origins": 722,
+      "mape": 0.7780237898353733
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 3,
+      "indicator": "boll_upper",
+      "origins": 722,
+      "mape": 1.6679655731174894
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 3,
+      "indicator": "ma10",
+      "origins": 722,
+      "mape": 1.5193028427690556
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 3,
+      "indicator": "ma20",
+      "origins": 722,
+      "mape": 0.7780237898353733
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 3,
+      "indicator": "ma5",
+      "origins": 722,
+      "mape": 2.9977064061734082
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 4,
+      "indicator": "boll_lower",
+      "origins": 721,
+      "mape": 2.6270291996442077
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 4,
+      "indicator": "boll_middle",
+      "origins": 721,
+      "mape": 1.159676617744615
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 4,
+      "indicator": "boll_upper",
+      "origins": 721,
+      "mape": 2.3490594677712826
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 4,
+      "indicator": "ma10",
+      "origins": 721,
+      "mape": 2.264449430314403
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 4,
+      "indicator": "ma20",
+      "origins": 721,
+      "mape": 1.159676617744615
+    },
+    {
+      "partition": "all",
+      "model": "baseline_v1",
+      "horizon": 4,
+      "indicator": "ma5",
+      "origins": 721,
+      "mape": 4.467177358538533
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 1,
+      "indicator": "boll_lower",
+      "origins": 724,
+      "mape": 0.496710919051942
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 1,
+      "indicator": "boll_middle",
+      "origins": 724,
+      "mape": 0.18417028954802672
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 1,
+      "indicator": "boll_upper",
+      "origins": 724,
+      "mape": 0.44162366775341844
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 1,
+      "indicator": "ma10",
+      "origins": 724,
+      "mape": 0.3590576933084168
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 1,
+      "indicator": "ma20",
+      "origins": 724,
+      "mape": 0.18417028954802672
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 1,
+      "indicator": "ma5",
+      "origins": 724,
+      "mape": 0.7085335258192668
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 2,
+      "indicator": "boll_lower",
+      "origins": 723,
+      "mape": 1.081196109499508
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 2,
+      "indicator": "boll_middle",
+      "origins": 723,
+      "mape": 0.42707217617788656
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 2,
+      "indicator": "boll_upper",
+      "origins": 723,
+      "mape": 0.9782914011990906
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 2,
+      "indicator": "ma10",
+      "origins": 723,
+      "mape": 0.8328767091612193
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 2,
+      "indicator": "ma20",
+      "origins": 723,
+      "mape": 0.42707217617788656
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 2,
+      "indicator": "ma5",
+      "origins": 723,
+      "mape": 1.6424696545312958
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 3,
+      "indicator": "boll_lower",
+      "origins": 722,
+      "mape": 1.7325405455369542
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 3,
+      "indicator": "boll_middle",
+      "origins": 722,
+      "mape": 0.7167655606863925
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 3,
+      "indicator": "boll_upper",
+      "origins": 722,
+      "mape": 1.5748078723825276
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 3,
+      "indicator": "ma10",
+      "origins": 722,
+      "mape": 1.3967051745938082
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 3,
+      "indicator": "ma20",
+      "origins": 722,
+      "mape": 0.7167655606863925
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 3,
+      "indicator": "ma5",
+      "origins": 722,
+      "mape": 2.751453010958238
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 4,
+      "indicator": "boll_lower",
+      "origins": 721,
+      "mape": 2.4045383770858004
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 4,
+      "indicator": "boll_middle",
+      "origins": 721,
+      "mape": 1.0486485136046697
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 4,
+      "indicator": "boll_upper",
+      "origins": 721,
+      "mape": 2.2254100116956885
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 4,
+      "indicator": "ma10",
+      "origins": 721,
+      "mape": 2.0421069546477044
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 4,
+      "indicator": "ma20",
+      "origins": 721,
+      "mape": 1.0486485136046697
+    },
+    {
+      "partition": "all",
+      "model": "last_close",
+      "horizon": 4,
+      "indicator": "ma5",
+      "origins": 721,
+      "mape": 4.016930979462568
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 1,
+      "indicator": "boll_lower",
+      "origins": 724,
+      "mape": 0.4990027726279987
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 1,
+      "indicator": "boll_middle",
+      "origins": 724,
+      "mape": 0.18625017961151816
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 1,
+      "indicator": "boll_upper",
+      "origins": 724,
+      "mape": 0.44319875214636145
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 1,
+      "indicator": "ma10",
+      "origins": 724,
+      "mape": 0.3629921249974895
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 1,
+      "indicator": "ma20",
+      "origins": 724,
+      "mape": 0.18625017961151816
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 1,
+      "indicator": "ma5",
+      "origins": 724,
+      "mape": 0.7165486402711312
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 2,
+      "indicator": "boll_lower",
+      "origins": 723,
+      "mape": 1.0897252297193438
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 2,
+      "indicator": "boll_middle",
+      "origins": 723,
+      "mape": 0.43414089442150494
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 2,
+      "indicator": "boll_upper",
+      "origins": 723,
+      "mape": 0.9829603505350492
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 2,
+      "indicator": "ma10",
+      "origins": 723,
+      "mape": 0.8464478437408189
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 2,
+      "indicator": "ma20",
+      "origins": 723,
+      "mape": 0.43414089442150494
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 2,
+      "indicator": "ma5",
+      "origins": 723,
+      "mape": 1.6694399678435283
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 3,
+      "indicator": "boll_lower",
+      "origins": 722,
+      "mape": 1.7501295748990868
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 3,
+      "indicator": "boll_middle",
+      "origins": 722,
+      "mape": 0.7286929144660551
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 3,
+      "indicator": "boll_upper",
+      "origins": 722,
+      "mape": 1.5854839972546286
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 3,
+      "indicator": "ma10",
+      "origins": 722,
+      "mape": 1.4200532463134183
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 3,
+      "indicator": "ma20",
+      "origins": 722,
+      "mape": 0.7286929144660551
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 3,
+      "indicator": "ma5",
+      "origins": 722,
+      "mape": 2.797815380348895
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 4,
+      "indicator": "boll_lower",
+      "origins": 721,
+      "mape": 2.4252145759370407
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 4,
+      "indicator": "boll_middle",
+      "origins": 721,
+      "mape": 1.0675157709683327
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 4,
+      "indicator": "boll_upper",
+      "origins": 721,
+      "mape": 2.235341524182394
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 4,
+      "indicator": "ma10",
+      "origins": 721,
+      "mape": 2.079785629184211
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 4,
+      "indicator": "ma20",
+      "origins": 721,
+      "mape": 1.0675157709683327
+    },
+    {
+      "partition": "all",
+      "model": "note_analog",
+      "horizon": 4,
+      "indicator": "ma5",
+      "origins": 721,
+      "mape": 4.091900968268103
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 1,
+      "indicator": "boll_lower",
+      "origins": 724,
+      "mape": 0.8745627283990023
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 1,
+      "indicator": "boll_middle",
+      "origins": 724,
+      "mape": 0.2635027232850497
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 1,
+      "indicator": "boll_upper",
+      "origins": 724,
+      "mape": 0.6887233695431904
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 1,
+      "indicator": "ma10",
+      "origins": 724,
+      "mape": 0.5003999575204439
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 1,
+      "indicator": "ma20",
+      "origins": 724,
+      "mape": 0.2635027232850497
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 1,
+      "indicator": "ma5",
+      "origins": 724,
+      "mape": 1.0544878955539312
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 2,
+      "indicator": "boll_lower",
+      "origins": 723,
+      "mape": 1.9505559108328703
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 2,
+      "indicator": "boll_middle",
+      "origins": 723,
+      "mape": 0.6122520825690824
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 2,
+      "indicator": "boll_upper",
+      "origins": 723,
+      "mape": 1.5284211247274164
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 2,
+      "indicator": "ma10",
+      "origins": 723,
+      "mape": 1.1437716753949194
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 2,
+      "indicator": "ma20",
+      "origins": 723,
+      "mape": 0.6122520825690824
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 2,
+      "indicator": "ma5",
+      "origins": 723,
+      "mape": 2.442070439484368
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 3,
+      "indicator": "boll_lower",
+      "origins": 722,
+      "mape": 3.164884272428443
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 3,
+      "indicator": "boll_middle",
+      "origins": 722,
+      "mape": 1.0107491131630155
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 3,
+      "indicator": "boll_upper",
+      "origins": 722,
+      "mape": 2.4860553745852307
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 3,
+      "indicator": "ma10",
+      "origins": 722,
+      "mape": 1.9259245383079453
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 3,
+      "indicator": "ma20",
+      "origins": 722,
+      "mape": 1.0107491131630155
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 3,
+      "indicator": "ma5",
+      "origins": 722,
+      "mape": 4.093989494987803
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 4,
+      "indicator": "boll_lower",
+      "origins": 721,
+      "mape": 4.537346795254012
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 4,
+      "indicator": "boll_middle",
+      "origins": 721,
+      "mape": 1.4734784242978334
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 4,
+      "indicator": "boll_upper",
+      "origins": 721,
+      "mape": 3.565693418117563
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 4,
+      "indicator": "ma10",
+      "origins": 721,
+      "mape": 2.8582156624368915
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 4,
+      "indicator": "ma20",
+      "origins": 721,
+      "mape": 1.4734784242978334
+    },
+    {
+      "partition": "all",
+      "model": "note_delta1",
+      "horizon": 4,
+      "indicator": "ma5",
+      "origins": 721,
+      "mape": 5.983469979035105
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 1,
+      "indicator": "boll_lower",
+      "origins": 724,
+      "mape": 0.9775299083036274
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 1,
+      "indicator": "boll_middle",
+      "origins": 724,
+      "mape": 0.3029548094731615
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 1,
+      "indicator": "boll_upper",
+      "origins": 724,
+      "mape": 0.7548505992629789
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 1,
+      "indicator": "ma10",
+      "origins": 724,
+      "mape": 0.5699471904252394
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 1,
+      "indicator": "ma20",
+      "origins": 724,
+      "mape": 0.3029548094731615
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 1,
+      "indicator": "ma5",
+      "origins": 724,
+      "mape": 1.1737073267570453
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 2,
+      "indicator": "boll_lower",
+      "origins": 723,
+      "mape": 2.1043479627881627
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 2,
+      "indicator": "boll_middle",
+      "origins": 723,
+      "mape": 0.6649545625075631
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 2,
+      "indicator": "boll_upper",
+      "origins": 723,
+      "mape": 1.6312576329390336
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 2,
+      "indicator": "ma10",
+      "origins": 723,
+      "mape": 1.266095900855352
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 2,
+      "indicator": "ma20",
+      "origins": 723,
+      "mape": 0.6649545625075631
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 2,
+      "indicator": "ma5",
+      "origins": 723,
+      "mape": 2.6459267644827755
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 3,
+      "indicator": "boll_lower",
+      "origins": 722,
+      "mape": 3.3789142824489473
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 3,
+      "indicator": "boll_middle",
+      "origins": 722,
+      "mape": 1.0909112196157873
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 3,
+      "indicator": "boll_upper",
+      "origins": 722,
+      "mape": 2.633253051011148
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 3,
+      "indicator": "ma10",
+      "origins": 722,
+      "mape": 2.111223443391045
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 3,
+      "indicator": "ma20",
+      "origins": 722,
+      "mape": 1.0909112196157873
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 3,
+      "indicator": "ma5",
+      "origins": 722,
+      "mape": 4.374283339498377
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 4,
+      "indicator": "boll_lower",
+      "origins": 721,
+      "mape": 4.759190366993749
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 4,
+      "indicator": "boll_middle",
+      "origins": 721,
+      "mape": 1.5582180725332895
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 4,
+      "indicator": "boll_upper",
+      "origins": 721,
+      "mape": 3.728762422930362
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 4,
+      "indicator": "ma10",
+      "origins": 721,
+      "mape": 3.0992177603484996
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 4,
+      "indicator": "ma20",
+      "origins": 721,
+      "mape": 1.5582180725332895
+    },
+    {
+      "partition": "all",
+      "model": "note_delta2",
+      "horizon": 4,
+      "indicator": "ma5",
+      "origins": 721,
+      "mape": 6.337325657703965
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 1,
+      "indicator": "boll_lower",
+      "origins": 724,
+      "mape": 0.5044750072330708
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 1,
+      "indicator": "boll_middle",
+      "origins": 724,
+      "mape": 0.18773526950908398
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 1,
+      "indicator": "boll_upper",
+      "origins": 724,
+      "mape": 0.4451233221681699
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 1,
+      "indicator": "ma10",
+      "origins": 724,
+      "mape": 0.365973015625261
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 1,
+      "indicator": "ma20",
+      "origins": 724,
+      "mape": 0.18773526950908398
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 1,
+      "indicator": "ma5",
+      "origins": 724,
+      "mape": 0.7226446382734293
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 2,
+      "indicator": "boll_lower",
+      "origins": 723,
+      "mape": 1.105802899850361
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 2,
+      "indicator": "boll_middle",
+      "origins": 723,
+      "mape": 0.44063459547280337
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 2,
+      "indicator": "boll_upper",
+      "origins": 723,
+      "mape": 0.9930847972295995
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 2,
+      "indicator": "ma10",
+      "origins": 723,
+      "mape": 0.8593627416206946
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 2,
+      "indicator": "ma20",
+      "origins": 723,
+      "mape": 0.44063459547280337
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 2,
+      "indicator": "ma5",
+      "origins": 723,
+      "mape": 1.6956866694737087
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 3,
+      "indicator": "boll_lower",
+      "origins": 722,
+      "mape": 1.7729968057455845
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 3,
+      "indicator": "boll_middle",
+      "origins": 722,
+      "mape": 0.7386316248422745
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 3,
+      "indicator": "boll_upper",
+      "origins": 722,
+      "mape": 1.5994023560161446
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 3,
+      "indicator": "ma10",
+      "origins": 722,
+      "mape": 1.440083800120549
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 3,
+      "indicator": "ma20",
+      "origins": 722,
+      "mape": 0.7386316248422745
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 3,
+      "indicator": "ma5",
+      "origins": 722,
+      "mape": 2.838142350503992
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 4,
+      "indicator": "boll_lower",
+      "origins": 721,
+      "mape": 2.44449031973004
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 4,
+      "indicator": "boll_middle",
+      "origins": 721,
+      "mape": 1.079487190438638
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 4,
+      "indicator": "boll_upper",
+      "origins": 721,
+      "mape": 2.258154831330184
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 4,
+      "indicator": "ma10",
+      "origins": 721,
+      "mape": 2.1031379742026854
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 4,
+      "indicator": "ma20",
+      "origins": 721,
+      "mape": 1.079487190438638
+    },
+    {
+      "partition": "all",
+      "model": "price_analog",
+      "horizon": 4,
+      "indicator": "ma5",
+      "origins": 721,
+      "mape": 4.137343363919021
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 1,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 0.5574560669291408
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 1,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 0.19387839992007214
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 1,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 0.4870935538794125
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 1,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 0.3756083483041437
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 1,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 0.19387839992007214
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 1,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 0.7386927310390289
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 2,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 1.2530717914657856
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 2,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 0.46979800910848574
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 2,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 1.1177834090643173
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 2,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 0.9113746750534749
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 2,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 0.46979800910848574
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 2,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 1.791505172513004
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 3,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 2.0561301296870065
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 3,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 0.8224149682071114
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 3,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 1.8335429442774462
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 3,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 1.5961416169168434
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 3,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 0.8224149682071114
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 3,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 3.137785146128383
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 4,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 2.884037489053496
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 4,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 1.2298947689510937
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 4,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 2.5795572496823334
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 4,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 2.387990851564066
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 4,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 1.2298947689510937
+    },
+    {
+      "partition": "development",
+      "model": "baseline_v1",
+      "horizon": 4,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 4.693054521057183
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 1,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 0.5223017528314495
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 1,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 0.18362426716222752
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 1,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 0.4642222368493524
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 1,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 0.3552761990492991
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 1,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 0.18362426716222752
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 1,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 0.6985586324065202
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 2,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 1.162053757967699
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 2,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 0.43613734011104854
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 2,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 1.0515491457931296
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 2,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 0.8444903098137914
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 2,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 0.43613734011104854
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 2,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 1.6595073625207324
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 3,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 1.8888551819375374
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 3,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 0.7514302765545144
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 3,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 1.719949793788982
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 3,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 1.4539990189876502
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 3,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 0.7514302765545144
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 3,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 2.8530712311776
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 4,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 2.630952423381822
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 4,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 1.106415519238025
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 4,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 2.4365038995005297
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 4,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 2.140262169318346
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 4,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 1.106415519238025
+    },
+    {
+      "partition": "development",
+      "model": "last_close",
+      "horizon": 4,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 4.191464653653905
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 1,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 0.5269612316739676
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 1,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 0.18703737394696143
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 1,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 0.47105604286664127
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 1,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 0.3616106111490007
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 1,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 0.18703737394696143
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 1,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 0.7113485554815959
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 2,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 1.1764779674389823
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 2,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 0.4487476997785213
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 2,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 1.0728683614647132
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 2,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 0.8681910085825257
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 2,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 0.4487476997785213
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 2,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 1.7062764930443768
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 3,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 1.9120380089770974
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 3,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 0.7723594845257965
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 3,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 1.7519495201019117
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 3,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 1.4943899032765402
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 3,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 0.7723594845257965
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 3,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 2.931715210318699
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 4,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 2.6543735162117446
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 4,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 1.1331810529557278
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 4,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 2.466090352156671
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 4,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 2.1926080889211703
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 4,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 1.1331810529557278
+    },
+    {
+      "partition": "development",
+      "model": "note_analog",
+      "horizon": 4,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 4.292363049733505
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 1,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 0.9109725669501867
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 1,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 0.2507816677051633
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 1,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 0.723300484254226
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 1,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 0.49071593449963724
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 1,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 0.2507816677051633
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 1,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 1.0139775691327444
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 2,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 2.0929609281143913
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 2,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 0.6032096268007217
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 2,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 1.624947096141015
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 2,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 1.1591800584504501
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 2,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 0.6032096268007217
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 2,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 2.415041206431136
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 3,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 3.4541063518981465
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 3,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 1.0221578806640417
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 3,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 2.6715146035339807
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 3,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 1.9930384593749475
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 3,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 1.0221578806640417
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 3,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 4.218935956568686
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 4,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 4.96448674569268
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 4,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 1.4961029468529348
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 4,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 3.8251662624628096
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 4,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 2.9630263822186853
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 4,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 1.4961029468529348
+    },
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 4,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 6.249008486381731
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 1,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 1.0481661602499233
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 1,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 0.3001410778807893
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 1,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 0.7992791720132204
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 1,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 0.5724451718773214
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 1,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 0.3001410778807893
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 1,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 1.1721594984780168
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 2,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 2.2989748885424124
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 2,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 0.6772012641553008
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 2,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 1.7553346257334883
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 2,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 1.2997887084800157
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 2,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 0.6772012641553008
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 2,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 2.715890264982064
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 3,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 3.7229787270807964
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 3,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 1.1233734439162812
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 3,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 2.8423859098811537
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 3,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 2.194807127458748
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 3,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 1.1233734439162812
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 3,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 4.587274851642823
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 4,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 5.23840692465637
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 4,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 1.6064973105578342
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 4,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 4.01754218400035
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 4,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 3.2276846823476277
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 4,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 1.6064973105578342
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 4,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 6.66519116677373
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 1,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 0.5320100983033499
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 1,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 0.1884667845893173
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 1,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 0.472877523767895
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 1,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 0.36451164803764663
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 1,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 0.1884667845893173
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 1,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 0.7172775811053588
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 2,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 1.1913627033751781
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 2,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 0.4536616502433431
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 2,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 1.0820851062514916
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 2,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 0.8781279916598419
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 2,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 0.4536616502433431
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 2,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 1.7266047671966074
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 3,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 1.9362290849658352
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 3,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 0.7807311456904208
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 3,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 1.7627571633065862
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 3,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 1.5113792177417218
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 3,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 0.7807311456904208
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 3,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 2.96611502276084
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 4,
+      "indicator": "boll_lower",
+      "origins": 483,
+      "mape": 2.6800294007926597
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 4,
+      "indicator": "boll_middle",
+      "origins": 483,
+      "mape": 1.14759208317023
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 4,
+      "indicator": "boll_upper",
+      "origins": 483,
+      "mape": 2.488657444529871
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 4,
+      "indicator": "ma10",
+      "origins": 483,
+      "mape": 2.2207970952921285
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 4,
+      "indicator": "ma20",
+      "origins": 483,
+      "mape": 1.14759208317023
+    },
+    {
+      "partition": "development",
+      "model": "price_analog",
+      "horizon": 4,
+      "indicator": "ma5",
+      "origins": 483,
+      "mape": 4.348173956525159
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 1,
+      "indicator": "boll_lower",
+      "origins": 241,
+      "mape": 0.47404320155576485
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 1,
+      "indicator": "boll_middle",
+      "origins": 241,
+      "mape": 0.19366857946577049
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 1,
+      "indicator": "boll_upper",
+      "origins": 241,
+      "mape": 0.4160315045420454
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 1,
+      "indicator": "ma10",
+      "origins": 241,
+      "mape": 0.3833350003184819
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 1,
+      "indicator": "ma20",
+      "origins": 241,
+      "mape": 0.19366857946577049
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 1,
+      "indicator": "ma5",
+      "origins": 241,
+      "mape": 0.7619325775489247
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 2,
+      "indicator": "boll_lower",
+      "origins": 240,
+      "mape": 0.9647250431887215
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 2,
+      "indicator": "boll_middle",
+      "origins": 240,
+      "mape": 0.4297015272711819
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 2,
+      "indicator": "boll_upper",
+      "origins": 240,
+      "mape": 0.8656797077633083
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 2,
+      "indicator": "ma10",
+      "origins": 240,
+      "mape": 0.8507345634432387
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 2,
+      "indicator": "ma20",
+      "origins": 240,
+      "mape": 0.4297015272711819
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 2,
+      "indicator": "ma5",
+      "origins": 240,
+      "mape": 1.6912821950966874
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 3,
+      "indicator": "boll_lower",
+      "origins": 239,
+      "mape": 1.5109663158433801
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 3,
+      "indicator": "boll_middle",
+      "origins": 239,
+      "mape": 0.6883127473519026
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 3,
+      "indicator": "boll_upper",
+      "origins": 239,
+      "mape": 1.3333468690578272
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 3,
+      "indicator": "ma10",
+      "origins": 239,
+      "mape": 1.3640177887381704
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 3,
+      "indicator": "ma20",
+      "origins": 239,
+      "mape": 0.6883127473519026
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 3,
+      "indicator": "ma5",
+      "origins": 239,
+      "mape": 2.7146184086911784
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 4,
+      "indicator": "boll_lower",
+      "origins": 238,
+      "mape": 2.105453553490063
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 4,
+      "indicator": "boll_middle",
+      "origins": 238,
+      "mape": 1.0171750755902902
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 4,
+      "indicator": "boll_upper",
+      "origins": 238,
+      "mape": 1.881284557422385
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 4,
+      "indicator": "ma10",
+      "origins": 238,
+      "mape": 2.0137330166018517
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 4,
+      "indicator": "ma20",
+      "origins": 238,
+      "mape": 1.0171750755902902
+    },
+    {
+      "partition": "holdout",
+      "model": "baseline_v1",
+      "horizon": 4,
+      "indicator": "ma5",
+      "origins": 238,
+      "mape": 4.008779587544802
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 1,
+      "indicator": "boll_lower",
+      "origins": 241,
+      "mape": 0.44542306546064653
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 1,
+      "indicator": "boll_middle",
+      "origins": 241,
+      "mape": 0.18526459997267825
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 1,
+      "indicator": "boll_upper",
+      "origins": 241,
+      "mape": 0.39633275956530173
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 1,
+      "indicator": "ma10",
+      "origins": 241,
+      "mape": 0.36663637267420046
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 1,
+      "indicator": "ma20",
+      "origins": 241,
+      "mape": 0.18526459997267825
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 1,
+      "indicator": "ma5",
+      "origins": 241,
+      "mape": 0.7285247022439834
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 2,
+      "indicator": "boll_lower",
+      "origins": 240,
+      "mape": 0.9184700919572736
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 2,
+      "indicator": "boll_middle",
+      "origins": 240,
+      "mape": 0.4088285337623982
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 2,
+      "indicator": "boll_upper",
+      "origins": 240,
+      "mape": 0.8308601902035873
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 2,
+      "indicator": "ma10",
+      "origins": 240,
+      "mape": 0.8095043378479175
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 2,
+      "indicator": "ma20",
+      "origins": 240,
+      "mape": 0.4088285337623982
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 2,
+      "indicator": "ma5",
+      "origins": 240,
+      "mape": 1.6081812672025546
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 3,
+      "indicator": "boll_lower",
+      "origins": 239,
+      "mape": 1.4166410920579517
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 3,
+      "indicator": "boll_middle",
+      "origins": 239,
+      "mape": 0.6467109256893095
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 3,
+      "indicator": "boll_upper",
+      "origins": 239,
+      "mape": 1.2814875876991911
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 3,
+      "indicator": "ma10",
+      "origins": 239,
+      "mape": 1.2809188698146217
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 3,
+      "indicator": "ma20",
+      "origins": 239,
+      "mape": 0.6467109256893095
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 3,
+      "indicator": "ma5",
+      "origins": 239,
+      "mape": 2.5460906663308225
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 4,
+      "indicator": "boll_lower",
+      "origins": 238,
+      "mape": 1.945051047837991
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 4,
+      "indicator": "boll_middle",
+      "origins": 238,
+      "mape": 0.9314154727605082
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 4,
+      "indicator": "boll_upper",
+      "origins": 238,
+      "mape": 1.7970135923270403
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 4,
+      "indicator": "ma10",
+      "origins": 238,
+      "mape": 1.8429096072278741
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 4,
+      "indicator": "ma20",
+      "origins": 238,
+      "mape": 0.9314154727605082
+    },
+    {
+      "partition": "holdout",
+      "model": "last_close",
+      "horizon": 4,
+      "indicator": "ma5",
+      "origins": 238,
+      "mape": 3.662730287721326
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 1,
+      "indicator": "boll_lower",
+      "origins": 241,
+      "mape": 0.44296984433255066
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 1,
+      "indicator": "boll_middle",
+      "origins": 241,
+      "mape": 0.18467252457409453
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 1,
+      "indicator": "boll_upper",
+      "origins": 241,
+      "mape": 0.38736858028787535
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 1,
+      "indicator": "ma10",
+      "origins": 241,
+      "mape": 0.3657608851170748
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 1,
+      "indicator": "ma20",
+      "origins": 241,
+      "mape": 0.18467252457409453
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 1,
+      "indicator": "ma5",
+      "origins": 241,
+      "mape": 0.7269703869655114
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 2,
+      "indicator": "boll_lower",
+      "origins": 240,
+      "mape": 0.9151353450585715
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 2,
+      "indicator": "boll_middle",
+      "origins": 240,
+      "mape": 0.40474469864050955
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 2,
+      "indicator": "boll_upper",
+      "origins": 240,
+      "mape": 0.8020204785391001
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 2,
+      "indicator": "ma10",
+      "origins": 240,
+      "mape": 0.8026897244968841
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 2,
+      "indicator": "ma20",
+      "origins": 240,
+      "mape": 0.40474469864050955
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 2,
+      "indicator": "ma5",
+      "origins": 240,
+      "mape": 1.5953064608768213
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 3,
+      "indicator": "boll_lower",
+      "origins": 239,
+      "mape": 1.4229255010092166
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 3,
+      "indicator": "boll_middle",
+      "origins": 239,
+      "mape": 0.6404462477762849
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 3,
+      "indicator": "boll_upper",
+      "origins": 239,
+      "mape": 1.2490704092410814
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 3,
+      "indicator": "ma10",
+      "origins": 239,
+      "mape": 1.2698247721996616
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 3,
+      "indicator": "ma20",
+      "origins": 239,
+      "mape": 0.6404462477762849
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 3,
+      "indicator": "ma5",
+      "origins": 239,
+      "mape": 2.5272144687362794
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 4,
+      "indicator": "boll_lower",
+      "origins": 238,
+      "mape": 1.9601567265560254
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 4,
+      "indicator": "boll_middle",
+      "origins": 238,
+      "mape": 0.9342538751703847
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 4,
+      "indicator": "boll_upper",
+      "origins": 238,
+      "mape": 1.7670571379993012
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 4,
+      "indicator": "ma10",
+      "origins": 238,
+      "mape": 1.8508224020709703
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 4,
+      "indicator": "ma20",
+      "origins": 238,
+      "mape": 0.9342538751703847
+    },
+    {
+      "partition": "holdout",
+      "model": "note_analog",
+      "horizon": 4,
+      "indicator": "ma5",
+      "origins": 238,
+      "mape": 3.685080861764787
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 1,
+      "indicator": "boll_lower",
+      "origins": 241,
+      "mape": 0.8015919731283715
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 1,
+      "indicator": "boll_middle",
+      "origins": 241,
+      "mape": 0.2889976189078095
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 1,
+      "indicator": "boll_upper",
+      "origins": 241,
+      "mape": 0.619425666616094
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 1,
+      "indicator": "ma10",
+      "origins": 241,
+      "mape": 0.519808186230193
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 1,
+      "indicator": "ma20",
+      "origins": 241,
+      "mape": 0.2889976189078095
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 1,
+      "indicator": "ma5",
+      "origins": 241,
+      "mape": 1.135676641037056
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 2,
+      "indicator": "boll_lower",
+      "origins": 240,
+      "mape": 1.663965813553809
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 2,
+      "indicator": "boll_middle",
+      "origins": 240,
+      "mape": 0.6304500248029081
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 2,
+      "indicator": "boll_upper",
+      "origins": 240,
+      "mape": 1.3341626072575485
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 2,
+      "indicator": "ma10",
+      "origins": 240,
+      "mape": 1.1127623044956636
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 2,
+      "indicator": "ma20",
+      "origins": 240,
+      "mape": 0.6304500248029081
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 2,
+      "indicator": "ma5",
+      "origins": 240,
+      "mape": 2.4964667710039987
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 3,
+      "indicator": "boll_lower",
+      "origins": 239,
+      "mape": 2.5803894423704246
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 3,
+      "indicator": "boll_middle",
+      "origins": 239,
+      "mape": 0.9876929010165905
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 3,
+      "indicator": "boll_upper",
+      "origins": 239,
+      "mape": 2.111257016500518
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 3,
+      "indicator": "ma10",
+      "origins": 239,
+      "mape": 1.7902926392478533
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 3,
+      "indicator": "ma20",
+      "origins": 239,
+      "mape": 0.9876929010165905
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 3,
+      "indicator": "ma5",
+      "origins": 239,
+      "mape": 3.8414826291151405
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 4,
+      "indicator": "boll_lower",
+      "origins": 238,
+      "mape": 3.6705039546578924
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 4,
+      "indicator": "boll_middle",
+      "origins": 238,
+      "mape": 1.4275639520536574
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 4,
+      "indicator": "boll_upper",
+      "origins": 238,
+      "mape": 3.03911617518162
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 4,
+      "indicator": "ma10",
+      "origins": 238,
+      "mape": 2.6455115546444263
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 4,
+      "indicator": "ma20",
+      "origins": 238,
+      "mape": 1.4275639520536574
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 4,
+      "indicator": "ma5",
+      "origins": 238,
+      "mape": 5.444583008243424
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 1,
+      "indicator": "boll_lower",
+      "origins": 241,
+      "mape": 0.8359643079299305
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 1,
+      "indicator": "boll_middle",
+      "origins": 241,
+      "mape": 0.308593947892729
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 1,
+      "indicator": "boll_upper",
+      "origins": 241,
+      "mape": 0.6658091028382209
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 1,
+      "indicator": "ma10",
+      "origins": 241,
+      "mape": 0.5649408624528098
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 1,
+      "indicator": "ma20",
+      "origins": 241,
+      "mape": 0.308593947892729
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 1,
+      "indicator": "ma5",
+      "origins": 241,
+      "mape": 1.176809405839082
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 2,
+      "indicator": "boll_lower",
+      "origins": 240,
+      "mape": 1.712661274707735
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 2,
+      "indicator": "boll_middle",
+      "origins": 240,
+      "mape": 0.6403080754414913
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 2,
+      "indicator": "boll_upper",
+      "origins": 240,
+      "mape": 1.3815526849401933
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 2,
+      "indicator": "ma10",
+      "origins": 240,
+      "mape": 1.1982891255107162
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 2,
+      "indicator": "ma20",
+      "origins": 240,
+      "mape": 0.6403080754414913
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 2,
+      "indicator": "ma5",
+      "origins": 240,
+      "mape": 2.5051252197279568
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 3,
+      "indicator": "boll_lower",
+      "origins": 239,
+      "mape": 2.683587392251527
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 3,
+      "indicator": "boll_middle",
+      "origins": 239,
+      "mape": 1.0253076449834075
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 3,
+      "indicator": "boll_upper",
+      "origins": 239,
+      "mape": 2.210612168859629
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 3,
+      "indicator": "ma10",
+      "origins": 239,
+      "mape": 1.9423074626182388
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 3,
+      "indicator": "ma20",
+      "origins": 239,
+      "mape": 1.0253076449834075
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 3,
+      "indicator": "ma5",
+      "origins": 239,
+      "mape": 3.94384442583408
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 4,
+      "indicator": "boll_lower",
+      "origins": 238,
+      "mape": 3.786662647031375
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 4,
+      "indicator": "boll_middle",
+      "origins": 238,
+      "mape": 1.4602396188952427
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 4,
+      "indicator": "boll_upper",
+      "origins": 238,
+      "mape": 3.1427093784059768
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 4,
+      "indicator": "ma10",
+      "origins": 238,
+      "mape": 2.8385054774679155
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 4,
+      "indicator": "ma20",
+      "origins": 238,
+      "mape": 1.4602396188952427
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 4,
+      "indicator": "ma5",
+      "origins": 238,
+      "mape": 5.6719515363565
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 1,
+      "indicator": "boll_lower",
+      "origins": 241,
+      "mape": 0.4492905716025944
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 1,
+      "indicator": "boll_middle",
+      "origins": 241,
+      "mape": 0.18626920401633423
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 1,
+      "indicator": "boll_upper",
+      "origins": 241,
+      "mape": 0.38949975630648015
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 1,
+      "indicator": "ma10",
+      "origins": 241,
+      "mape": 0.36890181456641324
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 1,
+      "indicator": "ma20",
+      "origins": 241,
+      "mape": 0.18626920401633423
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 1,
+      "indicator": "ma5",
+      "origins": 241,
+      "mape": 0.7334010225563254
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 2,
+      "indicator": "boll_lower",
+      "origins": 240,
+      "mape": 0.9336137952566671
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 2,
+      "indicator": "boll_middle",
+      "origins": 240,
+      "mape": 0.414417647747092
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 2,
+      "indicator": "boll_upper",
+      "origins": 240,
+      "mape": 0.813971675323042
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 2,
+      "indicator": "ma10",
+      "origins": 240,
+      "mape": 0.8215976759169101
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 2,
+      "indicator": "ma20",
+      "origins": 240,
+      "mape": 0.414417647747092
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 2,
+      "indicator": "ma5",
+      "origins": 240,
+      "mape": 1.6334639978063759
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 3,
+      "indicator": "boll_lower",
+      "origins": 239,
+      "mape": 1.4431173460661664
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 3,
+      "indicator": "boll_middle",
+      "origins": 239,
+      "mape": 0.653551840032004
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 3,
+      "indicator": "boll_upper",
+      "origins": 239,
+      "mape": 1.2692752768475961
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 3,
+      "indicator": "ma10",
+      "origins": 239,
+      "mape": 1.2960014289447057
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 3,
+      "indicator": "ma20",
+      "origins": 239,
+      "mape": 0.653551840032004
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 3,
+      "indicator": "ma5",
+      "origins": 239,
+      "mape": 2.5795197534326197
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 4,
+      "indicator": "boll_lower",
+      "origins": 238,
+      "mape": 1.9664845375735458
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 4,
+      "indicator": "boll_middle",
+      "origins": 238,
+      "mape": 0.9412743198951129
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 4,
+      "indicator": "boll_upper",
+      "origins": 238,
+      "mape": 1.7903701163072905
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 4,
+      "indicator": "ma10",
+      "origins": 238,
+      "mape": 1.8643591696388149
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 4,
+      "indicator": "ma20",
+      "origins": 238,
+      "mape": 0.9412743198951129
+    },
+    {
+      "partition": "holdout",
+      "model": "price_analog",
+      "horizon": 4,
+      "indicator": "ma5",
+      "origins": 238,
+      "mape": 3.7094812789242093
+    }
+  ],
+  "pairedBlockBootstrap": [
+    {
+      "partition": "all",
+      "horizon": 1,
+      "model": "baseline_v1",
+      "improvement_mape_pp": -0.19647563064556825,
+      "ci95_mape_pp": [
+        -0.2555014869641222,
+        -0.13940391138642613
+      ]
+    },
+    {
+      "partition": "all",
+      "horizon": 1,
+      "model": "price_analog",
+      "improvement_mape_pp": -0.07296920324905043,
+      "ci95_mape_pp": [
+        -0.14033792154323377,
+        -0.005103044799848019
+      ]
+    },
+    {
+      "partition": "all",
+      "horizon": 1,
+      "model": "note_analog",
+      "improvement_mape_pp": -0.040874384543914434,
+      "ci95_mape_pp": [
+        -0.11700209440238345,
+        0.03611033302711596
+      ]
+    },
+    {
+      "partition": "all",
+      "horizon": 1,
+      "model": "note_analog_vs_price_analog",
+      "improvement_mape_pp": 0.03209481870513601,
+      "ci95_mape_pp": [
+        -0.0011951883568111473,
+        0.06377870033202133
+      ]
+    },
+    {
+      "partition": "all",
+      "horizon": 2,
+      "model": "baseline_v1",
+      "improvement_mape_pp": -0.4142169854080203,
+      "ci95_mape_pp": [
+        -0.5587673968099991,
+        -0.26830067211355624
+      ]
+    },
+    {
+      "partition": "all",
+      "horizon": 2,
+      "model": "price_analog",
+      "improvement_mape_pp": -0.20454272619983735,
+      "ci95_mape_pp": [
+        -0.31095969847230287,
+        -0.09385446425375096
+      ]
+    },
+    {
+      "partition": "all",
+      "horizon": 2,
+      "model": "note_analog",
+      "improvement_mape_pp": -0.12125968466088491,
+      "ci95_mape_pp": [
+        -0.230571227177331,
+        -0.0055103113109519365
+      ]
+    },
+    {
+      "partition": "all",
+      "horizon": 2,
+      "model": "note_analog_vs_price_analog",
+      "improvement_mape_pp": 0.08328304153895247,
+      "ci95_mape_pp": [
+        0.02345435096182835,
+        0.14016258324828484
+      ]
+    },
+    {
+      "partition": "all",
+      "horizon": 3,
+      "model": "baseline_v1",
+      "improvement_mape_pp": -0.6673211104694362,
+      "ci95_mape_pp": [
+        -0.9011374833532619,
+        -0.43598362061899104
+      ]
+    },
+    {
+      "partition": "all",
+      "horizon": 3,
+      "model": "price_analog",
+      "improvement_mape_pp": -0.1886452441288259,
+      "ci95_mape_pp": [
+        -0.29264791877271457,
+        -0.07753714893807676
+      ]
+    },
+    {
+      "partition": "all",
+      "horizon": 3,
+      "model": "note_analog",
+      "improvement_mape_pp": -0.14664110883405718,
+      "ci95_mape_pp": [
+        -0.25533024141189076,
+        -0.03267887269993487
+      ]
+    },
+    {
+      "partition": "all",
+      "horizon": 3,
+      "model": "note_analog_vs_price_analog",
+      "improvement_mape_pp": 0.04200413529476872,
+      "ci95_mape_pp": [
+        -0.028560450544068625,
+        0.11083546475992143
+      ]
+    },
+    {
+      "partition": "all",
+      "horizon": 4,
+      "model": "baseline_v1",
+      "improvement_mape_pp": -0.9749553310125457,
+      "ci95_mape_pp": [
+        -1.3601339505803889,
+        -0.5976744891957874
+      ]
+    },
+    {
+      "partition": "all",
+      "horizon": 4,
+      "model": "price_analog",
+      "improvement_mape_pp": -0.2530995660458725,
+      "ci95_mape_pp": [
+        -0.40981300239488855,
+        -0.08981526475832077
+      ]
+    },
+    {
+      "partition": "all",
+      "horizon": 4,
+      "model": "note_analog",
+      "improvement_mape_pp": -0.21884161469348543,
+      "ci95_mape_pp": [
+        -0.37851635676105355,
+        -0.04228916710417343
+      ]
+    },
+    {
+      "partition": "all",
+      "horizon": 4,
+      "model": "note_analog_vs_price_analog",
+      "improvement_mape_pp": 0.03425795135238713,
+      "ci95_mape_pp": [
+        -0.07326950182557136,
+        0.1372894603315383
+      ]
+    },
+    {
+      "partition": "development",
+      "horizon": 1,
+      "model": "baseline_v1",
+      "improvement_mape_pp": -0.2094546520032388,
+      "ci95_mape_pp": [
+        -0.29077334339395877,
+        -0.1318051981888974
+      ]
+    },
+    {
+      "partition": "development",
+      "horizon": 1,
+      "model": "price_analog",
+      "improvement_mape_pp": -0.09593432224785815,
+      "ci95_mape_pp": [
+        -0.17173653190287957,
+        -0.01885626494963299
+      ]
+    },
+    {
+      "partition": "development",
+      "horizon": 1,
+      "model": "note_analog",
+      "improvement_mape_pp": -0.0644029396905932,
+      "ci95_mape_pp": [
+        -0.14976205437565662,
+        0.023284727345681322
+      ]
+    },
+    {
+      "partition": "development",
+      "horizon": 1,
+      "model": "note_analog_vs_price_analog",
+      "improvement_mape_pp": 0.03153138255726495,
+      "ci95_mape_pp": [
+        -0.007937774348949071,
+        0.07265762347433519
+      ]
+    },
+    {
+      "partition": "development",
+      "horizon": 2,
+      "model": "baseline_v1",
+      "improvement_mape_pp": -0.5073846724908788,
+      "ci95_mape_pp": [
+        -0.6886867921617821,
+        -0.3186758188131941
+      ]
+    },
+    {
+      "partition": "development",
+      "horizon": 2,
+      "model": "price_analog",
+      "improvement_mape_pp": -0.23809009500898198,
+      "ci95_mape_pp": [
+        -0.35574121814540066,
+        -0.11952496183661887
+      ]
+    },
+    {
+      "partition": "development",
+      "horizon": 2,
+      "model": "note_analog",
+      "improvement_mape_pp": -0.15092626273690093,
+      "ci95_mape_pp": [
+        -0.27641224095765315,
+        -0.01992348876817383
+      ]
+    },
+    {
+      "partition": "development",
+      "horizon": 2,
+      "model": "note_analog_vs_price_analog",
+      "improvement_mape_pp": 0.08716383227208105,
+      "ci95_mape_pp": [
+        0.019679948416235243,
+        0.1549396888984199
+      ]
+    },
+    {
+      "partition": "development",
+      "horizon": 3,
+      "model": "baseline_v1",
+      "improvement_mape_pp": -0.7993717725910797,
+      "ci95_mape_pp": [
+        -1.1273970275374552,
+        -0.4799190152848979
+      ]
+    },
+    {
+      "partition": "development",
+      "horizon": 3,
+      "model": "price_analog",
+      "improvement_mape_pp": -0.23966243101088963,
+      "ci95_mape_pp": [
+        -0.3800680541979819,
+        -0.09890724919146002
+      ]
+    },
+    {
+      "partition": "development",
+      "horizon": 3,
+      "model": "note_analog",
+      "improvement_mape_pp": -0.16928587118832517,
+      "ci95_mape_pp": [
+        -0.31230734950553585,
+        -0.019461044800523755
+      ]
+    },
+    {
+      "partition": "development",
+      "horizon": 3,
+      "model": "note_analog_vs_price_analog",
+      "improvement_mape_pp": 0.07037655982256445,
+      "ci95_mape_pp": [
+        -0.0053484558178343,
+        0.14790379678579743
+      ]
+    },
+    {
+      "partition": "development",
+      "horizon": 4,
+      "model": "baseline_v1",
+      "improvement_mape_pp": -1.0934544379554463,
+      "ci95_mape_pp": [
+        -1.6341793295671283,
+        -0.5752296343411916
+      ]
+    },
+    {
+      "partition": "development",
+      "horizon": 4,
+      "model": "price_analog",
+      "improvement_mape_pp": -0.3439047725097883,
+      "ci95_mape_pp": [
+        -0.5159960414234095,
+        -0.16084278489248532
+      ]
+    },
+    {
+      "partition": "development",
+      "horizon": 4,
+      "model": "note_analog",
+      "improvement_mape_pp": -0.24165307502084538,
+      "ci95_mape_pp": [
+        -0.4353031903702447,
+        -0.057066127278686464
+      ]
+    },
+    {
+      "partition": "development",
+      "horizon": 4,
+      "model": "note_analog_vs_price_analog",
+      "improvement_mape_pp": 0.10225169748894294,
+      "ci95_mape_pp": [
+        -0.014817306299692606,
+        0.2174775325129521
+      ]
+    },
+    {
+      "partition": "holdout",
+      "horizon": 1,
+      "model": "baseline_v1",
+      "improvement_mape_pp": -0.17046373306982196,
+      "ci95_mape_pp": [
+        -0.2566605390890354,
+        -0.08283055037458216
+      ]
+    },
+    {
+      "partition": "holdout",
+      "horizon": 1,
+      "model": "price_analog",
+      "improvement_mape_pp": -0.02694367430123245,
+      "ci95_mape_pp": [
+        -0.16731314990722573,
+        0.1070274211123157
+      ]
+    },
+    {
+      "partition": "holdout",
+      "horizon": 1,
+      "model": "note_analog",
+      "improvement_mape_pp": 0.0062803546089728966,
+      "ci95_mape_pp": [
+        -0.12171985823469184,
+        0.14478242860349888
+      ]
+    },
+    {
+      "partition": "holdout",
+      "horizon": 1,
+      "model": "note_analog_vs_price_analog",
+      "improvement_mape_pp": 0.03322402891020536,
+      "ci95_mape_pp": [
+        -0.027997333083404075,
+        0.09271536807817016
+      ]
+    },
+    {
+      "partition": "holdout",
+      "horizon": 2,
+      "model": "baseline_v1",
+      "improvement_mape_pp": -0.22671701515376758,
+      "ci95_mape_pp": [
+        -0.4183694254698109,
+        -0.016470795512598183
+      ]
+    },
+    {
+      "partition": "holdout",
+      "horizon": 2,
+      "model": "price_analog",
+      "improvement_mape_pp": -0.1370286464714338,
+      "ci95_mape_pp": [
+        -0.3772694225681754,
+        0.09514364156423251
+      ]
+    },
+    {
+      "partition": "holdout",
+      "horizon": 2,
+      "model": "note_analog",
+      "improvement_mape_pp": -0.06155569628290263,
+      "ci95_mape_pp": [
+        -0.2857798515949146,
+        0.16034894999717902
+      ]
+    },
+    {
+      "partition": "holdout",
+      "horizon": 2,
+      "model": "note_analog_vs_price_analog",
+      "improvement_mape_pp": 0.0754729501885312,
+      "ci95_mape_pp": [
+        -0.033082227463785155,
+        0.18133327245346634
+      ]
+    },
+    {
+      "partition": "holdout",
+      "horizon": 3,
+      "model": "baseline_v1",
+      "improvement_mape_pp": -0.40045722007297724,
+      "ci95_mape_pp": [
+        -0.6545076155477163,
+        -0.13292228908986456
+      ]
+    },
+    {
+      "partition": "holdout",
+      "horizon": 3,
+      "model": "price_analog",
+      "improvement_mape_pp": -0.08554356519980179,
+      "ci95_mape_pp": [
+        -0.27425584496473837,
+        0.09197944928524214
+      ]
+    },
+    {
+      "partition": "holdout",
+      "horizon": 3,
+      "model": "note_analog",
+      "improvement_mape_pp": -0.10087784432731477,
+      "ci95_mape_pp": [
+        -0.26409633479295264,
+        0.06178569901423032
+      ]
+    },
+    {
+      "partition": "holdout",
+      "horizon": 3,
+      "model": "note_analog_vs_price_analog",
+      "improvement_mape_pp": -0.01533427912751302,
+      "ci95_mape_pp": [
+        -0.14701849740764883,
+        0.13604021983603437
+      ]
+    },
+    {
+      "partition": "holdout",
+      "horizon": 4,
+      "model": "baseline_v1",
+      "improvement_mape_pp": -0.7344718492754831,
+      "ci95_mape_pp": [
+        -1.154332018108385,
+        -0.302088224638986
+      ]
+    },
+    {
+      "partition": "holdout",
+      "horizon": 4,
+      "model": "price_analog",
+      "improvement_mape_pp": -0.06881841175145528,
+      "ci95_mape_pp": [
+        -0.3733307145432488,
+        0.21861108670819915
+      ]
+    },
+    {
+      "partition": "holdout",
+      "horizon": 4,
+      "model": "note_analog",
+      "improvement_mape_pp": -0.17254776873501965,
+      "ci95_mape_pp": [
+        -0.48172682740593187,
+        0.12749547846746787
+      ]
+    },
+    {
+      "partition": "holdout",
+      "horizon": 4,
+      "model": "note_analog_vs_price_analog",
+      "improvement_mape_pp": -0.10372935698356436,
+      "ci95_mape_pp": [
+        -0.2854047502160908,
+        0.07779691686165346
+      ]
+    }
+  ],
+  "parameterConsistency": {
+    "baseline_v1": {
+      "forecasts": 2890,
+      "invalidBollOrder": 0
+    },
+    "last_close": {
+      "forecasts": 2890,
+      "invalidBollOrder": 0
+    },
+    "note_analog": {
+      "forecasts": 2890,
+      "invalidBollOrder": 0
+    },
+    "note_delta1": {
+      "forecasts": 2890,
+      "invalidBollOrder": 16
+    },
+    "note_delta2": {
+      "forecasts": 2890,
+      "invalidBollOrder": 13
+    },
+    "price_analog": {
+      "forecasts": 2890,
+      "invalidBollOrder": 0
+    }
+  },
+  "uniqueOrigins": 724,
+  "firstOrigin": "2023-09-18",
+  "lastOrigin": "2026-09-14",
+  "holdoutStart": "2025-09-16",
+  "dataLast": "2026-09-15",
+  "noteParameterOnly": "note_delta1/2 predict indicator parameters, not future closes or a complete trade strategy."
+}

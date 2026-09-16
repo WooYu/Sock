@@ -14,7 +14,7 @@ export function PredictionLayer({ prediction, transform, hoveredDay, onHoverDay,
   const days = prediction.days.filter((day) => transform.hasTime(day.day))
   if (!days.length) return null
 
-  const step = transform.rect.width / transform.times.length
+  const step = transform.widthForTime(days[0].day)
   const firstX = transform.xForTime(days[0].day)
   const boundaryX = firstX - step / 2
   const regionWidth = step * days.length

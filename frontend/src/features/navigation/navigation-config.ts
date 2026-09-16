@@ -21,7 +21,7 @@ export type NavigationItem = {
 }
 
 export const desktopNavigation: NavigationItem[] = [
-  { section: 'overview', label: '首页', href: '/overview', icon: 'home' },
+  { section: 'overview', label: '首页', href: '/', icon: 'home' },
   { section: 'analysis', label: '分析', href: '/analysis/key-levels', icon: 'analysis' },
   { section: 'rules', label: '规则', href: '/rules', icon: 'rules' },
   { section: 'review', label: '复盘', href: '/review/daily', icon: 'review' },
@@ -29,7 +29,7 @@ export const desktopNavigation: NavigationItem[] = [
 ]
 
 export const mobileNavigation: NavigationItem[] = [
-  { section: 'overview', label: '首页', href: '/overview', icon: 'home' },
+  { section: 'overview', label: '首页', href: '/', icon: 'home' },
   { section: 'analysis', label: '分析', href: '/analysis/key-levels', icon: 'analysis' },
   { section: 'rules', label: '规则', href: '/rules', icon: 'rules' },
   { section: 'review', label: '复盘', href: '/review/daily', icon: 'review' },

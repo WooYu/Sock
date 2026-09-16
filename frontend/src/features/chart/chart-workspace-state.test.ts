@@ -1,8 +1,31 @@
 ﻿import { describe, expect, test } from 'vitest'
 import { deserializeChartWorkspace, isChartWorkspaceV2, mergeChartWorkspace, serializeChartWorkspace } from './chart-workspace-state'
 import { drawingFixture, workspaceFixture } from './chart-workspace-test-fixtures'
+import type { ChartPeriod } from './chart-periods'
 
 describe('chart workspace v2 state', () => {
+  test.each<[ChartPeriod, string]>([
+    ['intraday', '2026-09-07T10:37:00+08:00'], ['1m', '2026-09-07T10:31:00+08:00'],
+    ['5m', '2026-09-07T10:35:00+08:00'], ['15m', '2026-09-07T10:45:00+08:00'],
+    ['30m', '2026-09-07T10:30:00+08:00'], ['60m', '2026-09-07T10:30:00+08:00'],
+    ['120m', '2026-09-07T11:30:00+08:00'], ['quarter', '2026-07-01'], ['year', '2026-01-01'],
+    ['day', '2026-09-07'], ['week', '2026-09-09'], ['month', '2026-08-28'],
+  ])('round trips %s drawing anchors without losing precision or legacy dates', (period, time) => {
+    const value = workspaceFixture({ period, drawings: [drawingFixture({ period, points: [{ time, price: 123.45 }] })] })
+    expect(deserializeChartWorkspace(serializeChartWorkspace(value))).toEqual(value)
+  })
+
+  test.each<[ChartPeriod, string]>([
+    ['5m', '2026-09-07'], ['day', '2026-09-07T10:35:00+08:00'],
+    ['5m', '2026-09-07T10:31:00+08:00'], ['1m', '2026-09-07T10:31:15+08:00'],
+    ['1m', '2026-09-07T10:31:00Z'], ['1m', '2026-09-07T10:31:00+09:00'],
+    ['1m', '2026-02-30T10:31:00+08:00'], ['1m', '2026-09-07T24:00:00+08:00'],
+    ['120m', '2026-09-07T14:00:00+08:00'], ['intraday', '2026-09-07T12:00:00+08:00'],
+  ])('rejects wrong granularity or malformed %s anchors %s', (period, time) => {
+    const value = workspaceFixture({ period, drawings: [drawingFixture({ period, points: [{ time, price: 123 }] })] })
+    expect(isChartWorkspaceV2(value)).toBe(false)
+    expect(deserializeChartWorkspace(JSON.stringify(value))).toBeNull()
+  })
   test('round trips canonical v2 without market data or transient properties', () => {
     const workspace = workspaceFixture({ drawings: [drawingFixture()] })
     const transient = { ...workspace, candles: [], selectedId: 'line-1', drawings: [{ ...workspace.drawings[0], pixel: 10 }] }
@@ -13,7 +36,7 @@ describe('chart workspace v2 state', () => {
 
   test.each([
     { revision: -1 }, { revision: 1.5 }, { updatedAt: 'yesterday' },
-    { updatedAt: '2026-02-30T00:00:00Z' }, { indicators: { ma5: 1 } },
+    { updatedAt: '2026-02-30T00:00:00Z' }, { updatedAt: '2026-09-07T24:00:00Z' }, { indicators: { ma5: 1 } },
     { layers: [] }, { view: { zoom: 0, panX: 0, panY: 0 } },
     { indicatorConfig: { bollPeriod: Number.NaN } },
     { drawings: [drawingFixture({ version: -1 })] },

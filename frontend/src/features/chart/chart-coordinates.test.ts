@@ -2,6 +2,13 @@ import { describe, expect, test } from 'vitest'
 import { createChartTransform } from './chart-coordinates'
 
 describe('createChartTransform', () => {
+  test('reserves readable forecast space without changing time/price coordinates', () => {
+    const times = Array.from({ length: 63 }, (_, index) => `day-${index}`)
+    const transform = createChartTransform({ times, minPrice: 10, maxPrice: 20, rect: { left: 40, top: 20, width: 900, height: 300 }, futureCount: 3 })
+    expect(transform.widthForTime('day-62')).toBeGreaterThan(transform.widthForTime('day-59') * 2)
+    for (const time of times) expect(transform.timeForX(transform.xForTime(time))).toBe(time)
+    expect(transform.priceForY(transform.yForPrice(15))).toBeCloseTo(15)
+  })
   test('round trips time and price independent of viewport size', () => {
     const transform = createChartTransform({
       times: ['2026-09-01', '2026-09-02', '2026-09-03'],

@@ -8,6 +8,17 @@ import { drawingFixture, workspaceFixture } from './chart-workspace-test-fixture
 const ok = () => new Response(JSON.stringify({ applied: true, cursor: 1 }), { status: 200 })
 
 describe('chart workspace command persistence', () => {
+  test('keeps explicit demo drawings local even when an account is signed in', async () => {
+    localStorage.setItem('stockcal.accessToken', 'token')
+    const { result } = renderHook(() => useChartWorkspace({ symbol: 'DEMO', period: 'day', localOnly: true }))
+    act(() => result.current.commands.create(drawingFixture({ symbol: 'DEMO' })))
+    await act(() => vi.advanceTimersByTimeAsync(500))
+    await act(() => result.current.flush())
+    expect(loadChartWorkspace('DEMO', 'day')?.drawings).toHaveLength(1)
+    expect(loadChartSyncQueue()).toHaveLength(0)
+    expect(fetch).not.toHaveBeenCalled()
+    expect(result.current.syncStatus).toBe('本机保存')
+  })
   beforeEach(() => {
     localStorage.clear()
     vi.useFakeTimers()

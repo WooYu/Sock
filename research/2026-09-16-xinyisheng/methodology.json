@@ -1,0 +1,24 @@
+{
+  "version": "notes-walkforward-v1",
+  "definedBeforeOutcomeAnalysis": true,
+  "stock": "300502.SZ",
+  "evaluationStart": "2023-09-16",
+  "holdoutStart": "2025-09-16",
+  "horizons": [1, 2, 3, 4],
+  "indicatorDefinition": {"ma": [5, 10, 20], "bollWindow": 20, "bollMultiplier": 2, "varianceDDoF": 0},
+  "models": {
+    "last_close": "Future closes equal latest close; future MA/BOLL recomputed using history plus these closes.",
+    "baseline_v1": "Existing Java baseline: 20-session close linear-regression slope, median 20-session true range; extend 1-4 days (production currently exposes 3).",
+    "price_analog": "Median observed 1-4 session OHLC paths of 20 nearest historical 10-close normalized shapes; train outcomes must end before the current 10-session observation window.",
+    "note_analog": "Same historical cases and frozen k=20, with an added 0.5 * mean mismatch of MA5/10/20, BOLL, double-high and market direction states drawn from note rule concepts.",
+    "note_delta1": "Indicator parameters only: I[t+h]=I[t]+h*(I[t]-I[t-1]). Source examples imply latest increment continuation. Does not fabricate a close-price forecast.",
+    "note_delta2": "Indicator parameters only: I[t+h]=I[t]+h*(I[t]-I[t-2])/2. Operationalizes 前/昨/今 two-increment average; adjustments based on discretionary phase/rounding are omitted and disclosed."
+  },
+  "analog": {"lookbackShape": 10, "trainingLookback": 504, "candidateStride": 5, "neighbors": 20, "minimumCandidates": 20, "volatilityWindow": 20, "ruleMismatchWeight": 0.5, "intervalQuantiles": [0.1, 0.9]},
+  "forecastOrigin": "After the final daily close at t; evaluate realized exchange sessions t+1..t+4.",
+  "directionNeutralBandReturn": 0.001,
+  "metrics": ["close MAPE", "OHLC mean MAPE", "directional accuracy with neutral band", "always-up comparator", "MA/BOLL MAPE by line and horizon", "80% historical-case close interval coverage", "target within realized range", "target vs high or low within 1%"],
+  "uncertainty": {"method": "paired moving-block bootstrap of error differences", "blockLengthSessions": 20, "replications": 2000, "seed": 300502, "level": 0.95},
+  "rules": "All testable rule events reported, including poor outcomes; not automatically enabled. Filters are not relabeled as directional predictions or complete trading systems.",
+  "warnings": ["One user-chosen stock introduces selection and survivorship limitations.", "Current note version and analyst operationalization postdate historical outcomes: retrospective chronological simulation, not actual prospective proof.", "No tuning or choosing k/weights on held-out performance.", "Today's QFQ vintage is not a point-in-time corporate-action database.", "Averages over overlapping 3/4-day forecasts are dependent; confidence bounds use time blocks."]
+}

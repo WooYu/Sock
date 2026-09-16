@@ -1,0 +1,131 @@
+{
+  "asOf": "2026-09-16",
+  "timezone": "Asia/Shanghai",
+  "stock": {
+    "symbol": "300502",
+    "name": "新易盛",
+    "exchange": "SZ"
+  },
+  "sources": [
+    {
+      "file": "sources/tencent-sz300502-qfq-2022.json",
+      "url": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sz300502,day,2022-01-01,2023-01-01,640,qfq",
+      "retrievedAt": "2026-09-16T08:47:20.432669+00:00",
+      "sha256": "95467ca923ab6b7c62130b833081fafd2845400ec5d40767c87a47a7093bc57c"
+    },
+    {
+      "file": "sources/tencent-sz300502-qfq-2023.json",
+      "url": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sz300502,day,2023-01-01,2024-01-01,640,qfq",
+      "retrievedAt": "2026-09-16T08:47:20.443276+00:00",
+      "sha256": "2da92157609c5bd9d1a6d65031dbe6739b84ca695c025f7cdd615baea6e5c442"
+    },
+    {
+      "file": "sources/tencent-sz300502-qfq-2024.json",
+      "url": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sz300502,day,2024-01-01,2025-01-01,640,qfq",
+      "retrievedAt": "2026-09-16T08:47:20.457430+00:00",
+      "sha256": "cd2d3ffb0e3c08d1c3d3e0aa269c29e73318e3613dc76d662c23bae5e06724a6"
+    },
+    {
+      "file": "sources/tencent-sz300502-qfq-2025.json",
+      "url": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sz300502,day,2025-01-01,2026-01-01,640,qfq",
+      "retrievedAt": "2026-09-16T08:47:20.686122+00:00",
+      "sha256": "9f6bd52e723a633570726ba788172df607fa03220f59caabf79dffcd2dd90cc0"
+    },
+    {
+      "file": "sources/tencent-sz300502-qfq-2026.json",
+      "url": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sz300502,day,2026-01-01,2026-09-17,640,qfq",
+      "retrievedAt": "2026-09-16T08:47:20.706827+00:00",
+      "sha256": "7527c4489707f4bae4f2fa63fb18ad144c91df383bd37a31b6edf249a3274ac0"
+    },
+    {
+      "file": "sources/tencent-sz300502-raw-2022.json",
+      "url": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sz300502,day,2022-01-01,2023-01-01,640,",
+      "retrievedAt": "2026-09-16T08:47:20.780332+00:00",
+      "sha256": "610cbd7bda58c2ee94a53d49aaff9f99c1c9d155bf25068f5e46151d43e2b253"
+    },
+    {
+      "file": "sources/tencent-sz300502-raw-2023.json",
+      "url": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sz300502,day,2023-01-01,2024-01-01,640,",
+      "retrievedAt": "2026-09-16T08:47:20.909172+00:00",
+      "sha256": "31743a185c3efb74097e4d90224fdc84737fbb2fc05492e9cfa56026e5341ac6"
+    },
+    {
+      "file": "sources/tencent-sz300502-raw-2024.json",
+      "url": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sz300502,day,2024-01-01,2025-01-01,640,",
+      "retrievedAt": "2026-09-16T08:47:20.945266+00:00",
+      "sha256": "858684943a3434a7ccc68c86a8ae78ad938407970fc83b2616afc7063febe715"
+    },
+    {
+      "file": "sources/tencent-sz300502-raw-2025.json",
+      "url": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sz300502,day,2025-01-01,2026-01-01,640,",
+      "retrievedAt": "2026-09-16T08:47:21.024827+00:00",
+      "sha256": "7147e2e0a6a0818bdb1db6a64148d8bfb88b1ad212811e0758b184f441f1bc8b"
+    },
+    {
+      "file": "sources/tencent-sz300502-raw-2026.json",
+      "url": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sz300502,day,2026-01-01,2026-09-17,640,",
+      "retrievedAt": "2026-09-16T08:47:21.110312+00:00",
+      "sha256": "5f3cbd37e7b18390412e205d97c16097611536d4d5686e7ada9ca9227260b2e5"
+    },
+    {
+      "file": "sources/tencent-sh000001-raw-2022.json",
+      "url": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh000001,day,2022-01-01,2023-01-01,640,",
+      "retrievedAt": "2026-09-16T08:47:21.190078+00:00",
+      "sha256": "96ef05dbbb2bcb661720308dc45ccd71e89a677b29b3838a2a66d00645c04b9f"
+    },
+    {
+      "file": "sources/tencent-sh000001-raw-2023.json",
+      "url": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh000001,day,2023-01-01,2024-01-01,640,",
+      "retrievedAt": "2026-09-16T08:47:21.272569+00:00",
+      "sha256": "bd0a65c39f0434c383ba761c246c626f8445a7db163bb763f83447a1f6ca6a86"
+    },
+    {
+      "file": "sources/tencent-sh000001-raw-2024.json",
+      "url": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh000001,day,2024-01-01,2025-01-01,640,",
+      "retrievedAt": "2026-09-16T08:47:21.380009+00:00",
+      "sha256": "2830f844bf4621b6f359c3dcc84eb19dfbacd853de86515663d0295c00fe2c98"
+    },
+    {
+      "file": "sources/tencent-sh000001-raw-2025.json",
+      "url": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh000001,day,2025-01-01,2026-01-01,640,",
+      "retrievedAt": "2026-09-16T08:47:21.429283+00:00",
+      "sha256": "e12b99439eaac7e3fd3b5241e1138534405c3a9d951846688d4e5b8e6b5b0f62"
+    },
+    {
+      "file": "sources/tencent-sh000001-raw-2026.json",
+      "url": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh000001,day,2026-01-01,2026-09-17,640,",
+      "retrievedAt": "2026-09-16T08:47:21.523066+00:00",
+      "sha256": "382123a82cba6a55d54892cdf93d49ea2aa715757c6fd6b14a10d1ab0ed8f29c"
+    },
+    {
+      "file": "sources/sina-sz300502-raw.json",
+      "url": "https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sz300502&scale=240&ma=no&datalen=1023",
+      "retrievedAt": "2026-09-16T08:47:21.531343+00:00",
+      "sha256": "48a4d56edb024d5f397aa5f3975d0be93556f7453878104f0f4fbdab4f130e27"
+    }
+  ],
+  "stock-adjusted.json": {
+    "rows": 1140,
+    "first": "2022-01-04",
+    "last": "2026-09-15",
+    "adjustment": "qfq",
+    "volumeUnit": "100 shares per lot",
+    "sha256": "68bc5595782619b48cb53d65e30b0ad3ab8b64077dd126f50d6e40f148bc5f6f"
+  },
+  "stock-raw.json": {
+    "rows": 1141,
+    "first": "2022-01-04",
+    "last": "2026-09-16",
+    "adjustment": "unadjusted",
+    "volumeUnit": "100 shares per lot",
+    "sha256": "6c592eab4ca3a0ec9b3878a909212f34e0451fa68f26df3746cc5e2ccd603750"
+  },
+  "benchmark-raw.json": {
+    "rows": 1141,
+    "first": "2022-01-04",
+    "last": "2026-09-16",
+    "adjustment": "unadjusted",
+    "volumeUnit": "100 shares per lot",
+    "sha256": "260cdbf7a4ab745c99622741488d3cb0279aed1ce7538b37e3ab301564f64869"
+  }
+}

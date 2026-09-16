@@ -1,0 +1,216 @@
+{
+  "sourceCommit": "707f4fe0032ff44f309e7f374ba68f16d9e065af",
+  "documents": 140,
+  "rawCandidates": 142,
+  "sourceQuotesValidated": 324,
+  "sourceComputability": {
+    "exact_daily": 6,
+    "requires_proxy": 73,
+    "requires_intraday": 20,
+    "requires_external_data": 23,
+    "subjective": 20
+  },
+  "reviewEntriesAfterTopicGrouping": 64,
+  "manualEntries": 10,
+  "workingTreeLineEndings": "File SHA256 reflects checked-out CRLF bytes; line quotes are newline-normalized.",
+  "groups": [
+    {
+      "id": "ma5-floor",
+      "sourceRuleIds": [
+        "b1-r02",
+        "b3-r02",
+        "b2-r23"
+      ]
+    },
+    {
+      "id": "ma20-floor",
+      "sourceRuleIds": [
+        "b1-r05",
+        "b1-r06",
+        "b3-r01",
+        "b3-r29"
+      ]
+    },
+    {
+      "id": "double-high",
+      "sourceRuleIds": [
+        "b1-r01",
+        "b2-r24",
+        "b3-r11"
+      ]
+    },
+    {
+      "id": "granville-start",
+      "sourceRuleIds": [
+        "b1-r09",
+        "b2-r11",
+        "b3-r05",
+        "b3-r06"
+      ]
+    },
+    {
+      "id": "granville-exit",
+      "sourceRuleIds": [
+        "b1-r10",
+        "b1-r12",
+        "b2-r13",
+        "b2-r15",
+        "b3-r07"
+      ]
+    },
+    {
+      "id": "granville-cycle",
+      "sourceRuleIds": [
+        "b1-r08",
+        "b1-r11",
+        "b2-r12",
+        "b2-r16",
+        "b2-r41",
+        "b3-r08",
+        "b3-r09"
+      ]
+    },
+    {
+      "id": "parameter-delta",
+      "sourceRuleIds": [
+        "b1-r17",
+        "b2-r02",
+        "b2-r03",
+        "b2-r05",
+        "b3-r18"
+      ]
+    },
+    {
+      "id": "three-day-levels",
+      "sourceRuleIds": [
+        "b1-r18",
+        "b2-r07",
+        "b2-r08",
+        "b2-r09",
+        "b3-r19",
+        "b3-r22",
+        "b3-r23"
+      ]
+    },
+    {
+      "id": "forecast-snapshot",
+      "sourceRuleIds": [
+        "b1-r19",
+        "b3-r20",
+        "b3-r21"
+      ]
+    },
+    {
+      "id": "multi-timeframe",
+      "sourceRuleIds": [
+        "b1-r23",
+        "b2-r04",
+        "b2-r06",
+        "b2-r22"
+      ]
+    },
+    {
+      "id": "key-point",
+      "sourceRuleIds": [
+        "b1-r20",
+        "b1-r22",
+        "b2-r10",
+        "b2-r17",
+        "b2-r18",
+        "b2-r19",
+        "b2-r20",
+        "b2-r21",
+        "b3-r24"
+      ]
+    },
+    {
+      "id": "mirror",
+      "sourceRuleIds": [
+        "b1-r03",
+        "b1-r21",
+        "b2-r37",
+        "b2-r40",
+        "b3-r25",
+        "b3-r26"
+      ]
+    },
+    {
+      "id": "market-turtle",
+      "sourceRuleIds": [
+        "b1-r15",
+        "b2-r44",
+        "b3-r13",
+        "b3-r15"
+      ]
+    },
+    {
+      "id": "turtle-exit",
+      "sourceRuleIds": [
+        "b1-r16",
+        "b3-r14"
+      ]
+    },
+    {
+      "id": "phase3",
+      "sourceRuleIds": [
+        "b1-r07",
+        "b1-r13",
+        "b1-r14",
+        "b2-r29",
+        "b2-r30",
+        "b2-r31",
+        "b2-r39",
+        "b3-r10",
+        "b3-r16",
+        "b3-r17"
+      ]
+    },
+    {
+      "id": "moxian",
+      "sourceRuleIds": [
+        "b2-r25",
+        "b2-r26",
+        "b2-r27",
+        "b2-r28",
+        "b2-r38",
+        "b3-r27",
+        "b3-r28",
+        "b3-r30",
+        "b3-r37"
+      ]
+    },
+    {
+      "id": "rebound-warning",
+      "sourceRuleIds": [
+        "b1-r04",
+        "b2-r35",
+        "b2-r36",
+        "b3-r40",
+        "b3-r41"
+      ]
+    },
+    {
+      "id": "trade-plan",
+      "sourceRuleIds": [
+        "b1-r26",
+        "b2-r54",
+        "b3-r43"
+      ]
+    },
+    {
+      "id": "ipo-context",
+      "sourceRuleIds": [
+        "b2-r51",
+        "b3-r32",
+        "b3-r33"
+      ]
+    },
+    {
+      "id": "ex-rights",
+      "sourceRuleIds": [
+        "b2-r43",
+        "b3-r34"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "sourceHashesVerified": 16,
+  "rawSourceCrosscheck": {
+    "overlapSessions": 1023,
+    "maxPriceDifferenceCNY": 0.0,
+    "priceMismatchesOver0011": 0,
+    "maxVolumeDifferenceShares": 50.0,
+    "volumeMismatchesOver100Shares": 0
+  },
+  "coverage": {
+    "warmupFirst": "2022-01-04",
+    "lastVerifiedAdjustedSession": "2026-09-15",
+    "lastRawSession": "2026-09-16",
+    "evaluationFirst": "2023-09-18",
+    "evaluationLast": "2026-09-15",
+    "evaluationSessions": 725,
+    "missingVsBenchmarkCalendar": [],
+    "nonpositiveVolumeSessions": []
+  },
+  "corporateActionCandidates": [
+    {
+      "day": "2025-05-28",
+      "rawReturn": -0.245340230090074,
+      "adjustedReturn": 0.061565804674309055
+    },
+    {
+      "day": "2026-06-11",
+      "rawReturn": -0.31909385113268607,
+      "adjustedReturn": -0.04549677719063938
+    }
+  ],
+  "caveats": [
+    "腾讯复权日线最后日期比未复权日线滞后，评估截止共同已验证日期，不拼接未经核验的复权行情。",
+    "前复权是本次下载的数据版本，不是每个历史时点独立保存的版本。",
+    "原始成交量不随复权股价缩放，除权事件附近的量比解释应谨慎。",
+    "腾讯和新浪可能共享上游交易所数据；交叉一致性不等于两个独立交易所来源。"
+  ]
+}

@@ -1,0 +1,2337 @@
+{
+  "principles": [
+    {
+      "id": "above_ma5",
+      "title": "收盘位于 MA5 上方",
+      "sourceRuleIds": [
+        "b1-r02",
+        "b3-r02"
+      ],
+      "interpretation": "经验的收盘代理，不等于买入指令",
+      "partition": "all",
+      "horizon": 1,
+      "events": 391,
+      "baseOrigins": 724,
+      "positive_pct": 47.570332480818415,
+      "median_return_pct": -0.278688524590176,
+      "mean_return_pct": 0.557391482134158,
+      "unconditional_positive_pct": 50.966850828729285,
+      "unconditional_mean_return_pct": 0.5389457519464231,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "above_ma5",
+      "title": "收盘位于 MA5 上方",
+      "sourceRuleIds": [
+        "b1-r02",
+        "b3-r02"
+      ],
+      "interpretation": "经验的收盘代理，不等于买入指令",
+      "partition": "all",
+      "horizon": 2,
+      "events": 391,
+      "baseOrigins": 723,
+      "positive_pct": 47.05882352941176,
+      "median_return_pct": -0.3601797185399769,
+      "mean_return_pct": 0.8505394558599355,
+      "unconditional_positive_pct": 51.17565698478561,
+      "unconditional_mean_return_pct": 1.093036594682282,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "above_ma5",
+      "title": "收盘位于 MA5 上方",
+      "sourceRuleIds": [
+        "b1-r02",
+        "b3-r02"
+      ],
+      "interpretation": "经验的收盘代理，不等于买入指令",
+      "partition": "all",
+      "horizon": 3,
+      "events": 390,
+      "baseOrigins": 722,
+      "positive_pct": 52.307692307692314,
+      "median_return_pct": 0.5124868090422008,
+      "mean_return_pct": 1.4057137044270327,
+      "unconditional_positive_pct": 54.84764542936288,
+      "unconditional_mean_return_pct": 1.6518155922316808,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "above_ma5",
+      "title": "收盘位于 MA5 上方",
+      "sourceRuleIds": [
+        "b1-r02",
+        "b3-r02"
+      ],
+      "interpretation": "经验的收盘代理，不等于买入指令",
+      "partition": "all",
+      "horizon": 4,
+      "events": 389,
+      "baseOrigins": 721,
+      "positive_pct": 52.44215938303341,
+      "median_return_pct": 0.7630963838856086,
+      "mean_return_pct": 2.0855197162921844,
+      "unconditional_positive_pct": 54.36893203883495,
+      "unconditional_mean_return_pct": 2.2004122366692567,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "below_ma20",
+      "title": "收盘位于 MA20 下方",
+      "sourceRuleIds": [
+        "b3-r01"
+      ],
+      "interpretation": "禁做/观望过滤，不等于做空预测",
+      "partition": "all",
+      "horizon": 1,
+      "events": 285,
+      "baseOrigins": 724,
+      "positive_pct": 54.385964912280706,
+      "median_return_pct": 0.5885433029636733,
+      "mean_return_pct": 0.4734392222837663,
+      "unconditional_positive_pct": 50.966850828729285,
+      "unconditional_mean_return_pct": 0.5389457519464231,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "below_ma20",
+      "title": "收盘位于 MA20 下方",
+      "sourceRuleIds": [
+        "b3-r01"
+      ],
+      "interpretation": "禁做/观望过滤，不等于做空预测",
+      "partition": "all",
+      "horizon": 2,
+      "events": 284,
+      "baseOrigins": 723,
+      "positive_pct": 53.52112676056338,
+      "median_return_pct": 0.9143498800094241,
+      "mean_return_pct": 1.0625783100185793,
+      "unconditional_positive_pct": 51.17565698478561,
+      "unconditional_mean_return_pct": 1.093036594682282,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "below_ma20",
+      "title": "收盘位于 MA20 下方",
+      "sourceRuleIds": [
+        "b3-r01"
+      ],
+      "interpretation": "禁做/观望过滤，不等于做空预测",
+      "partition": "all",
+      "horizon": 3,
+      "events": 284,
+      "baseOrigins": 722,
+      "positive_pct": 58.098591549295776,
+      "median_return_pct": 1.2920573619359277,
+      "mean_return_pct": 1.6593462930518659,
+      "unconditional_positive_pct": 54.84764542936288,
+      "unconditional_mean_return_pct": 1.6518155922316808,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "below_ma20",
+      "title": "收盘位于 MA20 下方",
+      "sourceRuleIds": [
+        "b3-r01"
+      ],
+      "interpretation": "禁做/观望过滤，不等于做空预测",
+      "partition": "all",
+      "horizon": 4,
+      "events": 283,
+      "baseOrigins": 721,
+      "positive_pct": 56.8904593639576,
+      "median_return_pct": 1.3483146067415852,
+      "mean_return_pct": 2.1259656955192825,
+      "unconditional_positive_pct": 54.36893203883495,
+      "unconditional_mean_return_pct": 2.2004122366692567,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_ma10_falling",
+      "title": "MA5 与 MA10 同时下降",
+      "sourceRuleIds": [
+        "b3-r03"
+      ],
+      "interpretation": "可直接计算的禁做状态",
+      "partition": "all",
+      "horizon": 1,
+      "events": 199,
+      "baseOrigins": 724,
+      "positive_pct": 56.78391959798995,
+      "median_return_pct": 0.7192982456140307,
+      "mean_return_pct": 0.5367122959855826,
+      "unconditional_positive_pct": 50.966850828729285,
+      "unconditional_mean_return_pct": 0.5389457519464231,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_ma10_falling",
+      "title": "MA5 与 MA10 同时下降",
+      "sourceRuleIds": [
+        "b3-r03"
+      ],
+      "interpretation": "可直接计算的禁做状态",
+      "partition": "all",
+      "horizon": 2,
+      "events": 199,
+      "baseOrigins": 723,
+      "positive_pct": 54.773869346733676,
+      "median_return_pct": 1.0230776417826881,
+      "mean_return_pct": 1.0742610047541028,
+      "unconditional_positive_pct": 51.17565698478561,
+      "unconditional_mean_return_pct": 1.093036594682282,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_ma10_falling",
+      "title": "MA5 与 MA10 同时下降",
+      "sourceRuleIds": [
+        "b3-r03"
+      ],
+      "interpretation": "可直接计算的禁做状态",
+      "partition": "all",
+      "horizon": 3,
+      "events": 199,
+      "baseOrigins": 722,
+      "positive_pct": 55.778894472361806,
+      "median_return_pct": 0.8928571428571397,
+      "mean_return_pct": 0.8543580836662752,
+      "unconditional_positive_pct": 54.84764542936288,
+      "unconditional_mean_return_pct": 1.6518155922316808,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_ma10_falling",
+      "title": "MA5 与 MA10 同时下降",
+      "sourceRuleIds": [
+        "b3-r03"
+      ],
+      "interpretation": "可直接计算的禁做状态",
+      "partition": "all",
+      "horizon": 4,
+      "events": 199,
+      "baseOrigins": 721,
+      "positive_pct": 55.27638190954774,
+      "median_return_pct": 1.3483146067415852,
+      "mean_return_pct": 1.5006782413894888,
+      "unconditional_positive_pct": 54.36893203883495,
+      "unconditional_mean_return_pct": 2.2004122366692567,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "three_ma_rising",
+      "title": "MA5/10/20 同时上升",
+      "sourceRuleIds": [
+        "b3-r04"
+      ],
+      "interpretation": "将三个原子状态取交集是研究组合",
+      "partition": "all",
+      "horizon": 1,
+      "events": 265,
+      "baseOrigins": 724,
+      "positive_pct": 45.660377358490564,
+      "median_return_pct": -0.5361329925968827,
+      "mean_return_pct": 0.43215094760855227,
+      "unconditional_positive_pct": 50.966850828729285,
+      "unconditional_mean_return_pct": 0.5389457519464231,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "three_ma_rising",
+      "title": "MA5/10/20 同时上升",
+      "sourceRuleIds": [
+        "b3-r04"
+      ],
+      "interpretation": "将三个原子状态取交集是研究组合",
+      "partition": "all",
+      "horizon": 2,
+      "events": 265,
+      "baseOrigins": 723,
+      "positive_pct": 47.16981132075472,
+      "median_return_pct": -0.3601797185399769,
+      "mean_return_pct": 0.7679654710875733,
+      "unconditional_positive_pct": 51.17565698478561,
+      "unconditional_mean_return_pct": 1.093036594682282,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "three_ma_rising",
+      "title": "MA5/10/20 同时上升",
+      "sourceRuleIds": [
+        "b3-r04"
+      ],
+      "interpretation": "将三个原子状态取交集是研究组合",
+      "partition": "all",
+      "horizon": 3,
+      "events": 265,
+      "baseOrigins": 722,
+      "positive_pct": 50.56603773584906,
+      "median_return_pct": 0.19401493327062536,
+      "mean_return_pct": 0.9185052047152288,
+      "unconditional_positive_pct": 54.84764542936288,
+      "unconditional_mean_return_pct": 1.6518155922316808,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "three_ma_rising",
+      "title": "MA5/10/20 同时上升",
+      "sourceRuleIds": [
+        "b3-r04"
+      ],
+      "interpretation": "将三个原子状态取交集是研究组合",
+      "partition": "all",
+      "horizon": 4,
+      "events": 265,
+      "baseOrigins": 721,
+      "positive_pct": 48.679245283018865,
+      "median_return_pct": -0.21942226344244808,
+      "mean_return_pct": 1.292526123368199,
+      "unconditional_positive_pct": 54.36893203883495,
+      "unconditional_mean_return_pct": 2.2004122366692567,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "double_high",
+      "title": "最高价、最低价同时抬升",
+      "sourceRuleIds": [
+        "b1-r01"
+      ],
+      "interpretation": "原文双高定义；持有纪律需另定",
+      "partition": "all",
+      "horizon": 1,
+      "events": 295,
+      "baseOrigins": 724,
+      "positive_pct": 49.152542372881356,
+      "median_return_pct": -0.19175455417066445,
+      "mean_return_pct": 0.5527360638766468,
+      "unconditional_positive_pct": 50.966850828729285,
+      "unconditional_mean_return_pct": 0.5389457519464231,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "double_high",
+      "title": "最高价、最低价同时抬升",
+      "sourceRuleIds": [
+        "b1-r01"
+      ],
+      "interpretation": "原文双高定义；持有纪律需另定",
+      "partition": "all",
+      "horizon": 2,
+      "events": 295,
+      "baseOrigins": 723,
+      "positive_pct": 49.49152542372882,
+      "median_return_pct": 0.0,
+      "mean_return_pct": 1.0218610484606836,
+      "unconditional_positive_pct": 51.17565698478561,
+      "unconditional_mean_return_pct": 1.093036594682282,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "double_high",
+      "title": "最高价、最低价同时抬升",
+      "sourceRuleIds": [
+        "b1-r01"
+      ],
+      "interpretation": "原文双高定义；持有纪律需另定",
+      "partition": "all",
+      "horizon": 3,
+      "events": 294,
+      "baseOrigins": 722,
+      "positive_pct": 53.40136054421769,
+      "median_return_pct": 0.9018161223199317,
+      "mean_return_pct": 1.39449103972541,
+      "unconditional_positive_pct": 54.84764542936288,
+      "unconditional_mean_return_pct": 1.6518155922316808,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "double_high",
+      "title": "最高价、最低价同时抬升",
+      "sourceRuleIds": [
+        "b1-r01"
+      ],
+      "interpretation": "原文双高定义；持有纪律需另定",
+      "partition": "all",
+      "horizon": 4,
+      "events": 294,
+      "baseOrigins": 721,
+      "positive_pct": 53.40136054421769,
+      "median_return_pct": 0.5836620643039026,
+      "mean_return_pct": 2.009606916802978,
+      "unconditional_positive_pct": 54.36893203883495,
+      "unconditional_mean_return_pct": 2.2004122366692567,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_break",
+      "title": "收盘跌破 MA5",
+      "sourceRuleIds": [
+        "b1-r02",
+        "b3-r02"
+      ],
+      "interpretation": "以收盘确认破位的研究代理",
+      "partition": "all",
+      "horizon": 1,
+      "events": 98,
+      "baseOrigins": 724,
+      "positive_pct": 50.0,
+      "median_return_pct": 0.061709573883661495,
+      "mean_return_pct": 0.09602588388792649,
+      "unconditional_positive_pct": 50.966850828729285,
+      "unconditional_mean_return_pct": 0.5389457519464231,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_break",
+      "title": "收盘跌破 MA5",
+      "sourceRuleIds": [
+        "b1-r02",
+        "b3-r02"
+      ],
+      "interpretation": "以收盘确认破位的研究代理",
+      "partition": "all",
+      "horizon": 2,
+      "events": 97,
+      "baseOrigins": 723,
+      "positive_pct": 59.79381443298969,
+      "median_return_pct": 1.1377447670492868,
+      "mean_return_pct": 1.6468895051780823,
+      "unconditional_positive_pct": 51.17565698478561,
+      "unconditional_mean_return_pct": 1.093036594682282,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_break",
+      "title": "收盘跌破 MA5",
+      "sourceRuleIds": [
+        "b1-r02",
+        "b3-r02"
+      ],
+      "interpretation": "以收盘确认破位的研究代理",
+      "partition": "all",
+      "horizon": 3,
+      "events": 97,
+      "baseOrigins": 722,
+      "positive_pct": 65.97938144329896,
+      "median_return_pct": 1.80111618467782,
+      "mean_return_pct": 2.7542386237466743,
+      "unconditional_positive_pct": 54.84764542936288,
+      "unconditional_mean_return_pct": 1.6518155922316808,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_break",
+      "title": "收盘跌破 MA5",
+      "sourceRuleIds": [
+        "b1-r02",
+        "b3-r02"
+      ],
+      "interpretation": "以收盘确认破位的研究代理",
+      "partition": "all",
+      "horizon": 4,
+      "events": 97,
+      "baseOrigins": 721,
+      "positive_pct": 56.70103092783505,
+      "median_return_pct": 1.012337138245134,
+      "mean_return_pct": 2.806464876876376,
+      "unconditional_positive_pct": 54.36893203883495,
+      "unconditional_mean_return_pct": 2.2004122366692567,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_reclaim_ma20_up",
+      "title": "重新站上 MA5 且 MA20 上升",
+      "sourceRuleIds": [
+        "b3-r41"
+      ],
+      "interpretation": "代理采用当前 MA20 上升，并非严格首次拐头",
+      "partition": "all",
+      "horizon": 1,
+      "events": 57,
+      "baseOrigins": 724,
+      "positive_pct": 59.64912280701754,
+      "median_return_pct": 0.6085423420349345,
+      "mean_return_pct": 1.4851635688891185,
+      "unconditional_positive_pct": 50.966850828729285,
+      "unconditional_mean_return_pct": 0.5389457519464231,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_reclaim_ma20_up",
+      "title": "重新站上 MA5 且 MA20 上升",
+      "sourceRuleIds": [
+        "b3-r41"
+      ],
+      "interpretation": "代理采用当前 MA20 上升，并非严格首次拐头",
+      "partition": "all",
+      "horizon": 2,
+      "events": 57,
+      "baseOrigins": 723,
+      "positive_pct": 42.10526315789473,
+      "median_return_pct": -0.723203929862859,
+      "mean_return_pct": 1.4296241870980904,
+      "unconditional_positive_pct": 51.17565698478561,
+      "unconditional_mean_return_pct": 1.093036594682282,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_reclaim_ma20_up",
+      "title": "重新站上 MA5 且 MA20 上升",
+      "sourceRuleIds": [
+        "b3-r41"
+      ],
+      "interpretation": "代理采用当前 MA20 上升，并非严格首次拐头",
+      "partition": "all",
+      "horizon": 3,
+      "events": 57,
+      "baseOrigins": 722,
+      "positive_pct": 52.63157894736842,
+      "median_return_pct": 1.3293967571383902,
+      "mean_return_pct": 1.4412995939435598,
+      "unconditional_positive_pct": 54.84764542936288,
+      "unconditional_mean_return_pct": 1.6518155922316808,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_reclaim_ma20_up",
+      "title": "重新站上 MA5 且 MA20 上升",
+      "sourceRuleIds": [
+        "b3-r41"
+      ],
+      "interpretation": "代理采用当前 MA20 上升，并非严格首次拐头",
+      "partition": "all",
+      "horizon": 4,
+      "events": 57,
+      "baseOrigins": 721,
+      "positive_pct": 56.14035087719298,
+      "median_return_pct": 2.5892017080408225,
+      "mean_return_pct": 2.809429957967073,
+      "unconditional_positive_pct": 54.36893203883495,
+      "unconditional_mean_return_pct": 2.2004122366692567,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "upper_touch_above_ma5",
+      "title": "触及 BOLL 上轨且收盘守住 MA5",
+      "sourceRuleIds": [
+        "b3-r10"
+      ],
+      "interpretation": "使用当日收盘后的轨道标记状态，不假定盘中提前成交",
+      "partition": "all",
+      "horizon": 1,
+      "events": 131,
+      "baseOrigins": 724,
+      "positive_pct": 47.32824427480916,
+      "median_return_pct": -0.5690944972233658,
+      "mean_return_pct": 0.817495562637776,
+      "unconditional_positive_pct": 50.966850828729285,
+      "unconditional_mean_return_pct": 0.5389457519464231,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "upper_touch_above_ma5",
+      "title": "触及 BOLL 上轨且收盘守住 MA5",
+      "sourceRuleIds": [
+        "b3-r10"
+      ],
+      "interpretation": "使用当日收盘后的轨道标记状态，不假定盘中提前成交",
+      "partition": "all",
+      "horizon": 2,
+      "events": 131,
+      "baseOrigins": 723,
+      "positive_pct": 49.61832061068702,
+      "median_return_pct": 0.00859416627991827,
+      "mean_return_pct": 1.074232226580805,
+      "unconditional_positive_pct": 51.17565698478561,
+      "unconditional_mean_return_pct": 1.093036594682282,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "upper_touch_above_ma5",
+      "title": "触及 BOLL 上轨且收盘守住 MA5",
+      "sourceRuleIds": [
+        "b3-r10"
+      ],
+      "interpretation": "使用当日收盘后的轨道标记状态，不假定盘中提前成交",
+      "partition": "all",
+      "horizon": 3,
+      "events": 131,
+      "baseOrigins": 722,
+      "positive_pct": 51.908396946564885,
+      "median_return_pct": 0.4557781595649457,
+      "mean_return_pct": 1.3623397236603718,
+      "unconditional_positive_pct": 54.84764542936288,
+      "unconditional_mean_return_pct": 1.6518155922316808,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "upper_touch_above_ma5",
+      "title": "触及 BOLL 上轨且收盘守住 MA5",
+      "sourceRuleIds": [
+        "b3-r10"
+      ],
+      "interpretation": "使用当日收盘后的轨道标记状态，不假定盘中提前成交",
+      "partition": "all",
+      "horizon": 4,
+      "events": 131,
+      "baseOrigins": 721,
+      "positive_pct": 49.61832061068702,
+      "median_return_pct": 0.08766049605526405,
+      "mean_return_pct": 1.7449013783007543,
+      "unconditional_positive_pct": 54.36893203883495,
+      "unconditional_mean_return_pct": 2.2004122366692567,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_pullback_up",
+      "title": "回踩上升 MA5 后收回",
+      "sourceRuleIds": [
+        "b1-r09"
+      ],
+      "interpretation": "最低价触线且收盘在线上；不冒充已识别葛一",
+      "partition": "all",
+      "horizon": 1,
+      "events": 152,
+      "baseOrigins": 724,
+      "positive_pct": 46.71052631578947,
+      "median_return_pct": -0.24838259163825205,
+      "mean_return_pct": 0.5803175633768115,
+      "unconditional_positive_pct": 50.966850828729285,
+      "unconditional_mean_return_pct": 0.5389457519464231,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_pullback_up",
+      "title": "回踩上升 MA5 后收回",
+      "sourceRuleIds": [
+        "b1-r09"
+      ],
+      "interpretation": "最低价触线且收盘在线上；不冒充已识别葛一",
+      "partition": "all",
+      "horizon": 2,
+      "events": 152,
+      "baseOrigins": 723,
+      "positive_pct": 46.05263157894737,
+      "median_return_pct": -0.6691522522798199,
+      "mean_return_pct": 0.9431753385760695,
+      "unconditional_positive_pct": 51.17565698478561,
+      "unconditional_mean_return_pct": 1.093036594682282,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_pullback_up",
+      "title": "回踩上升 MA5 后收回",
+      "sourceRuleIds": [
+        "b1-r09"
+      ],
+      "interpretation": "最低价触线且收盘在线上；不冒充已识别葛一",
+      "partition": "all",
+      "horizon": 3,
+      "events": 151,
+      "baseOrigins": 722,
+      "positive_pct": 55.62913907284768,
+      "median_return_pct": 0.9180371961300837,
+      "mean_return_pct": 1.7800514212242249,
+      "unconditional_positive_pct": 54.84764542936288,
+      "unconditional_mean_return_pct": 1.6518155922316808,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_pullback_up",
+      "title": "回踩上升 MA5 后收回",
+      "sourceRuleIds": [
+        "b1-r09"
+      ],
+      "interpretation": "最低价触线且收盘在线上；不冒充已识别葛一",
+      "partition": "all",
+      "horizon": 4,
+      "events": 150,
+      "baseOrigins": 721,
+      "positive_pct": 55.333333333333336,
+      "median_return_pct": 1.4907352374418315,
+      "mean_return_pct": 2.778452550151615,
+      "unconditional_positive_pct": 54.36893203883495,
+      "unconditional_mean_return_pct": 2.2004122366692567,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "boll_opening_up",
+      "title": "BOLL 向外张开且收盘在中轨上",
+      "sourceRuleIds": [
+        "b3-r16",
+        "b2-r30"
+      ],
+      "interpretation": "技术代理，不等同完整三期开口定义",
+      "partition": "all",
+      "horizon": 1,
+      "events": 120,
+      "baseOrigins": 724,
+      "positive_pct": 49.166666666666664,
+      "median_return_pct": -0.26132906389028654,
+      "mean_return_pct": 0.6631237963044887,
+      "unconditional_positive_pct": 50.966850828729285,
+      "unconditional_mean_return_pct": 0.5389457519464231,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "boll_opening_up",
+      "title": "BOLL 向外张开且收盘在中轨上",
+      "sourceRuleIds": [
+        "b3-r16",
+        "b2-r30"
+      ],
+      "interpretation": "技术代理，不等同完整三期开口定义",
+      "partition": "all",
+      "horizon": 2,
+      "events": 120,
+      "baseOrigins": 723,
+      "positive_pct": 45.83333333333333,
+      "median_return_pct": -0.287303314558629,
+      "mean_return_pct": 0.7388666200644239,
+      "unconditional_positive_pct": 51.17565698478561,
+      "unconditional_mean_return_pct": 1.093036594682282,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "boll_opening_up",
+      "title": "BOLL 向外张开且收盘在中轨上",
+      "sourceRuleIds": [
+        "b3-r16",
+        "b2-r30"
+      ],
+      "interpretation": "技术代理，不等同完整三期开口定义",
+      "partition": "all",
+      "horizon": 3,
+      "events": 120,
+      "baseOrigins": 722,
+      "positive_pct": 47.5,
+      "median_return_pct": -0.36773821555362574,
+      "mean_return_pct": 0.6675341194543893,
+      "unconditional_positive_pct": 54.84764542936288,
+      "unconditional_mean_return_pct": 1.6518155922316808,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "boll_opening_up",
+      "title": "BOLL 向外张开且收盘在中轨上",
+      "sourceRuleIds": [
+        "b3-r16",
+        "b2-r30"
+      ],
+      "interpretation": "技术代理，不等同完整三期开口定义",
+      "partition": "all",
+      "horizon": 4,
+      "events": 120,
+      "baseOrigins": 721,
+      "positive_pct": 45.83333333333333,
+      "median_return_pct": -0.979640471311638,
+      "mean_return_pct": 0.5584399302960895,
+      "unconditional_positive_pct": 54.36893203883495,
+      "unconditional_mean_return_pct": 2.2004122366692567,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "below_lower",
+      "title": "收盘低于 BOLL 下轨",
+      "sourceRuleIds": [
+        "b3-r16"
+      ],
+      "interpretation": "位置状态，不附加自动抄底含义",
+      "partition": "all",
+      "horizon": 1,
+      "events": 22,
+      "baseOrigins": 724,
+      "positive_pct": 63.63636363636363,
+      "median_return_pct": 1.6275236491878564,
+      "mean_return_pct": 0.805186132916372,
+      "unconditional_positive_pct": 50.966850828729285,
+      "unconditional_mean_return_pct": 0.5389457519464231,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "below_lower",
+      "title": "收盘低于 BOLL 下轨",
+      "sourceRuleIds": [
+        "b3-r16"
+      ],
+      "interpretation": "位置状态，不附加自动抄底含义",
+      "partition": "all",
+      "horizon": 2,
+      "events": 22,
+      "baseOrigins": 723,
+      "positive_pct": 63.63636363636363,
+      "median_return_pct": 2.4327191961516226,
+      "mean_return_pct": 1.6049067442172635,
+      "unconditional_positive_pct": 51.17565698478561,
+      "unconditional_mean_return_pct": 1.093036594682282,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "below_lower",
+      "title": "收盘低于 BOLL 下轨",
+      "sourceRuleIds": [
+        "b3-r16"
+      ],
+      "interpretation": "位置状态，不附加自动抄底含义",
+      "partition": "all",
+      "horizon": 3,
+      "events": 22,
+      "baseOrigins": 722,
+      "positive_pct": 72.72727272727273,
+      "median_return_pct": 2.728296704336286,
+      "mean_return_pct": 3.73499741230578,
+      "unconditional_positive_pct": 54.84764542936288,
+      "unconditional_mean_return_pct": 1.6518155922316808,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "below_lower",
+      "title": "收盘低于 BOLL 下轨",
+      "sourceRuleIds": [
+        "b3-r16"
+      ],
+      "interpretation": "位置状态，不附加自动抄底含义",
+      "partition": "all",
+      "horizon": 4,
+      "events": 22,
+      "baseOrigins": 721,
+      "positive_pct": 72.72727272727273,
+      "median_return_pct": 5.044587813876078,
+      "mean_return_pct": 4.5547937862953525,
+      "unconditional_positive_pct": 54.36893203883495,
+      "unconditional_mean_return_pct": 2.2004122366692567,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_above_ma10_above_ma20",
+      "title": "MA5 > MA10 > MA20",
+      "sourceRuleIds": [
+        "b3-r04",
+        "b2-r23"
+      ],
+      "interpretation": "研究使用的均线排列代理",
+      "partition": "all",
+      "horizon": 1,
+      "events": 316,
+      "baseOrigins": 724,
+      "positive_pct": 47.46835443037975,
+      "median_return_pct": -0.24931540815924524,
+      "mean_return_pct": 0.5086439965096381,
+      "unconditional_positive_pct": 50.966850828729285,
+      "unconditional_mean_return_pct": 0.5389457519464231,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_above_ma10_above_ma20",
+      "title": "MA5 > MA10 > MA20",
+      "sourceRuleIds": [
+        "b3-r04",
+        "b2-r23"
+      ],
+      "interpretation": "研究使用的均线排列代理",
+      "partition": "all",
+      "horizon": 2,
+      "events": 316,
+      "baseOrigins": 723,
+      "positive_pct": 47.78481012658228,
+      "median_return_pct": -0.2027708464099054,
+      "mean_return_pct": 0.9900736045053957,
+      "unconditional_positive_pct": 51.17565698478561,
+      "unconditional_mean_return_pct": 1.093036594682282,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_above_ma10_above_ma20",
+      "title": "MA5 > MA10 > MA20",
+      "sourceRuleIds": [
+        "b3-r04",
+        "b2-r23"
+      ],
+      "interpretation": "研究使用的均线排列代理",
+      "partition": "all",
+      "horizon": 3,
+      "events": 316,
+      "baseOrigins": 722,
+      "positive_pct": 52.21518987341772,
+      "median_return_pct": 0.46228562358245906,
+      "mean_return_pct": 1.744799799311058,
+      "unconditional_positive_pct": 54.84764542936288,
+      "unconditional_mean_return_pct": 1.6518155922316808,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_above_ma10_above_ma20",
+      "title": "MA5 > MA10 > MA20",
+      "sourceRuleIds": [
+        "b3-r04",
+        "b2-r23"
+      ],
+      "interpretation": "研究使用的均线排列代理",
+      "partition": "all",
+      "horizon": 4,
+      "events": 316,
+      "baseOrigins": 721,
+      "positive_pct": 51.89873417721519,
+      "median_return_pct": 0.4164801328001233,
+      "mean_return_pct": 2.612149153979655,
+      "unconditional_positive_pct": 54.36893203883495,
+      "unconditional_mean_return_pct": 2.2004122366692567,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "above_ma5",
+      "title": "收盘位于 MA5 上方",
+      "sourceRuleIds": [
+        "b1-r02",
+        "b3-r02"
+      ],
+      "interpretation": "经验的收盘代理，不等于买入指令",
+      "partition": "holdout",
+      "horizon": 1,
+      "events": 123,
+      "baseOrigins": 241,
+      "positive_pct": 41.46341463414634,
+      "median_return_pct": -0.773366368786299,
+      "mean_return_pct": -0.3747314075386512,
+      "unconditional_positive_pct": 50.20746887966805,
+      "unconditional_mean_return_pct": 0.3112976486446538,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "above_ma5",
+      "title": "收盘位于 MA5 上方",
+      "sourceRuleIds": [
+        "b1-r02",
+        "b3-r02"
+      ],
+      "interpretation": "经验的收盘代理，不等于买入指令",
+      "partition": "holdout",
+      "horizon": 2,
+      "events": 123,
+      "baseOrigins": 240,
+      "positive_pct": 44.71544715447154,
+      "median_return_pct": -1.1532627038618792,
+      "mean_return_pct": -0.4130747882364726,
+      "unconditional_positive_pct": 50.416666666666664,
+      "unconditional_mean_return_pct": 0.6065577355971941,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "above_ma5",
+      "title": "收盘位于 MA5 上方",
+      "sourceRuleIds": [
+        "b1-r02",
+        "b3-r02"
+      ],
+      "interpretation": "经验的收盘代理，不等于买入指令",
+      "partition": "holdout",
+      "horizon": 3,
+      "events": 122,
+      "baseOrigins": 239,
+      "positive_pct": 49.18032786885246,
+      "median_return_pct": -0.22043628882668087,
+      "mean_return_pct": 0.32031186608788564,
+      "unconditional_positive_pct": 53.13807531380753,
+      "unconditional_mean_return_pct": 0.9070542520229717,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "above_ma5",
+      "title": "收盘位于 MA5 上方",
+      "sourceRuleIds": [
+        "b1-r02",
+        "b3-r02"
+      ],
+      "interpretation": "经验的收盘代理，不等于买入指令",
+      "partition": "holdout",
+      "horizon": 4,
+      "events": 121,
+      "baseOrigins": 238,
+      "positive_pct": 51.2396694214876,
+      "median_return_pct": 0.4454909719086464,
+      "mean_return_pct": 0.7570859253045413,
+      "unconditional_positive_pct": 54.20168067226891,
+      "unconditional_mean_return_pct": 1.1909412333497782,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "below_ma20",
+      "title": "收盘位于 MA20 下方",
+      "sourceRuleIds": [
+        "b3-r01"
+      ],
+      "interpretation": "禁做/观望过滤，不等于做空预测",
+      "partition": "holdout",
+      "horizon": 1,
+      "events": 108,
+      "baseOrigins": 241,
+      "positive_pct": 57.407407407407405,
+      "median_return_pct": 0.504702212148056,
+      "mean_return_pct": 0.5490250516711146,
+      "unconditional_positive_pct": 50.20746887966805,
+      "unconditional_mean_return_pct": 0.3112976486446538,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "below_ma20",
+      "title": "收盘位于 MA20 下方",
+      "sourceRuleIds": [
+        "b3-r01"
+      ],
+      "interpretation": "禁做/观望过滤，不等于做空预测",
+      "partition": "holdout",
+      "horizon": 2,
+      "events": 107,
+      "baseOrigins": 240,
+      "positive_pct": 50.467289719626166,
+      "median_return_pct": 0.7792617727712114,
+      "mean_return_pct": 1.0303998662055458,
+      "unconditional_positive_pct": 50.416666666666664,
+      "unconditional_mean_return_pct": 0.6065577355971941,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "below_ma20",
+      "title": "收盘位于 MA20 下方",
+      "sourceRuleIds": [
+        "b3-r01"
+      ],
+      "interpretation": "禁做/观望过滤，不等于做空预测",
+      "partition": "holdout",
+      "horizon": 3,
+      "events": 107,
+      "baseOrigins": 239,
+      "positive_pct": 56.074766355140184,
+      "median_return_pct": 0.5211604179070406,
+      "mean_return_pct": 1.2984562236051491,
+      "unconditional_positive_pct": 53.13807531380753,
+      "unconditional_mean_return_pct": 0.9070542520229717,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "below_ma20",
+      "title": "收盘位于 MA20 下方",
+      "sourceRuleIds": [
+        "b3-r01"
+      ],
+      "interpretation": "禁做/观望过滤，不等于做空预测",
+      "partition": "holdout",
+      "horizon": 4,
+      "events": 106,
+      "baseOrigins": 238,
+      "positive_pct": 58.490566037735846,
+      "median_return_pct": 1.0808301665600761,
+      "mean_return_pct": 1.435109353039329,
+      "unconditional_positive_pct": 54.20168067226891,
+      "unconditional_mean_return_pct": 1.1909412333497782,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_ma10_falling",
+      "title": "MA5 与 MA10 同时下降",
+      "sourceRuleIds": [
+        "b3-r03"
+      ],
+      "interpretation": "可直接计算的禁做状态",
+      "partition": "holdout",
+      "horizon": 1,
+      "events": 71,
+      "baseOrigins": 241,
+      "positive_pct": 60.56338028169014,
+      "median_return_pct": 0.660088191008823,
+      "mean_return_pct": 0.9696559094678703,
+      "unconditional_positive_pct": 50.20746887966805,
+      "unconditional_mean_return_pct": 0.3112976486446538,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_ma10_falling",
+      "title": "MA5 与 MA10 同时下降",
+      "sourceRuleIds": [
+        "b3-r03"
+      ],
+      "interpretation": "可直接计算的禁做状态",
+      "partition": "holdout",
+      "horizon": 2,
+      "events": 71,
+      "baseOrigins": 240,
+      "positive_pct": 57.74647887323944,
+      "median_return_pct": 1.3837418975425564,
+      "mean_return_pct": 1.593414615411009,
+      "unconditional_positive_pct": 50.416666666666664,
+      "unconditional_mean_return_pct": 0.6065577355971941,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_ma10_falling",
+      "title": "MA5 与 MA10 同时下降",
+      "sourceRuleIds": [
+        "b3-r03"
+      ],
+      "interpretation": "可直接计算的禁做状态",
+      "partition": "holdout",
+      "horizon": 3,
+      "events": 71,
+      "baseOrigins": 239,
+      "positive_pct": 56.33802816901409,
+      "median_return_pct": 0.324954976117775,
+      "mean_return_pct": 0.8564489407222663,
+      "unconditional_positive_pct": 53.13807531380753,
+      "unconditional_mean_return_pct": 0.9070542520229717,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_ma10_falling",
+      "title": "MA5 与 MA10 同时下降",
+      "sourceRuleIds": [
+        "b3-r03"
+      ],
+      "interpretation": "可直接计算的禁做状态",
+      "partition": "holdout",
+      "horizon": 4,
+      "events": 71,
+      "baseOrigins": 238,
+      "positive_pct": 59.154929577464785,
+      "median_return_pct": 1.495936475600912,
+      "mean_return_pct": 1.287123988037827,
+      "unconditional_positive_pct": 54.20168067226891,
+      "unconditional_mean_return_pct": 1.1909412333497782,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "three_ma_rising",
+      "title": "MA5/10/20 同时上升",
+      "sourceRuleIds": [
+        "b3-r04"
+      ],
+      "interpretation": "将三个原子状态取交集是研究组合",
+      "partition": "holdout",
+      "horizon": 1,
+      "events": 77,
+      "baseOrigins": 241,
+      "positive_pct": 41.55844155844156,
+      "median_return_pct": -0.715221336067906,
+      "mean_return_pct": -0.23166827981935503,
+      "unconditional_positive_pct": 50.20746887966805,
+      "unconditional_mean_return_pct": 0.3112976486446538,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "three_ma_rising",
+      "title": "MA5/10/20 同时上升",
+      "sourceRuleIds": [
+        "b3-r04"
+      ],
+      "interpretation": "将三个原子状态取交集是研究组合",
+      "partition": "holdout",
+      "horizon": 2,
+      "events": 77,
+      "baseOrigins": 240,
+      "positive_pct": 48.05194805194805,
+      "median_return_pct": -0.5752636625119822,
+      "mean_return_pct": -0.03892419272478757,
+      "unconditional_positive_pct": 50.416666666666664,
+      "unconditional_mean_return_pct": 0.6065577355971941,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "three_ma_rising",
+      "title": "MA5/10/20 同时上升",
+      "sourceRuleIds": [
+        "b3-r04"
+      ],
+      "interpretation": "将三个原子状态取交集是研究组合",
+      "partition": "holdout",
+      "horizon": 3,
+      "events": 77,
+      "baseOrigins": 239,
+      "positive_pct": 49.35064935064935,
+      "median_return_pct": -0.17851051065181922,
+      "mean_return_pct": 0.024807243886917293,
+      "unconditional_positive_pct": 53.13807531380753,
+      "unconditional_mean_return_pct": 0.9070542520229717,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "three_ma_rising",
+      "title": "MA5/10/20 同时上升",
+      "sourceRuleIds": [
+        "b3-r04"
+      ],
+      "interpretation": "将三个原子状态取交集是研究组合",
+      "partition": "holdout",
+      "horizon": 4,
+      "events": 77,
+      "baseOrigins": 238,
+      "positive_pct": 49.35064935064935,
+      "median_return_pct": -0.44387918248185443,
+      "mean_return_pct": -0.1095105604520416,
+      "unconditional_positive_pct": 54.20168067226891,
+      "unconditional_mean_return_pct": 1.1909412333497782,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "double_high",
+      "title": "最高价、最低价同时抬升",
+      "sourceRuleIds": [
+        "b1-r01"
+      ],
+      "interpretation": "原文双高定义；持有纪律需另定",
+      "partition": "holdout",
+      "horizon": 1,
+      "events": 100,
+      "baseOrigins": 241,
+      "positive_pct": 38.0,
+      "median_return_pct": -1.0274402106290936,
+      "mean_return_pct": -0.6030400717313171,
+      "unconditional_positive_pct": 50.20746887966805,
+      "unconditional_mean_return_pct": 0.3112976486446538,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "double_high",
+      "title": "最高价、最低价同时抬升",
+      "sourceRuleIds": [
+        "b1-r01"
+      ],
+      "interpretation": "原文双高定义；持有纪律需另定",
+      "partition": "holdout",
+      "horizon": 2,
+      "events": 100,
+      "baseOrigins": 240,
+      "positive_pct": 45.0,
+      "median_return_pct": -1.2969506468230085,
+      "mean_return_pct": -0.5232880273718867,
+      "unconditional_positive_pct": 50.416666666666664,
+      "unconditional_mean_return_pct": 0.6065577355971941,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "double_high",
+      "title": "最高价、最低价同时抬升",
+      "sourceRuleIds": [
+        "b1-r01"
+      ],
+      "interpretation": "原文双高定义；持有纪律需另定",
+      "partition": "holdout",
+      "horizon": 3,
+      "events": 99,
+      "baseOrigins": 239,
+      "positive_pct": 48.484848484848484,
+      "median_return_pct": -0.2623620670015425,
+      "mean_return_pct": -0.07159172366668475,
+      "unconditional_positive_pct": 53.13807531380753,
+      "unconditional_mean_return_pct": 0.9070542520229717,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "double_high",
+      "title": "最高价、最低价同时抬升",
+      "sourceRuleIds": [
+        "b1-r01"
+      ],
+      "interpretation": "原文双高定义；持有纪律需另定",
+      "partition": "holdout",
+      "horizon": 4,
+      "events": 99,
+      "baseOrigins": 238,
+      "positive_pct": 52.52525252525253,
+      "median_return_pct": 0.47229751070565484,
+      "mean_return_pct": 0.5583760206637095,
+      "unconditional_positive_pct": 54.20168067226891,
+      "unconditional_mean_return_pct": 1.1909412333497782,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_break",
+      "title": "收盘跌破 MA5",
+      "sourceRuleIds": [
+        "b1-r02",
+        "b3-r02"
+      ],
+      "interpretation": "以收盘确认破位的研究代理",
+      "partition": "holdout",
+      "horizon": 1,
+      "events": 38,
+      "baseOrigins": 241,
+      "positive_pct": 50.0,
+      "median_return_pct": 0.061709573883661495,
+      "mean_return_pct": 0.8453043812388091,
+      "unconditional_positive_pct": 50.20746887966805,
+      "unconditional_mean_return_pct": 0.3112976486446538,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_break",
+      "title": "收盘跌破 MA5",
+      "sourceRuleIds": [
+        "b1-r02",
+        "b3-r02"
+      ],
+      "interpretation": "以收盘确认破位的研究代理",
+      "partition": "holdout",
+      "horizon": 2,
+      "events": 37,
+      "baseOrigins": 240,
+      "positive_pct": 62.16216216216216,
+      "median_return_pct": 2.5106452361392195,
+      "mean_return_pct": 3.054828224104161,
+      "unconditional_positive_pct": 50.416666666666664,
+      "unconditional_mean_return_pct": 0.6065577355971941,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_break",
+      "title": "收盘跌破 MA5",
+      "sourceRuleIds": [
+        "b1-r02",
+        "b3-r02"
+      ],
+      "interpretation": "以收盘确认破位的研究代理",
+      "partition": "holdout",
+      "horizon": 3,
+      "events": 37,
+      "baseOrigins": 239,
+      "positive_pct": 67.56756756756756,
+      "median_return_pct": 1.7222948093597923,
+      "mean_return_pct": 3.125701186096118,
+      "unconditional_positive_pct": 53.13807531380753,
+      "unconditional_mean_return_pct": 0.9070542520229717,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_break",
+      "title": "收盘跌破 MA5",
+      "sourceRuleIds": [
+        "b1-r02",
+        "b3-r02"
+      ],
+      "interpretation": "以收盘确认破位的研究代理",
+      "partition": "holdout",
+      "horizon": 4,
+      "events": 37,
+      "baseOrigins": 238,
+      "positive_pct": 59.45945945945946,
+      "median_return_pct": 1.5909416128831122,
+      "mean_return_pct": 1.7310304143516198,
+      "unconditional_positive_pct": 54.20168067226891,
+      "unconditional_mean_return_pct": 1.1909412333497782,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_reclaim_ma20_up",
+      "title": "重新站上 MA5 且 MA20 上升",
+      "sourceRuleIds": [
+        "b3-r41"
+      ],
+      "interpretation": "代理采用当前 MA20 上升，并非严格首次拐头",
+      "partition": "holdout",
+      "horizon": 1,
+      "events": 21,
+      "baseOrigins": 241,
+      "positive_pct": 47.61904761904761,
+      "median_return_pct": -0.19175455417066445,
+      "mean_return_pct": 0.19231443154189143,
+      "unconditional_positive_pct": 50.20746887966805,
+      "unconditional_mean_return_pct": 0.3112976486446538,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_reclaim_ma20_up",
+      "title": "重新站上 MA5 且 MA20 上升",
+      "sourceRuleIds": [
+        "b3-r41"
+      ],
+      "interpretation": "代理采用当前 MA20 上升，并非严格首次拐头",
+      "partition": "holdout",
+      "horizon": 2,
+      "events": 21,
+      "baseOrigins": 240,
+      "positive_pct": 42.857142857142854,
+      "median_return_pct": -0.5752636625119822,
+      "mean_return_pct": 0.30522606438320166,
+      "unconditional_positive_pct": 50.416666666666664,
+      "unconditional_mean_return_pct": 0.6065577355971941,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_reclaim_ma20_up",
+      "title": "重新站上 MA5 且 MA20 上升",
+      "sourceRuleIds": [
+        "b3-r41"
+      ],
+      "interpretation": "代理采用当前 MA20 上升，并非严格首次拐头",
+      "partition": "holdout",
+      "horizon": 3,
+      "events": 21,
+      "baseOrigins": 239,
+      "positive_pct": 57.14285714285714,
+      "median_return_pct": 1.3293967571383902,
+      "mean_return_pct": 0.829017316457065,
+      "unconditional_positive_pct": 53.13807531380753,
+      "unconditional_mean_return_pct": 0.9070542520229717,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_reclaim_ma20_up",
+      "title": "重新站上 MA5 且 MA20 上升",
+      "sourceRuleIds": [
+        "b3-r41"
+      ],
+      "interpretation": "代理采用当前 MA20 上升，并非严格首次拐头",
+      "partition": "holdout",
+      "horizon": 4,
+      "events": 21,
+      "baseOrigins": 238,
+      "positive_pct": 61.904761904761905,
+      "median_return_pct": 3.1596122778675184,
+      "mean_return_pct": 3.2310746903612464,
+      "unconditional_positive_pct": 54.20168067226891,
+      "unconditional_mean_return_pct": 1.1909412333497782,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "upper_touch_above_ma5",
+      "title": "触及 BOLL 上轨且收盘守住 MA5",
+      "sourceRuleIds": [
+        "b3-r10"
+      ],
+      "interpretation": "使用当日收盘后的轨道标记状态，不假定盘中提前成交",
+      "partition": "holdout",
+      "horizon": 1,
+      "events": 39,
+      "baseOrigins": 241,
+      "positive_pct": 38.46153846153847,
+      "median_return_pct": -1.1036071445660323,
+      "mean_return_pct": -0.7604983653139082,
+      "unconditional_positive_pct": 50.20746887966805,
+      "unconditional_mean_return_pct": 0.3112976486446538,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "upper_touch_above_ma5",
+      "title": "触及 BOLL 上轨且收盘守住 MA5",
+      "sourceRuleIds": [
+        "b3-r10"
+      ],
+      "interpretation": "使用当日收盘后的轨道标记状态，不假定盘中提前成交",
+      "partition": "holdout",
+      "horizon": 2,
+      "events": 39,
+      "baseOrigins": 240,
+      "positive_pct": 51.28205128205128,
+      "median_return_pct": 0.5333157298608171,
+      "mean_return_pct": -0.9297533464115734,
+      "unconditional_positive_pct": 50.416666666666664,
+      "unconditional_mean_return_pct": 0.6065577355971941,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "upper_touch_above_ma5",
+      "title": "触及 BOLL 上轨且收盘守住 MA5",
+      "sourceRuleIds": [
+        "b3-r10"
+      ],
+      "interpretation": "使用当日收盘后的轨道标记状态，不假定盘中提前成交",
+      "partition": "holdout",
+      "horizon": 3,
+      "events": 39,
+      "baseOrigins": 239,
+      "positive_pct": 48.717948717948715,
+      "median_return_pct": -0.17851051065181922,
+      "mean_return_pct": -0.8652523780292184,
+      "unconditional_positive_pct": 53.13807531380753,
+      "unconditional_mean_return_pct": 0.9070542520229717,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "upper_touch_above_ma5",
+      "title": "触及 BOLL 上轨且收盘守住 MA5",
+      "sourceRuleIds": [
+        "b3-r10"
+      ],
+      "interpretation": "使用当日收盘后的轨道标记状态，不假定盘中提前成交",
+      "partition": "holdout",
+      "horizon": 4,
+      "events": 39,
+      "baseOrigins": 238,
+      "positive_pct": 48.717948717948715,
+      "median_return_pct": -1.4191149460616392,
+      "mean_return_pct": -0.5074255760731565,
+      "unconditional_positive_pct": 54.20168067226891,
+      "unconditional_mean_return_pct": 1.1909412333497782,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_pullback_up",
+      "title": "回踩上升 MA5 后收回",
+      "sourceRuleIds": [
+        "b1-r09"
+      ],
+      "interpretation": "最低价触线且收盘在线上；不冒充已识别葛一",
+      "partition": "holdout",
+      "horizon": 1,
+      "events": 53,
+      "baseOrigins": 241,
+      "positive_pct": 37.735849056603776,
+      "median_return_pct": -1.0346423260200854,
+      "mean_return_pct": -0.3772513940033662,
+      "unconditional_positive_pct": 50.20746887966805,
+      "unconditional_mean_return_pct": 0.3112976486446538,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_pullback_up",
+      "title": "回踩上升 MA5 后收回",
+      "sourceRuleIds": [
+        "b1-r09"
+      ],
+      "interpretation": "最低价触线且收盘在线上；不冒充已识别葛一",
+      "partition": "holdout",
+      "horizon": 2,
+      "events": 53,
+      "baseOrigins": 240,
+      "positive_pct": 39.62264150943396,
+      "median_return_pct": -1.1646865366286119,
+      "mean_return_pct": -0.4135205679497119,
+      "unconditional_positive_pct": 50.416666666666664,
+      "unconditional_mean_return_pct": 0.6065577355971941,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_pullback_up",
+      "title": "回踩上升 MA5 后收回",
+      "sourceRuleIds": [
+        "b1-r09"
+      ],
+      "interpretation": "最低价触线且收盘在线上；不冒充已识别葛一",
+      "partition": "holdout",
+      "horizon": 3,
+      "events": 52,
+      "baseOrigins": 239,
+      "positive_pct": 53.84615384615385,
+      "median_return_pct": 1.8464759417097798,
+      "mean_return_pct": 0.9868388188959011,
+      "unconditional_positive_pct": 53.13807531380753,
+      "unconditional_mean_return_pct": 0.9070542520229717,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_pullback_up",
+      "title": "回踩上升 MA5 后收回",
+      "sourceRuleIds": [
+        "b1-r09"
+      ],
+      "interpretation": "最低价触线且收盘在线上；不冒充已识别葛一",
+      "partition": "holdout",
+      "horizon": 4,
+      "events": 51,
+      "baseOrigins": 238,
+      "positive_pct": 56.86274509803921,
+      "median_return_pct": 1.7590004931777203,
+      "mean_return_pct": 1.5354215191945766,
+      "unconditional_positive_pct": 54.20168067226891,
+      "unconditional_mean_return_pct": 1.1909412333497782,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "boll_opening_up",
+      "title": "BOLL 向外张开且收盘在中轨上",
+      "sourceRuleIds": [
+        "b3-r16",
+        "b2-r30"
+      ],
+      "interpretation": "技术代理，不等同完整三期开口定义",
+      "partition": "holdout",
+      "horizon": 1,
+      "events": 37,
+      "baseOrigins": 241,
+      "positive_pct": 54.054054054054056,
+      "median_return_pct": 0.8735704613907158,
+      "mean_return_pct": 0.5553518212253565,
+      "unconditional_positive_pct": 50.20746887966805,
+      "unconditional_mean_return_pct": 0.3112976486446538,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "boll_opening_up",
+      "title": "BOLL 向外张开且收盘在中轨上",
+      "sourceRuleIds": [
+        "b3-r16",
+        "b2-r30"
+      ],
+      "interpretation": "技术代理，不等同完整三期开口定义",
+      "partition": "holdout",
+      "horizon": 2,
+      "events": 37,
+      "baseOrigins": 240,
+      "positive_pct": 51.35135135135135,
+      "median_return_pct": 0.5333157298608171,
+      "mean_return_pct": -0.08904167377547197,
+      "unconditional_positive_pct": 50.416666666666664,
+      "unconditional_mean_return_pct": 0.6065577355971941,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "boll_opening_up",
+      "title": "BOLL 向外张开且收盘在中轨上",
+      "sourceRuleIds": [
+        "b3-r16",
+        "b2-r30"
+      ],
+      "interpretation": "技术代理，不等同完整三期开口定义",
+      "partition": "holdout",
+      "horizon": 3,
+      "events": 37,
+      "baseOrigins": 239,
+      "positive_pct": 48.64864864864865,
+      "median_return_pct": -0.17851051065181922,
+      "mean_return_pct": -0.3432097200660304,
+      "unconditional_positive_pct": 53.13807531380753,
+      "unconditional_mean_return_pct": 0.9070542520229717,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "boll_opening_up",
+      "title": "BOLL 向外张开且收盘在中轨上",
+      "sourceRuleIds": [
+        "b3-r16",
+        "b2-r30"
+      ],
+      "interpretation": "技术代理，不等同完整三期开口定义",
+      "partition": "holdout",
+      "horizon": 4,
+      "events": 37,
+      "baseOrigins": 238,
+      "positive_pct": 48.64864864864865,
+      "median_return_pct": -2.0601249505354247,
+      "mean_return_pct": -0.2925995245114646,
+      "unconditional_positive_pct": 54.20168067226891,
+      "unconditional_mean_return_pct": 1.1909412333497782,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "below_lower",
+      "title": "收盘低于 BOLL 下轨",
+      "sourceRuleIds": [
+        "b3-r16"
+      ],
+      "interpretation": "位置状态，不附加自动抄底含义",
+      "partition": "holdout",
+      "horizon": 1,
+      "events": 5,
+      "baseOrigins": 241,
+      "positive_pct": 60.0,
+      "median_return_pct": 0.20146520146520075,
+      "mean_return_pct": -0.7108677600296365,
+      "unconditional_positive_pct": 50.20746887966805,
+      "unconditional_mean_return_pct": 0.3112976486446538,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "below_lower",
+      "title": "收盘低于 BOLL 下轨",
+      "sourceRuleIds": [
+        "b3-r16"
+      ],
+      "interpretation": "位置状态，不附加自动抄底含义",
+      "partition": "holdout",
+      "horizon": 2,
+      "events": 5,
+      "baseOrigins": 240,
+      "positive_pct": 40.0,
+      "median_return_pct": -1.8908120593066569,
+      "mean_return_pct": -1.2163138061897238,
+      "unconditional_positive_pct": 50.416666666666664,
+      "unconditional_mean_return_pct": 0.6065577355971941,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "below_lower",
+      "title": "收盘低于 BOLL 下轨",
+      "sourceRuleIds": [
+        "b3-r16"
+      ],
+      "interpretation": "位置状态，不附加自动抄底含义",
+      "partition": "holdout",
+      "horizon": 3,
+      "events": 5,
+      "baseOrigins": 239,
+      "positive_pct": 60.0,
+      "median_return_pct": 2.2157505505304487,
+      "mean_return_pct": 3.4966575463016714,
+      "unconditional_positive_pct": 53.13807531380753,
+      "unconditional_mean_return_pct": 0.9070542520229717,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "below_lower",
+      "title": "收盘低于 BOLL 下轨",
+      "sourceRuleIds": [
+        "b3-r16"
+      ],
+      "interpretation": "位置状态，不附加自动抄底含义",
+      "partition": "holdout",
+      "horizon": 4,
+      "events": 5,
+      "baseOrigins": 238,
+      "positive_pct": 80.0,
+      "median_return_pct": 5.2278388278388155,
+      "mean_return_pct": 4.854331124571513,
+      "unconditional_positive_pct": 54.20168067226891,
+      "unconditional_mean_return_pct": 1.1909412333497782,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_above_ma10_above_ma20",
+      "title": "MA5 > MA10 > MA20",
+      "sourceRuleIds": [
+        "b3-r04",
+        "b2-r23"
+      ],
+      "interpretation": "研究使用的均线排列代理",
+      "partition": "holdout",
+      "horizon": 1,
+      "events": 98,
+      "baseOrigins": 241,
+      "positive_pct": 42.857142857142854,
+      "median_return_pct": -0.6675689094904125,
+      "mean_return_pct": -0.07375802772033925,
+      "unconditional_positive_pct": 50.20746887966805,
+      "unconditional_mean_return_pct": 0.3112976486446538,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_above_ma10_above_ma20",
+      "title": "MA5 > MA10 > MA20",
+      "sourceRuleIds": [
+        "b3-r04",
+        "b2-r23"
+      ],
+      "interpretation": "研究使用的均线排列代理",
+      "partition": "holdout",
+      "horizon": 2,
+      "events": 98,
+      "baseOrigins": 240,
+      "positive_pct": 46.93877551020408,
+      "median_return_pct": -0.2643343131941034,
+      "mean_return_pct": -0.015178608951841718,
+      "unconditional_positive_pct": 50.416666666666664,
+      "unconditional_mean_return_pct": 0.6065577355971941,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_above_ma10_above_ma20",
+      "title": "MA5 > MA10 > MA20",
+      "sourceRuleIds": [
+        "b3-r04",
+        "b2-r23"
+      ],
+      "interpretation": "研究使用的均线排列代理",
+      "partition": "holdout",
+      "horizon": 3,
+      "events": 98,
+      "baseOrigins": 239,
+      "positive_pct": 50.0,
+      "median_return_pct": 0.04189863719012976,
+      "mean_return_pct": 0.20633792585327032,
+      "unconditional_positive_pct": 53.13807531380753,
+      "unconditional_mean_return_pct": 0.9070542520229717,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    },
+    {
+      "id": "ma5_above_ma10_above_ma20",
+      "title": "MA5 > MA10 > MA20",
+      "sourceRuleIds": [
+        "b3-r04",
+        "b2-r23"
+      ],
+      "interpretation": "研究使用的均线排列代理",
+      "partition": "holdout",
+      "horizon": 4,
+      "events": 98,
+      "baseOrigins": 238,
+      "positive_pct": 47.95918367346938,
+      "median_return_pct": -0.409936803946348,
+      "mean_return_pct": 0.7780598091608631,
+      "unconditional_positive_pct": 54.20168067226891,
+      "unconditional_mean_return_pct": 1.1909412333497782,
+      "claim": "描述条件后表现，不是完整策略收益或因果效应"
+    }
+  ],
+  "scheduledTargets": [
+    {
+      "context": "all",
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 1,
+      "kind": "buy_reference",
+      "origins": 483,
+      "touch_pct": 47.20496894409938,
+      "extreme_within_1pct_pct": 16.149068322981368,
+      "extreme_mape": 4.346890191982616
+    },
+    {
+      "context": "all",
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 1,
+      "kind": "sell_reference",
+      "origins": 483,
+      "touch_pct": 15.734989648033126,
+      "extreme_within_1pct_pct": 7.246376811594203,
+      "extreme_mape": 11.325480090078853
+    },
+    {
+      "context": "all",
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 2,
+      "kind": "buy_reference",
+      "origins": 483,
+      "touch_pct": 37.267080745341616,
+      "extreme_within_1pct_pct": 10.559006211180124,
+      "extreme_mape": 5.666356950344131
+    },
+    {
+      "context": "all",
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 2,
+      "kind": "sell_reference",
+      "origins": 483,
+      "touch_pct": 13.043478260869565,
+      "extreme_within_1pct_pct": 6.832298136645963,
+      "extreme_mape": 11.944896208473377
+    },
+    {
+      "context": "all",
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 3,
+      "kind": "buy_reference",
+      "origins": 483,
+      "touch_pct": 26.91511387163561,
+      "extreme_within_1pct_pct": 7.453416149068323,
+      "extreme_mape": 7.363644116949233
+    },
+    {
+      "context": "all",
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 3,
+      "kind": "sell_reference",
+      "origins": 483,
+      "touch_pct": 12.422360248447205,
+      "extreme_within_1pct_pct": 5.175983436853002,
+      "extreme_mape": 12.756312794238555
+    },
+    {
+      "context": "all",
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 1,
+      "kind": "buy_reference",
+      "origins": 483,
+      "touch_pct": 44.3064182194617,
+      "extreme_within_1pct_pct": 14.285714285714285,
+      "extreme_mape": 4.63176081804549
+    },
+    {
+      "context": "all",
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 1,
+      "kind": "sell_reference",
+      "origins": 483,
+      "touch_pct": 14.492753623188406,
+      "extreme_within_1pct_pct": 7.6604554865424435,
+      "extreme_mape": 11.455788203807273
+    },
+    {
+      "context": "all",
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 2,
+      "kind": "buy_reference",
+      "origins": 483,
+      "touch_pct": 33.74741200828157,
+      "extreme_within_1pct_pct": 11.801242236024844,
+      "extreme_mape": 6.067513514497387
+    },
+    {
+      "context": "all",
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 2,
+      "kind": "sell_reference",
+      "origins": 483,
+      "touch_pct": 13.043478260869565,
+      "extreme_within_1pct_pct": 6.418219461697723,
+      "extreme_mape": 12.147161453411334
+    },
+    {
+      "context": "all",
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 3,
+      "kind": "buy_reference",
+      "origins": 483,
+      "touch_pct": 25.87991718426501,
+      "extreme_within_1pct_pct": 6.625258799171843,
+      "extreme_mape": 7.785060486361942
+    },
+    {
+      "context": "all",
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 3,
+      "kind": "sell_reference",
+      "origins": 483,
+      "touch_pct": 12.215320910973086,
+      "extreme_within_1pct_pct": 5.383022774327122,
+      "extreme_mape": 12.988162378162455
+    },
+    {
+      "context": "all",
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 1,
+      "kind": "buy_reference",
+      "origins": 241,
+      "touch_pct": 51.867219917012456,
+      "extreme_within_1pct_pct": 12.033195020746888,
+      "extreme_mape": 4.3937243919823255
+    },
+    {
+      "context": "all",
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 1,
+      "kind": "sell_reference",
+      "origins": 241,
+      "touch_pct": 19.08713692946058,
+      "extreme_within_1pct_pct": 7.053941908713693,
+      "extreme_mape": 10.029895580342272
+    },
+    {
+      "context": "all",
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 2,
+      "kind": "buy_reference",
+      "origins": 240,
+      "touch_pct": 38.75,
+      "extreme_within_1pct_pct": 10.833333333333334,
+      "extreme_mape": 5.611620641195254
+    },
+    {
+      "context": "all",
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 2,
+      "kind": "sell_reference",
+      "origins": 240,
+      "touch_pct": 17.083333333333332,
+      "extreme_within_1pct_pct": 7.5,
+      "extreme_mape": 10.478532690860087
+    },
+    {
+      "context": "all",
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 3,
+      "kind": "buy_reference",
+      "origins": 239,
+      "touch_pct": 33.054393305439326,
+      "extreme_within_1pct_pct": 11.715481171548117,
+      "extreme_mape": 6.703825619945991
+    },
+    {
+      "context": "all",
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 3,
+      "kind": "sell_reference",
+      "origins": 239,
+      "touch_pct": 11.715481171548117,
+      "extreme_within_1pct_pct": 5.439330543933055,
+      "extreme_mape": 11.001348115668227
+    },
+    {
+      "context": "all",
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 1,
+      "kind": "buy_reference",
+      "origins": 241,
+      "touch_pct": 47.71784232365145,
+      "extreme_within_1pct_pct": 13.692946058091287,
+      "extreme_mape": 4.606626223318538
+    },
+    {
+      "context": "all",
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 1,
+      "kind": "sell_reference",
+      "origins": 241,
+      "touch_pct": 17.842323651452283,
+      "extreme_within_1pct_pct": 7.468879668049793,
+      "extreme_mape": 10.120217338074863
+    },
+    {
+      "context": "all",
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 2,
+      "kind": "buy_reference",
+      "origins": 240,
+      "touch_pct": 35.0,
+      "extreme_within_1pct_pct": 10.0,
+      "extreme_mape": 5.756837736130308
+    },
+    {
+      "context": "all",
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 2,
+      "kind": "sell_reference",
+      "origins": 240,
+      "touch_pct": 15.833333333333332,
+      "extreme_within_1pct_pct": 6.666666666666667,
+      "extreme_mape": 10.598055213164026
+    },
+    {
+      "context": "all",
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 3,
+      "kind": "buy_reference",
+      "origins": 239,
+      "touch_pct": 32.63598326359833,
+      "extreme_within_1pct_pct": 11.715481171548117,
+      "extreme_mape": 6.828988359779377
+    },
+    {
+      "context": "all",
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 3,
+      "kind": "sell_reference",
+      "origins": 239,
+      "touch_pct": 12.97071129707113,
+      "extreme_within_1pct_pct": 4.602510460251046,
+      "extreme_mape": 11.16969527589978
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 1,
+      "kind": "buy_reference",
+      "origins": 226,
+      "touch_pct": 40.707964601769916,
+      "extreme_within_1pct_pct": 19.911504424778762,
+      "extreme_mape": 3.3639384943074218
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 1,
+      "kind": "sell_reference",
+      "origins": 226,
+      "touch_pct": 28.31858407079646,
+      "extreme_within_1pct_pct": 11.504424778761061,
+      "extreme_mape": 6.82991120744959
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 2,
+      "kind": "buy_reference",
+      "origins": 226,
+      "touch_pct": 34.51327433628318,
+      "extreme_within_1pct_pct": 9.734513274336283,
+      "extreme_mape": 5.66434233704393
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 2,
+      "kind": "sell_reference",
+      "origins": 226,
+      "touch_pct": 20.353982300884958,
+      "extreme_within_1pct_pct": 10.619469026548673,
+      "extreme_mape": 8.095804304325197
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 3,
+      "kind": "buy_reference",
+      "origins": 226,
+      "touch_pct": 28.31858407079646,
+      "extreme_within_1pct_pct": 7.964601769911504,
+      "extreme_mape": 7.812917170685155
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "development",
+      "model": "note_delta1",
+      "horizon": 3,
+      "kind": "sell_reference",
+      "origins": 226,
+      "touch_pct": 17.25663716814159,
+      "extreme_within_1pct_pct": 7.079646017699115,
+      "extreme_mape": 9.396203038702906
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 1,
+      "kind": "buy_reference",
+      "origins": 226,
+      "touch_pct": 39.823008849557525,
+      "extreme_within_1pct_pct": 17.25663716814159,
+      "extreme_mape": 3.660917854854734
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 1,
+      "kind": "sell_reference",
+      "origins": 226,
+      "touch_pct": 25.663716814159294,
+      "extreme_within_1pct_pct": 13.274336283185843,
+      "extreme_mape": 6.995287358943056
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 2,
+      "kind": "buy_reference",
+      "origins": 226,
+      "touch_pct": 32.30088495575221,
+      "extreme_within_1pct_pct": 11.061946902654867,
+      "extreme_mape": 5.99871542360816
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 2,
+      "kind": "sell_reference",
+      "origins": 226,
+      "touch_pct": 20.79646017699115,
+      "extreme_within_1pct_pct": 8.4070796460177,
+      "extreme_mape": 8.335473585986891
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 3,
+      "kind": "buy_reference",
+      "origins": 226,
+      "touch_pct": 25.663716814159294,
+      "extreme_within_1pct_pct": 8.4070796460177,
+      "extreme_mape": 8.067496856633852
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "development",
+      "model": "note_delta2",
+      "horizon": 3,
+      "kind": "sell_reference",
+      "origins": 226,
+      "touch_pct": 17.699115044247787,
+      "extreme_within_1pct_pct": 7.079646017699115,
+      "extreme_mape": 9.667817010024619
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 1,
+      "kind": "buy_reference",
+      "origins": 105,
+      "touch_pct": 46.666666666666664,
+      "extreme_within_1pct_pct": 16.19047619047619,
+      "extreme_mape": 3.334378909821267
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 1,
+      "kind": "sell_reference",
+      "origins": 105,
+      "touch_pct": 35.23809523809524,
+      "extreme_within_1pct_pct": 15.238095238095239,
+      "extreme_mape": 6.284318814430266
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 2,
+      "kind": "buy_reference",
+      "origins": 105,
+      "touch_pct": 39.04761904761905,
+      "extreme_within_1pct_pct": 14.285714285714285,
+      "extreme_mape": 5.6875792070299225
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 2,
+      "kind": "sell_reference",
+      "origins": 105,
+      "touch_pct": 29.523809523809526,
+      "extreme_within_1pct_pct": 15.238095238095239,
+      "extreme_mape": 7.2694400735413325
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 3,
+      "kind": "buy_reference",
+      "origins": 104,
+      "touch_pct": 34.61538461538461,
+      "extreme_within_1pct_pct": 10.576923076923077,
+      "extreme_mape": 6.8997266249637335
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "holdout",
+      "model": "note_delta1",
+      "horizon": 3,
+      "kind": "sell_reference",
+      "origins": 104,
+      "touch_pct": 20.192307692307693,
+      "extreme_within_1pct_pct": 9.615384615384617,
+      "extreme_mape": 8.188704761947598
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 1,
+      "kind": "buy_reference",
+      "origins": 105,
+      "touch_pct": 42.857142857142854,
+      "extreme_within_1pct_pct": 20.0,
+      "extreme_mape": 3.4442143283790427
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 1,
+      "kind": "sell_reference",
+      "origins": 105,
+      "touch_pct": 32.38095238095238,
+      "extreme_within_1pct_pct": 15.238095238095239,
+      "extreme_mape": 6.404451345694081
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 2,
+      "kind": "buy_reference",
+      "origins": 105,
+      "touch_pct": 32.38095238095238,
+      "extreme_within_1pct_pct": 15.238095238095239,
+      "extreme_mape": 5.561278294742753
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 2,
+      "kind": "sell_reference",
+      "origins": 105,
+      "touch_pct": 27.61904761904762,
+      "extreme_within_1pct_pct": 12.380952380952381,
+      "extreme_mape": 7.415117120063563
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 3,
+      "kind": "buy_reference",
+      "origins": 104,
+      "touch_pct": 26.923076923076923,
+      "extreme_within_1pct_pct": 11.538461538461538,
+      "extreme_mape": 6.846739382879245
+    },
+    {
+      "context": "rising_ma5_proxy",
+      "partition": "holdout",
+      "model": "note_delta2",
+      "horizon": 3,
+      "kind": "sell_reference",
+      "origins": 104,
+      "touch_pct": 23.076923076923077,
+      "extreme_within_1pct_pct": 6.730769230769231,
+      "extreme_mape": 8.366861358611922
+    }
+  ],
+  "nextDayReachability": [
+    {
+      "partition": "development",
+      "model": "note_delta1",
+      "origins": 483,
+      "mean_predicted_count": 3.1159420289855073,
+      "mean_actual_count": 1.7971014492753623,
+      "count_mae": 1.463768115942029,
+      "touch_precision_pct": 52.35880398671096,
+      "touch_recall_pct": 90.78341013824885
+    },
+    {
+      "partition": "development",
+      "model": "note_delta2",
+      "origins": 483,
+      "mean_predicted_count": 2.94824016563147,
+      "mean_actual_count": 1.660455486542443,
+      "count_mae": 1.4409937888198758,
+      "touch_precision_pct": 50.98314606741573,
+      "touch_recall_pct": 90.52369077306733
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta1",
+      "origins": 241,
+      "mean_predicted_count": 3.5062240663900415,
+      "mean_actual_count": 1.9751037344398341,
+      "count_mae": 1.6307053941908713,
+      "touch_precision_pct": 53.25443786982248,
+      "touch_recall_pct": 94.53781512605042
+    },
+    {
+      "partition": "holdout",
+      "model": "note_delta2",
+      "origins": 241,
+      "mean_predicted_count": 3.3609958506224067,
+      "mean_actual_count": 1.8506224066390042,
+      "count_mae": 1.6763485477178424,
+      "touch_precision_pct": 51.111111111111114,
+      "touch_recall_pct": 92.82511210762331
+    }
+  ],
+  "executionLimit": "仅检验日内价格范围是否覆盖参考位。没有证明触达顺序、可成交量、T+1可卖或净收益；不把同日触达买卖参考价当作一笔已实现收益。"
+}

@@ -14,6 +14,8 @@ import type {
 export type MarketClient = Pick<BrowserMarketClient, 'snapshot' | 'publishedRules'> & Partial<Pick<BrowserMarketClient, 'prediction'>>
 
 type WorkspaceContextValue = {
+  predictionStatus: 'idle' | 'loading' | 'ready' | 'error'
+  predictionError: string | null
   selectedSymbol: string | null
   selectedSecurity: Security | null
   cycle: OperationCycle
@@ -45,6 +47,8 @@ export function StockWorkspaceProvider({ children, client = browserMarketClient,
   const [status, setStatus] = useState<WorkspaceStatus>(initialSymbol ? 'loading' : 'idle')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [searchResults, setSearchResults] = useState<Security[]>([])
+  const [predictionStatus, setPredictionStatus] = useState<WorkspaceContextValue['predictionStatus']>('idle')
+  const [predictionError, setPredictionError] = useState<string | null>(null)
   const requestVersion = useRef(0)
   const abortController = useRef<AbortController | null>(null)
   const initialLoadSymbol = useRef<string | null>(null)
@@ -58,6 +62,8 @@ export function StockWorkspaceProvider({ children, client = browserMarketClient,
     let resolvedPrediction: StockWorkspaceSnapshot['prediction'] = null
     setStatus(preserving ? 'refreshing' : 'loading')
     setErrorMessage(null)
+    setPredictionStatus(client.prediction ? 'loading' : 'idle')
+    setPredictionError(null)
     if (!preserving) setCurrent(null)
     if (client.prediction) {
       void Promise.resolve()
@@ -65,6 +71,7 @@ export function StockWorkspaceProvider({ children, client = browserMarketClient,
         .then((prediction) => {
           if (!prediction || version !== requestVersion.current || controller.signal.aborted) return
           resolvedPrediction = prediction
+          setPredictionStatus('ready')
           if (!publishedSnapshot) return
           const previousSnapshot = publishedSnapshot
           const enrichedSnapshot = { ...previousSnapshot, prediction }
@@ -72,11 +79,18 @@ export function StockWorkspaceProvider({ children, client = browserMarketClient,
           setCurrent((snapshot) => snapshot === previousSnapshot ? enrichedSnapshot : snapshot)
           setLastSuccessful((snapshot) => snapshot === previousSnapshot ? enrichedSnapshot : snapshot)
         })
-        .catch(() => undefined)
+        .catch((error) => {
+          if (version !== requestVersion.current || controller.signal.aborted) return
+          setPredictionStatus('error')
+          setPredictionError(error instanceof Error ? error.message : '预测暂不可用')
+        })
     }
     try {
-      const market = await client.snapshot(symbol, controller.signal)
-      const rules = client.publishedRules ? await client.publishedRules(controller.signal).catch(() => []) : []
+      const [market, ruleResult] = await Promise.all([
+        client.snapshot(symbol, controller.signal),
+        client.publishedRules ? client.publishedRules(controller.signal).then((rules) => ({ rules, status: 'ready' as const })).catch(() => ({ rules: [], status: 'error' as const })) : Promise.resolve({ rules: [], status: 'ready' as const }),
+      ])
+      const rules = ruleResult.rules
       if (version !== requestVersion.current) return
       const snapshot: StockWorkspaceSnapshot = {
         symbol,
@@ -86,6 +100,8 @@ export function StockWorkspaceProvider({ children, client = browserMarketClient,
         cycle: nextCycle,
         generatedAt: new Date().toISOString(),
         prediction: resolvedPrediction,
+        publishedRules: rules,
+        rulesStatus: ruleResult.status,
       }
       publishedSnapshot = snapshot
       setCurrent(snapshot)
@@ -146,6 +162,8 @@ export function StockWorkspaceProvider({ children, client = browserMarketClient,
   }, [])
 
   const value = useMemo<WorkspaceContextValue>(() => ({
+    predictionStatus,
+    predictionError,
     selectedSymbol,
     selectedSecurity,
     cycle,
@@ -158,7 +176,7 @@ export function StockWorkspaceProvider({ children, client = browserMarketClient,
     selectStock,
     setCycle,
     refresh,
-  }), [current, cycle, errorMessage, lastSuccessful, refresh, search, searchResults, selectStock, selectedSecurity, selectedSymbol, setCycle, status])
+  }), [current, cycle, errorMessage, lastSuccessful, predictionStatus, predictionError, refresh, search, searchResults, selectStock, selectedSecurity, selectedSymbol, setCycle, status])
 
   return <WorkspaceContext.Provider value={value}>{children}</WorkspaceContext.Provider>
 }

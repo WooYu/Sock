@@ -35,7 +35,7 @@ class ChartWorkspaceController {
   private timer: ReturnType<typeof setTimeout> | undefined
   private saving = false
 
-  constructor(private readonly symbol: string, private readonly period: ChartPeriod) {
+  constructor(private readonly symbol: string, private readonly period: ChartPeriod, private readonly localOnly = false) {
     this.state = { workspace: emptyWorkspace(symbol, period), selectedId: null, syncStatus: '本机保存' }
     this.serverState = this.state
   }
@@ -52,7 +52,7 @@ class ChartWorkspaceController {
       window.addEventListener('storage', this.onStored)
       window.addEventListener('online', this.onOnline)
       window.addEventListener('offline', this.onOffline)
-      if (this.symbol && navigator.onLine && authorization()) {
+      if (!this.localOnly && this.symbol && navigator.onLine && authorization()) {
         void this.pull()
         this.schedule()
       }
@@ -79,6 +79,7 @@ class ChartWorkspaceController {
   }
 
   private idleStatus(): ChartSyncStatus {
+    if (this.localOnly) return '本机保存'
     const pending = loadChartSyncQueue().length
     if (!navigator.onLine) return '离线'
     if (hasChartSyncRecovery()) return '待同步'
@@ -103,10 +104,11 @@ class ChartWorkspaceController {
     this.refresh()
     if (this.state.syncStatus !== '同步中') this.setStatus(this.idleStatus())
   }
-  private onOffline = () => { clearTimeout(this.timer); this.setStatus('离线') }
+  private onOffline = () => { clearTimeout(this.timer); this.setStatus(this.localOnly ? '本机保存' : '离线') }
   private onOnline = () => { void this.flush(); void this.pull() }
 
   private async pull() {
+    if (this.localOnly) return
     const auth = authorization()
     if (!auth || !navigator.onLine || !this.symbol) return
     try {
@@ -119,11 +121,13 @@ class ChartWorkspaceController {
 
   private schedule() {
     clearTimeout(this.timer)
+    if (this.localOnly) return
     if (navigator.onLine && authorization()) this.timer = setTimeout(() => { void this.flush() }, 350)
   }
 
   flush = async (): Promise<void> => {
     clearTimeout(this.timer)
+    if (this.localOnly) return
     const auth = authorization()
     if (!navigator.onLine || !auth) { this.setStatus(this.idleStatus()); return }
     if (!loadChartSyncQueue().length) { this.setStatus(this.idleStatus()); return }
@@ -143,7 +147,7 @@ class ChartWorkspaceController {
     const previous = loadChartWorkspace(this.symbol, this.period)
     const outgoing = deserializeChartWorkspace(serializeChartWorkspace({ ...workspace, revision: Math.max(workspace.revision, previous?.revision ?? 0) + 1, updatedAt: new Date().toISOString() }))!
     // Queue first: this is the durable write-ahead copy if the local snapshot write fails.
-    enqueueChartWorkspace(outgoing)
+    if (!this.localOnly) enqueueChartWorkspace(outgoing)
     this.saving = true
     try { saveChartWorkspace(outgoing) } finally { this.saving = false }
     this.publish({ workspace: outgoing, selectedId: this.engine.currentSelectedId(), syncStatus: this.idleStatus() })
@@ -177,8 +181,8 @@ class ChartWorkspaceController {
   }
 }
 
-export function useChartWorkspace({ symbol, period }: { symbol: string; period: ChartPeriod }) {
-  const controller = useMemo(() => new ChartWorkspaceController(symbol, period), [symbol, period])
+export function useChartWorkspace({ symbol, period, localOnly = false }: { symbol: string; period: ChartPeriod; localOnly?: boolean }) {
+  const controller = useMemo(() => new ChartWorkspaceController(symbol, period, localOnly), [symbol, period, localOnly])
   const state = useSyncExternalStore(controller.subscribe, controller.getSnapshot, controller.getServerSnapshot)
   return { ...state, drawings: state.workspace.drawings, commands: controller.commands, flush: controller.flush }
 }

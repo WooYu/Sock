@@ -1,9 +1,12 @@
 import type { DecisionAction, DecisionRule, MarketSnapshot, RuleCondition, Security } from '@/features/workspace/stock-workspace-types'
 import { isPredictionSnapshot, type PredictionSnapshot } from '@/features/chart/chart-types'
+import type { ChartPeriod } from '@/features/chart/chart-periods'
+import type { ChartSeries } from '@/features/chart/chart-market-types'
 
 export type BrowserMarketClient = {
   search(query: string, signal?: AbortSignal): Promise<Security[]>
   snapshot(symbol: string, signal?: AbortSignal): Promise<MarketSnapshot>
+  series(symbol: string, period: ChartPeriod, signal?: AbortSignal): Promise<ChartSeries>
   prediction(symbol: string, signal?: AbortSignal): Promise<PredictionSnapshot>
   publishedRules?(signal?: AbortSignal): Promise<DecisionRule[]>
 }
@@ -17,6 +20,7 @@ async function browserRequest<T>(url: string, signal?: AbortSignal): Promise<T> 
 export const browserMarketClient: BrowserMarketClient = {
   search: (query, signal) => browserRequest(`/api/market/search?q=${encodeURIComponent(query)}`, signal),
   snapshot: (symbol, signal) => browserRequest(`/api/market/stocks/${encodeURIComponent(symbol)}/snapshot`, signal),
+  series: (symbol, period, signal) => browserRequest(`/api/market/stocks/${encodeURIComponent(symbol)}/candles?period=${encodeURIComponent(period)}&adjustment=none`, signal),
   prediction: async (symbol, signal) => {
     const prediction = await browserRequest<unknown>(`/api/market/stocks/${encodeURIComponent(symbol)}/prediction?period=day`, signal)
     if (!isPredictionSnapshot(prediction) || prediction.symbol !== symbol || prediction.period !== 'day') {

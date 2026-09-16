@@ -1,4 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
+import { aggregateCandles } from '../src/features/chart/chart-math'
+import type { ChartPeriod } from '../src/features/chart/chart-periods'
 
 const symbol = '600519'
 type CandleFixture = { day: string; open: number; high: number; low: number; close: number; volume: number }
@@ -79,6 +81,12 @@ function weekdayCandles(): CandleFixture[] {
 
 async function mockChartApi(page: Page) {
   const candles = weekdayCandles()
+  await page.route('**/api/market/stocks/*/candles?*', (route) => {
+    const url = new URL(route.request().url())
+    const requestedSymbol = url.pathname.split('/').at(-2) ?? symbol
+    const period = url.searchParams.get('period') as ChartPeriod
+    return route.fulfill({ json: { symbol: requestedSymbol, period, adjustment: 'none', kind: 'candles', bars: aggregateCandles(candles, period), source: { name: 'TEST', fetchedAt: '2026-08-28T07:00:00.000Z', state: 'READY', online: true }, limitedHistory: true } })
+  })
   await page.route('**/api/market/stocks/*/snapshot', (route) => {
     const requestedSymbol = new URL(route.request().url()).pathname.split('/').at(-2) ?? symbol
     return route.fulfill({ json: {
@@ -183,11 +191,12 @@ test.describe('unified workspace redesign', () => {
     await expect(page.getByText('数据源：TEST')).toBeVisible()
     const predictionCandles = page.getByTestId('prediction-candle')
     await expect(predictionCandles).toHaveCount(3)
-    const desktopPredictionDetails = page.locator('.sc-prediction-desktop-table')
-    await expect(desktopPredictionDetails.getByRole('table', { name: '未来三日推演详情' })).toBeVisible()
+    const desktopPredictionDetails = page.getByRole('region', { name: '未来预测' })
+    await expect(desktopPredictionDetails.getByRole('heading', { name: '未来 3 个交易日' })).toBeVisible()
+    await desktopPredictionDetails.locator('summary').click()
     await expect(desktopPredictionDetails.getByText('test-e2e-v1', { exact: true })).toBeVisible()
-    await expect(desktopPredictionDetails.getByText('2026-08-28T07:01:00.000Z', { exact: true })).toBeVisible()
-    await expect(desktopPredictionDetails.getByText('推演数据，不是实际行情', { exact: true })).toBeVisible()
+    await expect(desktopPredictionDetails.locator('time')).toHaveAttribute('datetime', '2026-08-28T07:01:00.000Z')
+    await expect(desktopPredictionDetails.getByText(/虚线为推演，实色为历史行情/)).toBeVisible()
     await page.screenshot({ path: testInfo.outputPath('chart-desktop.png') })
 
     await openHorizontalLineTool(page, '桌面绘图工具')
@@ -237,12 +246,13 @@ test.describe('unified workspace redesign', () => {
     await page.getByRole('button', { name: '撤销', exact: true }).click()
     await expect(page.getByTestId('annotation-horizontal-line')).toHaveCount(1)
 
-    const details = page.getByRole('table', { name: '未来三日推演详情' })
-    await details.getByRole('button', { name: /第2日/ }).click()
+    await page.getByRole('tab', { name: '预测', exact: true }).click()
+    const details = page.getByRole('region', { name: '未来预测' })
+    await details.getByRole('button', { name: /T\+2/ }).click()
     await expect(predictionCandles.nth(1)).toHaveAttribute('data-active', 'true')
     await predictionCandles.nth(2).focus()
     await predictionCandles.nth(2).press('Enter')
-    await expect(details.getByRole('button', { name: /第3日/ })).toHaveAttribute('aria-pressed', 'true')
+    await expect(details.getByRole('button', { name: /T\+3/ })).toHaveAttribute('aria-pressed', 'true')
 
     await page.getByRole('tab', { name: '周线' }).click()
     await expect(page.getByTestId('annotation-horizontal-line')).toHaveCount(0)
@@ -320,14 +330,13 @@ test.describe('unified workspace redesign', () => {
 
     const layout = await page.evaluate(() => {
       const actionBar = document.querySelector('[data-testid="chart-mobile-toolbar"]')?.getBoundingClientRect()
-      const primaryNav = document.querySelector('[data-testid="mobile-primary-nav"]')?.getBoundingClientRect()
       return {
         noHorizontalOverflow: document.documentElement.scrollWidth <= window.innerWidth + 1,
-        actionBarAboveNav: Boolean(actionBar && primaryNav && actionBar.bottom <= primaryNav.top + 1),
+        actionBarWithinViewport: Boolean(actionBar && actionBar.bottom <= window.innerHeight + 1),
       }
     })
     expect(layout.noHorizontalOverflow).toBe(true)
-    expect(layout.actionBarAboveNav).toBe(true)
+    expect(layout.actionBarWithinViewport).toBe(true)
     expect(pageErrors).toEqual([])
     await page.keyboard.press('Escape')
     await expect(objectSheet).toBeHidden()
@@ -339,9 +348,11 @@ test.describe('unified workspace redesign', () => {
     test(`does not overflow at 390px: ${route}`, async ({ page }) => {
       await page.setViewportSize({ width: 390, height: 844 })
       await page.goto(route)
-      await expect(page.getByTestId('mobile-primary-nav')).toBeVisible()
+      const isStudio = route.startsWith('/chart')
+      const navigation = page.getByTestId(isStudio ? 'chart-mobile-toolbar' : 'mobile-primary-nav')
+      await expect(navigation).toBeVisible()
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true)
-      const smallestPrimaryTarget = await page.getByTestId('mobile-primary-nav').getByRole('link').evaluateAll((links) => Math.min(...links.map((link) => link.getBoundingClientRect().height)))
+      const smallestPrimaryTarget = await navigation.getByRole(isStudio ? 'button' : 'link').evaluateAll((links) => Math.min(...links.map((link) => link.getBoundingClientRect().height)))
       expect(smallestPrimaryTarget).toBeGreaterThanOrEqual(44)
     })
   }

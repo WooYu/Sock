@@ -4,8 +4,9 @@ test.describe("live StockCal baseline", () => {
   test("renders the live-data shell without demo modules", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("h1").first()).toBeVisible();
-    await expect(page.getByTestId("desktop-primary-nav")).toBeAttached();
-    await expect(page.getByTestId("mobile-primary-nav")).toBeAttached();
+    await expect(page.getByTestId("research-studio")).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "研究工作台导航" })).toBeVisible();
+    await expect(page.getByText("当前为合成数据", { exact: false })).toHaveCount(0);
     await expect(page.getByText("公司行为调整")).toHaveCount(0);
     await expect(page.getByText("演示数据")).toHaveCount(0);
   });

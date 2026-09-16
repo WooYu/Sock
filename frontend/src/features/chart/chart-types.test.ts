@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { isPredictionSnapshot, migrateWorkspace } from './chart-types'
+import { drawingFixture } from './chart-workspace-test-fixtures'
 
 describe('chart contracts', () => {
   const predictionDay = (day: string) => ({
@@ -26,6 +27,22 @@ describe('chart contracts', () => {
     delete missingIndicator.ma5
     expect(isPredictionSnapshot({ ...snapshot, days: [missingIndicator, snapshot.days[1], snapshot.days[2]] })).toBe(false)
     expect(isPredictionSnapshot({ ...snapshot, days: [{ ...day, bollLower: Number.NaN }, snapshot.days[1], snapshot.days[2]] })).toBe(false)
+  })
+
+  test('accepts explicit insufficient-window MA and BOLL nulls while rejecting invalid or missing indicators', () => {
+    const day = { ...predictionDay('2026-09-07'), ma5: null, ma10: null, ma20: null, ma30: null, ma250: 123, bollUpper: null, bollMiddle: null, bollLower: null }
+    const snapshot = { symbol: '600519', period: 'day', generatedAt: '2026-09-07T00:00:00Z', modelVersion: 'test', days: [day, predictionDay('2026-09-08'), predictionDay('2026-09-09')] }
+    expect(isPredictionSnapshot(snapshot)).toBe(true)
+    expect(isPredictionSnapshot({ ...snapshot, days: [{ ...day, ma90: Number.NaN }, ...snapshot.days.slice(1)] })).toBe(false)
+    expect(isPredictionSnapshot({ ...snapshot, days: [{ ...day, bollMiddle: undefined }, ...snapshot.days.slice(1)] })).toBe(false)
+    expect(isPredictionSnapshot({ ...snapshot, generatedAt: '2026-09-07T24:00:00Z' })).toBe(false)
+  })
+
+  test('preserves new-period timestamp drawings during v2 migration and discards incompatible anchors', () => {
+    const valid = drawingFixture({ period: '5m', points: [{ time: '2026-09-07T10:35:00+08:00', price: 10 }] })
+    const result = migrateWorkspace({ version: 2, symbol: valid.symbol, period: '5m', drawings: [valid, { ...valid, id: 'bad', points: [{ time: '2026-09-07', price: 11 }] }] })
+    expect(result.period).toBe('5m')
+    expect(result.drawings).toEqual([valid])
   })
 
   test('requires canonical weekday sessions and leaves holiday validation to the backend', () => {

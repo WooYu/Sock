@@ -1,6 +1,7 @@
 import type { Candle, MarketSnapshot } from '../workspace/stock-workspace-types'
+import { isCalendarDate, isChartPeriod, isChartTime, isIsoTimestamp, MA_PERIODS, type ChartPeriod, type IndicatorValue } from './chart-periods'
 
-export type ChartPeriod = 'day' | 'week' | 'month'
+export type { ChartPeriod } from './chart-periods'
 
 export type TimePricePoint = {
   time: string
@@ -49,12 +50,17 @@ export type PredictionDay = {
   rangeLow: number
   rangeHigh: number
   confidence: number
-  ma5: number
-  ma10: number
-  ma20: number
-  bollUpper: number
-  bollMiddle: number
-  bollLower: number
+  ma5: IndicatorValue
+  ma10: IndicatorValue
+  ma20: IndicatorValue
+  ma30?: IndicatorValue
+  ma60?: IndicatorValue
+  ma90?: IndicatorValue
+  ma120?: IndicatorValue
+  ma250?: IndicatorValue
+  bollUpper: IndicatorValue
+  bollMiddle: IndicatorValue
+  bollLower: IndicatorValue
 }
 
 export type PredictionSnapshot = {
@@ -87,7 +93,6 @@ export type ChartWorkspaceV2 = {
   market?: MarketSnapshot
 }
 
-const chartPeriods: readonly ChartPeriod[] = ['day', 'week', 'month']
 const drawingKinds: readonly DrawingKind[] = ['trend-line', 'horizontal-line', 'rectangle', 'text', 'buy', 'sell', 'target', 'stop-loss']
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -98,11 +103,8 @@ function isFiniteNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value)
 }
 
-function isDate(value: unknown): value is string {
-  return typeof value === 'string' && !Number.isNaN(Date.parse(value))
-}
-
 function tradingDayKey(value: string): number {
+  if (!isCalendarDate(value)) return Number.NaN
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
   if (!match) return Number.NaN
   const year = Number(match[1])
@@ -116,17 +118,13 @@ function isTradingDay(value: unknown): value is string {
   return typeof value === 'string' && Number.isFinite(tradingDayKey(value))
 }
 
-function isChartPeriod(value: unknown): value is ChartPeriod {
-  return typeof value === 'string' && chartPeriods.includes(value as ChartPeriod)
-}
-
 function isDrawingKind(value: unknown): value is DrawingKind {
   return typeof value === 'string' && drawingKinds.includes(value as DrawingKind)
 }
 
 /** Runtime validation for the versioned, three-session prediction response. */
 export function isPredictionSnapshot(value: unknown): value is PredictionSnapshot {
-  if (!isRecord(value) || typeof value.symbol !== 'string' || !isChartPeriod(value.period) || !isDate(value.generatedAt) || typeof value.modelVersion !== 'string' || !Array.isArray(value.days) || value.days.length !== 3) return false
+  if (!isRecord(value) || typeof value.symbol !== 'string' || !isChartPeriod(value.period) || !isIsoTimestamp(value.generatedAt) || typeof value.modelVersion !== 'string' || !Array.isArray(value.days) || value.days.length !== 3) return false
 
   let previousDay: number | undefined
   for (const day of value.days) {
@@ -136,8 +134,10 @@ export function isPredictionSnapshot(value: unknown): value is PredictionSnapsho
     const prices = ['open', 'high', 'low', 'close', 'rangeLow', 'rangeHigh']
     if (!prices.every((key) => isFiniteNumber(day[key])) || !isFiniteNumber(day.confidence) || day.confidence < 0 || day.confidence > 1) return false
 
-    const indicators = ['ma5', 'ma10', 'ma20', 'bollUpper', 'bollMiddle', 'bollLower']
-    if (!indicators.every((key) => isFiniteNumber(day[key]))) return false
+    const nullableNumber = (item: unknown) => item === null || isFiniteNumber(item)
+    if (!['ma5', 'ma10', 'ma20'].every((key) => nullableNumber(day[key]))) return false
+    if (!MA_PERIODS.every((size) => day[`ma${size}`] === undefined || nullableNumber(day[`ma${size}`]))) return false
+    if (!['bollUpper', 'bollMiddle', 'bollLower'].every((key) => nullableNumber(day[key]))) return false
   }
   return true
 }
@@ -155,7 +155,8 @@ export type MigratedWorkspace = ChartWorkspaceV2 & { legacyDrawingsDiscarded: nu
 
 function isDrawingObject(value: unknown): value is DrawingObject {
   if (!isRecord(value) || typeof value.id !== 'string' || typeof value.symbol !== 'string' || !isChartPeriod(value.period) || !isDrawingKind(value.kind) || !Array.isArray(value.points) || !isRecord(value.style) || typeof value.locked !== 'boolean' || typeof value.visible !== 'boolean' || !isFiniteNumber(value.version) || typeof value.updatedAt !== 'string' || ('text' in value && typeof value.text !== 'string')) return false
-  if (!value.points.every((point) => isRecord(point) && typeof point.time === 'string' && isFiniteNumber(point.price))) return false
+  const period = value.period
+  if (!value.points.every((point) => isRecord(point) && isChartTime(point.time, period) && isFiniteNumber(point.price))) return false
   return typeof value.style.color === 'string' && isFiniteNumber(value.style.width) && (value.style.lineStyle === 'solid' || value.style.lineStyle === 'dashed') && isFiniteNumber(value.style.opacity)
 }
 
@@ -171,7 +172,7 @@ export function migrateWorkspace(input: unknown): MigratedWorkspace {
   const period = isChartPeriod(source.period) ? source.period : 'day'
   const symbol = typeof source.symbol === 'string' ? source.symbol : typeof source.stockCode === 'string' ? source.stockCode : ''
   const updatedAt = typeof source.updatedAt === 'string' ? source.updatedAt : new Date().toISOString()
-  const drawings = version === 2 ? legacyDrawings.filter(isDrawingObject) : []
+  const drawings = version === 2 ? legacyDrawings.filter((drawing): drawing is DrawingObject => isDrawingObject(drawing) && drawing.symbol === symbol && drawing.period === period) : []
 
   return {
     version: 2,

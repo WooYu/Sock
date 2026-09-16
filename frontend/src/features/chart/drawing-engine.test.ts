@@ -22,6 +22,23 @@ function drawing(overrides: Partial<DrawingObject> = {}): DrawingObject {
 }
 
 describe('DrawingEngine', () => {
+  test('moves legacy weekly anchors by their canonical bucket in the full time domain', () => {
+    const engine = new DrawingEngine([drawing({ period: 'week', kind: 'trend-line', points: [
+      { time: '2026-09-02', price: 10 }, { time: '2026-09-09', price: 12 },
+    ] })])
+    engine.select('line-1')
+    engine.move({ timeIndexDelta: 1, priceDelta: 2, timeDomain: ['2026-08-31', '2026-09-07', '2026-09-14'] })
+    expect(engine.current()[0].points).toEqual([{ time: '2026-09-07', price: 12 }, { time: '2026-09-14', price: 14 }])
+    engine.undo()
+    expect(engine.current()[0].points).toEqual([{ time: '2026-09-02', price: 10 }, { time: '2026-09-09', price: 12 }])
+  })
+
+  test('moves minute drawings across lunch using their actual bar domain', () => {
+    const engine = new DrawingEngine([drawing({ period: '60m', points: [{ time: '2026-09-07T11:30:00+08:00', price: 10 }] })])
+    engine.select('line-1')
+    engine.move({ timeIndexDelta: 1, priceDelta: 0, timeDomain: ['2026-09-07T10:30:00+08:00', '2026-09-07T11:30:00+08:00', '2026-09-07T14:00:00+08:00', '2026-09-07T15:00:00+08:00'] })
+    expect(engine.current()[0].points[0].time).toBe('2026-09-07T14:00:00+08:00')
+  })
   test('emits durable tombstones and treats undo redo as newer mutations', () => {
     const engine = new DrawingEngine([drawing()])
     engine.select('line-1')

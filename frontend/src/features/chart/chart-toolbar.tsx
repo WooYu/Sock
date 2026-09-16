@@ -1,4 +1,5 @@
 import type { ChartTool } from './chart-annotation-store'
+import { StudioIcon } from '../research/studio-icon'
 
 const primaryDrawingTools: Array<[ChartTool, string]> = [
   ['pointer', '指针'],
@@ -16,7 +17,8 @@ const secondaryDrawingTools: Array<[ChartTool, string]> = [
   ['text', '文字'],
 ]
 
-export function ChartToolbar({ activeTool, onToolChange }: { activeTool: ChartTool; onToolChange: (tool: ChartTool) => void }) {
+export function ChartToolbar({ activeTool, onToolChange, compact = false }: { activeTool: ChartTool; onToolChange: (tool: ChartTool) => void; compact?: boolean }) {
+  if (compact) return <div className="rs-drawing-tools" aria-label="绘图工具">{[...primaryDrawingTools.slice(0, 3), secondaryDrawingTools[0], primaryDrawingTools[3], secondaryDrawingTools[1], ...primaryDrawingTools.slice(4)].map(([tool, label]) => <button className="rs-drawing-tool" aria-label={label} title={label} aria-pressed={activeTool === tool} data-tool={tool} key={tool} onClick={() => onToolChange(tool)} type="button"><StudioIcon name={tool} size={19} /></button>)}</div>
   return (
     <div className="sc-kline-tool-row" aria-label="绘图工具">
       <span className="sc-kline-group-label">绘图工具</span>

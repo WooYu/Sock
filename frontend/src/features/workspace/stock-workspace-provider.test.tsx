@@ -89,6 +89,8 @@ function PredictionProbe() {
       <p>Status: {workspace.status}</p>
       <p>Prediction: {workspace.current?.prediction ? `${workspace.current.prediction.symbol}/${workspace.current.prediction.modelVersion}` : 'none'}</p>
       <p>Error: {workspace.errorMessage ?? 'none'}</p>
+      <p>Prediction status: {workspace.predictionStatus}</p>
+      <p>Prediction error: {workspace.predictionError ?? 'none'}</p>
       <button type="button" onClick={() => workspace.selectStock('600519')}>Select 600519</button>
       <button type="button" onClick={() => workspace.selectStock('000001')}>Select 000001</button>
       <button type="button" onClick={() => workspace.refresh()}>Refresh</button>
@@ -97,6 +99,14 @@ function PredictionProbe() {
 }
 
 describe('StockWorkspaceProvider', () => {
+  test('reports a prediction failure while retaining successfully loaded market data', async () => {
+    const market: MarketClient = { snapshot: async (symbol) => demoMarketSnapshot(symbol), prediction: async () => { throw new Error('预测数据不足') } }
+    render(<StockWorkspaceProvider client={market} initialSymbol="600519"><PredictionProbe /></StockWorkspaceProvider>)
+    expect(await screen.findByText('Status: ready')).toBeInTheDocument()
+    expect(await screen.findByText('Prediction status: error')).toBeInTheDocument()
+    expect(screen.getByText('Prediction error: 预测数据不足')).toBeInTheDocument()
+    expect(screen.getByText('Error: none')).toBeInTheDocument()
+  })
   test('defaults analysis to the short operation cycle', () => {
     render(
       <StockWorkspaceProvider client={{ snapshot: async (symbol) => demoMarketSnapshot(symbol) }}>

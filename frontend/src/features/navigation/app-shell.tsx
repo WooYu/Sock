@@ -89,7 +89,7 @@ export function AppShell({
     <div className="sc-shell sc-shell-unified" data-testid="app-shell">
       <header className="sc-shell-header">
         <div className="sc-shell-header-inner">
-          <Link className="sc-brand" href="/overview" aria-label="回到总览">
+          <Link className="sc-brand" href="/" aria-label="回到总览">
             <span className="sc-brand-mark"><i /><i /><i /></span>
             <span>StockCal</span>
           </Link>

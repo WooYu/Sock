@@ -1,8 +1,6 @@
-import { ProductShell } from '@/features/navigation/product-shell'
-import { LiveOverviewPage } from '@/features/overview/live-overview-page'
-import { StockWorkspaceProvider } from '@/features/workspace/stock-workspace-provider'
+import { ResearchStudio } from '@/features/research/research-studio'
 
-export default async function Home({ searchParams }: { searchParams: Promise<{ symbol?: string }> }) {
-  const { symbol } = await searchParams
-  return <StockWorkspaceProvider initialSymbol={symbol ?? '600519'}><ProductShell activeHref="/overview" section="overview"><LiveOverviewPage /></ProductShell></StockWorkspaceProvider>
+export default async function Home({ searchParams }: { searchParams: Promise<{ symbol?: string; example?: string }> }) {
+  const { symbol, example } = await searchParams
+  return <ResearchStudio initialSymbol={symbol ?? '600519'} initialPreview={example === '1'} />
 }

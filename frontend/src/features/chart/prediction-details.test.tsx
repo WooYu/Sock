@@ -33,7 +33,7 @@ test('renders every required prediction value in the desktop table', () => {
     ['BOLL上轨', '11.21', '21.21', '31.21'],
     ['BOLL中轨', '10.22', '20.22', '30.22'],
     ['BOLL下轨', '9.23', '19.23', '29.23'],
-    ['置信度', '81%', '72%', '63%'],
+    ['模型参考值', '81%', '72%', '63%'],
   ]
 
   for (const [label, ...values] of expectedRows) {
