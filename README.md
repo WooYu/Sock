@@ -46,6 +46,9 @@ frontend/                    Next.js Web-first 前端
 backend/                     Spring Boot 4 / Java 21 服务
 backend/src/main/resources/  配置与 Flyway 数据库迁移
 docs/                        产品设计、路线图与交接文档
+docs/archive/flutter/        历史 Flutter 工作记录
+notes/                       股票笔记原文，供知识导入使用
+research/                    回测脚本、数据来源及研究证据
 compose.yaml                 PostgreSQL 17 与 Redis 8 本地服务
 ```
 
@@ -87,6 +90,7 @@ STOCKCAL_NOTES_PATH=C:\Users\Administrator\Documents\Obsidian Vault\印象笔记
 ```bash
 cd frontend
 npm test
+npm run lint
 npm run build
 
 cd ../backend

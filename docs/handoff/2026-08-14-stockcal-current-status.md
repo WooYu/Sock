@@ -73,9 +73,9 @@ C:\Users\Administrator\Documents\Obsidian Vault\印象笔记\股票
 - `docs/superpowers/specs/2026-08-26-stockcal-prototype-realignment-design.md`：当前 Web-first + Next.js/Vercel 权威设计。
 - `docs/superpowers/plans/2026-08-27-stockcal-web-first-plan.md`：当前 Next.js/Vercel 实施计划。
 - `docs/superpowers/plans/2026-08-27-stockcal-navigation-workspace.md`：已替代的 Flutter 导航计划，仅作历史记录。
-- `task_plan.md`：当前阶段状态和验收门槛。
-- `progress.md`：按时间记录的 TDD 与验证历史。
-- `findings.md`：环境限制、架构发现和关键决策。
+- `docs/archive/flutter/task_plan.md`：历史 Flutter 阶段状态和验收门槛。
+- `docs/archive/flutter/progress.md`：历史 TDD 与验证记录。
+- `docs/archive/flutter/findings.md`：历史环境限制、架构发现和关键决策。
 
 ## 8. 验证命令
 
