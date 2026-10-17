@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test'
 
 test('keeps research entry labels and positions stable when switching panels', async ({ page }) => {
   await page.goto('/?example=1')
+  await expect(page.getByRole('region', { name: '自动 MA/BOLL 预测', exact: true }).getByRole('button', { name: '30分钟', exact: true })).toBeEnabled()
   const tabs = page.getByRole('tablist', { name: '研究依据类型' })
   await tabs.scrollIntoViewIfNeeded()
   const names = ['走势依据', '笔记规则', '历史相似', '多周期分析']

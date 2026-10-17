@@ -9,6 +9,9 @@ import { ChartWorkspace } from '../chart/chart-workspace'
 import type { ChartPeriod } from '../chart/chart-periods'
 import { ResearchHeader } from '../navigation/research-header'
 import { StockPicker } from './stock-picker'
+import { useAutomaticForecast } from './use-automatic-forecast'
+import { AutomaticForecastPanel } from './automatic-forecast-panel'
+import type { MergedLevel } from '../scenario/scenario-types'
 import { ResearchEvidence } from './research-evidence'
 import { StudioIcon } from './studio-icon'
 import { createPreviewData, loadPreviewSeries } from './preview-data'
@@ -28,6 +31,7 @@ function Studio({ initialPreview, initialSymbol }: { initialPreview: boolean; in
   const [demo, setDemo] = useState(initialPreview)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [analysisOpen, setAnalysisOpen] = useState(false)
+  const [levelSelection, setLevelSelection] = useState<{ owner: string; id: string } | null>(null)
   const [chartSelection, setChartSelection] = useState<{ owner: string; period: ChartPeriod } | null>(null)
   const mobileSearch = useRef<HTMLButtonElement>(null)
   const pickerPanel = useRef<HTMLDivElement>(null)
@@ -38,7 +42,10 @@ function Studio({ initialPreview, initialSymbol }: { initialPreview: boolean; in
   const cached = workspace.current ?? workspace.lastSuccessful
   const current = cached?.symbol === selectedSymbol ? cached : null
   const market = demo ? preview.market : current?.market
-  const prediction = demo ? preview.prediction : current?.prediction ?? null
+  const automatic = useAutomaticForecast({ symbol: selectedSymbol, sourceMode: demo ? 'demo' : 'real', client: demo ? previewScenarioClient : browserMarketClient, name: market?.quote.security.name })
+  const selectedLevel = levelSelection?.owner === selectedSymbol ? automatic.analysis?.mergedLevels.find(level => level.id === levelSelection.id) ?? null : null
+  const selectLevel = (level: MergedLevel) => setLevelSelection({ owner: selectedSymbol, id: level.id })
+  const forecastPanel = <AutomaticForecastPanel compact forecast={automatic} selected={selectedLevel} onSelect={selectLevel} rules={demo ? [] : current?.publishedRules} stockAnalysis={current?.analysis} />
   const security = market?.quote.security ?? workspace.selectedSecurity
   const price = market?.quote.price
   const change = market?.quote.previousClose && price !== undefined ? price - market.quote.previousClose : null
@@ -50,7 +57,7 @@ function Studio({ initialPreview, initialSymbol }: { initialPreview: boolean; in
   const updateUrl = (symbol: string, example = false) => { const url = new URL(window.location.href); url.searchParams.set('symbol', symbol); if (example) url.searchParams.set('example', '1'); else url.searchParams.delete('example'); window.history.pushState(null, '', `${url.pathname}${url.search}`) }
   const closePicker = () => { setPickerOpen(false); mobileSearch.current?.focus() }
   const select = (selection: Security) => { setDemo(false); closePicker(); updateUrl(selection.code); void workspace.selectStock(selection.code, selection) }
-  const refresh = () => { if (!demo) void workspace.refresh() }
+  const refresh = () => { if (!demo) { void workspace.refresh(); void automatic.refresh() } }
   const showExample = () => { setDemo(true); setPickerOpen(false); updateUrl(workspace.selectedSymbol ?? initialSymbol, true) }
   const exitExample = () => { setDemo(false); updateUrl(workspace.selectedSymbol ?? initialSymbol); if (!workspace.current) void workspace.selectStock(workspace.selectedSymbol ?? initialSymbol) }
   const restoreLocation = useCallback(() => { const url = new URL(window.location.href); const example = url.searchParams.get('example') === '1'; setDemo(example); if (!example) { const symbol = url.searchParams.get('symbol') ?? initialSymbol; if (symbol !== workspace.selectedSymbol) void workspace.selectStock(symbol) } }, [initialSymbol, workspace])
@@ -98,7 +105,7 @@ function Studio({ initialPreview, initialSymbol }: { initialPreview: boolean; in
           <dl className="rs-quote-facts">{([['开盘', market?.quote.open], ['最高', market?.quote.high], ['最低', market?.quote.low]] as const).map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value?.toFixed(2) ?? '—'}</dd></div>)}</dl>
           <button className="rs-refresh rs-icon-button" title="刷新行情与预测" aria-label="刷新行情与预测" disabled={loading || demo} onClick={refresh} type="button"><StudioIcon name="refresh" /><span>{loading ? '刷新中' : '刷新'}</span></button>
         </section>
-        {market && market.dailyCandles.length ? <ChartWorkspace key={market.quote.security.code} variant="studio" period={chartPeriod} onPeriodChange={changePeriod} loadSeries={demo ? loadPreviewSeries : browserMarketClient.series} snapshot={market} prediction={prediction} status={demo ? 'ready' : workspace.status} errorMessage={demo ? null : workspace.errorMessage} onRetry={refresh} forecastStatus={demo ? 'ready' : workspace.predictionStatus} forecastError={demo ? null : workspace.predictionError} footer={<ResearchEvidence candles={market.dailyCandles} analysis={demo ? null : current?.analysis} rules={demo ? [] : current?.publishedRules} rulesStatus={demo ? 'ready' : current?.rulesStatus} demo={demo} scenario={scenarioPanel} />} /> : <section className="rs-empty-workspace" aria-live="polite"><div className="rs-empty-chart-icon"><StudioIcon name="chart" size={38} /></div><h2>{loading ? '正在加载 K 线' : '从走势，开始你的研究'}</h2><p>{loading ? '正在获取历史行情与未来预测…' : workspace.status === 'error' ? '行情暂时未连接。你可以重新加载，或先用示例体验完整工作台。' : '搜索股票，查看 K 线、标记关键位置，再与未来推演对照。'}</p><div><button className="rs-button rs-button-primary" onClick={refresh} disabled={loading} type="button"><StudioIcon name="refresh" size={16} />{loading ? '正在加载' : '重新加载行情'}</button><button className="rs-button" onClick={showExample} type="button">用示例体验<StudioIcon name="arrow" size={16} /></button></div><div className="rs-empty-features"><span>趋势线与关键位标记</span><span>未来 3 日价格、MA、BOLL</span><span>笔记与历史走势对照</span></div></section>}
+        {market && market.dailyCandles.length ? <ChartWorkspace key={market.quote.security.code} variant="studio" period={chartPeriod} onPeriodChange={changePeriod} loadSeries={demo ? loadPreviewSeries : browserMarketClient.series} snapshot={market} prediction={null} forecastPanel={forecastPanel} forecastReferences={automatic.analysis?.references.filter(ref => ref.method === 'average_delta')} status={demo ? 'ready' : workspace.status} errorMessage={demo ? null : workspace.errorMessage} onRetry={refresh} forecastStatus={demo ? 'ready' : workspace.predictionStatus} forecastError={demo ? null : workspace.predictionError} footer={<><AutomaticForecastPanel forecast={automatic} selected={selectedLevel} onSelect={selectLevel} rules={demo ? [] : current?.publishedRules} stockAnalysis={current?.analysis} /><ResearchEvidence candles={market.dailyCandles} analysis={demo ? null : current?.analysis} rules={demo ? [] : current?.publishedRules} rulesStatus={demo ? 'ready' : current?.rulesStatus} demo={demo} scenario={scenarioPanel} scenarioInitiallyOpen={analysisOpen} selectedLevel={selectedLevel} /></>} /> : <section className="rs-empty-workspace" aria-live="polite"><div className="rs-empty-chart-icon"><StudioIcon name="chart" size={38} /></div><h2>{loading ? '正在加载 K 线' : '从走势，开始你的研究'}</h2><p>{loading ? '正在获取历史行情与未来预测…' : workspace.status === 'error' ? '行情暂时未连接。你可以重新加载，或先用示例体验完整工作台。' : '搜索股票，查看 K 线、标记关键位置，再与未来推演对照。'}</p><div><button className="rs-button rs-button-primary" onClick={refresh} disabled={loading} type="button"><StudioIcon name="refresh" size={16} />{loading ? '正在加载' : '重新加载行情'}</button><button className="rs-button" onClick={showExample} type="button">用示例体验<StudioIcon name="arrow" size={16} /></button></div><div className="rs-empty-features"><span>趋势线与关键位标记</span><span>前三后四 MA / BOLL 预测</span><span>笔记与历史走势对照</span></div></section>}
         {(!market || !market.dailyCandles.length) ? scenarioPanel : null}
         <footer className="rs-page-footer"><span>StockCal · 研究、记录、验证</span><span>{demo ? '示例不对应任何真实证券' : '预测为技术推演，仅供研究参考'}</span><Link href="/settings">设置</Link></footer>
       </main>

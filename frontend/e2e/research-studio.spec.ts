@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { createPreviewData } from '../src/features/research/preview-data'
+import { createPreviewData, loadPreviewSeries } from '../src/features/research/preview-data'
 import { aggregateCandles } from '../src/features/chart/chart-math'
 import type { ChartPeriod } from '../src/features/chart/chart-periods'
 
@@ -7,11 +7,12 @@ const sample = createPreviewData()
 const names: Record<string, string> = { '600519': '贵州茅台', '002475': '立讯精密', '000001': '平安银行' }
 
 async function marketApi(page: Page, failPrediction = false) {
-  await page.route('**/api/market/stocks/*/candles?*', (route) => {
+  await page.route('**/api/market/stocks/*/candles?*', async (route) => {
     const url = new URL(route.request().url())
     const symbol = url.pathname.split('/').at(-2)!
     const period = url.searchParams.get('period') as ChartPeriod
-    return route.fulfill({ json: { symbol, period, adjustment: 'none', kind: 'candles', bars: aggregateCandles(sample.market.dailyCandles, period), source: { ...sample.market.source, name: 'TEST', online: true }, limitedHistory: true } })
+    const bars = period === '60m' || period === '30m' ? (await loadPreviewSeries('DEMO', period)).bars : aggregateCandles(sample.market.dailyCandles, period)
+    return route.fulfill({ json: { symbol, period, adjustment: 'none', kind: 'candles', bars, source: { ...sample.market.source, name: 'TEST', online: true }, limitedHistory: true } })
   })
   await page.route('**/api/market/search?*', (route) => route.fulfill({ json: [{ code: '002475', name: '立讯精密', exchange: 'SZ' }] }))
   await page.route('**/api/market/stocks/*/snapshot', (route) => {
@@ -63,32 +64,30 @@ test.describe('K-line research studio', () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true)
   })
 
-  test('selects forecasts, reads all indicators, and compares actual historical evidence', async ({ page }, info) => {
-    test.skip(info.project.name !== 'desktop', 'Desktop forecast rail')
-    const errors: string[] = []
-    page.on('pageerror', (error) => errors.push(error.message))
+  test('automatically calculates three historical and four future indicator columns and links candidate evidence', async ({ page }) => {
     await marketApi(page)
+    const requested: string[] = []
+    page.on('request', request => { if (request.url().includes('/candles?')) requested.push(new URL(request.url()).searchParams.get('period')!) })
     await page.goto('/')
-    await expect(page.getByRole('heading', { name: '贵州茅台', exact: true })).toBeVisible()
-    await expect(page.getByTestId('prediction-candle')).toHaveCount(3)
-    await expect(page.getByTestId('predicted-indicator-line')).toHaveCount(6)
-    const rail = page.getByRole('region', { name: '未来预测' })
-    await rail.getByRole('button', { name: /T\+2/ }).click()
-    await expect(page.getByTestId('prediction-candle').nth(1)).toHaveAttribute('aria-pressed', 'true')
-    await rail.getByRole('tab', { name: 'MA 均线' }).click()
-    for (const label of ['MA5', 'MA10', 'MA20']) await expect(rail.getByText(label, { exact: true })).toBeVisible()
-    await rail.getByRole('tab', { name: 'BOLL 通道' }).click()
-    for (const label of ['BOLL 上轨', 'BOLL 中轨', 'BOLL 下轨']) await expect(rail.getByText(label, { exact: true })).toBeVisible()
-    await page.getByRole('switch', { name: '未来推演', exact: true }).uncheck()
+    const panel = page.getByRole('region', { name: '自动 MA/BOLL 预测', exact: true })
+    await expect(panel.getByRole('button', { name: '30分钟', exact: true })).toBeEnabled()
+    expect(requested).toContain('60m')
+    expect(requested).toContain('30m')
+    const table = panel.getByRole('table', { name: /日线 MA\/BOLL参考位/ })
+    await expect(table.getByRole('columnheader', { name: /历史第/ })).toHaveCount(3)
+    await expect(table.getByRole('columnheader', { name: /未来第/ })).toHaveCount(4)
     await expect(page.getByTestId('prediction-candle')).toHaveCount(0)
-    await expect(rail.getByText('预测图层已隐藏')).toBeVisible()
-    await rail.getByRole('button', { name: '显示未来推演' }).click()
-    await expect(page.getByTestId('prediction-candle')).toHaveCount(3)
+    await expect(page.getByTestId('indicator-projection')).toHaveCount(1)
+    await page.getByRole('button', { name: 'MA总开关' }).click()
+    await expect(page.locator('[data-chart-layer=indicator] [data-indicator]')).toHaveCount(0)
+    await page.getByRole('button', { name: 'MA总开关' }).click()
+    await expect(page.locator('[data-chart-layer=indicator] [data-indicator]')).toHaveCount(3)
+    await panel.locator('.rs-auto-levels button').first().click()
+    await expect(panel.getByRole('region', { name: '所选价位依据' })).toBeVisible()
+    await page.getByRole('tab', { name: '笔记规则', exact: true }).click()
+    await expect(page.getByRole('heading', { name: /价位选择依据 ·/ })).toBeVisible()
     await page.getByRole('tab', { name: '历史相似', exact: true }).click()
-    await expect(page.getByText('历史后续 3 日').first()).toBeVisible()
-    await page.getByRole('tab', { name: /笔记规则/ }).click()
-    await expect(page.getByText('均线位置校验')).toBeVisible()
-    expect(errors).toEqual([])
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
   })
 
   test('searches in place, preserves selection in the URL, and saves a watchlist', async ({ page }, info) => {
@@ -114,7 +113,7 @@ test.describe('K-line research studio', () => {
     test.skip(info.project.name !== 'desktop', 'Desktop drawing inspector')
     await marketApi(page)
     await page.goto('/chart')
-    await expect(page.getByTestId('prediction-candle')).toHaveCount(3)
+    await expect(page.getByTestId('indicator-projection')).toHaveCount(1)
     await page.getByLabel('桌面绘图工具').getByRole('button', { name: '水平线', exact: true }).click()
     await page.getByRole('img', { name: 'K线主图' }).click({ position: { x: 240, y: 150 } })
     await expect(page.getByTestId('annotation-horizontal-line')).toHaveCount(1)
@@ -126,7 +125,7 @@ test.describe('K-line research studio', () => {
     await expect(page.getByTestId('drawing-price-label')).toHaveText('33.25')
     await page.reload()
     await expect(page.getByTestId('drawing-price-label')).toHaveText('33.25')
-    await page.getByRole('button', { name: '适应全图', exact: true }).click()
+    await page.getByRole('button', { name: '近期复位', exact: true }).click()
     await expect(page.getByText(`共 ${sample.market.dailyCandles.length} 根 K 线`)).toBeVisible()
     await page.getByRole('tab', { name: '周线', exact: true }).click()
     await expect(page.getByTestId('annotation-horizontal-line')).toHaveCount(0)
@@ -140,7 +139,8 @@ test.describe('K-line research studio', () => {
     await page.goto('/')
     await expect(page.getByRole('img', { name: 'K线主图' })).toBeVisible()
     if (info.project.name === 'mobile') await page.getByRole('button', { name: '预测详情', exact: true }).click()
-    await expect(page.getByRole('heading', { name: '预测暂不可用', exact: true })).toBeVisible()
+    await expect(page.getByRole('region', { name: info.project.name === 'mobile' ? '预测候选价位' : '自动 MA/BOLL 预测', exact: true }).locator('.rs-auto-levels button').first()).toBeVisible()
+    if (info.project.name === 'mobile') await page.getByRole('button', { name: '关闭预测详情', exact: true }).click()
     await page.route('**/api/market/stocks/*/snapshot', (route) => route.fulfill({ status: 502, json: {} }))
     await page.goto('/?symbol=000001')
     await expect(page.getByRole('button', { name: '用示例体验' })).toBeVisible()
@@ -148,19 +148,19 @@ test.describe('K-line research studio', () => {
     await page.getByRole('button', { name: '用示例体验' }).click()
     await expect(page.getByRole('heading', { name: '示例股票', exact: true })).toBeVisible()
     await expect(page.getByText(/当前为合成数据/)).toBeVisible()
-    await expect(page.getByTestId('prediction-candle')).toHaveCount(3)
+    await expect(page.getByTestId('indicator-projection')).toHaveCount(1)
   })
 
   test('opens the full mobile forecast and keeps drawing tools reachable', async ({ page }, info) => {
     test.skip(info.project.name !== 'mobile', 'Phone forecast sheet')
     await marketApi(page)
     await page.goto('/')
-    await expect(page.getByTestId('prediction-candle')).toHaveCount(3)
+    await expect(page.getByTestId('indicator-projection')).toHaveCount(1)
     await expect(page.getByRole('navigation', { name: '移动绘图工具' }).getByRole('button', { name: '水平线', exact: true })).toBeVisible()
     await page.getByRole('button', { name: '预测详情', exact: true }).click()
     const sheet = page.getByRole('dialog', { name: '预测详情' })
-    await sheet.getByRole('tab', { name: /第3日/ }).click()
-    for (const label of ['MA5', 'MA10', 'MA20', 'BOLL上轨', 'BOLL中轨', 'BOLL下轨']) await expect(sheet.getByText(label, { exact: true })).toBeVisible()
+    await expect(sheet.getByRole('heading', { name: '合并候选价位' })).toBeVisible()
+    await expect(sheet.locator('.rs-auto-levels button').first()).toBeVisible()
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true)
   })
 })
@@ -177,12 +177,10 @@ test('navigates continuous history without changing drawings and restores foreca
   await chart.focus()
   await chart.press('ArrowLeft')
   await expect.poll(async () => Number(await surface.getAttribute('data-visible-end'))).toBeLessThan(end)
-  await expect(page.getByTestId('prediction-candle')).toHaveCount(0)
+  await expect(page.getByTestId('indicator-projection')).toHaveCount(0)
   await page.getByRole('button', { name: '回到最新', exact: true }).click()
   await expect(surface).toHaveAttribute('data-visible-end', String(end))
-  await expect(page.getByTestId('prediction-candle')).toHaveCount(3)
-  await page.getByTestId('prediction-candle').nth(1).click()
-  await expect(page.getByTestId('prediction-candle').nth(1)).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.getByTestId('indicator-projection')).toHaveCount(1)
   const box = await chart.boundingBox()
   await page.mouse.move(box!.x + box!.width * 0.8, box!.y + box!.height / 2)
   await page.mouse.wheel(0, -150)
@@ -194,6 +192,10 @@ test('navigates continuous history without changing drawings and restores foreca
   await expect.poll(async () => Number(await surface.getAttribute('data-visible-end'))).toBeLessThan(end)
   await chart.press('0')
   await expect.poll(async () => Number(await surface.getAttribute('data-visible-end')) - Number(await surface.getAttribute('data-visible-start'))).toBe(80)
+  const zoomOut = page.getByRole('button', { name: '缩小图表', exact: true })
+  for (let i = 0; i < 8 && await zoomOut.isEnabled(); i++) await zoomOut.click()
+  await expect(zoomOut).toBeDisabled()
+  expect(Number(await surface.getAttribute('data-visible-end')) - Number(await surface.getAttribute('data-visible-start'))).toBeLessThanOrEqual(180)
 })
 
 

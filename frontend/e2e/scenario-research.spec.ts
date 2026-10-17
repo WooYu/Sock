@@ -60,7 +60,7 @@ test('local-only failure retries the frozen version, reloads its receipt and exp
   await page.route('**/api/scenario-records/*/evaluations', route => route.fulfill({ json: evaluated ? [evaluation()] : [] }))
   await page.route('**/api/scenario-records/*/evaluate', route => { evaluated = true; return route.fulfill({ json: { latestStatus: evaluation(), latestSuccessful: evaluation() } }) })
   await page.goto('/?symbol=603533')
-  if (await page.getByRole('tab', { name: '多周期分析', exact: true }).count()) await page.getByRole('tab', { name: '多周期分析', exact: true }).click()
+  await page.getByRole('tab', { name: '多周期分析', exact: true }).click()
 
   await page.getByRole('button', { name: '开始多周期分析' }).click()
   const panel = page.getByRole('region', { name: '多周期情景分析', exact: true })
@@ -73,7 +73,7 @@ test('local-only failure retries the frozen version, reloads its receipt and exp
   await expect(panel.getByText('已入库', { exact: true })).toBeVisible()
   expect(uploads).toHaveLength(2); expect(uploads[1]).toEqual(uploads[0])
   await page.reload()
-  if (await page.getByRole('tab', { name: '多周期分析', exact: true }).count()) await page.getByRole('tab', { name: '多周期分析', exact: true }).click()
+  await page.getByRole('tab', { name: '多周期分析', exact: true }).click()
 
   await page.getByRole('button', { name: '开始多周期分析' }).click()
   await panel.getByText('分析历史 · 1个版本', { exact: true }).click()
@@ -87,7 +87,7 @@ test('local-only failure retries the frozen version, reloads its receipt and exp
   expect(exported.records).toEqual([frozen.snapshot]); expect(exported.research[0].selectedEvaluationId).toBe(evaluation().id)
   expect(exported.research[0].actualEvidence[0].candleHash).toBe('b'.repeat(64))
   expect(exported.research[0].noteBindings.length).toBeGreaterThan(0)
-  expect(periods.every(p => p === 'day')).toBe(true); expect(periods.length).toBeLessThanOrEqual(6)
+  expect([...new Set(periods)].sort()).toEqual(['30m', '60m', 'day']) // Automatic forecast now loads unclear lower periods too.
   expect(uploads).toHaveLength(2); expect(errors).toEqual([])
   await page.getByRole('region', { name: '价格核对', exact: true }).screenshot({ path: info.outputPath('price-evaluation.png') })
 })

@@ -28,3 +28,9 @@ test('keeps entry labels and analysis draft unchanged across tab switches', asyn
   expect(screen.getByRole('tab', { name: '走势依据' })).toHaveFocus()
   expect(screen.getByRole('tab', { name: '走势依据' })).toHaveAttribute('aria-selected', 'true')
 })
+
+test('keeps an already opened advanced analysis visible after the market panel remounts', () => {
+  render(<ResearchEvidence candles={createPreviewData().market.dailyCandles} scenario={<ScenarioDraft />} scenarioInitiallyOpen />)
+  expect(screen.getByRole('tab', { name: '多周期分析' })).toHaveAttribute('aria-selected', 'true')
+  expect(screen.getByLabelText('确认依据')).toBeVisible()
+})

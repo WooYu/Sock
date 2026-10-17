@@ -44,6 +44,7 @@ type ChartCanvasProps = {
   onViewportZoom?: (factor: number, anchor?: number) => void
   onViewportPan?: (bars: number) => void
   onViewportReset?: () => void
+  projectedTimes?: string[]
 }
 
 type PointerGesture = {
@@ -59,7 +60,6 @@ type PointerGesture = {
 }
 
 const maKeys: readonly MaKey[] = MA_PERIODS.map((period) => `ma${period}` as MaKey)
-const bollColor = '#6f7fd8'
 const viewBox = { width: 960, height: 430 }
 const volumeTop = 345
 const volumeHeight = 55
@@ -186,8 +186,8 @@ function IndicatorLayer({ indicators, indicatorValues, transform, candles }: Pic
   const shared = { transform, historicalCount: candles.length }
   return (
     <g data-chart-layer="indicator">
-      {maKeys.map((key) => indicators[key] ? <g key={key} data-indicator={key}><IndicatorLine {...shared} values={indicatorValues[key] ?? []} color={MA_COLORS[key]} width={2} /></g> : null)}
-      {indicators.boll ? <><IndicatorLine {...shared} values={indicatorValues.boll.upper} color={bollColor} width={1.5} dashed /><IndicatorLine {...shared} values={indicatorValues.boll.middle} color="#9aa5c4" width={1.5} /><IndicatorLine {...shared} values={indicatorValues.boll.lower} color={bollColor} width={1.5} dashed /></> : null}
+      {maKeys.map((key) => indicators[key] ? <g key={key} data-indicator={key}><IndicatorLine {...shared} values={indicatorValues[key] ?? []} color={MA_COLORS[key]} width={1.4} /></g> : null)}
+      {indicators.boll ? <><IndicatorLine {...shared} values={indicatorValues.boll.upper} color="#64748b" width={1} dashed />{!indicators.ma20 ? <IndicatorLine {...shared} values={indicatorValues.boll.middle} color="#94a3b8" width={0.8} dashed /> : null}<IndicatorLine {...shared} values={indicatorValues.boll.lower} color="#64748b" width={1} dashed /></> : null}
     </g>
   )
 }
@@ -257,7 +257,7 @@ export function ChartCanvas(props: ChartCanvasProps) {
       if (props.activeTool === 'pointer') props.onSelectDrawing(null)
       return
     }
-    props.onCreateDrawing(drawing(props.activeTool, [dataPoint(event)]))
+    if (!dataPoint(event).time.startsWith('forecast:')) props.onCreateDrawing(drawing(props.activeTool, [dataPoint(event)]))
   }
   const handlePointerDown = (event: ReactPointerEvent<SVGSVGElement>) => {
     consumeGestureClick.current = false
@@ -280,6 +280,7 @@ export function ChartCanvas(props: ChartCanvasProps) {
       return
     }
     if (props.activeTool !== 'trend-line' && props.activeTool !== 'rectangle') return
+    if (dataPoint(event).time.startsWith('forecast:')) return
     event.currentTarget.setPointerCapture?.(event.pointerId)
     gesture.current = { kind: 'create', pointerId: event.pointerId, captureTarget: event.currentTarget, start: dataPoint(event), drawingKind: props.activeTool }
   }
@@ -314,6 +315,7 @@ export function ChartCanvas(props: ChartCanvasProps) {
     if (!active || active.pointerId !== event.pointerId) return
     gesture.current = null
     const end = dataPoint(event)
+    if (active.kind !== 'pan' && end.time.startsWith('forecast:')) { releaseGestureCapture(active); consumeGestureClick.current = true; return }
     if (active.kind === 'pan') {
       if (active.moved) consumeGestureClick.current = true
       const finalDelta = (active.lastClientX ?? event.clientX) - event.clientX
@@ -421,6 +423,11 @@ export function ChartCanvas(props: ChartCanvasProps) {
       <HistoricalLayer candles={props.candles} keyLevels={props.keyLevels} showKeyLevels={props.showKeyLevels} transform={props.transform} kind={kind} previousClose={props.previousClose} period={props.period} />
       {kind === 'candles' ? <IndicatorLayer candles={props.candles} indicatorValues={props.indicatorValues} indicators={props.indicators} transform={props.transform} /> : <g data-chart-layer="indicator" />}
       <g data-chart-layer="prediction">{prediction ? <PredictionLayer hoveredDay={props.hoveredDay} onHoverDay={props.onHoverDay} onSelectDay={props.onSelectPredictionDay} prediction={prediction} selectedDay={props.selectedPredictionDay} transform={props.transform} /> : null}</g>
+      {props.projectedTimes?.length ? <g data-testid="indicator-projection" pointerEvents="none">
+        <rect x={props.transform.rect.left + props.transform.rect.width * .85} y={props.transform.rect.top} width={props.transform.rect.width * .15} height={props.transform.rect.height} fill="#64748b" opacity=".035" />
+        <line x1={props.transform.rect.left + props.transform.rect.width * .85} x2={props.transform.rect.left + props.transform.rect.width * .85} y1={props.transform.rect.top} y2={props.transform.rect.top + props.transform.rect.height} stroke="#94a3b8" strokeDasharray="4 5" />
+        <text x={props.transform.rect.left + props.transform.rect.width * .85 + 8} y={props.transform.rect.top + 16} fill="#526079" fontSize="12">后4根 · 指标</text>
+      </g> : null}
       <g data-chart-layer="drawing">{props.showDrawings ? <DrawingLayer drawings={props.drawings} interactionsDisabled={props.activeTool === 'pan'} onFocusEditor={() => svgRef.current?.focus()} onMoveDrawing={beginDrawingMove} onMovePoint={beginPointMove} onSelect={props.onSelectDrawing} selectedId={props.selectedId} transform={props.transform} /> : null}</g>
       <g data-chart-layer="crosshair">{props.crosshair && crosshairPoint && crosshairCandle && crosshairPrice !== null ? <g data-testid="crosshair-layer"><line className="sc-crosshair" x1={props.transform.xForTime(crosshairCandle.day)} x2={props.transform.xForTime(crosshairCandle.day)} y1={props.transform.rect.top} y2={volumeTop + volumeHeight} /><line className="sc-crosshair" x1={props.transform.rect.left} x2={props.transform.rect.left + props.transform.rect.width} y1={props.transform.yForPrice(crosshairPrice)} y2={props.transform.yForPrice(crosshairPrice)} /><CrosshairTooltip candle={crosshairCandle} price={crosshairPrice} index={crosshairIndex} kind={kind} period={props.period} transform={props.transform} indicators={props.indicators} indicatorValues={props.indicatorValues} /></g> : null}</g>
     </svg>

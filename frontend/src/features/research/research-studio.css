@@ -211,3 +211,48 @@
   .rs-chart-workspace .sc-kline-axis-labels text { font-size: 23px; fill: #626d80; transform-box: fill-box; transform-origin: center; transform: scaleY(.65); }
   .rs-chart-workspace .sc-key-level-label { display: none; }
 }
+/* Keep candles primary; indicators have separate hue and line-weight roles. */
+.rs-indicator-master { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.rs-indicator-master > button { min-height: 44px; padding: 0 12px; border: 1px solid #e5e9ef; background: #fff; color: #526079; border-radius: 6px; white-space: nowrap; }
+.rs-indicator-master > button[aria-pressed=true] { background: #eef3f8; color: #243b53; }
+.rs-chart-workspace .sc-rise-stroke { stroke: #d92d40; stroke-width: 1.25; }
+.rs-chart-workspace .sc-rise-fill { fill: #d92d40; }
+.rs-chart-workspace .sc-fall-stroke { stroke: #008a72; stroke-width: 1.25; }
+.rs-chart-workspace .sc-fall-fill { fill: #008a72; }
+.rs-chart-workspace .sc-volume-bars rect { fill: #b8c4d3; opacity: .7; }
+.rs-auto-forecast { padding: 22px 18px; border-top: 1px solid var(--rs-border); background: #fff; min-width: 0; }
+.rs-auto-forecast > header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.rs-auto-forecast h2 { font-size: 17px; margin: 0 0 6px; }
+.rs-auto-forecast h3 { font-size: 14px; margin: 20px 0 8px; }
+.rs-auto-forecast header p, .rs-auto-method { color: #626d80; font-size: 12px; line-height: 1.8; margin: 4px 0 12px; }
+.rs-auto-status { padding: 10px 12px; background: #f4f6fa; border-radius: 8px; color: #45516b; font-size: 12px; line-height: 1.8; }
+.rs-auto-periods { display: flex; gap: 8px; margin: 14px 0; }
+.rs-auto-periods button { min-height: 44px; padding: 0 14px; background: #f5f6fa; border-radius: 6px; color: #526079; }
+.rs-auto-periods button[aria-pressed=true] { background: #eeecfb; color: #5146b8; }
+.rs-auto-periods button:disabled { opacity: .45; }
+.rs-auto-forecast .sa-reference-table { min-width: 760px; width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.rs-auto-forecast .sa-reference-table th, .rs-auto-forecast .sa-reference-table td { padding: 12px 8px; border-bottom: 1px solid #edf0f5; text-align: right; font-size: 12px; }
+.rs-auto-forecast .sa-reference-table th:first-child { text-align: left; }
+.rs-auto-forecast .sa-reference-table small { display: block; margin-top: 5px; font-size: 10px; font-weight: normal; color: #626d80; }
+.rs-auto-forecast .sa-reference-table .sa-historical-value { background: #f7f8fa; color: #626d80; }
+.rs-auto-forecast .sa-reference-table td:not(.sa-historical-value) { color: #384d78; }
+.rs-auto-forecast .sa-table-scroll { overflow-x: auto; max-width: 100%; }
+.rs-auto-levels { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 8px; }
+.rs-auto-levels button { min-height: 90px; display: grid; grid-template-columns: 1fr auto; gap: 5px; text-align: left; padding: 12px; background: #fafbfe; border: 1px solid #e5e9ef; border-radius: 8px; color: #526079; }
+.rs-auto-levels button[aria-pressed=true] { background: #f0effd; border-color: #7064d5; }
+.rs-auto-levels strong { font-size: 18px; color: #243b53; }
+.rs-auto-levels span { font-size: 12px; }
+.rs-auto-levels small { grid-column: 1 / -1; line-height: 1.6; font-size: 11px; }
+.rs-selected-basis { margin-top: 16px; padding: 4px 14px 14px; background: #f6f7fc; border-radius: 8px; font-size: 12px; line-height: 1.8; overflow-wrap: anywhere; }
+.rs-selected-basis small { color: #626d80; }
+.rs-auto-forecast.is-compact { border: 0; padding: 18px; }
+.rs-auto-forecast.is-compact h2 { font-size: 15px; }
+.rs-auto-forecast.is-compact .rs-auto-levels { grid-template-columns: 1fr; max-height: 650px; overflow-y: auto; }
+.rs-auto-forecast.is-compact .rs-auto-levels button { min-height: 80px; }
+.rs-evidence-tabs { grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); }
+@media(max-width:720px) { .rs-auto-forecast { padding: 18px 12px; }.rs-indicator-master { gap: 4px; }.rs-indicator-master > button { padding: 0 8px; font-size: 11px; }.rs-indicator-settings summary { font-size: 11px; }.rs-auto-levels { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.rs-auto-all-link { display: flex; align-items: center; min-height: 44px; color: #5146b8; font-size: 12px; margin-top: 10px; }
+
+.rs-auto-table-hint { color: #626d80; font-size: 12px; margin: 8px 0; }
+.rs-auto-forecast .sa-reference-table tr > th:first-child { position: sticky; left: 0; background: #fff; z-index: 1; }

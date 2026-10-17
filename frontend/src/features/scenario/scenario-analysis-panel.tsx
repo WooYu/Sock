@@ -140,7 +140,7 @@ function ScenarioPanel({ symbol, sourceMode, activePeriod, onPeriodChange, clien
     setActionError(null)
     try {
       const frozen = { ...draft.analysis, createdAt: new Date().toISOString() }
-      setRecords(saveScenarioSnapshot(localStorage, frozen)); setNotice('已保存分析版本' + frozen.version)
+      setRecords(saveScenarioSnapshot(localStorage, frozen)); window.dispatchEvent(new Event('stockcal:scenario-saved')); setNotice('已保存分析版本' + frozen.version)
       const selected = cloud.identityScope ? loadStudySelections(cloud.identityScope) : []
       void cloud.saveFrozen(frozen, [...freezeLegacyBindings(frozen, tagVersions.current), ...selected.map(s => ({ revisionId: s.revisionId, sourceHash: s.sourceHash, legacyKey: null, inlineVersion: null }))])
     }
