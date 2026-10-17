@@ -82,7 +82,7 @@ export function ExperienceWorkbench({ data = researchPackage as KnowledgePackage
   useEffect(() => {
     const onLocation = () => {
       const view = new URL(window.location.href).searchParams.get('view')
-      setTab(view === 'backtest' || view === 'notes' || view === 'samples' ? view : 'library')
+      setTab(view === 'backtest' || view === 'notes' || view === 'samples' ? view : 'notes')
     }
     window.addEventListener('popstate', onLocation)
     return () => window.removeEventListener('popstate', onLocation)
@@ -189,8 +189,8 @@ export function ExperienceWorkbench({ data = researchPackage as KnowledgePackage
       {writeError && !editor ? <div className="kw-alert" role="alert">{writeError}</div> : null}
       {message ? <div className="kw-notice" role="status"><StudioIcon name="book" size={16} /><span>{message}</span><button type="button" aria-label="关闭保存提示" onClick={() => setMessage('')}><StudioIcon name="close" size={14} /></button></div> : null}
 
-      {tab !== 'samples' ? <div className="kw-summary" aria-label="知识库概况">
-        <div><span>{tab === 'notes' ? '当前笔记目录' : '原研究来源'}</span><strong>{tab === 'notes' ? noteSummary.documents : data.docCount}<small>篇</small></strong><p>保留 GitHub 原文与行号</p></div>
+      {tab !== 'samples' && tab !== 'notes' ? <div className="kw-summary" aria-label="知识库概况">
+        <div><span>原研究来源</span><strong>{data.docCount}<small>篇</small></strong><p>保留 GitHub 原文与行号</p></div>
         <div><span>经验与原则</span><strong>{entries.length}<small>条</small></strong><p>包括 {counts.manual} 条手工记录</p></div>
         <div><span>待核对解释</span><strong>{counts.pending}<small>条</small></strong><p>确认含义后再开展研究</p></div>
         <div className="kw-summary-note"><StudioIcon name="layers" size={24} /><p><strong>经验 ≠ 可执行规则</strong><span>定义缺失时保持参考；确认解释不代表启用交易。</span></p></div>

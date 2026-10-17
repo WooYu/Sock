@@ -11,6 +11,14 @@ const fixture: NoteCatalog = { ...complete, documents: complete.documents.filter
 beforeEach(() => localStorage.clear())
 
 describe('note tagging workbench', () => {
+  it('opens the selected original from both the catalog and detail heading', () => {
+    render(<NoteTagWorkbench catalog={fixture} />)
+    const record = fixture.documents[0]
+    const link = screen.getByRole('link', { name: `查看原文：${record.title}` })
+    expect(link).toHaveAttribute('href', record.sourceUrl)
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(within(screen.getByRole('region', { name: '标签详情' })).getByRole('link', { name: '查看原文 ↗' })).toHaveAttribute('href', record.sourceUrl)
+  })
   it('combines topic and usage filters and can inspect rule fragments', async () => {
     const user = userEvent.setup()
     render(<NoteTagWorkbench catalog={fixture} />)

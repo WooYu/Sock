@@ -1,14 +1,14 @@
 import { bollinger, movingAverage } from '../chart/chart-math'
-import { isIsoTimestamp } from '../chart/chart-periods'
+import { MA_PERIODS, isIsoTimestamp } from '../chart/chart-periods'
 import type { Candle } from '../workspace/stock-workspace-types'
 import { barEndAt, futureBarTargets } from './scenario-calendar'
 import type { AnalysisInput, AnalysisKind, AnalysisPeriod, CloseScenario, Horizon, Indicator, PeriodInput, PriceReference } from './scenario-types'
 export type ReferenceOptions = { kind?: AnalysisKind; period: AnalysisPeriod; method: PriceReference['method']; horizons: Horizon[]; scenario?: CloseScenario; executionWindow: PriceReference['executionWindow'] }
-export const SCENARIO_INDICATORS: Indicator[] = ['ma5', 'ma10', 'ma20', 'bollUpper', 'bollMiddle', 'bollLower']
+export const SCENARIO_INDICATORS: Indicator[] = [...MA_PERIODS.map(n => `ma${n}` as Indicator), 'bollUpper', 'bollMiddle', 'bollLower']
 export function indicatorSeries(candles: Candle[]): Record<Indicator, Array<number | null>> {
   const bands = bollinger(candles, 20, 2)
-  return { ma5: movingAverage(candles, 5), ma10: movingAverage(candles, 10), ma20: movingAverage(candles, 20),
-    bollUpper: bands.upper, bollMiddle: bands.middle, bollLower: bands.lower }
+  return { ...Object.fromEntries(MA_PERIODS.map(n => [`ma${n}`, movingAverage(candles, n)])),
+    bollUpper: bands.upper, bollMiddle: bands.middle, bollLower: bands.lower } as Record<Indicator, Array<number | null>>
 }
 export function createFlatScenario(input: PeriodInput): CloseScenario {
   const origin = input.closed.at(-1)
@@ -44,7 +44,7 @@ export function computeReferences(input: AnalysisInput, options: ReferenceOption
       const current = past[indicator].at(-1)
       const prev = past[indicator].at(-2)
       const earlier = past[indicator].at(-3)
-      const observedWindow = indicator.startsWith('boll') || indicator === 'ma20' ? 20 : indicator === 'ma10' ? 10 : 5
+      const observedWindow = indicator.startsWith('boll') ? 20 : Number(indicator.slice(2))
       if (future && periodInput.closed.length >= observedWindow) value = future[indicator][periodInput.closed.length + target.horizon - 1]
       else if (current != null && prev != null && (options.method === 'last_delta' || earlier != null)) {
         const delta = options.method === 'last_delta' ? current - prev : (current - earlier!) / 2

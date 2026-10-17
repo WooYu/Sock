@@ -25,8 +25,8 @@ describe('AppShell', () => {
   test('keeps the primary navigation focused on five workspaces', () => {
     render(<AppShell section="overview" onSectionChange={vi.fn()} />)
 
-    expect(screen.getByTestId('desktop-primary-nav').querySelectorAll('a')).toHaveLength(5)
-    expect(screen.getByTestId('mobile-primary-nav').querySelectorAll('a')).toHaveLength(5)
+    expect(screen.getByTestId('desktop-primary-nav').querySelectorAll('a')).toHaveLength(4)
+    expect(screen.getByTestId('mobile-primary-nav').querySelectorAll('a')).toHaveLength(4)
     expect(screen.getByTestId('desktop-primary-nav').querySelector('a[href="/analysis/key-levels"]')).toBeInTheDocument()
   })
 
@@ -58,14 +58,14 @@ describe('AppShell', () => {
 
     rerender(<AppShell activeHref="/trading/ledger" section="trading" onSectionChange={vi.fn()} />)
 
-    expect(screen.getByTestId('desktop-primary-nav').querySelector('a[href="/review/daily"]')).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByTestId('desktop-primary-nav').querySelector('a[href="/review/daily"]')).toBeNull()
   })
 
   test('all mobile destinations meet the 48px touch target', () => {
     render(<AppShell section="overview" onSectionChange={vi.fn()} />)
 
     const links = screen.getByTestId('mobile-primary-nav').querySelectorAll('a')
-    expect(links).toHaveLength(5)
+    expect(links).toHaveLength(4)
     for (const link of links) {
       expect(link.className).toContain('min-h-12')
       expect(link.querySelector('.sc-nav-icon')).toHaveAttribute('aria-hidden', 'true')

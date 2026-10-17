@@ -23,6 +23,7 @@ function save(value: SavedList) { try { const raw = JSON.stringify(value); if (r
 export function StockPicker({ selectedSymbol, market, onSelect, onClose }: { selectedSymbol: string | null; market?: MarketSnapshot | null; onSelect: (security: Security) => void; onClose: () => void }) {
   const stored = useSyncExternalStore(subscribe, read, () => emptyList)
   const saved = useMemo(() => parse(stored), [stored])
+  const [researchStages, setResearchStages] = useState<Record<string, string>>({})
   const [tab, setTab] = useState<'recent' | 'favorites'>('recent')
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<Security[]>([])
@@ -31,6 +32,18 @@ export function StockPicker({ selectedSymbol, market, onSelect, onClose }: { sel
   const [notice, setNotice] = useState('')
   const input = useRef<HTMLInputElement>(null)
   const version = useRef(0)
+  useEffect(() => {
+    const readStages = () => {
+      const stages: Record<string, string> = {}
+      for (const item of [...initialSecurities, ...saved.recent, ...saved.favorites, ...results]) {
+        try { const stage = JSON.parse(localStorage.getItem('stockcal.research-journal.v1:' + item.code) ?? 'null')?.stage; if (['关注中', '研究中', '待验证', '已结束'].includes(stage)) stages[item.code] = stage } catch { /* Keep stock selection available if one local journal cannot be read. */ }
+      }
+      setResearchStages(stages)
+    }
+    queueMicrotask(readStages)
+    window.addEventListener('stockcal:research-journal', readStages); window.addEventListener('storage', readStages)
+    return () => { window.removeEventListener('stockcal:research-journal', readStages); window.removeEventListener('storage', readStages) }
+  }, [saved, results])
   const choose = (security: Security) => { if (!save({ ...parse(read()), recent: [security, ...parse(read()).recent.filter((item) => item.code !== security.code)].slice(0, 20) })) setNotice('浏览器未允许保存，当前选择仍可使用'); setQuery(''); onSelect(security) }
 
   useEffect(() => {
@@ -74,7 +87,7 @@ export function StockPicker({ selectedSymbol, market, onSelect, onClose }: { sel
         const quote = market?.quote.security.code === security.code ? market.quote : null
         const change = quote?.previousClose ? (quote.price / quote.previousClose - 1) * 100 : null
         return <div className={`rs-security-row ${selectedSymbol === security.code ? 'is-selected' : ''} ${query.trim() && activeIndex === index ? 'is-focused' : ''}`} key={security.code}>
-          <button id={`rs-result-${index}`} type="button" role={query.trim() ? 'option' : undefined} aria-selected={query.trim() ? activeIndex === index : undefined} aria-current={!query.trim() && selectedSymbol === security.code ? 'true' : undefined} className="rs-security-select" onClick={() => choose(security)}><span><strong>{security.name}</strong><small>{security.exchange ?? ''} {security.code}</small></span>{quote ? <span className={`rs-security-quote ${change !== null && change < 0 ? 'rs-down' : 'rs-up'}`}><strong>{quote.price.toFixed(2)}</strong><small>{change === null ? '—' : `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`}</small></span> : null}</button>
+          <button id={`rs-result-${index}`} type="button" role={query.trim() ? 'option' : undefined} aria-selected={query.trim() ? activeIndex === index : undefined} aria-current={!query.trim() && selectedSymbol === security.code ? 'true' : undefined} className="rs-security-select" onClick={() => choose(security)}><span><strong>{security.name}</strong><small>{security.exchange ?? ''} {security.code}{researchStages[security.code] ? ` · ${researchStages[security.code]}` : ''}</small></span>{quote ? <span className={`rs-security-quote ${change !== null && change < 0 ? 'rs-down' : 'rs-up'}`}><strong>{quote.price.toFixed(2)}</strong><small>{change === null ? '—' : `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`}</small></span> : null}</button>
           {!query.trim() ? <button className={`rs-star ${favorite ? 'is-starred' : ''}`} aria-label={`${favorite ? '取消自选' : '加入自选'} ${security.name}`} aria-pressed={favorite} onClick={() => { if (!save({ ...saved, favorites: favorite ? saved.favorites.filter((item) => item.code !== security.code) : [...saved.favorites, security] })) setNotice('自选保存失败，请检查浏览器存储设置') }} type="button"><StudioIcon name="star" size={15} /></button> : null}
         </div>
       })}

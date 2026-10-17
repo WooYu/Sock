@@ -99,26 +99,26 @@ describe('immutable knowledge records', () => {
 })
 
 describe('experience workbench', () => {
-  it('opens learning samples and keeps its URL entry while preserving the library tab', async () => {
+  it('opens learning samples without retired navigation entries', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => Response.json({ items: [], nextCursor: null, asOf: '2026-10-16T08:00:00Z' })))
     const user = userEvent.setup(); render(<ExperienceWorkbench data={fixture} />)
     await user.click(screen.getByRole('link', { name: '学习样本' }))
     expect(await screen.findByRole('heading', { name: '学习样本库' }, { timeout: 20_000 })).toBeInTheDocument()
     expect(window.location.search).toContain('view=samples')
-    await user.click(screen.getByRole('link', { name: '经验与原则' }))
-    expect(screen.getByRole('button', { name: '查看记录：五日线底线' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: '经验与原则' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: '复盘' })).not.toBeInTheDocument()
     vi.unstubAllGlobals()
   })
-  it('opens the source tagging view and returns to the existing knowledge records', async () => {
+  it('opens the source tagging view without a separate experience entry', async () => {
     const user = userEvent.setup()
     render(<ExperienceWorkbench data={fixture} />)
     await user.click(screen.getByRole('link', { name: '笔记标签' }))
     // The actual lazy-loaded source catalog can take longer to import under a parallel suite.
     expect(await screen.findByRole('heading', { name: '笔记标签目录' }, { timeout: 20_000 })).toBeInTheDocument()
     expect(window.location.search).toContain('view=notes')
-    await user.click(screen.getByRole('link', { name: '经验与原则' }))
-    expect(screen.getByRole('button', { name: '查看记录：五日线底线' })).toBeInTheDocument()
-  })
+    expect(screen.queryByRole('link', { name: '经验与原则' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: '复盘' })).not.toBeInTheDocument()
+  }, 30_000)
 
   it('saves a manual entry, edits a new version and makes the old text inspectable after reload', async () => {
     const user = userEvent.setup()

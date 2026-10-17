@@ -149,3 +149,16 @@ describe('immutable analysis ledger', () => {
     expect(SCENARIO_STORAGE_KEY).not.toContain('note-tags')
   })
 })
+
+test('keeps six-indicator historical provisional snapshots readable after MA expansion', () => {
+  const dates = Array.from({ length: 23 }, (_, i) => new Date(Date.UTC(2026, 8, 1 + i)).toISOString().slice(0, 10))
+  const input = analysisInputFixture(seriesFixture({ dates, closes: Array<number>(23).fill(10), fetchedAt: '2026-09-23T14:00:00+08:00' }))
+  const snapshot = buildScenarioAnalysis(input, {}, { id: 'legacy-six-indicator', version: 1, kind: 'live', createdAt: input.asOf, registry: [], scenarios: [], horizons: [1, 2, 3], executionWindow: null })
+  const oldKeys = ['ma5', 'ma10', 'ma20', 'bollUpper', 'bollMiddle', 'bollLower']
+  for (const provisional of snapshot.provisional ?? []) {
+    provisional.indicators = Object.fromEntries(Object.entries(provisional.indicators).filter(([key]) => oldKeys.includes(key))) as typeof provisional.indicators
+    provisional.references = provisional.references.filter(ref => oldKeys.includes(ref.indicator))
+  }
+  snapshot.references = snapshot.references.filter(ref => oldKeys.includes(ref.indicator))
+  expect(parseScenarioLedger(JSON.stringify({ schemaVersion: 1, records: [snapshot] }))).toEqual([snapshot])
+})

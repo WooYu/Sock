@@ -1,0 +1,13 @@
+import { MA_PERIODS, PERIOD_LABELS, formatChartTime, type ChartPeriod, type IndicatorKey, type MaKey } from './chart-periods'
+import type { IndicatorProjection, ProjectionKey } from './indicator-projection'
+export function IndicatorForecastDetails({ points, period, indicators, selectedTime, onSelect, session }: { session?: IndicatorProjection | null; points: IndicatorProjection[]; period: ChartPeriod; indicators: Partial<Record<IndicatorKey, boolean>>; selectedTime: string | null; onSelect: (time: string | null) => void }) {
+  if (!points.length) return null
+  const selected = points.find(p => p.day === selectedTime)
+  const keys: ProjectionKey[] = [...MA_PERIODS.filter(n => indicators[`ma${n}`]).map(n => `ma${n}` as MaKey), ...(indicators.boll ? ['bollUpper', 'bollMiddle', 'bollLower'] as const : [])]
+  const labels = { bollUpper: 'BOLL上轨', bollMiddle: 'BOLL中轨', bollLower: 'BOLL下轨' }
+  return <section className="rs-indicator-forecast" aria-label="指标预测详情">
+    <div className="rs-forecast-date-buttons" aria-label="选择指标预测时间">{points.map((p, i) => <button key={p.day} type="button" aria-pressed={selected?.day === p.day} onClick={() => onSelect(p.day)}>{p.estimated ? '预计 ' : ''}{formatChartTime(p.day, period)}<small>{PERIOD_LABELS[period]} · 第{i + 1}根</small></button>)}</div>
+    {session ? <details className="rs-session-reach"><summary>{session.estimated ? '预计 ' : ''}{session.day.slice(0, 10)} · 本周期当日可能达到的指标区间</summary><p>覆盖原点之后至该交易日收盘的全部本周期K线，不限于图中的4根。按近期增量延续形成情景范围；若原点已收盘，则查看下一预计交易日。</p><div className="rs-forecast-value-grid">{keys.map(key => <div key={key}><strong>{key.startsWith('ma') ? key.toUpperCase() : labels[key as keyof typeof labels]}</strong><span>{session.values[key]?.toFixed(2) ?? '—'}</span><small>{session.values[key] == null ? '历史不足' : session.ranges[key] ? `${session.ranges[key]![0].toFixed(2)}～${session.ranges[key]![1].toFixed(2)}` : '区间暂无'}</small></div>)}</div><p>大字为该交易日收盘时指标的外推值，下方为余下各根K线情景范围的并集。</p></details> : null}
+    {selected ? <><header><strong>{formatChartTime(selected.day, period)} · 指标预测</strong><button type="button" onClick={() => onSelect(null)}>收起详情</button></header><div className="rs-forecast-value-grid">{keys.map(key => <div key={key}><strong>{key.startsWith('ma') ? key.toUpperCase() : labels[key as keyof typeof labels]}</strong><span>{selected.values[key]?.toFixed(2) ?? '—'}</span><small>{selected.values[key] == null ? '历史不足' : selected.ranges[key] ? `${selected.ranges[key]![0].toFixed(2)}～${selected.ranges[key]![1].toFixed(2)}` : '区间暂无'}</small></div>)}</div><p>区间为近期增量延续的情景范围；BOLL 通道与该情景区间分别展示。</p></> : <p>点击上方时间或图中预测区域，查看各条 MA 和 BOLL 的预测值与区间。</p>}
+  </section>
+}

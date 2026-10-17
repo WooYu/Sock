@@ -31,7 +31,7 @@ export function derivePeriodState(original: PeriodInput, annotations: AnalysisAn
   const priorVolumes = bars.slice(-6, -1).map(b => b.volume)
   const avgVolume = priorVolumes.length === 5 ? priorVolumes.reduce((a, b) => a + b, 0) / 5 : null
   const facts: PeriodFacts = {
-    close: current?.close ?? null, ma5, ma10, ma20, bollUpper: upper, bollMiddle: middle, bollLower: lower,
+    close: current?.close ?? null, ma5, ma10, ma20, ma30: last('ma30'), ma60: last('ma60'), ma90: last('ma90'), ma120: last('ma120'), ma250: last('ma250'), bollUpper: upper, bollMiddle: middle, bollLower: lower,
     ma5Delta: delta('ma5'), ma10Delta: delta('ma10'), ma20Delta: delta('ma20'), bollMiddleDelta: delta('bollMiddle'),
     closeAboveMa5: current && ma5 !== null ? current.close > ma5 : null,
     closeAboveMa20: current && ma20 !== null ? current.close > ma20 : null,

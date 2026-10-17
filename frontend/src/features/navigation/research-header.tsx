@@ -9,11 +9,9 @@ export type KnowledgeView = 'library' | 'notes' | 'samples' | 'backtest'
 
 const destinations = [
   { key: 'chart', label: 'K 线工作台', href: '/' },
-  { key: 'library', label: '经验与原则', href: '/knowledge' },
   { key: 'notes', label: '笔记标签', href: '/knowledge?view=notes' },
   { key: 'samples', label: '学习样本', href: '/knowledge?view=samples' },
   { key: 'backtest', label: '回测证据', href: '/knowledge?view=backtest' },
-  { key: 'review', label: '复盘', href: '/review/daily' },
 ] as const
 
 export function ResearchHeader({ active, onKnowledgeNavigate }: {
@@ -26,7 +24,7 @@ export function ResearchHeader({ active, onKnowledgeNavigate }: {
       {destinations.map(item => <Link key={item.key} id={`research-nav-${item.key}`} href={item.href}
         aria-current={active === item.key ? 'page' : undefined}
         onClick={event => {
-          if (onKnowledgeNavigate && item.key !== 'chart' && item.key !== 'review'
+          if (onKnowledgeNavigate && item.key !== 'chart'
             && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey && event.button === 0) {
             event.preventDefault()
             onKnowledgeNavigate(item.key)

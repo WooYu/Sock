@@ -74,13 +74,13 @@ function evaluateSelectedRules(input: AnalysisInput, states: Partial<Record<Anal
       if (!bottom || bottom.period !== period || !bottom.reason.trim() || !isIsoTimestamp(bottom.selectedAt)
         || Date.parse(bottom.selectedAt) > Date.parse(input.asOf)) result.missing.push('selected_bottom')
       else {
-        const value = bottom.kind === 'price' ? bottom.price ?? null : bottom.indicator ? state.facts[bottom.indicator] : null
+        const value = bottom.kind === 'price' ? bottom.price ?? null : bottom.indicator ? state.facts[bottom.indicator] ?? null : null
         if (value === null || !Number.isFinite(value) || value <= 0) result.missing.push('bottom_value')
         else riskReference = { id: rule.id + ':' + period, ruleId: rule.id, period, kind: bottom.kind === 'price' ? 'price' : 'dynamic_line',
           ...(bottom.indicator ? { indicator: bottom.indicator } : {}), value, condition: rule.risk?.condition ?? '所选底线失守时重新核对', evidence: result.evidence }
       }
     } else if (rule.risk) {
-      const value = rule.risk.indicator ? state.facts[rule.risk.indicator] : null
+      const value = rule.risk.indicator ? state.facts[rule.risk.indicator] ?? null : null
       if (rule.risk.indicator && (value === null || !Number.isFinite(value) || value <= 0)) result.missing.push('risk_indicator')
       else riskReference = { id: rule.id + ':' + period, ruleId: rule.id, period, ...rule.risk, value, evidence: result.evidence }
     }
@@ -102,7 +102,7 @@ function evaluateSelectedRules(input: AnalysisInput, states: Partial<Record<Anal
     if (mode.status === 'confirmed' && mode.id === 'trend_climb' && annotations.holding === 'held'
       && bottom?.period === selected.period && bottom.reason.trim() && isIsoTimestamp(bottom.selectedAt)
       && Date.parse(bottom.selectedAt) <= Date.parse(input.asOf) && !risk.some(r => r.period === bottom.period && r.ruleId === 'trend_selected_bottom')) {
-      const value = bottom.kind === 'price' ? bottom.price : bottom.indicator ? state.facts[bottom.indicator] : null
+      const value = bottom.kind === 'price' ? bottom.price : bottom.indicator ? state.facts[bottom.indicator] ?? null : null
       if (value != null && Number.isFinite(value) && value > 0) risk.push({ id: 'manual_selected_bottom:' + bottom.period,
         ruleId: 'manual_selected_bottom', period: bottom.period, kind: bottom.kind === 'price' ? 'price' : 'dynamic_line',
         ...(bottom.kind === 'indicator' ? { indicator: bottom.indicator } : {}), value,

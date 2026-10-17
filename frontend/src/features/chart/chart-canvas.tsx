@@ -9,6 +9,8 @@ import { MA_COLORS, MA_PERIODS, formatChartTime, isIntradayPeriod, type ChartPer
 import type { DrawingMove } from './drawing-engine'
 import { DrawingLayer } from './drawing-layer'
 import { PredictionLayer } from './prediction-layer'
+import { IndicatorProjectionLayer } from './indicator-projection-layer'
+import type { IndicatorProjection } from './indicator-projection'
 
 type ChartCanvasProps = {
   candles: Candle[]
@@ -45,6 +47,10 @@ type ChartCanvasProps = {
   onViewportPan?: (bars: number) => void
   onViewportReset?: () => void
   projectedTimes?: string[]
+  projectedEstimated?: boolean
+  selectedProjectionTime?: string | null
+  onSelectProjectionTime?: (time: string | null) => void
+  projectedRanges?: IndicatorProjection['ranges'][]
 }
 
 type PointerGesture = {
@@ -174,12 +180,12 @@ function HistoricalLayer({ candles, transform, keyLevels, showKeyLevels, kind = 
   )
 }
 
-function IndicatorLine({ values, color, width, dashed, transform, historicalCount }: { values: IndicatorValue[]; color: string; width: number; dashed?: boolean; transform: ChartTransform; historicalCount: number }) {
+function IndicatorLine({ values, color, width, dashed, solidForecast, transform, historicalCount }: { values: IndicatorValue[]; color: string; width: number; dashed?: boolean; solidForecast?: boolean; transform: ChartTransform; historicalCount: number }) {
   if (!values.length) return null
   const historicalPath = linePath(values.slice(0, historicalCount), transform.times, transform)
   const predictionStart = Math.max(0, historicalCount - 1)
   const predictedPath = values.length > historicalCount ? linePath(values.slice(predictionStart), transform.times.slice(predictionStart), transform) : ''
-  return <>{historicalPath ? <path d={historicalPath} fill="none" stroke={color} strokeDasharray={dashed ? '5 4' : undefined} strokeWidth={width} /> : null}{predictedPath ? <path data-testid="predicted-indicator-line" d={predictedPath} fill="none" stroke={color} strokeDasharray="4 4" opacity="0.65" strokeWidth={width} /> : null}</>
+  return <>{historicalPath ? <path d={historicalPath} fill="none" stroke={color} strokeDasharray={dashed ? '5 4' : undefined} strokeWidth={width} /> : null}{predictedPath ? <path data-testid="predicted-indicator-line" d={predictedPath} fill="none" stroke={color} strokeDasharray={solidForecast ? undefined : "4 4"} opacity="0.75" strokeWidth={width} /> : null}</>
 }
 
 function IndicatorLayer({ indicators, indicatorValues, transform, candles }: Pick<ChartCanvasProps, 'indicators' | 'indicatorValues' | 'transform' | 'candles'>) {
@@ -187,7 +193,11 @@ function IndicatorLayer({ indicators, indicatorValues, transform, candles }: Pic
   return (
     <g data-chart-layer="indicator">
       {maKeys.map((key) => indicators[key] ? <g key={key} data-indicator={key}><IndicatorLine {...shared} values={indicatorValues[key] ?? []} color={MA_COLORS[key]} width={1.4} /></g> : null)}
-      {indicators.boll ? <><IndicatorLine {...shared} values={indicatorValues.boll.upper} color="#64748b" width={1} dashed />{!indicators.ma20 ? <IndicatorLine {...shared} values={indicatorValues.boll.middle} color="#94a3b8" width={0.8} dashed /> : null}<IndicatorLine {...shared} values={indicatorValues.boll.lower} color="#64748b" width={1} dashed /></> : null}
+      {indicators.boll ? <><g data-testid="boll-channel" pointerEvents="none">{indicatorValues.boll.upper.map((upper, i) => {
+        const lower = indicatorValues.boll.lower[i], nextUpper = indicatorValues.boll.upper[i + 1], nextLower = indicatorValues.boll.lower[i + 1]
+        if (![upper, lower, nextUpper, nextLower].every(v => v != null && Number.isFinite(v)) || !transform.times[i + 1]) return null
+        return <path key={i} d={`M ${transform.xForTime(transform.times[i])} ${transform.yForPrice(upper!)} L ${transform.xForTime(transform.times[i + 1])} ${transform.yForPrice(nextUpper!)} L ${transform.xForTime(transform.times[i + 1])} ${transform.yForPrice(nextLower!)} L ${transform.xForTime(transform.times[i])} ${transform.yForPrice(lower!)} Z`} fill="#8490d8" opacity={i >= candles.length - 1 ? '.10' : '.04'} />
+      })}</g><IndicatorLine {...shared} values={indicatorValues.boll.upper} color="#6f7fd8" width={1} solidForecast />{!indicators.ma20 ? <IndicatorLine {...shared} values={indicatorValues.boll.middle} color="#94a3b8" width={0.8} solidForecast /> : null}<IndicatorLine {...shared} values={indicatorValues.boll.lower} color="#6f7fd8" width={1} solidForecast /></> : null}
     </g>
   )
 }
@@ -423,11 +433,7 @@ export function ChartCanvas(props: ChartCanvasProps) {
       <HistoricalLayer candles={props.candles} keyLevels={props.keyLevels} showKeyLevels={props.showKeyLevels} transform={props.transform} kind={kind} previousClose={props.previousClose} period={props.period} />
       {kind === 'candles' ? <IndicatorLayer candles={props.candles} indicatorValues={props.indicatorValues} indicators={props.indicators} transform={props.transform} /> : <g data-chart-layer="indicator" />}
       <g data-chart-layer="prediction">{prediction ? <PredictionLayer hoveredDay={props.hoveredDay} onHoverDay={props.onHoverDay} onSelectDay={props.onSelectPredictionDay} prediction={prediction} selectedDay={props.selectedPredictionDay} transform={props.transform} /> : null}</g>
-      {props.projectedTimes?.length ? <g data-testid="indicator-projection" pointerEvents="none">
-        <rect x={props.transform.rect.left + props.transform.rect.width * .85} y={props.transform.rect.top} width={props.transform.rect.width * .15} height={props.transform.rect.height} fill="#64748b" opacity=".035" />
-        <line x1={props.transform.rect.left + props.transform.rect.width * .85} x2={props.transform.rect.left + props.transform.rect.width * .85} y1={props.transform.rect.top} y2={props.transform.rect.top + props.transform.rect.height} stroke="#94a3b8" strokeDasharray="4 5" />
-        <text x={props.transform.rect.left + props.transform.rect.width * .85 + 8} y={props.transform.rect.top + 16} fill="#526079" fontSize="12">后4根 · 指标</text>
-      </g> : null}
+      {props.projectedTimes?.length ? <IndicatorProjectionLayer selectedTime={props.selectedProjectionTime} onSelect={props.onSelectProjectionTime} times={props.projectedTimes} estimated={props.projectedEstimated} ranges={props.projectedRanges} historicalCount={props.candles.length} transform={props.transform} period={props.period} indicators={props.indicators} values={props.indicatorValues} interactive={props.activeTool === 'pointer'} /> : null}
       <g data-chart-layer="drawing">{props.showDrawings ? <DrawingLayer drawings={props.drawings} interactionsDisabled={props.activeTool === 'pan'} onFocusEditor={() => svgRef.current?.focus()} onMoveDrawing={beginDrawingMove} onMovePoint={beginPointMove} onSelect={props.onSelectDrawing} selectedId={props.selectedId} transform={props.transform} /> : null}</g>
       <g data-chart-layer="crosshair">{props.crosshair && crosshairPoint && crosshairCandle && crosshairPrice !== null ? <g data-testid="crosshair-layer"><line className="sc-crosshair" x1={props.transform.xForTime(crosshairCandle.day)} x2={props.transform.xForTime(crosshairCandle.day)} y1={props.transform.rect.top} y2={volumeTop + volumeHeight} /><line className="sc-crosshair" x1={props.transform.rect.left} x2={props.transform.rect.left + props.transform.rect.width} y1={props.transform.yForPrice(crosshairPrice)} y2={props.transform.yForPrice(crosshairPrice)} /><CrosshairTooltip candle={crosshairCandle} price={crosshairPrice} index={crosshairIndex} kind={kind} period={props.period} transform={props.transform} indicators={props.indicators} indicatorValues={props.indicatorValues} /></g> : null}</g>
     </svg>

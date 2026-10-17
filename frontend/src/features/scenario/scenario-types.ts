@@ -2,7 +2,7 @@ import type { Candle, MarketSnapshot } from '../workspace/stock-workspace-types'
 
 export type AnalysisPeriod = 'day' | '60m' | '30m'
 export type Horizon = 1 | 2 | 3 | 4
-export type Indicator = 'ma5' | 'ma10' | 'ma20' | 'bollUpper' | 'bollMiddle' | 'bollLower'
+export type Indicator = 'ma5' | 'ma10' | 'ma20' | 'ma30' | 'ma60' | 'ma90' | 'ma120' | 'ma250' | 'bollUpper' | 'bollMiddle' | 'bollLower'
 export type TradingCalendar = { fromDay: string; throughDay: string; tradingDays: string[]; sourceUrl: string; verifiedAt: string }
 export type PeriodInput = {
   symbol: string; period: AnalysisPeriod; asOf: string; adjustment: 'none'
@@ -69,7 +69,7 @@ export type PeriodSelection = {
   mode: NonNullable<AnalysisAnnotations['mode']>; bottom?: AnalysisAnnotations['bottom']; mirror?: AnalysisAnnotations['mirror']
   range?: AnalysisAnnotations['range']; flags?: AnalysisAnnotations['flags']
 }
-export type PeriodFacts = {
+export type PeriodFacts = Partial<Record<'ma30' | 'ma60' | 'ma90' | 'ma120' | 'ma250', number | null>> & {
   close: number | null; ma5: number | null; ma10: number | null; ma20: number | null
   bollUpper: number | null; bollMiddle: number | null; bollLower: number | null
   ma5Delta: number | null; ma10Delta: number | null; ma20Delta: number | null; bollMiddleDelta: number | null

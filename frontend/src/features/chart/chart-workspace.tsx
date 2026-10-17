@@ -13,6 +13,9 @@ import { bollinger, movingAverage, withPredictionMovingAverages } from './chart-
 import type { ChartPeriod, DrawingRecoveryRecord, PredictionSnapshot, TimePricePoint } from './chart-types'
 import type { DrawingMove } from './drawing-engine'
 import { ChartCanvas } from './chart-canvas'
+import { IndicatorForecastDetails } from './indicator-forecast-details'
+import { projectIndicators, projectSessionIndicators } from './indicator-projection'
+import { scenarioCalendar } from '../scenario/scenario-calendar-data'
 import { useChartViewport } from './use-chart-viewport'
 import { ChartMobileSheet } from './chart-mobile-sheet'
 import { PredictionDetails } from './prediction-details'
@@ -56,13 +59,14 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
   const symbol = snapshot?.quote.security.code ?? ''
   const { workspace, drawings, selectedId, syncStatus, commands } = useChartWorkspace({ symbol, period: activePeriod, localOnly: symbol === 'DEMO' })
   const [maVisible, setMaVisible] = useState(true)
-  const configuredIndicators = { ...DEFAULT_INDICATORS, ...(isStudio ? { ma30: false, ma60: false, ma90: false, ma120: false, ma250: false } : {}), ...workspace.indicators }
+  const configuredIndicators = { ...DEFAULT_INDICATORS, ...workspace.indicators }
   const indicators = { ...configuredIndicators, ...(maVisible ? {} : Object.fromEntries(MA_PERIODS.map(period => [`ma${period}`, false]))) }
   const layers: ChartLayerState = { keyLevels: true, annotations: true, prediction: true, ...workspace.layers }
   const zoom = workspace.view.zoom
   const crosshair = workspace.crosshair
   const [hoveredDay, setHoveredDay] = useState<string | null>(null)
   const [selectedPredictionDay, setSelectedPredictionDay] = useState<string | null>(null)
+  const [selectedProjectionTime, setSelectedProjectionTime] = useState<string | null>(null)
   const [mobileSheet, setMobileSheet] = useState<MobileSheet>(null)
   const chartScrollRef = useRef<HTMLDivElement>(null)
   const viewportState = useRef({ key: '', predictionKey: '', userPanned: false })
@@ -84,12 +88,16 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
   const fullBoll = useMemo(() => bollinger(allCandles, 20, 2), [allCandles])
   const boll = useMemo(() => ({ upper: fullBoll.upper.slice(visibleStart, visibleEnd), middle: fullBoll.middle.slice(visibleStart, visibleEnd), lower: fullBoll.lower.slice(visibleStart, visibleEnd) }), [fullBoll, visibleStart, visibleEnd])
   const projection = useMemo(() => {
-    if (!forecastReferences) return []
-    return [1, 2, 3, 4].map(horizon => {
-      const refs = forecastReferences.filter(ref => ref.period === activePeriod && ref.target.horizon === horizon && ref.originBarKey === allCandles.at(-1)?.day)
-      return { day: refs.length ? refs.find(ref => ref.target.barKey)?.target.barKey ?? `forecast:${activePeriod}:${horizon}` : '', values: Object.fromEntries(refs.map(ref => [ref.indicator, ref.valid ? ref.value : null])) }
-    }).filter(point => point.day)
-  }, [activePeriod, forecastReferences, allCandles])
+    if (!isStudio || activePrediction) return []
+    return projectIndicators(allCandles, activePeriod, scenarioCalendar).map(point => {
+      const refs = forecastReferences?.filter(ref => ref.period === activePeriod && ref.target.horizon === point.horizon && ref.originBarKey === allCandles.at(-1)?.day) ?? []
+      const target = refs.find(ref => ref.target.barKey)?.target.barKey
+      const ranges = { ...point.ranges }
+      for (const ref of refs) if (!ref.valid) delete ranges[ref.indicator]
+      return { ...point, ranges, ...(target ? { day: target, estimated: false } : {}), values: { ...point.values, ...Object.fromEntries(refs.map(ref => [ref.indicator, ref.valid ? ref.value : null])) } }
+    })
+  }, [activePeriod, activePrediction, allCandles, isStudio, forecastReferences])
+  const sessionProjection = useMemo(() => isStudio && layers.prediction ? projectSessionIndicators(allCandles, activePeriod, scenarioCalendar) : null, [activePeriod, allCandles, isStudio, layers.prediction])
   const visibleProjection = useMemo(() => layers.prediction && viewport.atLatest ? projection : [], [layers.prediction, viewport.atLatest, projection])
   const visiblePrediction = layers.prediction && (!isStudio || viewport.atLatest) ? activePrediction : null
   const indicatorValues = useMemo(() => ({
@@ -108,6 +116,7 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
     ...(visiblePrediction?.days.flatMap((day) => [day.high, day.low, day.rangeHigh, day.rangeLow]) ?? []),
     ...(!intraday ? MA_PERIODS.flatMap((period) => indicators[`ma${period}`] ? indicatorValues[`ma${period}`] : []) : allCandles.map((bar) => bar.averagePrice)),
     ...(!intraday && indicators.boll ? [...indicatorValues.boll.upper, ...indicatorValues.boll.lower] : []),
+    ...visibleProjection.flatMap(point => Object.entries(point.ranges).filter(([key]) => key.startsWith('boll') ? indicators.boll : indicators[key as MaKey]).flatMap(([, range]) => range ?? [])),
     ...(intraday && series.data?.previousClose ? [series.data.previousClose] : []),
     ...(!isStudio || viewport.atLatest ? [currentPrice] : []),
   ].filter((value): value is number => typeof value === 'number' && Number.isFinite(value))
@@ -273,10 +282,11 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
           <div className="sc-chart-mobile-context"><button disabled={!isStudio && (!activePrediction || !layers.prediction)} onClick={() => setMobileSheet('prediction')} type="button">预测详情</button><button onClick={() => setMobileSheet('properties')} type="button">对象属性</button></div>
 
           <div className="sc-kline-chart-panel">
-            <div className="sc-kline-chart-heading"><div className="sc-kline-legend">{intraday ? <><span style={{ color: '#5651da' }}>分时价格</span><span style={{ color: '#c79b28' }}>成交均价</span><span>不含午间休市</span></> : <><span><i className="sc-candle-rise" />历史行情</span>{visiblePrediction || visibleProjection.length ? <span><i className="rs-forecast-swatch" />MA/BOLL 后4根 · 虚线</span> : null}{MA_PERIODS.map((period) => { const key = `ma${period}` as MaKey; return indicators[key] ? <span key={key} style={{ color: indicatorColors[key] }}>{`MA${period}`} {movingAverages[key].at(-1)?.toFixed(2) ?? '—'}</span> : null })}</>}</div></div>
+            <div className="sc-kline-chart-heading"><div className="sc-kline-legend">{intraday ? <><span style={{ color: '#5651da' }}>分时价格</span><span style={{ color: '#c79b28' }}>成交均价</span><span>不含午间休市</span></> : <><span><i className="sc-candle-rise" />历史行情</span>{visiblePrediction || visibleProjection.length ? <span><i className="rs-forecast-swatch" />MA/BOLL 后4根 · 点选查看</span> : null}{MA_PERIODS.map((period) => { const key = `ma${period}` as MaKey; return indicators[key] ? <span key={key} style={{ color: indicatorColors[key] }}>{`MA${period}`} {movingAverages[key].at(-1)?.toFixed(2) ?? '—'}</span> : null })}</>}</div></div>
             {series.loading ? <p className="rs-series-message" role="status">正在加载{PERIOD_LABELS[activePeriod]}行情…</p> : null}
             {series.error ? <p className="rs-series-message is-error" role="status">{series.error}<button type="button" onClick={series.retry}>重新加载该周期</button></p> : null}
-            <div className="sc-kline-chart-scroll" ref={chartScrollRef}>{candles.length ? <div className="sc-kline-chart-surface" data-zoom={isStudio ? Math.round(allCandles.length / Math.max(1, viewport.count) * 100) : zoom} data-visible-start={visibleStart} data-visible-end={visibleEnd} style={{ width: isStudio ? '100%' : `${zoom}%` }}><ChartCanvas projectedTimes={visibleProjection.map(point => point.day)} panOnPointer={isStudio && !intraday} onViewportZoom={isStudio && !intraday ? viewport.zoomBy : undefined} onViewportPan={isStudio && !intraday ? viewport.panBy : undefined} onViewportReset={isStudio && !intraday ? viewport.reset : undefined} activeTool={activeTool} candles={candles} kind={intraday ? 'intraday' : 'candles'} previousClose={series.data?.previousClose} crosshair={crosshair} drawings={drawings} hoveredDay={hoveredDay} indicatorValues={indicatorValues} indicators={indicators} keyLevels={keyLevels} onCreateDrawing={(drawing) => { commands.create(drawing); if (isStudio) { setRightTab('drawings'); setActiveTool('pointer') } }} onDeleteSelected={deleteSelectedDrawing} onHoverDay={setHoveredDay} onMoveDrawing={moveDrawing} onMovePoint={moveDrawingPoint} onPan={panChart} onPanEnd={commitPan} onRedo={commands.redo} onSelectDrawing={(id) => { commands.select(id); if (isStudio && id) setRightTab('drawings') }} onSelectPredictionDay={selectPredictionDay} onUndo={commands.undo} period={activePeriod} prediction={visiblePrediction} selectedId={selectedId} selectedPredictionDay={activePredictionDay} showDrawings={layers.annotations} showKeyLevels={layers.keyLevels} symbol={symbol} transform={transform} /></div> : <div className="rs-series-empty">{series.loading ? '正在准备图表' : '此周期暂无可绘制的数据，可切换其他周期或重试。'}</div>}</div>
+            {visibleProjection.length ? <p className="rs-auto-method">{activePeriod === 'day' ? '未来4个交易日' : `${PERIOD_LABELS[activePeriod]}未来4根`} · 按最近3根指标平均增量外推，包含全部已选 MA；区间取最近两次增量分别延续的情景范围，不是置信区间。{visibleProjection.some(point => point.estimated) ? '横轴为预计时间，仅跳过周末，节假日待核实。' : '横轴按已核实交易日历。'}点选预测时间查看数值；数据不足的指标显示“—”。</p> : null}
+            <div className="sc-kline-chart-scroll" ref={chartScrollRef}>{candles.length ? <div className="sc-kline-chart-surface" data-zoom={isStudio ? Math.round(allCandles.length / Math.max(1, viewport.count) * 100) : zoom} data-visible-start={visibleStart} data-visible-end={visibleEnd} style={{ width: isStudio ? '100%' : `${zoom}%` }}><ChartCanvas selectedProjectionTime={selectedProjectionTime} onSelectProjectionTime={setSelectedProjectionTime} projectedTimes={visibleProjection.map(point => point.day)} projectedEstimated={visibleProjection.some(point => point.estimated)} projectedRanges={visibleProjection.map(point => point.ranges)} panOnPointer={isStudio && !intraday} onViewportZoom={isStudio && !intraday ? viewport.zoomBy : undefined} onViewportPan={isStudio && !intraday ? viewport.panBy : undefined} onViewportReset={isStudio && !intraday ? viewport.reset : undefined} activeTool={activeTool} candles={candles} kind={intraday ? 'intraday' : 'candles'} previousClose={series.data?.previousClose} crosshair={crosshair} drawings={drawings} hoveredDay={hoveredDay} indicatorValues={indicatorValues} indicators={indicators} keyLevels={keyLevels} onCreateDrawing={(drawing) => { commands.create(drawing); if (isStudio) { setRightTab('drawings'); setActiveTool('pointer') } }} onDeleteSelected={deleteSelectedDrawing} onHoverDay={setHoveredDay} onMoveDrawing={moveDrawing} onMovePoint={moveDrawingPoint} onPan={panChart} onPanEnd={commitPan} onRedo={commands.redo} onSelectDrawing={(id) => { commands.select(id); if (isStudio && id) setRightTab('drawings') }} onSelectPredictionDay={selectPredictionDay} onUndo={commands.undo} period={activePeriod} prediction={visiblePrediction} selectedId={selectedId} selectedPredictionDay={activePredictionDay} showDrawings={layers.annotations} showKeyLevels={layers.keyLevels} symbol={symbol} transform={transform} /></div> : <div className="rs-series-empty">{series.loading ? '正在准备图表' : '此周期暂无可绘制的数据，可切换其他周期或重试。'}</div>}</div>
             {isStudio && !intraday ? <div className="rs-chart-navigator" aria-label="图表浏览">
               <div className="rs-chart-navigation-actions"><button type="button" aria-label="缩小图表" onClick={() => viewport.zoomBy(1.25)} disabled={viewport.count >= viewport.maxCount}>−</button><button type="button" aria-label="放大图表" onClick={() => viewport.zoomBy(0.8)} disabled={viewport.count <= Math.min(12, allCandles.length)}>＋</button><button type="button" onClick={viewport.latest} disabled={viewport.atLatest}>回到最新</button><button type="button" onClick={viewport.reset}>近期复位</button></div>
               <label className="rs-chart-history-slider"><span>浏览历史</span><input aria-label="浏览历史行情" type="range" min={viewport.count} max={allCandles.length} value={viewport.end} onChange={event => viewport.seek(Number(event.target.value))} disabled={viewport.count >= allCandles.length} /><span>{candles[0]?.day.slice(0, 10)} — {candles.at(-1)?.day.slice(0, 10)}</span></label>
@@ -288,6 +298,7 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
           </div>
           {!isStudio && (activeTool === 'rectangle' || activeTool === 'trend-line') && <button className="sc-kline-add-annotation" onClick={addRectangle} type="button">添加矩形标注</button>}
           {activePeriod !== 'day' && layers.prediction && !forecastReferences ? <section aria-live="polite" className="sc-prediction-unavailable">未来推演仅支持日线周期</section> : null}
+          {visibleProjection.length ? <IndicatorForecastDetails session={sessionProjection} points={visibleProjection} period={activePeriod} indicators={indicators} selectedTime={selectedProjectionTime} onSelect={setSelectedProjectionTime} /> : null}
           {!isStudio && visiblePrediction ? <PredictionDetails mode="desktop-table" onSelectDay={selectPredictionDay} prediction={visiblePrediction} selectedDay={detailPredictionDay} /> : null}
           <nav aria-label="移动绘图工具" className="sc-chart-mobile-toolbar" data-testid="chart-mobile-toolbar"><button aria-pressed={activeTool === 'pointer'} onClick={() => setActiveTool('pointer')} type="button"><span aria-hidden="true">↖</span>选择</button><button aria-pressed={activeTool === 'trend-line'} onClick={() => setActiveTool('trend-line')} type="button"><span aria-hidden="true">╱</span>趋势线</button><button aria-pressed={activeTool === 'horizontal-line'} onClick={() => setActiveTool('horizontal-line')} type="button"><span aria-hidden="true">─</span>水平线</button><button aria-haspopup="dialog" aria-pressed={markerTools.some(([tool]) => tool === activeTool)} onClick={() => setMobileSheet('markers')} type="button"><span aria-hidden="true">◆</span>标记</button><button aria-haspopup="dialog" onClick={() => setMobileSheet('more')} type="button"><span aria-hidden="true">•••</span>更多</button></nav>
         </div>

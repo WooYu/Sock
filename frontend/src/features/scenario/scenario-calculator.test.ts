@@ -3,6 +3,7 @@ import { computeReferences, createFlatScenario } from './scenario-calculator'
 import { analysisInputFixture, seriesFixture, testCalendar } from './scenario-test-fixtures'
 import type { AnalysisPeriod, Indicator, PriceReference } from './scenario-types'
 
+const legacyIndicators = ['ma5', 'ma10', 'ma20', 'bollUpper', 'bollMiddle', 'bollLower']
 const valueAt = (refs: PriceReference[], indicator: Indicator, h: number) => refs.find(r => r.indicator === indicator && r.target.horizon === h)?.value
 const options = { period: 'day' as const, horizons: [1, 2, 3] as const, executionWindow: null }
 const shockInput = () => analysisInputFixture(seriesFixture({ closes: [...Array<number>(19).fill(10), 11] }))
@@ -12,7 +13,7 @@ describe('scenario reference calculations', () => {
     scenario.selectedAt = '2027-01-01T00:00:00Z'
     const args = { ...options, horizons: [1, 2, 3] as [1, 2, 3], method: 'rolling_close' as const, scenario }
     expect(() => computeReferences(input, args)).toThrow(/时点/)
-    expect(computeReferences(input, { ...args, kind: 'replay' }).every(r => r.valid)).toBe(true)
+    expect(computeReferences(input, { ...args, kind: 'replay' }).filter(r => legacyIndicators.includes(r.indicator)).every(r => r.valid)).toBe(true)
   })
   test('average_delta_uses_last_three_indicator_values', () => {
     const refs = computeReferences(shockInput(), { ...options, horizons: [1, 2, 3], method: 'average_delta' })
@@ -31,7 +32,8 @@ describe('scenario reference calculations', () => {
     const avg = computeReferences(input, { ...options, horizons: [1, 2, 3], method: 'average_delta' })
     expect(avg.filter(r => r.indicator.startsWith('boll')).every(r => !r.valid && r.issues.includes('history_insufficient'))).toBe(true)
     const rolled = computeReferences(input, { ...options, horizons: [1, 2, 3], method: 'rolling_close', scenario: createFlatScenario(input.periods.day!) })
-    expect(rolled.every(r => r.valid)).toBe(true)
+    expect(rolled.filter(r => legacyIndicators.includes(r.indicator)).every(r => r.valid)).toBe(true)
+    expect(rolled.filter(r => r.indicator === 'ma250').every(r => !r.valid && r.value === null)).toBe(true)
   })
   test('invalid_extrapolated_boll_is_flagged', () => {
     const input = analysisInputFixture(seriesFixture({ closes: [20, 20, ...Array<number>(20).fill(10)] }))
@@ -42,7 +44,7 @@ describe('scenario reference calculations', () => {
   })
   test('constant_prices_have_zero_bandwidth', () => {
     const input = analysisInputFixture(seriesFixture({ closes: Array<number>(22).fill(10) }))
-    expect(computeReferences(input, { ...options, horizons: [1, 2, 3], method: 'average_delta' }).every(r => r.valid && r.value === 10)).toBe(true)
+    expect(computeReferences(input, { ...options, horizons: [1, 2, 3], method: 'average_delta' }).filter(r => legacyIndicators.includes(r.indicator)).every(r => r.valid && r.value === 10)).toBe(true)
   })
   test('last_delta_remains_an_explicit_comparison', () => {
     const refs = computeReferences(shockInput(), { ...options, horizons: [1], method: 'last_delta' })
@@ -82,4 +84,13 @@ describe('scenario reference calculations', () => {
     const refs = computeReferences(input, { ...options, horizons: [1, 2, 3], method: 'rolling_close', scenario: createFlatScenario(input.periods.day!) })
     expect(refs.every(r => !r.valid && r.issues.includes('history_insufficient'))).toBe(true)
   })
+})
+
+test('all eight MA windows produce four horizon references from sufficient history', () => {
+  const input = analysisInputFixture(seriesFixture({ closes: Array.from({ length: 260 }, (_, i) => 100 + i), fetchedAt: '2027-12-31T23:00:00Z' }))
+  const refs = computeReferences(input, { period: 'day', horizons: [1, 2, 3, 4], method: 'average_delta', executionWindow: null })
+  for (const size of [5, 10, 20, 30, 60, 90, 120, 250]) {
+    const current = 359 - (size - 1) / 2
+    for (const h of [1, 2, 3, 4]) expect(valueAt(refs, `ma${size}` as Indicator, h)).toBeCloseTo(current + h, 10)
+  }
 })

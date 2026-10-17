@@ -69,8 +69,8 @@ function snapshotValid(value: unknown): value is ScenarioAnalysis {
         [p.period]: continuousScenarioInput(original, s.annotations) } }, p.period, horizons)
       return expected !== null && p.originBarKey === expected.originBarKey && p.observedAt === expected.observedAt
         && p.observedClose === expected.observedClose && p.condition === expected.condition
-        && SCENARIO_INDICATORS.every(key => p.indicators[key] === expected.indicators[key])
-        && JSON.stringify(p.references) === JSON.stringify(expected.references)
+        && SCENARIO_INDICATORS.filter(key => ['ma5', 'ma10', 'ma20', 'bollUpper', 'bollMiddle', 'bollLower'].includes(key) || Object.hasOwn(p.indicators, key)).every(key => p.indicators[key] === expected.indicators[key])
+        && JSON.stringify(p.references) === JSON.stringify(expected.references.filter(ref => Object.hasOwn(p.indicators, ref.indicator)))
     }))) return false
     for (const [period, state] of Object.entries(s.states)) {
       if (state.period !== period || state.asOf !== s.input.asOf || state.kind !== s.kind || !s.input.periods[state.period]

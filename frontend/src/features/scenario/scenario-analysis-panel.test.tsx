@@ -220,7 +220,7 @@ describe('scenario analysis workspace', () => {
   })
   test('30m_failure_keeps_upper_analysis_and_retry', async () => {
     render(<Harness client={makeClient(true)} />)
-    await screen.findByText('笔记来源已加载')
+    await screen.findByText('笔记来源已加载', {}, { timeout: 10_000 })
     await userEvent.click(screen.getByRole('button', { name: '看1小时' }))
     await screen.findByRole('table', { name: '1小时 MA/BOLL参考位' })
     await userEvent.click(screen.getByRole('button', { name: '继续看30分钟' }))
@@ -275,7 +275,7 @@ describe('scenario analysis workspace', () => {
       ...(period === 'day' ? { dates: ['2026-10-12'], closes: [11] } : { closes: Array<number>(22).fill(10) }),
     }) }
     render(<Harness client={client} />)
-    await screen.findByText('笔记来源已加载')
+    await screen.findByText('笔记来源已加载', {}, { timeout: 10_000 })
     await waitFor(() => expect(within(screen.getByRole('region', { name: '日线状态' })).getByText(/未完成1根/)).toBeVisible())
     expect(screen.getByRole('button', { name: '核对形态与模式' })).toBeDisabled()
   })

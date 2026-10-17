@@ -19,7 +19,7 @@ export function ScenarioReferenceTable({ analysis, period, method, scenarioId, h
         return <th key={h}>未来第{h}根<small>{target?.barKey ? displayTime(target.barKey) : '日期待核实'}</small></th>
       })}</tr></thead>
       <tbody>{SCENARIO_INDICATORS.map(indicator => <tr key={indicator}>
-        <th scope="row">{INDICATOR_NAMES[indicator]}</th>{historyCount ? historical.map((bar, i) => <td className="sa-historical-value" key={bar.day}>{series[indicator][bars.length - historical.length + i]?.toFixed(2) ?? '—'}</td>) : <td>{origin?.[indicator]?.toFixed(2) ?? '—'}</td>}
+        <th scope="row">{INDICATOR_NAMES[indicator]}</th>{historyCount ? historical.map((bar, i) => <td className="sa-historical-value" key={bar.day}>{series[indicator][bars.length - historical.length + i]?.toFixed(2) ?? '—'}</td>) : <td>{series[indicator].at(-1)?.toFixed(2) ?? '—'}</td>}
         {horizons.map(h => {
           const ref = refs.find(r => r.indicator === indicator && r.target.horizon === h)
           const reason = ref?.issues.find(i => i !== 'calendar_missing' && i !== 'calendar_out_of_range') ?? ref?.issues[0]
