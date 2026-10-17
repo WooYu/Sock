@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
-const providerSnapshot = { code: 0, data: { sz300502: { day: [['2026-09-15', '10', '11', '12', '9', '100'], ['2026-09-16', '11', '12', '13', '10', '150']], qt: { sz300502: ['51', '新易盛', '300502', '12', '11', '11', '150'] } } } }
+const providerSnapshot = { code: 0, data: { sz300502: { qfqday: [['2026-09-15', '10', '11', '12', '9', '100'], ['2026-09-16', '11', '12', '13', '10', '150']], qt: { sz300502: ['51', '新易盛', '300502', '12', '11', '11', '150'] } } } }
 const callSnapshot = async (symbol = '300502') => (await import('./stocks/[symbol]/snapshot/route')).GET(new Request(`http://localhost/api/market/stocks/${symbol}/snapshot`), { params: Promise.resolve({ symbol }) })
 const callSearch = async (query: string) => (await import('./search/route')).GET(new Request(`http://localhost/api/market/search?q=${encodeURIComponent(query)}`))
 

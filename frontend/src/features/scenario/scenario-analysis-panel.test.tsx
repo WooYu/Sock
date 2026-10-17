@@ -108,7 +108,9 @@ describe('scenario analysis workspace', () => {
     expect(within(historySummary).queryByRole('button', { name: '汇总三个周期' })).not.toBeInTheDocument()
   }, 15000)
   test('shows_only_actual_computed_prices_without_count_controls_or_padding_and_freezes_history', async () => {
+    vi.setSystemTime(new Date('2026-09-22T16:00:00+08:00'))
     const client = { series: async (symbol: string, period: ChartPeriod) => seriesFixture({ symbol, period: period as AnalysisPeriod,
+      dates: Array.from({ length: 22 }, (_, i) => period === 'day' ? '2026-09-' + String(i + 1).padStart(2, '0') : '2026-09-' + String([15, 16, 17, 18, 21, 22][Math.floor(i / 4)]).padStart(2, '0') + 'T' + ['10:30', '11:30', '14:00', '15:00'][i % 4] + ':00+08:00'),
       closes: Array<number>(22).fill(period === 'day' ? 10 : 10.4), fetchedAt: new Date().toISOString() }) }
     const rendered = render(<Harness client={client} />)
     const summary = await screen.findByRole('region', { name: '跨周期综合结果' })
@@ -261,10 +263,10 @@ describe('scenario analysis workspace', () => {
     expect(screen.getByRole('button', { name: '返回当前分析' })).toBeVisible()
     expect(screen.getAllByRole('link', { name: /查看笔记原文/ }).some(link => link.getAttribute('href')?.includes('/blob/'))).toBe(true)
   })
-  test('unknown_calendar_is_visible_and_demo_cannot_save_real_records', async () => {
+  test('verified_calendar_is_available_and_demo_cannot_save_real_records', async () => {
     render(<Harness client={makeClient()} sourceMode="demo" symbol="DEMO" />)
     await screen.findByText('笔记来源已加载')
-    expect(screen.getByText('交易日历未核实，目标日期待核实')).toBeVisible()
+    expect(screen.queryByText('交易日历未核实，目标日期待核实')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: '保存分析快照' })).toBeDisabled()
     expect(screen.getByText('合成示例分析')).toBeVisible()
   })

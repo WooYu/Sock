@@ -25,7 +25,7 @@ export function evaluateRangeCoverage(snapshot: ScenarioAnalysis, actual: Period
   if (!validExecutionWindow(window)) issues.push('invalid_execution_window')
   if (snapshot.kind !== 'live' || snapshot.input.sourceMode !== 'real') issues.push('not_a_live_forward_plan')
   if (!(Date.parse(snapshot.createdAt) < start && Date.parse(snapshot.input.asOf) < start)) issues.push('plan_after_window_start')
-  if (actual.symbol !== snapshot.input.symbol || actual.adjustment !== snapshot.input.periods[actual.period]?.adjustment) issues.push('actual_symbol_or_adjustment_mismatch')
+  if (actual.symbol !== snapshot.input.symbol || actual.adjustment !== (snapshot.input.periods[actual.period]?.adjustment ?? snapshot.input.periods.day?.adjustment ?? 'none')) issues.push('actual_symbol_or_adjustment_mismatch')
   if (basisChanged(snapshot, actual)) issues.push('adjustment_basis_changed')
   if (actual.period !== window.period) issues.push('actual_period_mismatch')
   if (Date.parse(actual.asOf) < end || Date.parse(actual.source.fetchedAt) < end) issues.push('window_not_finished')

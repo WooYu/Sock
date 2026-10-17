@@ -28,4 +28,8 @@ test('saved forecasts only receive actual indicators after their target close', 
   expect(before[0].values.every(v => v.actual === null)).toBe(true)
   const after = compareIndicatorProjection(points, candles, '2027-01-01T00:00:00Z')
   expect(after[0].values.find(v => v.key === 'ma250')?.actual).toBeCloseTo(candles.slice(-253, -3).reduce((s, b) => s + b.close, 0) / 250, 8)
+  const late = compareIndicatorProjection(points, candles, '2027-01-01T00:00:00Z', points[0].day + 'T15:00:00+08:00')
+  expect(late[0].late).toBe(true)
+  expect(late[0].values.every(v => v.actual === null && v.error === null)).toBe(true)
+  expect(late[1].late).toBe(false)
 })
