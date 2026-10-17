@@ -13,7 +13,14 @@ export async function GET(
     return NextResponse.json({ message: '股票代码格式不正确' }, { status: 400 })
   }
   try {
-    return NextResponse.json(await (process.env.STOCKCAL_API_BASE_URL ? getMarketSnapshot(symbol) : getPublicMarketSnapshot(symbol)))
+    if (!process.env.STOCKCAL_API_BASE_URL) return NextResponse.json(await getPublicMarketSnapshot(symbol))
+    const snapshot = await getMarketSnapshot(symbol)
+    if (snapshot.adjustment === 'qfq') return NextResponse.json(snapshot)
+    // Legacy backends supply raw, short history. Keep their quote while using
+    // explicitly adjusted, sufficient daily history for every indicator consumer.
+    const adjusted = await getPublicMarketSnapshot(symbol)
+    return NextResponse.json({ ...snapshot, adjustment: 'qfq', dailyCandles: adjusted.dailyCandles,
+      source: { ...adjusted.source, name: `${adjusted.source.name} · 报价 ${snapshot.source.name}` } })
   } catch (error) {
     if (!process.env.STOCKCAL_API_BASE_URL && error instanceof PublicMarketError) return NextResponse.json({ code: error.code, message: error.message }, { status: error.status })
     return NextResponse.json({ message: '行情暂时不可用' }, { status: 502 })
