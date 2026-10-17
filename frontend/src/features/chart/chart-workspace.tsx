@@ -57,7 +57,7 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
   const activePeriod = controlledPeriod ?? internalPeriod
   const setActivePeriod = (period: ChartPeriod) => { if (controlledPeriod === undefined) setInternalPeriod(period); onPeriodChange?.(period) }
   const symbol = snapshot?.quote.security.code ?? ''
-  const [adjustment, setAdjustment] = useState<'none' | 'qfq' | 'hfq'>(snapshot?.adjustment ?? (symbol === 'DEMO' ? 'none' : 'qfq'))
+  const [adjustment, setAdjustment] = useState<'none' | 'qfq' | 'hfq'>(snapshot ? snapshot.adjustment ?? 'none' : 'qfq')
   const priceBasis = symbol === 'DEMO' || isIntradayPeriod(activePeriod) ? 'none' : adjustment
   const { workspace, drawings, selectedId, syncStatus, commands } = useChartWorkspace({ symbol: priceBasis === 'none' ? symbol : `${symbol}-${priceBasis}`, period: activePeriod, localOnly: symbol === 'DEMO' })
   const [maVisible, setMaVisible] = useState(true)
