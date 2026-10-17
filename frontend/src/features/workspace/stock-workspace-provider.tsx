@@ -11,7 +11,7 @@ import type {
   WorkspaceStatus,
 } from './stock-workspace-types'
 
-export type MarketClient = Pick<BrowserMarketClient, 'snapshot' | 'publishedRules'> & Partial<Pick<BrowserMarketClient, 'prediction'>>
+export type MarketClient = Pick<BrowserMarketClient, 'snapshot' | 'publishedRules'> & Partial<Pick<BrowserMarketClient, 'prediction' | 'cachedSnapshot'>>
 
 type WorkspaceContextValue = {
   predictionStatus: 'idle' | 'loading' | 'ready' | 'error'
@@ -56,6 +56,14 @@ export function StockWorkspaceProvider({ children, client = browserMarketClient,
   const recent = useRef(new Map<string, StockWorkspaceSnapshot>())
 
   const load = useCallback(async (symbol: string, security: Security, nextCycle: OperationCycle, preserving: boolean) => {
+    const savedMarket = !preserving ? client.cachedSnapshot?.(symbol) : null
+    if (savedMarket) {
+      const saved: StockWorkspaceSnapshot = { symbol, security: savedMarket.quote.security, market: savedMarket,
+        analysis: analyzeMarketSnapshot(savedMarket, nextCycle, []), cycle: nextCycle, generatedAt: savedMarket.source.fetchedAt,
+        prediction: null, publishedRules: [], rulesStatus: 'loading' }
+      setCurrent(saved); setLastSuccessful(saved)
+      preserving = true
+    }
     const version = ++requestVersion.current
     abortController.current?.abort()
     const controller = new AbortController()
@@ -120,9 +128,9 @@ export function StockWorkspaceProvider({ children, client = browserMarketClient,
       if (version !== requestVersion.current) return
       if (controller.signal.aborted) return
       setErrorMessage(error instanceof Error ? error.message : '行情加载失败')
-      setStatus(preserving && lastSuccessful ? 'stale' : 'error')
+      setStatus(preserving ? 'stale' : 'error')
     }
-  }, [client, lastSuccessful, loadPrediction])
+  }, [client, loadPrediction])
 
   const search = useCallback(async (query: string) => {
     if (!('search' in client)) return

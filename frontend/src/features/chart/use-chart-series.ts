@@ -5,6 +5,8 @@ import type { MarketSnapshot } from '../workspace/stock-workspace-types'
 import { aggregateCandles } from './chart-math'
 import { isIntradayPeriod, type ChartPeriod } from './chart-periods'
 import type { ChartSeries, PriceAdjustment } from './chart-market-types'
+import { browserMarketClient } from '@/lib/api/browser-client'
+import { cachedChartSeries } from '@/lib/api/market-history-cache'
 
 export type ChartSeriesLoader = (symbol: string, period: ChartPeriod, signal?: AbortSignal, adjustment?: PriceAdjustment) => Promise<ChartSeries>
 type SeriesState = { key: string; data: ChartSeries | null; loading: boolean; error: string | null }
@@ -20,6 +22,7 @@ export function useChartSeries(snapshot: MarketSnapshot | null | undefined, peri
   } : null, [period, snapshot, symbol, adjustment])
   // A full daily snapshot already carries enough observations for MA250 plus a useful view.
   const needsRemote = Boolean(loader && symbol && (period !== 'day' || !local || (snapshot?.dailyCandles.length ?? 0) < 370))
+  const cached = useMemo(() => loader === browserMarketClient.series ? cachedChartSeries(symbol, period, adjustment) : null, [loader, symbol, period, adjustment])
 
   useEffect(() => {
     if (!needsRemote || !loader) return
@@ -31,12 +34,12 @@ export function useChartSeries(snapshot: MarketSnapshot | null | undefined, peri
       setRemote({ key, data, loading: false, error: null })
     }).catch((error) => {
       if (controller.signal.aborted) return
-      setRemote((old) => ({ key, data: old.key.startsWith(`${symbol}:${period}:${adjustment}:`) && old.data ? old.data : period === 'day' ? local : null, loading: false, error: error instanceof Error ? error.message : '该周期行情暂不可用' }))
+      setRemote((old) => ({ key, data: old.key.startsWith(`${symbol}:${period}:${adjustment}:`) && old.data ? old.data : cached ?? (period === 'day' ? local : null), loading: false, error: error instanceof Error ? error.message : '该周期行情暂不可用' }))
     })
     return () => controller.abort()
-  }, [attempt, key, loader, local, needsRemote, period, snapshot, symbol, adjustment])
+  }, [attempt, cached, key, loader, local, needsRemote, period, snapshot, symbol, adjustment])
 
   if (!needsRemote) return { data: local, loading: false, error: isIntradayPeriod(period) ? '当前数据源未提供分时或分钟行情' : null, retry: () => setAttempt((value) => value + 1) }
-  const state = remote.key === key ? remote : { data: remote.key.startsWith(`${symbol}:${period}:${adjustment}:`) ? remote.data : period === 'day' ? local : null, loading: true, error: null }
+  const state = remote.key === key ? remote : { data: remote.key.startsWith(`${symbol}:${period}:${adjustment}:`) ? remote.data : cached ?? (period === 'day' ? local : null), loading: true, error: null }
   return { ...state, retry: () => setAttempt((value) => value + 1) }
 }

@@ -23,3 +23,26 @@ test('one daily read renders before optional rules and keeps adjustment explicit
   expect(unusedPredictions).toBe(0)
   expect(rawReads).toBe(1)
 })
+
+test('cached history survives reload and stays visible when a forced update fails', async ({ page }) => {
+  const bars = Array.from({ length: 400 }, (_, i) => ({ day: new Date(Date.UTC(2024, 0, i + 1)).toISOString().slice(0, 10), open: 100, high: 102, low: 99, close: 101, volume: 100 }))
+  const source = { name: '缓存测试行情', fetchedAt: '2026-10-18T00:00:00Z', state: 'TEST', online: true }
+  let snapshots = 0, fail = false
+  await page.route('**/api/market/stocks/*/snapshot', route => {
+    snapshots++
+    return fail ? route.abort('failed') : route.fulfill({ json: { adjustment: 'qfq', quote: { security: { code: '600519', name: '贵州茅台' }, price: 101 }, dailyCandles: bars, source } })
+  })
+  await page.route('**/api/market/stocks/*/candles?*', route => route.fulfill({ json: { symbol: '600519', period: new URL(route.request().url()).searchParams.get('period'), adjustment: 'none', kind: 'candles', bars, source, limitedHistory: false } }))
+  await page.goto('/?symbol=600519')
+  await expect(page.getByRole('img', { name: 'K线主图' })).toBeVisible({ timeout: 30000 })
+  await expect(page.getByRole('button', { name: '刷新行情与预测' })).toBeEnabled()
+  await page.reload()
+  await expect(page.getByRole('img', { name: 'K线主图' })).toBeVisible({ timeout: 30000 })
+  await expect(page.getByRole('button', { name: '刷新行情与预测' })).toBeEnabled()
+  expect(snapshots).toBe(1)
+  fail = true
+  await page.getByRole('button', { name: '刷新行情与预测' }).click()
+  await expect(page.getByRole('img', { name: 'K线主图' })).toBeVisible()
+  await expect(page.locator('.rs-data-timestamps')).toContainText('更新失败 · 保留缓存')
+  expect(snapshots).toBe(2)
+})

@@ -2,10 +2,12 @@ import type { DecisionAction, DecisionRule, MarketSnapshot, RuleCondition, Secur
 import { isPredictionSnapshot, type PredictionSnapshot } from '@/features/chart/chart-types'
 import type { ChartPeriod } from '@/features/chart/chart-periods'
 import type { ChartSeries, PriceAdjustment } from '@/features/chart/chart-market-types'
+import { cachedMarketRead, invalidateMarketHistory, snapshotUrl, storeMarketRead } from './market-history-cache'
 
 export type BrowserMarketClient = {
   search(query: string, signal?: AbortSignal): Promise<Security[]>
   snapshot(symbol: string, signal?: AbortSignal): Promise<MarketSnapshot>
+  cachedSnapshot?(symbol: string): MarketSnapshot | null
   series(symbol: string, period: ChartPeriod, signal?: AbortSignal, adjustment?: PriceAdjustment): Promise<ChartSeries>
   prediction(symbol: string, signal?: AbortSignal): Promise<PredictionSnapshot>
   publishedRules?(signal?: AbortSignal): Promise<DecisionRule[]>
@@ -19,12 +21,14 @@ async function browserRequest<T>(url: string, signal?: AbortSignal): Promise<T> 
 
 // Share short-lived reads across the chart and analysis without sharing cancellation.
 const marketReads = new Map<string, { expires: number; value: Promise<unknown> }>()
-export function clearMarketReads() { marketReads.clear() }
+export function clearMarketReads() { marketReads.clear(); invalidateMarketHistory() }
 function marketRead<T>(url: string, signal?: AbortSignal): Promise<T> {
   if (signal?.aborted) return Promise.reject(new DOMException('Aborted', 'AbortError'))
   let entry = marketReads.get(url)
   if (!entry || entry.expires <= Date.now()) {
-    const value = browserRequest<T>(url).catch(error => { if (marketReads.get(url)?.value === value) marketReads.delete(url); throw error })
+    const cached = cachedMarketRead<T>(url, true)
+    const value = (cached ? Promise.resolve(cached) : browserRequest<T>(url).then(result => { storeMarketRead(url, result as MarketSnapshot | ChartSeries); return result }))
+      .catch(error => { if (marketReads.get(url)?.value === value) marketReads.delete(url); throw error })
     entry = { expires: Date.now() + 15_000, value }
     if (marketReads.size >= 64) marketReads.delete(marketReads.keys().next().value!)
     marketReads.set(url, entry)
@@ -41,6 +45,7 @@ function marketRead<T>(url: string, signal?: AbortSignal): Promise<T> {
 export const browserMarketClient: BrowserMarketClient = {
   search: (query, signal) => browserRequest(`/api/market/search?q=${encodeURIComponent(query)}`, signal),
   snapshot: (symbol, signal) => marketRead(`/api/market/stocks/${encodeURIComponent(symbol)}/snapshot`, signal),
+  cachedSnapshot: symbol => cachedMarketRead<MarketSnapshot>(snapshotUrl(symbol)),
   series: (symbol, period, signal, adjustment = ['intraday', '1m', '5m', '15m', '30m', '60m', '120m'].includes(period) ? 'none' : 'qfq') => period === 'day' && adjustment === 'qfq'
     ? browserMarketClient.snapshot(symbol, signal).then(market => ({ symbol, period, adjustment: market.adjustment ?? 'none', kind: 'candles', bars: market.dailyCandles, source: market.source, limitedHistory: market.dailyCandles.length < 250 }))
     : marketRead(`/api/market/stocks/${encodeURIComponent(symbol)}/candles?period=${encodeURIComponent(period)}&adjustment=${adjustment}`, signal),
