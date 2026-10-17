@@ -43,10 +43,10 @@ describe('ChartWorkspace', () => {
   test('reveals a saved marker outside the current window from the drawing list', async () => {
     saveChartWorkspace(workspaceFixture({ drawings: [drawingFixture({ kind: 'text', text: '早期观察', points: [{ time: snapshot.dailyCandles[0].day, price: 1430 }] })] }))
     render(<ChartWorkspace variant="studio" prediction={prediction} snapshot={snapshot} />)
-    await userEvent.click(screen.getByRole('button', { name: '30 根' }))
+    await userEvent.click(screen.getByRole('button', { name: '放大图表' }))
     await userEvent.click(screen.getByRole('tab', { name: /绘图与图层/ }))
     await userEvent.click(within(screen.getByRole('region', { name: '已保存的绘图' })).getByRole('button', { name: /早期观察/ }))
-    expect(screen.getByRole('button', { name: '全部' })).toHaveAttribute('aria-pressed', 'true')
+    expect(document.querySelector('.sc-kline-chart-surface')).toHaveAttribute('data-visible-start', '0')
   })
   test('keeps a drag-created trend line selected through the browser follow-up click', async () => {
     render(<ChartWorkspace variant="studio" prediction={prediction} snapshot={snapshot} />)
@@ -61,7 +61,7 @@ describe('ChartWorkspace', () => {
   test('keeps an older anchored horizontal line visible when narrowing the history window', async () => {
     saveChartWorkspace(workspaceFixture({ drawings: [drawingFixture({ points: [{ time: snapshot.dailyCandles[0].day, price: 1430 }] })] }))
     render(<ChartWorkspace variant="studio" prediction={prediction} snapshot={snapshot} />)
-    await userEvent.click(screen.getByRole('button', { name: '30 根' }))
+    await userEvent.click(screen.getByRole('button', { name: '放大图表' }))
     expect(screen.getByTestId('annotation-horizontal-line')).toBeInTheDocument()
     expect(screen.getByTestId('drawing-price-label')).toHaveTextContent('1430.00')
   })

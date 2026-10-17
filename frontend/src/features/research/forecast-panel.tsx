@@ -29,8 +29,8 @@ export function ForecastPanel({ prediction, selectedDay, onSelectDay, currentPri
           {(detail === 'price' ? [['预测开盘', day.open], ['预测最高', day.high], ['预测最低', day.low], ['预测收盘', day.close]] : detail === 'ma' ? MA_PERIODS.map((period) => [`MA${period}`, day[`ma${period}`]]) : [['BOLL 上轨', day.bollUpper], ['BOLL 中轨', day.bollMiddle], ['BOLL 下轨', day.bollLower]]).map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value === null || value === undefined ? '—' : Number(value).toFixed(2)}</dd></div>)}
         </dl>
         {detail === 'ma' && MA_PERIODS.some((period) => day[`ma${period}`] == null) ? <p className="rs-forecast-note">“—”表示历史不足以计算该均线，不以短窗口替代。</p> : null}
-        <p className="rs-forecast-note">虚线为推演，实色为历史行情。MA 与 BOLL 基于历史收盘及预测收盘连续计算。</p>
-        <details className="rs-model-details"><summary>计算说明与生成时间</summary><p>{prediction.modelVersion === 'baseline-v1' ? '当前使用近 20 日线性趋势与波动区间。笔记规则用于独立校验，尚未调整此基准路径。' : '预测值来自当前返回的模型快照。'}</p><p>模型参考值 {Math.round(day.confidence * 100)}%，未经回测校准，不代表命中概率。</p><code>{prediction.modelVersion}</code><time dateTime={prediction.generatedAt}>{new Date(prediction.generatedAt).toLocaleString('zh-CN')}</time></details>
+        <p className="rs-forecast-basis"><strong>价格依据</strong>{prediction.modelVersion === 'baseline-v1' ? '近 20 日价格趋势与波动区间' : `模型快照 ${prediction.modelVersion}`}</p>
+        <details className="rs-model-details"><summary>计算说明与生成时间</summary><p>{prediction.modelVersion === 'baseline-v1' ? '当前使用近 20 日线性趋势与波动区间。笔记规则用于独立校验，尚未调整此基准路径。' : '预测值来自当前返回的模型快照。'}</p><p>虚线为推演，实色为历史行情。MA 与 BOLL 基于历史及预测收盘连续计算。</p><p>模型参考值 {Math.round(day.confidence * 100)}%，未经回测校准，不代表命中概率。</p><code>{prediction.modelVersion}</code><time dateTime={prediction.generatedAt}>{new Date(prediction.generatedAt).toLocaleString('zh-CN')}</time></details>
       </>}
   </section>
 }

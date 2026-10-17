@@ -11,6 +11,7 @@
 }
 .kw-workbench * { box-sizing: border-box; }
 .kw-workbench h1, .kw-workbench h2, .kw-workbench h3, .kw-workbench p, .kw-workbench blockquote { margin: 0; }
+.kw-workbench .kw-view-caption { margin-bottom: 17px; }
 .kw-workbench a { color: inherit; text-decoration: none; }
 .kw-workbench button, .kw-workbench input, .kw-workbench textarea, .kw-workbench select { font: inherit; }
 .kw-workbench button { cursor: pointer; border: 0; background: transparent; }
@@ -20,15 +21,6 @@
 .kw-workbench :is(ul, ol) { margin: 0; padding-left: 20px; }
 .kw-workbench li + li { margin-top: 7px; }
 .kw-workbench svg { flex-shrink: 0; }
-.kw-header { height: 66px; display: flex; align-items: center; gap: 56px; padding: 0 28px; border-bottom: 1px solid var(--kw-border); background: #fff; }
-.kw-brand { display: inline-flex; align-items: center; gap: 10px; font-size: 21px; font-weight: 750; letter-spacing: -.8px; }
-.kw-brand > span { display: grid; place-items: center; background: var(--kw-blue); color: #fff; width: 31px; height: 31px; border-radius: 9px; }
-.kw-header nav { display: flex; align-self: stretch; gap: 32px; }
-.kw-header nav a { display: flex; align-items: center; position: relative; color: #747e92; white-space: nowrap; }
-.kw-header nav a[aria-current=page] { color: var(--kw-blue); font-weight: 650; }
-.kw-header nav a[aria-current=page]::after { content: ''; position: absolute; inset: auto 0 0; height: 3px; background: var(--kw-blue); border-radius: 3px 3px 0 0; }
-.kw-header-note { margin-left: auto; color: #8791a3; font-size: 12px; display: flex; align-items: center; gap: 8px; }
-.kw-header-note i { width: 6px; height: 6px; border-radius: 50%; background: #96b9a8; }
 .kw-main { max-width: 1580px; margin: 0 auto; padding: 0 28px; }
 .kw-breadcrumb { display: flex; align-items: center; gap: 10px; height: 51px; color: #9199a9; font-size: 12px; }
 .kw-breadcrumb strong { font-weight: 400; color: #738095; }
@@ -56,12 +48,7 @@
 .kw-summary-note p { margin: 0 !important; display: grid; gap: 7px; }
 .kw-summary-note strong { font-size: 12px; font-weight: 550; color: #736d93; }
 .kw-summary-note p span { display: block; max-width: 215px; color: #9197a7; font-size: 11px; line-height: 1.8; }
-.kw-tabs { display: flex; align-items: stretch; gap: 28px; min-height: 44px; border-bottom: 1px solid var(--kw-border); margin-bottom: 17px; }
-.kw-tabs > button { display: inline-flex; align-items: center; gap: 8px; position: relative; font-size: 13px; color: #929aaa; padding: 0 0 13px; white-space: nowrap; flex-shrink: 0; }
-.kw-tabs > button[aria-selected=true] { color: #534cbd; font-weight: 600; }
-.kw-tabs > button[aria-selected=true]::after { content: ''; position: absolute; inset: auto 0 -1px; height: 2px; background: #7168d6; }
-.kw-tabs > button > span { font-size: 10px; font-weight: 500; padding: 0 6px; border-radius: 4px; color: #958cbd; background: #edeaf7; }
-.kw-tabs-caption { margin-left: auto; align-self: center; color: #99a1b0; font-size: 11px; padding-bottom: 12px; }
+.kw-view-caption { color: #758096; font-size: 12px; margin: 0 0 17px; }
 .kw-library { display: grid; grid-template-columns: 176px minmax(280px, .92fr) minmax(380px, 1.3fr); align-items: start; min-height: 660px; gap: 16px; }
 .kw-sidebar { padding: 11px 7px 0 0; min-width: 0; }
 .kw-sidebar h2 { font-size: 12px; font-weight: 600; color: #758096; padding: 0 10px 16px; }

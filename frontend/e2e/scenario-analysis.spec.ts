@@ -36,6 +36,8 @@ test.describe('multi-period scenario analysis', () => {
     })
     await page.goto('/?symbol=603533', { waitUntil: 'domcontentloaded' })
     await expect(page).toHaveTitle(/StockCal/)
+    if (await page.getByRole('tab', { name: '多周期分析', exact: true }).count()) await page.getByRole('tab', { name: '多周期分析', exact: true }).click()
+
     await page.getByRole('button', { name: '开始多周期分析' }).click()
     const panel = page.getByRole('region', { name: '多周期情景分析', exact: true })
     const summary = panel.getByRole('region', { name: '跨周期综合结果', exact: true })
@@ -87,6 +89,8 @@ test.describe('multi-period scenario analysis', () => {
       expect(level.changeRatio).toBeCloseTo(level.value / 10 - 1)
     }
     await page.reload()
+    if (await page.getByRole('tab', { name: '多周期分析', exact: true }).count()) await page.getByRole('tab', { name: '多周期分析', exact: true }).click()
+
     await page.getByRole('button', { name: '开始多周期分析' }).click()
     await panel.getByText('分析历史 · 1个版本', { exact: true }).click()
     await panel.getByRole('button', { name: '查看分析版本1' }).click()
@@ -118,6 +122,8 @@ test.describe('multi-period scenario analysis', () => {
     })
     await page.goto('/?symbol=603533', { waitUntil: 'domcontentloaded' })
     await expect(page.getByRole('heading', { name: '*ST样例', exact: true })).toBeVisible()
+    if (await page.getByRole('tab', { name: '多周期分析', exact: true }).count()) await page.getByRole('tab', { name: '多周期分析', exact: true }).click()
+
     await page.getByRole('button', { name: '开始多周期分析' }).click()
     const summary = page.getByRole('region', { name: '跨周期综合结果', exact: true })
     await expect(summary).toContainText('请选择适用的涨跌幅规则')
@@ -147,6 +153,8 @@ test.describe('multi-period scenario analysis', () => {
     await installScenarioApi(page)
     await page.goto('/?symbol=603533', { waitUntil: 'domcontentloaded' })
     await expect(page).toHaveTitle(/StockCal/)
+    if (await page.getByRole('tab', { name: '多周期分析', exact: true }).count()) await page.getByRole('tab', { name: '多周期分析', exact: true }).click()
+
     await page.getByRole('button', { name: '开始多周期分析' }).click()
     const panel = page.getByRole('region', { name: '多周期情景分析', exact: true })
     await expect(panel).toBeVisible()
@@ -185,6 +193,8 @@ test.describe('multi-period scenario analysis', () => {
     await panel.getByRole('button', { name: '保存分析快照' }).click()
     await expect(panel.getByText('已保存分析版本1')).toBeVisible()
     await page.reload()
+    if (await page.getByRole('tab', { name: '多周期分析', exact: true }).count()) await page.getByRole('tab', { name: '多周期分析', exact: true }).click()
+
     await page.getByRole('button', { name: '开始多周期分析' }).click()
     await panel.scrollIntoViewIfNeeded()
     await panel.getByText('分析历史 · 1个版本', { exact: true }).click()
@@ -214,6 +224,8 @@ test.describe('multi-period scenario analysis', () => {
   test('failed_30m_keeps_day_and_hour_evidence', async ({ page }) => {
     await installScenarioApi(page, true)
     await page.goto('/?symbol=603533', { waitUntil: 'domcontentloaded' })
+    if (await page.getByRole('tab', { name: '多周期分析', exact: true }).count()) await page.getByRole('tab', { name: '多周期分析', exact: true }).click()
+
     await page.getByRole('button', { name: '开始多周期分析' }).click()
     const panel = page.getByRole('region', { name: '多周期情景分析', exact: true })
     await panel.scrollIntoViewIfNeeded()
@@ -238,6 +250,8 @@ test.describe('multi-period scenario analysis', () => {
       try { await route.fulfill({ json: { symbol: '603533', period: '60m', adjustment: 'none', kind: 'candles', bars: fixture['60m'], source: { name: '旧股票延迟响应', fetchedAt: new Date().toISOString(), online: true, state: 'TEST' } } }) } catch { /* The old request may already be aborted. */ }
     })
     await page.goto('/?symbol=603533', { waitUntil: 'domcontentloaded' })
+    if (await page.getByRole('tab', { name: '多周期分析', exact: true }).count()) await page.getByRole('tab', { name: '多周期分析', exact: true }).click()
+
     await page.getByRole('button', { name: '开始多周期分析' }).click()
     await page.getByRole('button', { name: '看1小时' }).click()
     await requested

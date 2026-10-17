@@ -102,21 +102,21 @@ describe('experience workbench', () => {
   it('opens learning samples and keeps its URL entry while preserving the library tab', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => Response.json({ items: [], nextCursor: null, asOf: '2026-10-16T08:00:00Z' })))
     const user = userEvent.setup(); render(<ExperienceWorkbench data={fixture} />)
-    await user.click(screen.getByRole('tab', { name: '学习样本' }))
-    expect(await screen.findByRole('heading', { name: '学习样本库' })).toBeInTheDocument()
+    await user.click(screen.getByRole('link', { name: '学习样本' }))
+    expect(await screen.findByRole('heading', { name: '学习样本库' }, { timeout: 20_000 })).toBeInTheDocument()
     expect(window.location.search).toContain('view=samples')
-    await user.click(screen.getByRole('tab', { name: /经验库/ }))
+    await user.click(screen.getByRole('link', { name: '经验与原则' }))
     expect(screen.getByRole('button', { name: '查看记录：五日线底线' })).toBeInTheDocument()
     vi.unstubAllGlobals()
   })
   it('opens the source tagging view and returns to the existing knowledge records', async () => {
     const user = userEvent.setup()
     render(<ExperienceWorkbench data={fixture} />)
-    await user.click(screen.getByRole('tab', { name: '笔记标签' }))
+    await user.click(screen.getByRole('link', { name: '笔记标签' }))
     // The actual lazy-loaded source catalog can take longer to import under a parallel suite.
-    expect(await screen.findByRole('heading', { name: '笔记标签目录' }, { timeout: 5_000 })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: '笔记标签目录' }, { timeout: 20_000 })).toBeInTheDocument()
     expect(window.location.search).toContain('view=notes')
-    await user.click(screen.getByRole('tab', { name: /经验库/ }))
+    await user.click(screen.getByRole('link', { name: '经验与原则' }))
     expect(screen.getByRole('button', { name: '查看记录：五日线底线' })).toBeInTheDocument()
   })
 
@@ -191,7 +191,7 @@ describe('experience workbench', () => {
   it('shows data-backed horizon comparisons and source details', async () => {
     const user = userEvent.setup()
     render(<ExperienceWorkbench data={fixture} />)
-    await user.click(screen.getByRole('tab', { name: '回测证据' }))
+    await user.click(screen.getByRole('link', { name: '回测证据' }))
     expect(screen.getByText('经验规则代理尚未显示稳定优势。')).toBeInTheDocument()
     expect(screen.getByText('3.10%')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '未来 4 日' }))

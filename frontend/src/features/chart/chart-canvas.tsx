@@ -40,6 +40,10 @@ type ChartCanvasProps = {
   onRedo?: () => void
   onPan?: (deltaX: number) => void
   onPanEnd?: () => void
+  panOnPointer?: boolean
+  onViewportZoom?: (factor: number, anchor?: number) => void
+  onViewportPan?: (bars: number) => void
+  onViewportReset?: () => void
 }
 
 type PointerGesture = {
@@ -48,6 +52,7 @@ type PointerGesture = {
   captureTarget: SVGElement
   start: TimePricePoint
   lastClientX?: number
+  moved?: boolean
   drawingId?: string
   pointIndex?: number
   drawingKind?: 'trend-line' | 'rectangle'
@@ -77,6 +82,7 @@ function screenPoint(svg: SVGSVGElement, clientX: number, clientY: number) {
   const bounds = svg.getBoundingClientRect()
   const width = bounds.width || viewBox.width
   const height = bounds.height || viewBox.height
+  if (svg.getAttribute('preserveAspectRatio') === 'none') return { x: (clientX - bounds.left) / width * viewBox.width, y: (clientY - bounds.top) / height * viewBox.height }
   const scale = Math.min(width / viewBox.width, height / viewBox.height)
   const left = bounds.left + (width - viewBox.width * scale) / 2
   const top = bounds.top + (height - viewBox.height * scale) / 2
@@ -144,7 +150,7 @@ function HistoricalLayer({ candles, transform, keyLevels, showKeyLevels, kind = 
       <g className="sc-kline-axis-labels">
         {[0, 1, 2, 3, 4].map((line) => {
           const y = transform.rect.top + line * (transform.rect.height / 4)
-          return <text key={line} x={transform.rect.left + transform.rect.width + 12} y={y + 4}>{priceText(transform.priceForY(y))}</text>
+          return <text key={line} x={viewBox.width - 10} textAnchor="end" y={y + 4}>{priceText(transform.priceForY(y))}</text>
         })}
       </g>
       {kind === 'intraday' ? <IntradayPrices candles={candles} transform={transform} previousClose={previousClose} /> : <g data-testid="candlestick-layer">
@@ -220,6 +226,8 @@ export function ChartCanvas(props: ChartCanvasProps) {
   const consumeGestureClick = useRef(false)
   const [crosshairPoint, setCrosshairPoint] = useState<{ x: number; y: number } | null>(null)
   const kind = props.kind ?? 'candles'
+  const touchPoints = useRef(new Map<number, { x: number; y: number }>())
+  const pinchDistance = useRef(0)
   const prediction = kind === 'candles' && props.period === 'day' ? props.prediction : null
 
   const svgPoint = (event: ReactMouseEvent<SVGSVGElement> | ReactPointerEvent<SVGSVGElement>) => {
@@ -253,7 +261,20 @@ export function ChartCanvas(props: ChartCanvasProps) {
   }
   const handlePointerDown = (event: ReactPointerEvent<SVGSVGElement>) => {
     consumeGestureClick.current = false
-    if (props.activeTool === 'pan') {
+    if (props.activeTool === 'pointer' && (event.target as Element).closest('[data-testid="prediction-candle"]')) return
+    event.currentTarget.focus({ preventScroll: true })
+    if (event.pointerType === 'touch' && props.onViewportZoom) {
+      touchPoints.current.set(event.pointerId, { x: event.clientX, y: event.clientY })
+      if (touchPoints.current.size > 1) {
+        const points = [...touchPoints.current.values()]
+        pinchDistance.current = Math.hypot(points[1].x - points[0].x, points[1].y - points[0].y)
+        gesture.current = null
+        consumeGestureClick.current = true
+        event.currentTarget.setPointerCapture?.(event.pointerId)
+        return
+      }
+    }
+    if (props.activeTool === 'pan' || (props.panOnPointer && props.activeTool === 'pointer')) {
       event.currentTarget.setPointerCapture?.(event.pointerId)
       gesture.current = { kind: 'pan', pointerId: event.pointerId, captureTarget: event.currentTarget, start: dataPoint(event), lastClientX: event.clientX }
       return
@@ -282,11 +303,19 @@ export function ChartCanvas(props: ChartCanvasProps) {
     }
   }
   const handlePointerUp = (event: ReactPointerEvent<SVGSVGElement>) => {
+    touchPoints.current.delete(event.pointerId)
+    if (pinchDistance.current) {
+      if (!touchPoints.current.size) pinchDistance.current = 0
+      gesture.current = null
+      consumeGestureClick.current = true
+      return
+    }
     const active = gesture.current
     if (!active || active.pointerId !== event.pointerId) return
     gesture.current = null
     const end = dataPoint(event)
     if (active.kind === 'pan') {
+      if (active.moved) consumeGestureClick.current = true
       const finalDelta = (active.lastClientX ?? event.clientX) - event.clientX
       if (finalDelta) props.onPan?.(finalDelta)
       props.onPanEnd?.()
@@ -308,26 +337,54 @@ export function ChartCanvas(props: ChartCanvasProps) {
     releaseGestureCapture(active)
   }
   const cancelPointerGesture = (event: ReactPointerEvent<SVGSVGElement>) => {
+    touchPoints.current.delete(event.pointerId)
+    if (!touchPoints.current.size) pinchDistance.current = 0
     const active = gesture.current
     if (!active || active.pointerId !== event.pointerId) return
     gesture.current = null
     releaseGestureCapture(active)
   }
   const clearLostPointerGesture = (event: ReactPointerEvent<SVGSVGElement>) => {
+    touchPoints.current.delete(event.pointerId)
+    if (!touchPoints.current.size) pinchDistance.current = 0
     const active = gesture.current
     if (active?.pointerId === event.pointerId) gesture.current = null
   }
   const handlePointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
+    if (event.pointerType === 'touch' && touchPoints.current.has(event.pointerId)) {
+      touchPoints.current.set(event.pointerId, { x: event.clientX, y: event.clientY })
+      if (touchPoints.current.size > 1 && props.onViewportZoom) {
+        const points = [...touchPoints.current.values()]
+        const distance = Math.hypot(points[1].x - points[0].x, points[1].y - points[0].y)
+        const center = screenPoint(event.currentTarget, (points[0].x + points[1].x) / 2, (points[0].y + points[1].y) / 2)
+        if (distance > 0 && pinchDistance.current > 0) props.onViewportZoom(pinchDistance.current / distance, (center.x - props.transform.rect.left) / props.transform.rect.width)
+        pinchDistance.current = distance
+        return
+      }
+    }
     const active = gesture.current
     if (active?.kind === 'pan' && active.pointerId === event.pointerId) {
       const delta = (active.lastClientX ?? event.clientX) - event.clientX
-      if (delta) props.onPan?.(delta)
+      if (delta) { props.onPan?.(delta); active.moved = true }
       active.lastClientX = event.clientX
     }
     if (props.crosshair) setCrosshairPoint(svgPoint(event))
   }
   const handleKeyDown = (event: ReactKeyboardEvent<SVGSVGElement>) => {
     const modifier = event.ctrlKey || event.metaKey
+    if (!modifier && props.onViewportZoom && ['ArrowUp', 'ArrowDown', '+', '=', '-'].includes(event.key)) {
+      event.preventDefault()
+      props.onViewportZoom(['ArrowUp', '+', '='].includes(event.key) ? 0.8 : 1.25)
+      return
+    }
+    if (!modifier && props.onViewportPan && ['ArrowLeft', 'ArrowRight'].includes(event.key)) {
+      event.preventDefault()
+      props.onViewportPan(event.key === 'ArrowLeft' ? -Math.max(1, props.candles.length / 10) : Math.max(1, props.candles.length / 10))
+      return
+    }
+    if (!modifier && event.key === '0' && props.onViewportReset) {
+      event.preventDefault(); props.onViewportReset(); return
+    }
     if (modifier && event.key.toLowerCase() === 'z') {
       event.preventDefault()
       if (event.shiftKey) props.onRedo?.()
@@ -360,7 +417,7 @@ export function ChartCanvas(props: ChartCanvasProps) {
   const crosshairPrice = crosshairPoint ? props.transform.priceForY(crosshairPoint.y) : null
 
   return (
-    <svg aria-keyshortcuts="Delete Escape Control+Z Meta+Z Control+Y Meta+Y" aria-label={kind === 'intraday' ? '分时主图' : 'K线主图'} className="sc-kline-svg" onClick={createPointDrawing} onKeyDown={handleKeyDown} onLostPointerCapture={clearLostPointerGesture} onPointerCancel={cancelPointerGesture} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} preserveAspectRatio="xMidYMid meet" ref={svgRef} role="img" tabIndex={0} viewBox={`0 0 ${viewBox.width} ${viewBox.height}`}>
+    <svg aria-keyshortcuts="Delete Escape Control+Z Meta+Z Control+Y Meta+Y" aria-label={kind === 'intraday' ? '分时主图' : 'K线主图'} className={`sc-kline-svg ${props.panOnPointer ? 'sc-kline-svg-interactive' : ''}`} onDoubleClick={() => { if (props.activeTool === 'pointer' || props.activeTool === 'pan') props.onViewportReset?.() }} onClick={createPointDrawing} onKeyDown={handleKeyDown} onLostPointerCapture={clearLostPointerGesture} onPointerCancel={cancelPointerGesture} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} preserveAspectRatio={props.panOnPointer ? 'none' : 'xMidYMid meet'} ref={svgRef} role="img" tabIndex={0} viewBox={`0 0 ${viewBox.width} ${viewBox.height}`}>
       <HistoricalLayer candles={props.candles} keyLevels={props.keyLevels} showKeyLevels={props.showKeyLevels} transform={props.transform} kind={kind} previousClose={props.previousClose} period={props.period} />
       {kind === 'candles' ? <IndicatorLayer candles={props.candles} indicatorValues={props.indicatorValues} indicators={props.indicators} transform={props.transform} /> : <g data-chart-layer="indicator" />}
       <g data-chart-layer="prediction">{prediction ? <PredictionLayer hoveredDay={props.hoveredDay} onHoverDay={props.onHoverDay} onSelectDay={props.onSelectPredictionDay} prediction={prediction} selectedDay={props.selectedPredictionDay} transform={props.transform} /> : null}</g>

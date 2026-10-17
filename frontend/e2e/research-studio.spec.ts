@@ -26,6 +26,43 @@ async function marketApi(page: Page, failPrediction = false) {
 }
 
 test.describe('K-line research studio', () => {
+  test('opens search with a shortcut, clears without closing, and restores focus after selection', async ({ page }, info) => {
+    await marketApi(page)
+    await page.goto('/?example=1')
+    await expect(page.getByRole('heading', { name: '示例股票', exact: true })).toBeVisible()
+    // Wait for an observable client interaction before sending a global shortcut.
+    if (info.project.name === 'mobile') await page.getByRole('button', { name: '选股', exact: true }).click()
+    const search = page.getByRole('combobox', { name: '搜索 A 股' })
+    await search.fill('准备')
+    await page.getByRole('button', { name: '清空搜索' }).click()
+    if (info.project.name === 'mobile') await page.getByRole('button', { name: '关闭选股', exact: true }).click()
+    else await search.press('Tab')
+    await page.keyboard.press('Control+k')
+    await expect(search).toBeFocused()
+    if (info.project.name === 'mobile') {
+      await expect(page.getByRole('dialog', { name: '选择股票' })).toBeVisible()
+      await expect(page.locator('body')).toHaveCSS('overflow', 'hidden')
+    }
+    await search.fill('立讯')
+    await page.getByRole('button', { name: '清空搜索' }).click()
+    await expect(search).toHaveValue('')
+    await expect(search).toBeFocused()
+    await search.fill('立讯')
+    await search.press('Escape')
+    await expect(search).toHaveValue('')
+    await expect(search).toBeFocused()
+    await search.fill('立讯')
+    await expect(page.getByRole('option', { name: /立讯精密/ })).toBeVisible()
+    await search.press('Enter')
+    await expect(page.getByRole('heading', { name: '立讯精密', exact: true })).toBeVisible()
+    if (info.project.name === 'mobile') {
+      await expect(page.getByRole('dialog', { name: '选择股票' })).toHaveCount(0)
+      await expect(page.getByRole('button', { name: '选股', exact: true })).toBeFocused()
+      await expect(page.locator('body')).not.toHaveCSS('overflow', 'hidden')
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true)
+  })
+
   test('selects forecasts, reads all indicators, and compares actual historical evidence', async ({ page }, info) => {
     test.skip(info.project.name !== 'desktop', 'Desktop forecast rail')
     const errors: string[] = []
@@ -34,7 +71,7 @@ test.describe('K-line research studio', () => {
     await page.goto('/')
     await expect(page.getByRole('heading', { name: '贵州茅台', exact: true })).toBeVisible()
     await expect(page.getByTestId('prediction-candle')).toHaveCount(3)
-    await expect(page.getByTestId('predicted-indicator-line')).toHaveCount(11)
+    await expect(page.getByTestId('predicted-indicator-line')).toHaveCount(6)
     const rail = page.getByRole('region', { name: '未来预测' })
     await rail.getByRole('button', { name: /T\+2/ }).click()
     await expect(page.getByTestId('prediction-candle').nth(1)).toHaveAttribute('aria-pressed', 'true')
@@ -89,7 +126,7 @@ test.describe('K-line research studio', () => {
     await expect(page.getByTestId('drawing-price-label')).toHaveText('33.25')
     await page.reload()
     await expect(page.getByTestId('drawing-price-label')).toHaveText('33.25')
-    await page.getByRole('button', { name: '全部', exact: true }).click()
+    await page.getByRole('button', { name: '适应全图', exact: true }).click()
     await expect(page.getByText(`共 ${sample.market.dailyCandles.length} 根 K 线`)).toBeVisible()
     await page.getByRole('tab', { name: '周线', exact: true }).click()
     await expect(page.getByTestId('annotation-horizontal-line')).toHaveCount(0)
@@ -126,4 +163,59 @@ test.describe('K-line research studio', () => {
     for (const label of ['MA5', 'MA10', 'MA20', 'BOLL上轨', 'BOLL中轨', 'BOLL下轨']) await expect(sheet.getByText(label, { exact: true })).toBeVisible()
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true)
   })
+})
+
+test('navigates continuous history without changing drawings and restores forecast at latest', async ({ page }) => {
+  await marketApi(page)
+  await page.goto('/?example=1')
+  const chart = page.getByRole('img', { name: 'K线主图', exact: true })
+  const surface = page.locator('.sc-kline-chart-surface')
+  await expect(chart).toBeVisible()
+  await page.getByRole('button', { name: '放大图表', exact: true }).click()
+  const start = Number(await surface.getAttribute('data-visible-start'))
+  const end = Number(await surface.getAttribute('data-visible-end'))
+  await chart.focus()
+  await chart.press('ArrowLeft')
+  await expect.poll(async () => Number(await surface.getAttribute('data-visible-end'))).toBeLessThan(end)
+  await expect(page.getByTestId('prediction-candle')).toHaveCount(0)
+  await page.getByRole('button', { name: '回到最新', exact: true }).click()
+  await expect(surface).toHaveAttribute('data-visible-end', String(end))
+  await expect(page.getByTestId('prediction-candle')).toHaveCount(3)
+  await page.getByTestId('prediction-candle').nth(1).click()
+  await expect(page.getByTestId('prediction-candle').nth(1)).toHaveAttribute('aria-pressed', 'true')
+  const box = await chart.boundingBox()
+  await page.mouse.move(box!.x + box!.width * 0.8, box!.y + box!.height / 2)
+  await page.mouse.wheel(0, -150)
+  await expect.poll(async () => Number(await surface.getAttribute('data-visible-start'))).toBeGreaterThan(start)
+  await page.mouse.move(box!.x + box!.width * 0.4, box!.y + box!.height * 0.5)
+  await page.mouse.down()
+  await page.mouse.move(box!.x + box!.width * 0.7, box!.y + box!.height * 0.5, { steps: 8 })
+  await page.mouse.up()
+  await expect.poll(async () => Number(await surface.getAttribute('data-visible-end'))).toBeLessThan(end)
+  await chart.press('0')
+  await expect.poll(async () => Number(await surface.getAttribute('data-visible-end')) - Number(await surface.getAttribute('data-visible-start'))).toBe(80)
+})
+
+
+test('supports two-finger zoom on the mobile chart', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mobile', 'Touch viewport')
+  await marketApi(page)
+  await page.goto('/?example=1')
+  const chart = page.getByRole('img', { name: 'K线主图', exact: true })
+  await chart.scrollIntoViewIfNeeded()
+  const surface = page.locator('.sc-kline-chart-surface')
+  const count = async () => Number(await surface.getAttribute('data-visible-end')) - Number(await surface.getAttribute('data-visible-start'))
+  const initial = await count()
+  const box = (await chart.boundingBox())!
+  const client = await page.context().newCDPSession(page)
+  const y = box.y + box.height / 2
+  const center = box.x + box.width / 2
+  const points = (distance: number) => [{ x: center - distance, y, id: 1 }, { x: center + distance, y, id: 2 }]
+  await client.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: points(30) })
+  await client.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: points(60) })
+  await client.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
+  await expect.poll(count).toBeLessThan(initial)
+  await chart.focus()
+  await chart.press('0')
+  await expect.poll(count).toBe(80)
 })

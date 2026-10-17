@@ -54,17 +54,18 @@ export function StockPicker({ selectedSymbol, market, onSelect, onClose }: { sel
   }, [query])
 
   useEffect(() => {
-    const shortcut = (event: KeyboardEvent) => { if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); input.current?.focus() } }
-    window.addEventListener('keydown', shortcut)
-    return () => window.removeEventListener('keydown', shortcut)
-  }, [])
+    if (query.trim()) document.getElementById(`rs-result-${activeIndex}`)?.scrollIntoView?.({ block: 'nearest' })
+  }, [activeIndex, query, results])
+
+  const clearSearch = () => { setQuery(''); setResults([]); setSearchState('idle'); setActiveIndex(0); input.current?.focus() }
 
   const visible = query.trim() ? results : tab === 'favorites' ? saved.favorites : saved.recent.length ? saved.recent : initialSecurities
   return <aside aria-label="股票选择" className="rs-stock-picker">
     <div className="rs-picker-heading"><strong>A 股市场</strong><button aria-label="关闭选股" className="rs-mobile-only rs-icon-button" onClick={onClose} type="button"><StudioIcon name="close" /></button><span className="rs-desktop-only">沪 · 深 · 北</span></div>
     <form className="rs-search" onSubmit={(event) => { event.preventDefault(); if (results[activeIndex] && query.trim()) choose(results[activeIndex]); else if (/^\d{6}$/.test(query.trim())) choose({ code: query.trim(), name: query.trim() }) }}>
-      <StudioIcon name="search" size={16} /><input aria-label="搜索 A 股" aria-autocomplete="list" aria-controls="rs-stock-results" aria-expanded={Boolean(query.trim())} aria-activedescendant={query.trim() && results[activeIndex] ? `rs-result-${activeIndex}` : undefined} role="combobox" ref={input} value={query} onChange={(event) => { setQuery(event.target.value); setResults([]); setSearchState(event.target.value.trim() ? 'loading' : 'idle') }} onKeyDown={(event) => { if (event.key === 'Escape') { setQuery(''); input.current?.blur() } if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && results.length) { event.preventDefault(); setActiveIndex((index) => (index + (event.key === 'ArrowDown' ? 1 : -1) + results.length) % results.length) } }} placeholder="代码 / 名称 / 拼音" autoComplete="off" /><kbd>⌘K</kbd>
+      <StudioIcon name="search" size={16} /><input aria-label="搜索 A 股" aria-describedby="rs-search-help" aria-autocomplete="list" aria-controls="rs-stock-results" aria-expanded={Boolean(query.trim())} aria-activedescendant={query.trim() && results[activeIndex] ? `rs-result-${activeIndex}` : undefined} role="combobox" ref={input} value={query} onChange={(event) => { setQuery(event.target.value); setResults([]); setActiveIndex(0); setSearchState(event.target.value.trim() ? 'loading' : 'idle') }} onKeyDown={(event) => { if (event.nativeEvent.isComposing) return; if (event.key === 'Escape' && query) { event.stopPropagation(); clearSearch() } if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && results.length) { event.preventDefault(); setActiveIndex((index) => (index + (event.key === 'ArrowDown' ? 1 : -1) + results.length) % results.length) } }} placeholder="代码 / 名称 / 拼音" autoComplete="off" />{query ? <button className="rs-search-clear" aria-label="清空搜索" type="button" onClick={clearSearch}><StudioIcon name="close" size={16} /></button> : <kbd title="Ctrl+K / ⌘K">Ctrl K</kbd>}
     </form>
+    <p id="rs-search-help" className="rs-search-help">输入代码或名称，↑↓ 选择，回车查看</p>
     {!query.trim() ? <div role="tablist" aria-label="股票列表类型" className="rs-list-tabs"><button role="tab" aria-selected={tab === 'recent'} onClick={() => setTab('recent')} type="button">最近查看</button><button role="tab" aria-selected={tab === 'favorites'} onClick={() => setTab('favorites')} type="button">我的自选 <span>{saved.favorites.length}</span></button></div> : <p className="rs-search-summary" role="status">{searchState === 'loading' ? '正在搜索…' : searchState === 'error' ? '搜索服务暂不可用' : `${results.length} 个搜索结果`}</p>}
     {!query.trim() && tab === 'recent' && !saved.recent.length ? <p className="rs-suggestion-label">常用股票 · 点击查看</p> : null}
     <div className="rs-stock-results" id="rs-stock-results" role={query.trim() ? 'listbox' : undefined} aria-label="股票列表">
