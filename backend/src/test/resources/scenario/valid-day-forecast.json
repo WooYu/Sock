@@ -1,0 +1,797 @@
+{
+  "schemaVersion": 1,
+  "definitionVersion": "scenario-research-v1",
+  "id": "forecast-fixture",
+  "version": 1,
+  "kind": "live",
+  "createdAt": "2026-10-09T16:00:00+08:00",
+  "input": {
+    "symbol": "603533",
+    "asOf": "2026-10-09T16:00:00+08:00",
+    "sourceMode": "real",
+    "calendar": {
+      "fromDay": "2026-10-09",
+      "throughDay": "2026-10-15",
+      "tradingDays": [
+        "2026-10-09",
+        "2026-10-12",
+        "2026-10-13",
+        "2026-10-14",
+        "2026-10-15"
+      ],
+      "sourceUrl": "https://test.invalid/synthetic-calendar",
+      "verifiedAt": "2026-09-01T00:00:00Z"
+    },
+    "periods": {
+      "day": {
+        "symbol": "603533",
+        "period": "day",
+        "asOf": "2026-10-09T16:00:00+08:00",
+        "adjustment": "none",
+        "source": {
+          "name": "合成测试行情",
+          "fetchedAt": "2026-10-09T16:00:00+08:00",
+          "state": "TEST",
+          "online": true
+        },
+        "closed": [
+          {
+            "day": "2026-09-18",
+            "endTime": "2026-09-18",
+            "open": 10,
+            "close": 10,
+            "high": 10.2,
+            "low": 9.8,
+            "volume": 1000
+          },
+          {
+            "day": "2026-09-19",
+            "endTime": "2026-09-19",
+            "open": 10,
+            "close": 10,
+            "high": 10.2,
+            "low": 9.8,
+            "volume": 1000
+          },
+          {
+            "day": "2026-09-20",
+            "endTime": "2026-09-20",
+            "open": 10,
+            "close": 10,
+            "high": 10.2,
+            "low": 9.8,
+            "volume": 1000
+          },
+          {
+            "day": "2026-09-21",
+            "endTime": "2026-09-21",
+            "open": 10,
+            "close": 10,
+            "high": 10.2,
+            "low": 9.8,
+            "volume": 1000
+          },
+          {
+            "day": "2026-09-22",
+            "endTime": "2026-09-22",
+            "open": 10,
+            "close": 10,
+            "high": 10.2,
+            "low": 9.8,
+            "volume": 1000
+          },
+          {
+            "day": "2026-09-23",
+            "endTime": "2026-09-23",
+            "open": 10,
+            "close": 10,
+            "high": 10.2,
+            "low": 9.8,
+            "volume": 1000
+          },
+          {
+            "day": "2026-09-24",
+            "endTime": "2026-09-24",
+            "open": 10,
+            "close": 10,
+            "high": 10.2,
+            "low": 9.8,
+            "volume": 1000
+          },
+          {
+            "day": "2026-09-25",
+            "endTime": "2026-09-25",
+            "open": 10,
+            "close": 10,
+            "high": 10.2,
+            "low": 9.8,
+            "volume": 1000
+          },
+          {
+            "day": "2026-09-26",
+            "endTime": "2026-09-26",
+            "open": 10,
+            "close": 10,
+            "high": 10.2,
+            "low": 9.8,
+            "volume": 1000
+          },
+          {
+            "day": "2026-09-27",
+            "endTime": "2026-09-27",
+            "open": 10,
+            "close": 10,
+            "high": 10.2,
+            "low": 9.8,
+            "volume": 1000
+          },
+          {
+            "day": "2026-09-28",
+            "endTime": "2026-09-28",
+            "open": 10,
+            "close": 10,
+            "high": 10.2,
+            "low": 9.8,
+            "volume": 1000
+          },
+          {
+            "day": "2026-09-29",
+            "endTime": "2026-09-29",
+            "open": 10,
+            "close": 10,
+            "high": 10.2,
+            "low": 9.8,
+            "volume": 1000
+          },
+          {
+            "day": "2026-09-30",
+            "endTime": "2026-09-30",
+            "open": 10,
+            "close": 10,
+            "high": 10.2,
+            "low": 9.8,
+            "volume": 1000
+          },
+          {
+            "day": "2026-10-01",
+            "endTime": "2026-10-01",
+            "open": 10,
+            "close": 10,
+            "high": 10.2,
+            "low": 9.8,
+            "volume": 1000
+          },
+          {
+            "day": "2026-10-02",
+            "endTime": "2026-10-02",
+            "open": 10,
+            "close": 10,
+            "high": 10.2,
+            "low": 9.8,
+            "volume": 1000
+          },
+          {
+            "day": "2026-10-03",
+            "endTime": "2026-10-03",
+            "open": 10,
+            "close": 10,
+            "high": 10.2,
+            "low": 9.8,
+            "volume": 1000
+          },
+          {
+            "day": "2026-10-04",
+            "endTime": "2026-10-04",
+            "open": 10,
+            "close": 10,
+            "high": 10.2,
+            "low": 9.8,
+            "volume": 1000
+          },
+          {
+            "day": "2026-10-05",
+            "endTime": "2026-10-05",
+            "open": 10,
+            "close": 10,
+            "high": 10.2,
+            "low": 9.8,
+            "volume": 1000
+          },
+          {
+            "day": "2026-10-06",
+            "endTime": "2026-10-06",
+            "open": 10,
+            "close": 10,
+            "high": 10.2,
+            "low": 9.8,
+            "volume": 1000
+          },
+          {
+            "day": "2026-10-07",
+            "endTime": "2026-10-07",
+            "open": 10,
+            "close": 10,
+            "high": 10.2,
+            "low": 9.8,
+            "volume": 1000
+          },
+          {
+            "day": "2026-10-08",
+            "endTime": "2026-10-08",
+            "open": 10,
+            "close": 10,
+            "high": 10.2,
+            "low": 9.8,
+            "volume": 1000
+          },
+          {
+            "day": "2026-10-09",
+            "endTime": "2026-10-09",
+            "open": 11,
+            "close": 11,
+            "high": 11.2,
+            "low": 10.8,
+            "volume": 1000
+          }
+        ],
+        "observed": [],
+        "lastClosedAt": "2026-10-09T15:00:00+08:00",
+        "issues": [
+          "calendar_history_unverified"
+        ]
+      }
+    },
+    "loadIssues": {}
+  },
+  "annotations": {},
+  "states": {
+    "day": {
+      "period": "day",
+      "asOf": "2026-10-09T16:00:00+08:00",
+      "kind": "live",
+      "facts": {
+        "close": 11,
+        "ma5": 10.2,
+        "ma10": 10.1,
+        "ma20": 10.05,
+        "bollUpper": 10.485889894354068,
+        "bollMiddle": 10.05,
+        "bollLower": 9.614110105645933,
+        "ma5Delta": 0.1999999999999993,
+        "ma10Delta": 0.09999999999999964,
+        "ma20Delta": 0.05000000000000071,
+        "bollMiddleDelta": 0.05000000000000071,
+        "closeAboveMa5": true,
+        "closeAboveMa20": true,
+        "closeAboveBollMiddle": true,
+        "ma5Distance": 0.07843137254901968,
+        "ma20Distance": 0.09452736318407952,
+        "bandwidth": 0.08674425758289903,
+        "volumeRatio": 1,
+        "body": 0,
+        "upperWick": 0.1999999999999993,
+        "lowerWick": 0.1999999999999993,
+        "range": 0.3999999999999986,
+        "higherHigh": true,
+        "higherLow": true
+      },
+      "bars": [
+        {
+          "day": "2026-09-18",
+          "endTime": "2026-09-18",
+          "open": 10,
+          "close": 10,
+          "high": 10.2,
+          "low": 9.8,
+          "volume": 1000
+        },
+        {
+          "day": "2026-09-19",
+          "endTime": "2026-09-19",
+          "open": 10,
+          "close": 10,
+          "high": 10.2,
+          "low": 9.8,
+          "volume": 1000
+        },
+        {
+          "day": "2026-09-20",
+          "endTime": "2026-09-20",
+          "open": 10,
+          "close": 10,
+          "high": 10.2,
+          "low": 9.8,
+          "volume": 1000
+        },
+        {
+          "day": "2026-09-21",
+          "endTime": "2026-09-21",
+          "open": 10,
+          "close": 10,
+          "high": 10.2,
+          "low": 9.8,
+          "volume": 1000
+        },
+        {
+          "day": "2026-09-22",
+          "endTime": "2026-09-22",
+          "open": 10,
+          "close": 10,
+          "high": 10.2,
+          "low": 9.8,
+          "volume": 1000
+        },
+        {
+          "day": "2026-09-23",
+          "endTime": "2026-09-23",
+          "open": 10,
+          "close": 10,
+          "high": 10.2,
+          "low": 9.8,
+          "volume": 1000
+        },
+        {
+          "day": "2026-09-24",
+          "endTime": "2026-09-24",
+          "open": 10,
+          "close": 10,
+          "high": 10.2,
+          "low": 9.8,
+          "volume": 1000
+        },
+        {
+          "day": "2026-09-25",
+          "endTime": "2026-09-25",
+          "open": 10,
+          "close": 10,
+          "high": 10.2,
+          "low": 9.8,
+          "volume": 1000
+        },
+        {
+          "day": "2026-09-26",
+          "endTime": "2026-09-26",
+          "open": 10,
+          "close": 10,
+          "high": 10.2,
+          "low": 9.8,
+          "volume": 1000
+        },
+        {
+          "day": "2026-09-27",
+          "endTime": "2026-09-27",
+          "open": 10,
+          "close": 10,
+          "high": 10.2,
+          "low": 9.8,
+          "volume": 1000
+        },
+        {
+          "day": "2026-09-28",
+          "endTime": "2026-09-28",
+          "open": 10,
+          "close": 10,
+          "high": 10.2,
+          "low": 9.8,
+          "volume": 1000
+        },
+        {
+          "day": "2026-09-29",
+          "endTime": "2026-09-29",
+          "open": 10,
+          "close": 10,
+          "high": 10.2,
+          "low": 9.8,
+          "volume": 1000
+        },
+        {
+          "day": "2026-09-30",
+          "endTime": "2026-09-30",
+          "open": 10,
+          "close": 10,
+          "high": 10.2,
+          "low": 9.8,
+          "volume": 1000
+        },
+        {
+          "day": "2026-10-01",
+          "endTime": "2026-10-01",
+          "open": 10,
+          "close": 10,
+          "high": 10.2,
+          "low": 9.8,
+          "volume": 1000
+        },
+        {
+          "day": "2026-10-02",
+          "endTime": "2026-10-02",
+          "open": 10,
+          "close": 10,
+          "high": 10.2,
+          "low": 9.8,
+          "volume": 1000
+        },
+        {
+          "day": "2026-10-03",
+          "endTime": "2026-10-03",
+          "open": 10,
+          "close": 10,
+          "high": 10.2,
+          "low": 9.8,
+          "volume": 1000
+        },
+        {
+          "day": "2026-10-04",
+          "endTime": "2026-10-04",
+          "open": 10,
+          "close": 10,
+          "high": 10.2,
+          "low": 9.8,
+          "volume": 1000
+        },
+        {
+          "day": "2026-10-05",
+          "endTime": "2026-10-05",
+          "open": 10,
+          "close": 10,
+          "high": 10.2,
+          "low": 9.8,
+          "volume": 1000
+        },
+        {
+          "day": "2026-10-06",
+          "endTime": "2026-10-06",
+          "open": 10,
+          "close": 10,
+          "high": 10.2,
+          "low": 9.8,
+          "volume": 1000
+        },
+        {
+          "day": "2026-10-07",
+          "endTime": "2026-10-07",
+          "open": 10,
+          "close": 10,
+          "high": 10.2,
+          "low": 9.8,
+          "volume": 1000
+        },
+        {
+          "day": "2026-10-08",
+          "endTime": "2026-10-08",
+          "open": 10,
+          "close": 10,
+          "high": 10.2,
+          "low": 9.8,
+          "volume": 1000
+        },
+        {
+          "day": "2026-10-09",
+          "endTime": "2026-10-09",
+          "open": 11,
+          "close": 11,
+          "high": 11.2,
+          "low": 10.8,
+          "volume": 1000
+        }
+      ],
+      "directionCandidate": "rising",
+      "direction": "rising",
+      "style": "unknown",
+      "confirmed": false,
+      "shockConfirmed": false,
+      "granville": {
+        "anchorBarKey": null,
+        "stage": null,
+        "context": null,
+        "events": [],
+        "contextStages": {
+          "up": {
+            "anchorBarKey": null,
+            "stage": null
+          },
+          "down": {
+            "anchorBarKey": null,
+            "stage": null
+          }
+        }
+      },
+      "issues": [
+        "calendar_history_unverified",
+        "trend_requires_confirmation",
+        "granville_anchor_missing"
+      ]
+    }
+  },
+  "modeCandidates": [
+    {
+      "id": "trend_climb",
+      "period": "day",
+      "status": "insufficient",
+      "missing": [
+        "confirmed_trend",
+        "rise_style_definition",
+        "selected_bottom"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "mirror_retest",
+      "period": "day",
+      "status": "insufficient",
+      "missing": [
+        "selected_line"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "down_rebound",
+      "period": "day",
+      "status": "insufficient",
+      "missing": [
+        "confirmed_background",
+        "falling_background"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "range",
+      "period": "day",
+      "status": "insufficient",
+      "missing": [
+        "confirmed_range_boundaries"
+      ],
+      "evidence": []
+    }
+  ],
+  "provisional": [],
+  "scenarios": [
+    {
+      "id": "base:day:2026-10-09",
+      "symbol": "603533",
+      "period": "day",
+      "originBarKey": "2026-10-09",
+      "kind": "base",
+      "closes": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "condition": "后三根（或第四根）收盘保持原点收盘价",
+      "selectedAt": "2026-10-09T16:00:00+08:00",
+      "evidence": []
+    }
+  ],
+  "inactiveScenarios": [],
+  "references": [
+    {
+      "id": "603533|day|2026-10-09|rolling_close|base:day:2026-10-09|ma5|1",
+      "period": "day",
+      "indicator": "ma5",
+      "method": "rolling_close",
+      "scenarioId": "base:day:2026-10-09",
+      "originBarKey": "2026-10-09",
+      "originEndAt": "2026-10-09T15:00:00+08:00",
+      "asOf": "2026-10-09T16:00:00+08:00",
+      "target": {
+        "horizon": 1,
+        "barKey": "2026-10-12",
+        "endAt": "2026-10-12T15:00:00+08:00",
+        "issues": []
+      },
+      "executionWindow": {
+        "period": "day",
+        "startAt": "2026-10-12T09:30:00+08:00",
+        "endAt": "2026-10-12T15:00:00+08:00"
+      },
+      "value": 10.4,
+      "valid": true,
+      "issues": []
+    },
+    {
+      "id": "603533|day|2026-10-09|rolling_close|base:day:2026-10-09|ma5|2",
+      "period": "day",
+      "indicator": "ma5",
+      "method": "rolling_close",
+      "scenarioId": "base:day:2026-10-09",
+      "originBarKey": "2026-10-09",
+      "originEndAt": "2026-10-09T15:00:00+08:00",
+      "asOf": "2026-10-09T16:00:00+08:00",
+      "target": {
+        "horizon": 2,
+        "barKey": "2026-10-13",
+        "endAt": "2026-10-13T15:00:00+08:00",
+        "issues": []
+      },
+      "executionWindow": {
+        "period": "day",
+        "startAt": "2026-10-12T09:30:00+08:00",
+        "endAt": "2026-10-12T15:00:00+08:00"
+      },
+      "value": 10.6,
+      "valid": true,
+      "issues": []
+    },
+    {
+      "id": "603533|day|2026-10-09|rolling_close|base:day:2026-10-09|ma5|3",
+      "period": "day",
+      "indicator": "ma5",
+      "method": "rolling_close",
+      "scenarioId": "base:day:2026-10-09",
+      "originBarKey": "2026-10-09",
+      "originEndAt": "2026-10-09T15:00:00+08:00",
+      "asOf": "2026-10-09T16:00:00+08:00",
+      "target": {
+        "horizon": 3,
+        "barKey": "2026-10-14",
+        "endAt": "2026-10-14T15:00:00+08:00",
+        "issues": []
+      },
+      "executionWindow": {
+        "period": "day",
+        "startAt": "2026-10-12T09:30:00+08:00",
+        "endAt": "2026-10-12T15:00:00+08:00"
+      },
+      "value": 10.8,
+      "valid": true,
+      "issues": []
+    }
+  ],
+  "mergedLevels": [
+    {
+      "id": "603533|day|2026-10-09|rolling_close|base:day:2026-10-09|ma5|1",
+      "value": 10.4,
+      "references": [
+        {
+          "id": "603533|day|2026-10-09|rolling_close|base:day:2026-10-09|ma5|1",
+          "period": "day",
+          "indicator": "ma5",
+          "method": "rolling_close",
+          "scenarioId": "base:day:2026-10-09",
+          "originBarKey": "2026-10-09",
+          "originEndAt": "2026-10-09T15:00:00+08:00",
+          "asOf": "2026-10-09T16:00:00+08:00",
+          "target": {
+            "horizon": 1,
+            "barKey": "2026-10-12",
+            "endAt": "2026-10-12T15:00:00+08:00",
+            "issues": []
+          },
+          "executionWindow": {
+            "period": "day",
+            "startAt": "2026-10-12T09:30:00+08:00",
+            "endAt": "2026-10-12T15:00:00+08:00"
+          },
+          "value": 10.4,
+          "valid": true,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "603533|day|2026-10-09|rolling_close|base:day:2026-10-09|ma5|2",
+      "value": 10.6,
+      "references": [
+        {
+          "id": "603533|day|2026-10-09|rolling_close|base:day:2026-10-09|ma5|2",
+          "period": "day",
+          "indicator": "ma5",
+          "method": "rolling_close",
+          "scenarioId": "base:day:2026-10-09",
+          "originBarKey": "2026-10-09",
+          "originEndAt": "2026-10-09T15:00:00+08:00",
+          "asOf": "2026-10-09T16:00:00+08:00",
+          "target": {
+            "horizon": 2,
+            "barKey": "2026-10-13",
+            "endAt": "2026-10-13T15:00:00+08:00",
+            "issues": []
+          },
+          "executionWindow": {
+            "period": "day",
+            "startAt": "2026-10-12T09:30:00+08:00",
+            "endAt": "2026-10-12T15:00:00+08:00"
+          },
+          "value": 10.6,
+          "valid": true,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "603533|day|2026-10-09|rolling_close|base:day:2026-10-09|ma5|3",
+      "value": 10.8,
+      "references": [
+        {
+          "id": "603533|day|2026-10-09|rolling_close|base:day:2026-10-09|ma5|3",
+          "period": "day",
+          "indicator": "ma5",
+          "method": "rolling_close",
+          "scenarioId": "base:day:2026-10-09",
+          "originBarKey": "2026-10-09",
+          "originEndAt": "2026-10-09T15:00:00+08:00",
+          "asOf": "2026-10-09T16:00:00+08:00",
+          "target": {
+            "horizon": 3,
+            "barKey": "2026-10-14",
+            "endAt": "2026-10-14T15:00:00+08:00",
+            "issues": []
+          },
+          "executionWindow": {
+            "period": "day",
+            "startAt": "2026-10-12T09:30:00+08:00",
+            "endAt": "2026-10-12T15:00:00+08:00"
+          },
+          "value": 10.8,
+          "valid": true,
+          "issues": []
+        }
+      ]
+    }
+  ],
+  "consolidation": {
+    "definitionVersion": "reference-mean-1pct-v1",
+    "tolerance": 0.01,
+    "aggregation": "arithmetic_mean",
+    "method": "rolling_close",
+    "scenarioIds": {
+      "day": "base:day:2026-10-09"
+    }
+  },
+  "rules": [],
+  "risk": [],
+  "entryBlocked": false,
+  "dailyPriceLadder": {
+    "definitionVersion": "daily-close-levels-v2",
+    "tickSize": 0.01,
+    "selection": {
+      "limit": {
+        "source": "board_default",
+        "ratio": 0.1,
+        "label": "主板常规 ±10%"
+      }
+    },
+    "anchor": {
+      "barKey": "2026-10-09",
+      "endAt": "2026-10-09T15:00:00+08:00",
+      "close": 11
+    },
+    "band": {
+      "lower": 9.9,
+      "upper": 12.1
+    },
+    "up": [],
+    "down": [
+      {
+        "id": "down-1080",
+        "value": 10.8,
+        "changeRatio": -0.01818181818181818,
+        "kind": "merged",
+        "groupIds": [
+          "603533|day|2026-10-09|rolling_close|base:day:2026-10-09|ma5|3"
+        ]
+      },
+      {
+        "id": "down-1060",
+        "value": 10.6,
+        "changeRatio": -0.03636363636363636,
+        "kind": "merged",
+        "groupIds": [
+          "603533|day|2026-10-09|rolling_close|base:day:2026-10-09|ma5|2"
+        ]
+      },
+      {
+        "id": "down-1040",
+        "value": 10.4,
+        "changeRatio": -0.05454545454545454,
+        "kind": "merged",
+        "groupIds": [
+          "603533|day|2026-10-09|rolling_close|base:day:2026-10-09|ma5|1"
+        ]
+      }
+    ],
+    "excludedGroupIds": [],
+    "issues": []
+  }
+}

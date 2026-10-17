@@ -1,0 +1,393 @@
+{
+  "definitionVersion": "ohlc-price-closeness-v1",
+  "symbol": "603533",
+  "name": "掌阅科技",
+  "evaluatedAt": "2026-10-16T15:56:17.815184+00:00",
+  "kind": "retrospective_replay",
+  "forwardEligible": false,
+  "prediction": {
+    "id": "adaptive-close14-day",
+    "createdAt": "2026-10-15T04:19:44.347Z",
+    "cutoff": "2026-10-14T15:00:00+08:00",
+    "periods": [
+      "day"
+    ],
+    "method": "average_delta",
+    "sourceFile": "/tmp/stockcal-adaptive-close14-results.json",
+    "sourceSha256": "2a12b21d68df355339d9d7ee570078ccbd4b5471c4060980c69190c1be8fa245",
+    "priceLadder": {
+      "definitionVersion": "daily-close-levels-v2",
+      "tickSize": 0.01,
+      "selection": {
+        "limit": {
+          "source": "board_default",
+          "ratio": 0.1,
+          "label": "主板常规 ±10%"
+        }
+      },
+      "anchor": {
+        "barKey": "2026-10-14",
+        "endAt": "2026-10-14T15:00:00+08:00",
+        "close": 29.92
+      },
+      "band": {
+        "lower": 26.93,
+        "upper": 32.91
+      },
+      "up": [
+        {
+          "id": "up-3075",
+          "value": 30.75,
+          "changeRatio": 0.027740641711229946,
+          "kind": "merged",
+          "groupIds": [
+            "603533|day|2026-10-14|average_delta||bollUpper|3"
+          ]
+        }
+      ],
+      "down": [
+        {
+          "id": "down-2975",
+          "value": 29.75,
+          "changeRatio": -0.005681818181818182,
+          "kind": "merged",
+          "groupIds": [
+            "603533|day|2026-10-14|average_delta||ma5|3::603533|day|2026-10-14|average_delta||bollUpper|2"
+          ]
+        },
+        {
+          "id": "down-2904",
+          "value": 29.04,
+          "changeRatio": -0.029411764705882353,
+          "kind": "merged",
+          "groupIds": [
+            "603533|day|2026-10-14|average_delta||bollUpper|1"
+          ]
+        },
+        {
+          "id": "down-2865",
+          "value": 28.65,
+          "changeRatio": -0.042446524064171126,
+          "kind": "merged",
+          "groupIds": [
+            "603533|day|2026-10-14|average_delta||ma5|2"
+          ]
+        },
+        {
+          "id": "down-2769",
+          "value": 27.69,
+          "changeRatio": -0.07453208556149733,
+          "kind": "merged",
+          "groupIds": [
+            "603533|day|2026-10-14|average_delta||ma5|1"
+          ]
+        }
+      ],
+      "excludedGroupIds": [
+        "603533|day|2026-10-14|average_delta||bollLower|3",
+        "603533|day|2026-10-14|average_delta||bollLower|2",
+        "603533|day|2026-10-14|average_delta||bollLower|1",
+        "603533|day|2026-10-14|average_delta||bollMiddle|1::603533|day|2026-10-14|average_delta||ma20|1::603533|day|2026-10-14|average_delta||bollMiddle|2::603533|day|2026-10-14|average_delta||ma20|2",
+        "603533|day|2026-10-14|average_delta||bollMiddle|3::603533|day|2026-10-14|average_delta||ma20|3",
+        "603533|day|2026-10-14|average_delta||ma10|1",
+        "603533|day|2026-10-14|average_delta||ma10|2",
+        "603533|day|2026-10-14|average_delta||ma10|3"
+      ],
+      "issues": []
+    }
+  },
+  "actual": {
+    "candle": {
+      "day": "2026-10-15",
+      "endTime": "2026-10-15",
+      "open": 29.51,
+      "close": 29.01,
+      "high": 32.91,
+      "low": 28.95,
+      "volume": 112231100
+    },
+    "source": {
+      "name": "腾讯公开行情·延时",
+      "fetchedAt": "2026-10-16T05:06:02.090Z",
+      "state": "DELAYED",
+      "online": true
+    },
+    "sourceFile": "/tmp/stockcal-603533-2026-10-16T05-06-00-081Z-day-source.json",
+    "sourceSha256": "4ed1ad37756d99395b7cc6e2221759874c23b9ad55c08a40e174a0e2388d72bb"
+  },
+  "criteria": {
+    "threshold": 0.01,
+    "operator": "lt",
+    "denominator": "actual_price",
+    "formula": "abs(predicted_price - actual_price) / actual_price",
+    "exactMatchTick": 0.01,
+    "levelPass": "any_of_open_high_low_close",
+    "consolidationToleranceIsSeparate": true
+  },
+  "levels": [
+    {
+      "levelId": "up-3075",
+      "price": 30.75,
+      "comparisons": {
+        "open": {
+          "actualPrice": 29.51,
+          "relativeError": 0.042019654354456114,
+          "errorPercent": 4.2019654354456115,
+          "withinTolerance": false,
+          "exactMatch": false
+        },
+        "high": {
+          "actualPrice": 32.91,
+          "relativeError": 0.06563354603463993,
+          "errorPercent": 6.563354603463993,
+          "withinTolerance": false,
+          "exactMatch": false
+        },
+        "low": {
+          "actualPrice": 28.95,
+          "relativeError": 0.06217616580310881,
+          "errorPercent": 6.217616580310881,
+          "withinTolerance": false,
+          "exactMatch": false
+        },
+        "close": {
+          "actualPrice": 29.01,
+          "relativeError": 0.05997931747673216,
+          "errorPercent": 5.997931747673216,
+          "withinTolerance": false,
+          "exactMatch": false
+        }
+      },
+      "nearestField": "open",
+      "matchedFields": [],
+      "withinTolerance": false,
+      "exactMatch": false
+    },
+    {
+      "levelId": "down-2975",
+      "price": 29.75,
+      "comparisons": {
+        "open": {
+          "actualPrice": 29.51,
+          "relativeError": 0.008132836326668925,
+          "errorPercent": 0.8132836326668926,
+          "withinTolerance": true,
+          "exactMatch": false
+        },
+        "high": {
+          "actualPrice": 32.91,
+          "relativeError": 0.09601944697660286,
+          "errorPercent": 9.601944697660286,
+          "withinTolerance": false,
+          "exactMatch": false
+        },
+        "low": {
+          "actualPrice": 28.95,
+          "relativeError": 0.027633851468048358,
+          "errorPercent": 2.763385146804836,
+          "withinTolerance": false,
+          "exactMatch": false
+        },
+        "close": {
+          "actualPrice": 29.01,
+          "relativeError": 0.0255084453636677,
+          "errorPercent": 2.55084453636677,
+          "withinTolerance": false,
+          "exactMatch": false
+        }
+      },
+      "nearestField": "open",
+      "matchedFields": [
+        "open"
+      ],
+      "withinTolerance": true,
+      "exactMatch": false
+    },
+    {
+      "levelId": "down-2904",
+      "price": 29.04,
+      "comparisons": {
+        "open": {
+          "actualPrice": 29.51,
+          "relativeError": 0.01592680447305998,
+          "errorPercent": 1.592680447305998,
+          "withinTolerance": false,
+          "exactMatch": false
+        },
+        "high": {
+          "actualPrice": 32.91,
+          "relativeError": 0.11759343664539654,
+          "errorPercent": 11.759343664539653,
+          "withinTolerance": false,
+          "exactMatch": false
+        },
+        "low": {
+          "actualPrice": 28.95,
+          "relativeError": 0.0031088082901554403,
+          "errorPercent": 0.31088082901554404,
+          "withinTolerance": true,
+          "exactMatch": false
+        },
+        "close": {
+          "actualPrice": 29.01,
+          "relativeError": 0.001034126163391934,
+          "errorPercent": 0.10341261633919338,
+          "withinTolerance": true,
+          "exactMatch": false
+        }
+      },
+      "nearestField": "close",
+      "matchedFields": [
+        "low",
+        "close"
+      ],
+      "withinTolerance": true,
+      "exactMatch": false
+    },
+    {
+      "levelId": "down-2865",
+      "price": 28.65,
+      "comparisons": {
+        "open": {
+          "actualPrice": 29.51,
+          "relativeError": 0.029142663503896982,
+          "errorPercent": 2.9142663503896986,
+          "withinTolerance": false,
+          "exactMatch": false
+        },
+        "high": {
+          "actualPrice": 32.91,
+          "relativeError": 0.12944393801276208,
+          "errorPercent": 12.944393801276208,
+          "withinTolerance": false,
+          "exactMatch": false
+        },
+        "low": {
+          "actualPrice": 28.95,
+          "relativeError": 0.010362694300518135,
+          "errorPercent": 1.0362694300518134,
+          "withinTolerance": false,
+          "exactMatch": false
+        },
+        "close": {
+          "actualPrice": 29.01,
+          "relativeError": 0.012409513960703205,
+          "errorPercent": 1.2409513960703207,
+          "withinTolerance": false,
+          "exactMatch": false
+        }
+      },
+      "nearestField": "low",
+      "matchedFields": [],
+      "withinTolerance": false,
+      "exactMatch": false
+    },
+    {
+      "levelId": "down-2769",
+      "price": 27.69,
+      "comparisons": {
+        "open": {
+          "actualPrice": 29.51,
+          "relativeError": 0.06167400881057269,
+          "errorPercent": 6.167400881057269,
+          "withinTolerance": false,
+          "exactMatch": false
+        },
+        "high": {
+          "actualPrice": 32.91,
+          "relativeError": 0.15861440291704648,
+          "errorPercent": 15.86144029170465,
+          "withinTolerance": false,
+          "exactMatch": false
+        },
+        "low": {
+          "actualPrice": 28.95,
+          "relativeError": 0.043523316062176166,
+          "errorPercent": 4.352331606217617,
+          "withinTolerance": false,
+          "exactMatch": false
+        },
+        "close": {
+          "actualPrice": 29.01,
+          "relativeError": 0.045501551189245086,
+          "errorPercent": 4.550155118924509,
+          "withinTolerance": false,
+          "exactMatch": false
+        }
+      },
+      "nearestField": "low",
+      "matchedFields": [],
+      "withinTolerance": false,
+      "exactMatch": false
+    }
+  ],
+  "targets": [
+    {
+      "field": "open",
+      "price": 29.51,
+      "nearestPredictedPrice": 29.75,
+      "actualPrice": 29.51,
+      "relativeError": 0.008132836326668925,
+      "errorPercent": 0.8132836326668926,
+      "withinTolerance": true,
+      "exactMatch": false
+    },
+    {
+      "field": "high",
+      "price": 32.91,
+      "nearestPredictedPrice": 30.75,
+      "actualPrice": 32.91,
+      "relativeError": 0.06563354603463993,
+      "errorPercent": 6.563354603463993,
+      "withinTolerance": false,
+      "exactMatch": false
+    },
+    {
+      "field": "low",
+      "price": 28.95,
+      "nearestPredictedPrice": 29.04,
+      "actualPrice": 28.95,
+      "relativeError": 0.0031088082901554403,
+      "errorPercent": 0.31088082901554404,
+      "withinTolerance": true,
+      "exactMatch": false
+    },
+    {
+      "field": "close",
+      "price": 29.01,
+      "nearestPredictedPrice": 29.04,
+      "actualPrice": 29.01,
+      "relativeError": 0.001034126163391934,
+      "errorPercent": 0.10341261633919338,
+      "withinTolerance": true,
+      "exactMatch": false
+    }
+  ],
+  "summary": {
+    "predictedLevelCount": 5,
+    "closeLevelCount": 2,
+    "closeLevelFraction": 0.4,
+    "exactLevelCount": 0,
+    "actualTargetCount": 4,
+    "coveredTargetCount": 3,
+    "coveredTargetFraction": 0.75
+  },
+  "intradaySupportResistance": {
+    "status": "not_evaluated",
+    "reason": "No intraday path for this target day selected; a daily range cannot prove repeated visits, resistance or support."
+  },
+  "limitations": [
+    "Single retrospectively selected example; its match fractions do not establish general predictive accuracy or profits.",
+    "Daily-only stopping assumption was chosen retrospectively; this is not a plan saved before the target session.",
+    "One predicted level can match multiple OHLC prices; per-level and per-target fractions have different denominators.",
+    "All computed eligible levels are included; no prices were added or removed using the actual outcome.",
+    "Public delayed provider history may be revised; no exchange-authoritative reconciliation was performed."
+  ],
+  "verification": {
+    "actualSourceHashMatches": true,
+    "allPredictionOriginsBeforeTargetDay": true,
+    "allFiveLevelsIncluded": true,
+    "independentFractionArithmeticAgrees": true,
+    "strictOnePercentBoundaryChecked": true
+  }
+}

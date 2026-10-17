@@ -31,7 +31,7 @@ const fixture: KnowledgePackage = {
 const draft = { title: '观察量能', originalText: '突破时观察量能。', interpretation: '', type: 'experience' as const }
 
 beforeEach(() => { localStorage.clear() })
-afterEach(() => { vi.restoreAllMocks() })
+afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals() })
 
 describe('immutable knowledge records', () => {
   it('keeps manually saved text uninterpreted until a person supplies an interpretation', () => {
@@ -99,6 +99,27 @@ describe('immutable knowledge records', () => {
 })
 
 describe('experience workbench', () => {
+  it('opens learning samples and keeps its URL entry while preserving the library tab', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => Response.json({ items: [], nextCursor: null, asOf: '2026-10-16T08:00:00Z' })))
+    const user = userEvent.setup(); render(<ExperienceWorkbench data={fixture} />)
+    await user.click(screen.getByRole('tab', { name: '学习样本' }))
+    expect(await screen.findByRole('heading', { name: '学习样本库' })).toBeInTheDocument()
+    expect(window.location.search).toContain('view=samples')
+    await user.click(screen.getByRole('tab', { name: /经验库/ }))
+    expect(screen.getByRole('button', { name: '查看记录：五日线底线' })).toBeInTheDocument()
+    vi.unstubAllGlobals()
+  })
+  it('opens the source tagging view and returns to the existing knowledge records', async () => {
+    const user = userEvent.setup()
+    render(<ExperienceWorkbench data={fixture} />)
+    await user.click(screen.getByRole('tab', { name: '笔记标签' }))
+    // The actual lazy-loaded source catalog can take longer to import under a parallel suite.
+    expect(await screen.findByRole('heading', { name: '笔记标签目录' }, { timeout: 5_000 })).toBeInTheDocument()
+    expect(window.location.search).toContain('view=notes')
+    await user.click(screen.getByRole('tab', { name: /经验库/ }))
+    expect(screen.getByRole('button', { name: '查看记录：五日线底线' })).toBeInTheDocument()
+  })
+
   it('saves a manual entry, edits a new version and makes the old text inspectable after reload', async () => {
     const user = userEvent.setup()
     const view = render(<ExperienceWorkbench data={fixture} />)

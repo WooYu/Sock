@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 1,
+  "definitionVersion": "note-to-calculation-candidates-v1",
+  "status": "research_candidate",
+  "items": [
+    {
+      "id": "recent_delta_on_large_change",
+      "name": "差值变化较大时改用最近一根增量",
+      "role": "method_selection",
+      "currentImplementation": "last_delta is available as an explicit method; no automatic threshold selects it",
+      "candidateAction": "原点前两段指标增量差异足够大时，比较最近一根增量与平均增量",
+      "formula": null,
+      "needsDefinition": [
+        "“差值较大”的绝对或相对阈值与分母",
+        "是否对各MA/BOLL独立判断",
+        "日线和小时线阈值是否不同"
+      ],
+      "evidence": [
+        {
+          "file": "参数计算注意点（20251023-晚评）.md",
+          "sourceHash": "253db2347019bcce8e0405b1e9173a37b4af78f007e181002bb2530a62fc8cbf",
+          "startLine": 15,
+          "endLine": 15,
+          "quote": "1. 如果2天差值较大，使用最近一天的，作为均值"
+        }
+      ],
+      "status": "research_candidate",
+      "predictionEffect": "untested",
+      "activation": "inactive",
+      "formulaNote": "No formula is inferred from an underdefined sentence; candidate actions are research proposals, not literal source formulas."
+    },
+    {
+      "id": "accelerating_indicator_delta",
+      "name": "增量递增时研究跟随递增的外推",
+      "role": "parameter_formula",
+      "currentImplementation": "average_delta and last_delta use a constant future increment",
+      "candidateAction": "提出单独的递增增量候选公式，与既有恒定增量对照",
+      "formula": null,
+      "needsDefinition": [
+        "如何估计递增幅度",
+        "递增持续几根以及何时衰减",
+        "是否需要限制外推幅度与BOLL顺序"
+      ],
+      "evidence": [
+        {
+          "file": "参数计算注意点（20251023-晚评）.md",
+          "sourceHash": "253db2347019bcce8e0405b1e9173a37b4af78f007e181002bb2530a62fc8cbf",
+          "startLine": 18,
+          "endLine": 18,
+          "quote": "4. 差值有递增规律时，跟着递增"
+        }
+      ],
+      "status": "research_candidate",
+      "predictionEffect": "untested",
+      "activation": "inactive",
+      "formulaNote": "No formula is inferred from an underdefined sentence; candidate actions are research proposals, not literal source formulas."
+    },
+    {
+      "id": "granville_stage_adjustment",
+      "name": "按已确认葛阶段研究参数调整",
+      "role": "granville_stage",
+      "currentImplementation": "manual Granville event state is recorded; no new price adjustment invented",
+      "candidateAction": "在人工确认起点与阶段的样本中，分别检验各阶段误差和可解释的调整",
+      "formula": null,
+      "needsDefinition": [
+        "各阶段调整方向和数值",
+        "循环与重置如何影响外推",
+        "避免将葛阶段与BOLL一期二期三期混为一项"
+      ],
+      "evidence": [
+        {
+          "file": "参数计算注意点（20251023-晚评）.md",
+          "sourceHash": "253db2347019bcce8e0405b1e9173a37b4af78f007e181002bb2530a62fc8cbf",
+          "startLine": 19,
+          "endLine": 19,
+          "quote": "5. 根据葛兰碧第几天适当增减"
+        }
+      ],
+      "status": "research_candidate",
+      "predictionEffect": "untested",
+      "activation": "inactive",
+      "formulaNote": "No formula is inferred from an underdefined sentence; candidate actions are research proposals, not literal source formulas."
+    },
+    {
+      "id": "ma5_to_ma10_reference_selection",
+      "name": "五日线下和突破后的参考均线选择",
+      "role": "method_selection",
+      "currentImplementation": "both MA5 and MA10 references exist; current ladder shows the selected method all levels",
+      "candidateAction": "先按位置区分MA5与MA10参考，检验是否减少无关价位而漏报关键点",
+      "formula": null,
+      "needsDefinition": [
+        "位置按盘中现价还是完整收盘",
+        "突破确认采用触及、站上还是收盘确认",
+        "只选显示重点还是改变正式计算集合"
+      ],
+      "evidence": [
+        {
+          "file": "参数计算_1.md",
+          "sourceHash": "923452521d5124fbb7ca5d2101ecf0f44fb14670257f8100866ed486f71d289e",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "5日线以下时算5日线，突破5日线后算10日线。"
+        }
+      ],
+      "status": "research_candidate",
+      "predictionEffect": "untested",
+      "activation": "inactive",
+      "formulaNote": "No formula is inferred from an underdefined sentence; candidate actions are research proposals, not literal source formulas."
+    },
+    {
+      "id": "decline_strength_horizon",
+      "name": "下跌强弱与今日至大后天MA5参考对应",
+      "role": "support_resistance",
+      "currentImplementation": "future 1/2/3 references are retained; current MA5 exists in facts",
+      "candidateAction": "保留原文强/中/弱/很弱与相应MA5的映射，在预先定义强弱后再检验",
+      "formula": null,
+      "needsDefinition": [
+        "强、中、弱、很弱的量化判据",
+        "上涨“相反”的准确映射",
+        "来源中“今天/明天”按何种计算时点对齐"
+      ],
+      "evidence": [
+        {
+          "file": "参数计算_1.md",
+          "sourceHash": "923452521d5124fbb7ca5d2101ecf0f44fb14670257f8100866ed486f71d289e",
+          "startLine": 10,
+          "endLine": 10,
+          "quote": "下跌过程：强（今天5日线）、中（明天5日线）、弱（后天5日线）、很弱（大后天5日线）"
+        },
+        {
+          "file": "参数计算_1.md",
+          "sourceHash": "923452521d5124fbb7ca5d2101ecf0f44fb14670257f8100866ed486f71d289e",
+          "startLine": 12,
+          "endLine": 12,
+          "quote": "上涨过程是相反的，机构不会好心打今天5日线"
+        }
+      ],
+      "status": "research_candidate",
+      "predictionEffect": "untested",
+      "activation": "inactive",
+      "formulaNote": "No formula is inferred from an underdefined sentence; candidate actions are research proposals, not literal source formulas."
+    },
+    {
+      "id": "climb_next_upper_as_high",
+      "name": "已确认攀升时把未来上轨列为高点参考假设",
+      "role": "mode",
+      "currentImplementation": "future BOLL upper is computed but no guaranteed high-price role is assigned",
+      "candidateAction": "在事先确认攀升的样本中，单独比较预先计算的未来上轨与当前执行窗口最高价",
+      "formula": null,
+      "needsDefinition": [
+        "攀升与贴上轨的可复核条件",
+        "未来第几根上轨用于哪个当前窗口",
+        "盘前固定上轨与盘中动态重算需分别留版本"
+      ],
+      "evidence": [
+        {
+          "file": "20250910-锂电池按照计划进行（前三天后三天算参数）.md",
+          "sourceHash": "71daf097ea7080147052b9b2eec447d577443bc3d51ef3a90bb88fee63871f2b",
+          "startLine": 14,
+          "endLine": 14,
+          "quote": "他每天的高点都是明天的布林线上轨"
+        }
+      ],
+      "status": "research_candidate",
+      "predictionEffect": "untested",
+      "activation": "inactive",
+      "formulaNote": "No formula is inferred from an underdefined sentence; candidate actions are research proposals, not literal source formulas."
+    },
+    {
+      "id": "explicit_intraday_period_references",
+      "name": "30与60分钟参数作为按需核对来源",
+      "role": "parameter_formula",
+      "currentImplementation": "day first, sequential optional hour/30m only as required by the user",
+      "candidateAction": "对确需核对的案例保留具体周期和未来根数来源，比较补一个子周期是否改善关键价覆盖",
+      "formula": null,
+      "needsDefinition": [
+        "“预估后面2次”的具体计算方法",
+        "原文长期位置校准的具体公式"
+      ],
+      "evidence": [
+        {
+          "file": "参数计算.md",
+          "sourceHash": "5236f14e7c9eee49c0c40bae494a5e69dd498863c44587bb5bed614fa85364aa",
+          "startLine": 14,
+          "endLine": 14,
+          "quote": "30分、60分线预估后面2次的参数，作为基准参数"
+        }
+      ],
+      "status": "research_candidate",
+      "predictionEffect": "untested",
+      "activation": "inactive",
+      "formulaNote": "No formula is inferred from an underdefined sentence; candidate actions are research proposals, not literal source formulas."
+    },
+    {
+      "id": "historical_merge_definition_override",
+      "name": "旧合并阈值与数量按现行用户要求单独标注",
+      "role": "validation",
+      "currentImplementation": "1% complete-link arithmetic-mean groups; all actual valid levels, no fixed quota",
+      "candidateAction": "在学习样本中保留原文千分之一/大概六个的来源差异，正式评估使用用户当前口径",
+      "formula": null,
+      "needsDefinition": [],
+      "evidence": [
+        {
+          "file": "参数计算.md",
+          "sourceHash": "5236f14e7c9eee49c0c40bae494a5e69dd498863c44587bb5bed614fa85364aa",
+          "startLine": 16,
+          "endLine": 16,
+          "quote": "通过上面日月季年的位置校准，偏差在千分之一的都可以合并，找出支撑位、目标位、压力位（大概6个参数）"
+        }
+      ],
+      "conflict": "原文千分之一及大概6个参数与用户现行1%整组分组、给出全部实际结果不同",
+      "status": "research_candidate",
+      "predictionEffect": "untested",
+      "activation": "inactive",
+      "formulaNote": "No formula is inferred from an underdefined sentence; candidate actions are research proposals, not literal source formulas."
+    }
+  ],
+  "note": "这些是连接原文、计算选择与验证的研究入口；没有启用新规则，没有将标签当作准确度证明。"
+}

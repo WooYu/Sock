@@ -1,0 +1,39 @@
+{
+  "definitionVersion": "direction-conditioned-method-v1",
+  "id": "603533-daily-direction-method-candidate-001",
+  "version": 1,
+  "createdAt": "2026-10-16T16:07:11.734150+00:00",
+  "status": "research_candidate",
+  "proposedBy": "Codex AI review of training segment; deterministic method ranking from predeclared protocol",
+  "trainingSha256": "7804c7cc642753353436d7d41c2d92c6588e3cfdcdba0b84f8754de17de0239d",
+  "sourceSha256": "4ed1ad37756d99395b7cc6e2221759874c23b9ad55c08a40e174a0e2388d72bb",
+  "trainingStart": "2026-07-16",
+  "trainingEnd": "2026-09-09",
+  "defaultMethod": "last_delta",
+  "methodByDirection": {
+    "unknown": "average_delta",
+    "rising": "rolling_close",
+    "falling": "average_delta"
+  },
+  "minimumSamplesPerDirection": 8,
+  "conditionMeaning": "Only the pre-origin MA/BOLL directionCandidate from current code; never a human-confirmed trend or Granville stage.",
+  "priceFormulaChanges": false,
+  "formulaMeaning": "Select an existing formula before target data; preserve its exact formulas, 1% grouping and full valid ladder.",
+  "trainingMetrics": {
+    "meanDailyPrecision": 0.36971230158730156,
+    "meanDailyCoverage": 0.65,
+    "selectionScore": 0.47133489643631976,
+    "samples": 40
+  },
+  "prediction": "The conditional choice may improve out-of-period OHLC closeness versus a fixed method; must be validated without revising the rule.",
+  "frozenBeforeValidation": true,
+  "validationNotUsedForChoice": true,
+  "activation": "disabled; research-only; no change to live defaults",
+  "limitations": [
+    "Only 9 unknown, 18 rising and 13 falling training examples.",
+    "Regime labels are existing automatic candidates, not confirmed patterns.",
+    "The unknown group did not beat the single previous-close benchmark on the selection score.",
+    "A conditional method selector is a candidate calculation rule, not a newly proven price formula.",
+    "One earlier known validation case and other previously inspected days prevent claiming strict blind validation."
+  ]
+}

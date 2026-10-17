@@ -1,0 +1,5095 @@
+{
+  "schemaVersion": 1,
+  "batchId": 3,
+  "status": "ai_candidate",
+  "records": [
+    {
+      "file": "04-position-sizing.md",
+      "sourceHash": "ff098791ebbe324bf40601389a9531487aec969da3ab70638267113bfbe10e38",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 1
+      },
+      "summary": "以单股持仓市值不超过总资产20%限制集中风险，未规定估值时点或调仓频率。",
+      "roles": [
+        "risk"
+      ],
+      "tags": [
+        "kind.principle",
+        "topic.position",
+        "purpose.risk",
+        "timeframe.unknown",
+        "scope.unknown",
+        "data.portfolio",
+        "computability.direct"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.principle",
+          "startLine": 1,
+          "endLine": 1,
+          "quote": "单只股票持仓市值不超过总资产的 20%，避免持仓过度集中导致单一风险暴露过大。",
+          "reason": "账户集中度纪律。"
+        },
+        {
+          "tagId": "topic.position",
+          "startLine": 1,
+          "endLine": 1,
+          "quote": "单只股票持仓市值不超过总资产的 20%，避免持仓过度集中导致单一风险暴露过大。",
+          "reason": "比较持仓和总资产。"
+        },
+        {
+          "tagId": "purpose.risk",
+          "startLine": 1,
+          "endLine": 1,
+          "quote": "单只股票持仓市值不超过总资产的 20%，避免持仓过度集中导致单一风险暴露过大。",
+          "reason": "避免单一风险暴露。"
+        },
+        {
+          "tagId": "timeframe.unknown",
+          "startLine": 1,
+          "endLine": 1,
+          "quote": "单只股票持仓市值不超过总资产的 20%，避免持仓过度集中导致单一风险暴露过大。",
+          "reason": "完整正文未明确观察和调仓周期。"
+        },
+        {
+          "tagId": "scope.unknown",
+          "startLine": 1,
+          "endLine": 1,
+          "quote": "单只股票持仓市值不超过总资产的 20%，避免持仓过度集中导致单一风险暴露过大。",
+          "reason": "完整正文虽有股票泛称或元数据，但没有限定A股市场及明确适用情境；scope.stock在现有词表标为A股，故保守待补。"
+        },
+        {
+          "tagId": "data.portfolio",
+          "startLine": 1,
+          "endLine": 1,
+          "quote": "单只股票持仓市值不超过总资产的 20%，避免持仓过度集中导致单一风险暴露过大。",
+          "reason": "需同一时点账户资产及持仓。"
+        },
+        {
+          "tagId": "computability.direct",
+          "startLine": 1,
+          "endLine": 1,
+          "quote": "单只股票持仓市值不超过总资产的 20%，避免持仓过度集中导致单一风险暴露过大。",
+          "reason": "给定同一时点两个账户值可直接比较；不证明收益。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "单股持仓比例上限",
+          "kind": "risk",
+          "formula": "single_stock_market_value / total_assets <= 0.20",
+          "periods": [
+            "unknown"
+          ],
+          "inputs": [
+            "单股持仓市值",
+            "同一估值时点总资产（正值）"
+          ],
+          "applicability": [
+            "只检查集中度。"
+          ],
+          "invalidation": [
+            "总资产为零或估值时点不一致无法使用。"
+          ],
+          "gaps": [
+            "未定义总资产是否扣融资负债、估值时点、超限后的动作。"
+          ],
+          "computability": "direct",
+          "evidence": [
+            {
+              "startLine": 1,
+              "endLine": 1,
+              "quote": "单只股票持仓市值不超过总资产的 20%，避免持仓过度集中导致单一风险暴露过大。"
+            }
+          ]
+        }
+      ],
+      "gaps": [
+        "不能从集中度纪律推导价格或最优仓位。"
+      ],
+      "attachments": {
+        "present": false,
+        "status": "none",
+        "note": "正文未列附件或外部链接；未据提及的图形推断数据。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "05-breakout-buy.md",
+      "sourceHash": "94edf9eeb016fa24d5a1a93a599a3fb9c56cc88fd1def00d41a270928b3d1be4",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 1
+      },
+      "summary": "把放量突破前期箱体或平台高点视为趋势启动和跟进的经验条件。",
+      "roles": [
+        "trend",
+        "mode"
+      ],
+      "tags": [
+        "kind.experience",
+        "topic.volume",
+        "purpose.trend",
+        "timeframe.unknown",
+        "scope.rising",
+        "data.unknown",
+        "computability.definition"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "startLine": 1,
+          "endLine": 1,
+          "quote": "当股价放量突破前期箱体或整理平台的高点时，是趋势启动信号，可跟进买入。",
+          "reason": "突破买入经验。"
+        },
+        {
+          "tagId": "topic.volume",
+          "startLine": 1,
+          "endLine": 1,
+          "quote": "当股价放量突破前期箱体或整理平台的高点时，是趋势启动信号，可跟进买入。",
+          "reason": "突破要求放量。"
+        },
+        {
+          "tagId": "purpose.trend",
+          "startLine": 1,
+          "endLine": 1,
+          "quote": "当股价放量突破前期箱体或整理平台的高点时，是趋势启动信号，可跟进买入。",
+          "reason": "直接称为趋势启动信号。"
+        },
+        {
+          "tagId": "timeframe.unknown",
+          "startLine": 1,
+          "endLine": 1,
+          "quote": "当股价放量突破前期箱体或整理平台的高点时，是趋势启动信号，可跟进买入。",
+          "reason": "全文未指定行情周期。"
+        },
+        {
+          "tagId": "scope.rising",
+          "startLine": 1,
+          "endLine": 1,
+          "quote": "当股价放量突破前期箱体或整理平台的高点时，是趋势启动信号，可跟进买入。",
+          "reason": "向上突破情境。"
+        },
+        {
+          "tagId": "data.unknown",
+          "startLine": 1,
+          "endLine": 1,
+          "quote": "当股价放量突破前期箱体或整理平台的高点时，是趋势启动信号，可跟进买入。",
+          "reason": "需量价但全文未指定采样周期和数据口径。"
+        },
+        {
+          "tagId": "computability.definition",
+          "startLine": 1,
+          "endLine": 1,
+          "quote": "当股价放量突破前期箱体或整理平台的高点时，是趋势启动信号，可跟进买入。",
+          "reason": "前期、箱体、放量和突破均缺阈值。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "放量突破平台高点",
+          "kind": "condition",
+          "formula": null,
+          "periods": [
+            "unknown"
+          ],
+          "inputs": [
+            "价格与成交量",
+            "前期箱体或平台高点"
+          ],
+          "applicability": [
+            "先确认箱体或平台再判放量突破。"
+          ],
+          "invalidation": [
+            "不放量或未突破不满足本条件。"
+          ],
+          "gaps": [
+            "放量倍数、窗口、平台识别、盘中或收盘确认及失败止损均未定义。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 1,
+              "endLine": 1,
+              "quote": "当股价放量突破前期箱体或整理平台的高点时，是趋势启动信号，可跟进买入。"
+            }
+          ]
+        }
+      ],
+      "gaps": [],
+      "attachments": {
+        "present": false,
+        "status": "none",
+        "note": "正文未列附件或外部链接；未据提及的图形推断数据。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "20220913_收盘_关于长线下跌趋势个股的底部博弈问题.md",
+      "sourceHash": "9debff5268a08faae43d7998d725ca2d68f7e5e65d295f29cb6172ad0b45c7f9",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 22
+      },
+      "summary": "用高低开后的回落与反弹观察多空强弱；正文没有长期底部计算方法。",
+      "roles": [
+        "trend",
+        "risk",
+        "context"
+      ],
+      "tags": [
+        "kind.experience",
+        "topic.market",
+        "purpose.trend",
+        "timeframe.intraday",
+        "scope.falling",
+        "data.intraday",
+        "data.attachment",
+        "computability.definition"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "startLine": 14,
+          "endLine": 14,
+          "quote": "低开之后必有反弹啊。但是如果是低开之后没有反弹，就像滑滑梯一样要滑下去了。",
+          "reason": "以反弹预期解释强弱。"
+        },
+        {
+          "tagId": "topic.market",
+          "startLine": 14,
+          "endLine": 14,
+          "quote": "我们外面大涨，我们高开，一个姓。外面大跌，那就我们一个姓低开。",
+          "reason": "比较外部市场涨跌与本地开盘。"
+        },
+        {
+          "tagId": "purpose.trend",
+          "startLine": 18,
+          "endLine": 18,
+          "quote": "如果说高开低走，一路下跌，那这个问题就比较大了。啊，就显示信心问题。",
+          "reason": "持续下跌被解释为信心问题。"
+        },
+        {
+          "tagId": "timeframe.intraday",
+          "startLine": 14,
+          "endLine": 14,
+          "quote": "高开跟他相反，他有获利的一个出逃。形成高开低走，低走之后，看好的人会逢低进场。",
+          "reason": "观察开盘后路径，无固定分钟级别。"
+        },
+        {
+          "tagId": "scope.falling",
+          "startLine": 18,
+          "endLine": 18,
+          "quote": "那么同样道理，低开。低走。没反弹。那这个问题也很大。",
+          "reason": "持续下跌情境。"
+        },
+        {
+          "tagId": "data.intraday",
+          "startLine": 14,
+          "endLine": 14,
+          "quote": "高开跟他相反，他有获利的一个出逃。形成高开低走，低走之后，看好的人会逢低进场。",
+          "reason": "确认先低走后反弹需盘中路径。"
+        },
+        {
+          "tagId": "data.attachment",
+          "startLine": 10,
+          "endLine": 10,
+          "quote": "[EverBUDS 20220914\\_083203\\_APPrecording.mp3](../_attachments/EverBUDS 20220914_083203_APPrecording.mp3)",
+          "reason": "音频未核对。"
+        },
+        {
+          "tagId": "computability.definition",
+          "startLine": 18,
+          "endLine": 18,
+          "quote": "跑了以后我们来看看啊买盘是多是少？如果买盘跟不上，继续看空的人的数量。那这个问题就比较大。",
+          "reason": "无反弹或买盘不足无量化边界。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "预期反弹缺失提示弱势",
+          "kind": "risk",
+          "formula": null,
+          "periods": [
+            "unknown"
+          ],
+          "inputs": [
+            "开盘相对前收的高低关系",
+            "开盘后价格路径和买盘证据"
+          ],
+          "applicability": [
+            "高低开后观察是否出现反弹；无价格公式。"
+          ],
+          "invalidation": [
+            "出现反弹不属此处无反弹情境，但不证明反转。"
+          ],
+          "gaps": [
+            "无观察截止时刻、反弹幅度与持续时间、买盘阈值；“必有”属于经验说法。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 14,
+              "endLine": 14,
+              "quote": "低开之后必有反弹啊。但是如果是低开之后没有反弹，就像滑滑梯一样要滑下去了。"
+            },
+            {
+              "startLine": 18,
+              "endLine": 18,
+              "quote": "如果说高开低走，一路下跌，那这个问题就比较大了。啊，就显示信心问题。"
+            }
+          ]
+        }
+      ],
+      "gaps": [
+        "音频未核对；“一个姓”“主力的太子”等转录歧义保留。"
+      ],
+      "attachments": {
+        "present": true,
+        "status": "not_inspected",
+        "note": "仅阅读文字；所列图片、音视频或外部链接未实际检查。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "20220915_午盘_三分法分析板块冷热.md",
+      "sourceHash": "8f2e396d35d87763cc37e26dc29ca6f767e66eb33b30c8ecac8bcfd660438ce9",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 57
+      },
+      "summary": "以葛兰碧分段、均线支撑压力互换和布林形态比较板块冷热，提醒破五反抽失败及横盘后开口向下的风险。",
+      "roles": [
+        "granville_stage",
+        "support_resistance",
+        "trend",
+        "method_selection",
+        "risk",
+        "validation"
+      ],
+      "tags": [
+        "kind.experience",
+        "topic.granville",
+        "topic.boll",
+        "topic.market",
+        "purpose.screen",
+        "purpose.levels",
+        "timeframe.daily",
+        "timeframe.intraday",
+        "scope.falling",
+        "data.sector",
+        "data.intraday",
+        "data.attachment",
+        "computability.definition"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "startLine": 17,
+          "endLine": 17,
+          "quote": "支撑位和压力位互换。之前在摸线的时候，五日线、十日线、二十线是支撑位，破位反抽的时候，五日线、十日线、二日线将成为压力位。",
+          "reason": "用盘面个例解释均线角色。"
+        },
+        {
+          "tagId": "topic.granville",
+          "startLine": 13,
+          "endLine": 13,
+          "quote": "昨天低开就形成了格兰蒂第二天的一个下跌，同时收阳线以后低开高走，形成了格兰蒂第一天的一个上涨。",
+          "reason": "涨跌段可在一天衔接重数。"
+        },
+        {
+          "tagId": "topic.boll",
+          "startLine": 45,
+          "endLine": 45,
+          "quote": "我们用一个布林线来当一把尺子去量，当温度计去测，知道哪儿是热点，哪儿是冰点，不要去冰点里面去坐着蹲着是吧。",
+          "reason": "以布林线测冷热。"
+        },
+        {
+          "tagId": "topic.market",
+          "startLine": 53,
+          "endLine": 53,
+          "quote": "要么就不做，要做一定要选好我们墨线二期、三期的个股和板块来做好了。",
+          "reason": "选择板块与个股。"
+        },
+        {
+          "tagId": "purpose.screen",
+          "startLine": 53,
+          "endLine": 53,
+          "quote": "要么就不做，要做一定要选好我们墨线二期、三期的个股和板块来做好了。",
+          "reason": "明确优先二三期个股板块。"
+        },
+        {
+          "tagId": "purpose.levels",
+          "startLine": 17,
+          "endLine": 17,
+          "quote": "支撑位和压力位互换。之前在摸线的时候，五日线、十日线、二十线是支撑位，破位反抽的时候，五日线、十日线、二日线将成为压力位。",
+          "reason": "均线支撑压力互换。"
+        },
+        {
+          "tagId": "timeframe.daily",
+          "startLine": 13,
+          "endLine": 13,
+          "quote": "九月九号是格兰蒂的第一天，九月十三号是格兰比的第二天，第二天又是新的阴线下跌的第一天。",
+          "reason": "按交易日及五日线计数。"
+        },
+        {
+          "tagId": "timeframe.intraday",
+          "startLine": 25,
+          "endLine": 25,
+          "quote": "先看六十分钟，再看三十分钟，三十分钟看十五十五看不出来，看五分钟五分钟看不上，看一分钟都可以",
+          "reason": "正文列60分钟到更小级别。"
+        },
+        {
+          "tagId": "scope.falling",
+          "startLine": 29,
+          "endLine": 29,
+          "quote": "虽然不是每一次都能够成功地杀出断头，但是断头都是从破位五日线的第一天开始",
+          "reason": "破位反抽下跌情境。"
+        },
+        {
+          "tagId": "data.sector",
+          "startLine": 45,
+          "endLine": 45,
+          "quote": "看到没有？看一看房地产板块的指数，银行板块指数、券商板块指数，大家可以去看一看。",
+          "reason": "直接观察板块指数。"
+        },
+        {
+          "tagId": "data.intraday",
+          "startLine": 21,
+          "endLine": 21,
+          "quote": "当时在高开的时候它是三二五四。",
+          "reason": "均线盘中变动必须有时点。"
+        },
+        {
+          "tagId": "data.attachment",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "[EverBUDS 20220915\\_122614\\_APPrecording.mp3](../_attachments/EverBUDS 20220915_122614_APPrecording.mp3)",
+          "reason": "音频未核对。"
+        },
+        {
+          "tagId": "computability.definition",
+          "startLine": 25,
+          "endLine": 25,
+          "quote": "而这个寻求的方法它就是我们的摸线。",
+          "reason": "摸线与跨级别选取缺算法。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "上涨下跌段衔接重数",
+          "kind": "pattern",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "开收和盘中路径"
+          ],
+          "applicability": [
+            "分别识别上涨和下跌段，不只按自然日单一编号。"
+          ],
+          "invalidation": [
+            "不满足所述低开高走时不能沿用个例编号。"
+          ],
+          "gaps": [
+            "拆段门槛、起止及交易日重数规则未定义。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 13,
+              "endLine": 13,
+              "quote": "昨天低开就形成了格兰蒂第二天的一个下跌，同时收阳线以后低开高走，形成了格兰蒂第一天的一个上涨。"
+            }
+          ]
+        },
+        {
+          "name": "均线支撑压力随阶段互换",
+          "kind": "condition",
+          "formula": null,
+          "periods": [
+            "day",
+            "60m",
+            "30m"
+          ],
+          "inputs": [
+            "相关周期均线及其当时值",
+            "价格与阶段"
+          ],
+          "applicability": [
+            "先区分摸线支撑和破位反抽。"
+          ],
+          "invalidation": [
+            "突破或阶段改变时不能沿用旧压力。"
+          ],
+          "gaps": [
+            "“二日线”“二十键”转录不清；无近线容差和外推法。",
+            "3253.23是稍后值，3254是口述开盘时指标值，不能混时点宣称精度。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 17,
+              "endLine": 17,
+              "quote": "支撑位和压力位互换。之前在摸线的时候，五日线、十日线、二十线是支撑位，破位反抽的时候，五日线、十日线、二日线将成为压力位。"
+            },
+            {
+              "startLine": 21,
+              "endLine": 21,
+              "quote": "当时在高开的时候它是三二五四。"
+            }
+          ]
+        },
+        {
+          "name": "破五次日反抽失败风险",
+          "kind": "risk",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "MA5",
+            "首日破位和次日反抽路径"
+          ],
+          "applicability": [
+            "先破五，次日反抽失败。"
+          ],
+          "invalidation": [
+            "不是每次反抽都断头；收复不属于失败条件。"
+          ],
+          "gaps": [
+            "破位、反抽失败和断头跌幅均无阈值。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 29,
+              "endLine": 29,
+              "quote": "虽然不是每一次都能够成功地杀出断头，但是断头都是从破位五日线的第一天开始，第二天反抽五日线失败会形成恐慌性的、习惯性的这种杀断头。"
+            }
+          ]
+        },
+        {
+          "name": "布林形态区分二三期和开口下行",
+          "kind": "condition",
+          "formula": null,
+          "periods": [
+            "unknown"
+          ],
+          "inputs": [
+            "板块和个股的布林形态"
+          ],
+          "applicability": [
+            "先确认反转阶段或横盘后下行再筛选。"
+          ],
+          "invalidation": [
+            "横盘后开口往下不属于偏好的反转。"
+          ],
+          "gaps": [
+            "无布林参数、二三期边界、冷热分值或开口斜率。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 37,
+              "endLine": 37,
+              "quote": "它经过三期的死亡，然后震荡筑底震荡做完以后，它没有选择继续反转，而是选择了开口往下。"
+            },
+            {
+              "startLine": 53,
+              "endLine": 53,
+              "quote": "要么就不做，要做一定要选好我们墨线二期、三期的个股和板块来做好了。"
+            }
+          ]
+        }
+      ],
+      "gaps": [
+        "音频和被描述的图形未核对；点位与消息解释为口述。"
+      ],
+      "attachments": {
+        "present": true,
+        "status": "not_inspected",
+        "note": "仅阅读文字；所列图片、音视频或外部链接未实际检查。"
+      },
+      "userRuleConflicts": [
+        "第25行从60分钟逐级下钻到1分钟；当前要求先日线，不清楚才下钻，明确后最多核对一个下级周期，不能把原文当强制全算。"
+      ]
+    },
+    {
+      "file": "20220916_早盘_关键点和目标位心态调整.md",
+      "sourceHash": "d1461dc6382d08281f6e8114b413b0ba3d83f02e656808d8ea62e49fea2e170a",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 19
+      },
+      "summary": "记录房地产板块关键点10.5、目标位10.8及卖出后涨停案例，比较减半与全部卖出的事后收益感受。",
+      "roles": [
+        "support_resistance",
+        "risk",
+        "context"
+      ],
+      "tags": [
+        "kind.case",
+        "topic.market",
+        "purpose.levels",
+        "timeframe.unknown",
+        "scope.unknown",
+        "data.sector",
+        "computability.reference"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.case",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "案例：房地产板块摸线半年线附近，关键点卖出，却涨停了。",
+          "reason": "明确标注案例。"
+        },
+        {
+          "tagId": "topic.market",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "案例：房地产板块摸线半年线附近，关键点卖出，却涨停了。",
+          "reason": "房地产板块案例。"
+        },
+        {
+          "tagId": "purpose.levels",
+          "startLine": 11,
+          "endLine": 13,
+          "quote": "10.5关键点\n\n10.8目标位",
+          "reason": "只列关键点目标位。"
+        },
+        {
+          "tagId": "timeframe.unknown",
+          "startLine": 15,
+          "endLine": 17,
+          "quote": "15 10.5\\_10.6\n\n30 10.80\\_10.9",
+          "reason": "全文15、30未标分钟或其他单位，不能据数字猜周期。"
+        },
+        {
+          "tagId": "scope.unknown",
+          "startLine": 5,
+          "endLine": 5,
+          "quote": "  - 股票",
+          "reason": "完整正文虽有股票泛称或元数据，但没有限定A股市场及明确适用情境；scope.stock在现有词表标为A股，故保守待补。"
+        },
+        {
+          "tagId": "data.sector",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "案例：房地产板块摸线半年线附近，关键点卖出，却涨停了。",
+          "reason": "需板块行情。"
+        },
+        {
+          "tagId": "computability.reference",
+          "startLine": 11,
+          "endLine": 17,
+          "quote": "10.5关键点\n\n10.8目标位\n\n15 10.5\\_10.6\n\n30 10.80\\_10.9",
+          "reason": "只列点位，缺计算过程。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "关键点减半与全卖的个例比较",
+          "kind": "context",
+          "formula": null,
+          "periods": [
+            "unknown"
+          ],
+          "inputs": [
+            "关键点10.5",
+            "目标位10.8",
+            "未给出的成交持仓记录"
+          ],
+          "applicability": [
+            "仅为该例退出选择的事后比较。"
+          ],
+          "invalidation": [
+            "不应推广成所有关键点清仓。"
+          ],
+          "gaps": [
+            "15与30的周期未知；无成本、数量、费用或点位生成式。"
+          ],
+          "computability": "reference",
+          "evidence": [
+            {
+              "startLine": 9,
+              "endLine": 9,
+              "quote": "案例：房地产板块摸线半年线附近，关键点卖出，却涨停了。"
+            },
+            {
+              "startLine": 19,
+              "endLine": 19,
+              "quote": "关键点减半停车看一看，实际收益不如直接关键点全部卖出。"
+            }
+          ]
+        }
+      ],
+      "gaps": [
+        "10.5_10.6和10.80_10.9未说明区间含义、时点和单位。",
+        "卖出后涨停与“全卖收益更高”的比较在原文并列；缺成本、后续交易和比较区间，保留其表面张力，不替作者消除。"
+      ],
+      "attachments": {
+        "present": false,
+        "status": "none",
+        "note": "正文未列附件或外部链接；未据提及的图形推断数据。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "20221111-早盘-复合型摸线照镜子算参数.md",
+      "sourceHash": "ec7a97a48a66bd5cf7ed3105d96bb064f6c46948dd473be0544d25957efd6f58",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 41
+      },
+      "summary": "讨论60分钟布林上轨、开口后第2至4天出高的可能性和首小时关键点，主张盘中与日线互证，但参数算式及多处转录不清。",
+      "roles": [
+        "parameter_formula",
+        "support_resistance",
+        "method_selection",
+        "validation",
+        "risk"
+      ],
+      "tags": [
+        "kind.experience",
+        "topic.boll",
+        "topic.mirror",
+        "purpose.forecast",
+        "timeframe.intraday",
+        "timeframe.daily",
+        "scope.unknown",
+        "data.intraday",
+        "data.attachment",
+        "computability.definition"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "startLine": 25,
+          "endLine": 25,
+          "quote": "有人说开口四天下四天出高啊，四天出发点，不是啊，234都可能出高点。",
+          "reason": "口述研究方法而无完整算式。"
+        },
+        {
+          "tagId": "topic.boll",
+          "startLine": 29,
+          "endLine": 29,
+          "quote": "破位了。错位了，我们用我们以上轨作为进口，对吧？",
+          "reason": "破位后以上轨参照。"
+        },
+        {
+          "tagId": "topic.mirror",
+          "startLine": 21,
+          "endLine": 21,
+          "quote": "哎照镜子呢这个就是110分钟线上，他反复呈现以布林线上轨，所以照镜子的一个走。",
+          "reason": "明确提照镜子，但级别转录有歧义。"
+        },
+        {
+          "tagId": "purpose.forecast",
+          "startLine": 25,
+          "endLine": 25,
+          "quote": "我先说这个参数怎么算出来的？啊？就是60分钟，对吧？参数为中心啊。",
+          "reason": "参数从60分钟寻找。"
+        },
+        {
+          "tagId": "timeframe.intraday",
+          "startLine": 29,
+          "endLine": 29,
+          "quote": "60分钟，这个第四天就开始拉拉稀了，拉垮了拉夸的情况下。",
+          "reason": "明确60分钟。"
+        },
+        {
+          "tagId": "timeframe.daily",
+          "startLine": 37,
+          "endLine": 37,
+          "quote": "因为盘中我们还会以各种的技术去分析日线和分时线的一个杀毒佐证，一个应用我们学到的知识，去反复去论证的一个过程",
+          "reason": "日线与分时互证。"
+        },
+        {
+          "tagId": "scope.unknown",
+          "startLine": 21,
+          "endLine": 21,
+          "quote": "比如说既然说是29，怎么可能是29的半年线是固定死的这个东西啊。",
+          "reason": "全文证券及适用阶段转录不清，无法定范围。"
+        },
+        {
+          "tagId": "data.intraday",
+          "startLine": 33,
+          "endLine": 33,
+          "quote": "比如说未来我们今天有这个上轨。你一个小时一个小时的来看。",
+          "reason": "逐小时观察上轨。"
+        },
+        {
+          "tagId": "data.attachment",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "[EverBUDS 20221111\\_130206\\_APPrecording.mp3](../_attachments/EverBUDS 20221111_130206_APPrecording.mp3)",
+          "reason": "音频未核对。"
+        },
+        {
+          "tagId": "computability.definition",
+          "startLine": 37,
+          "endLine": 37,
+          "quote": "我说的也不保证百分之百。",
+          "reason": "不保证且需盘中论证，没有执行判据。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "开口高点可能在第2至4天",
+          "kind": "pattern",
+          "formula": null,
+          "periods": [
+            "day",
+            "60m"
+          ],
+          "inputs": [
+            "布林开口起点与随后路径"
+          ],
+          "applicability": [
+            "先确认本段的开口形态。"
+          ],
+          "invalidation": [
+            "不能改成必定第4天出高。"
+          ],
+          "gaps": [
+            "60分钟语境中“天”是交易日还是K线根数不清；无开口和出高判据。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 25,
+              "endLine": 25,
+              "quote": "有人说开口四天下四天出高啊，四天出发点，不是啊，234都可能出高点。"
+            }
+          ]
+        },
+        {
+          "name": "上轨照镜子与首小时关键点",
+          "kind": "condition",
+          "formula": null,
+          "periods": [
+            "60m"
+          ],
+          "inputs": [
+            "60分钟上轨与逐小时价格",
+            "日线形态佐证"
+          ],
+          "applicability": [
+            "先确认破位、上轨参照及反抽。"
+          ],
+          "invalidation": [
+            "参照或阶段未确认不能套用。"
+          ],
+          "gaps": [
+            "无镜像窗口、上轨外推式、布林参数和未完成小时K输入假设。",
+            "“110分钟”“160分钟”“507线上”“29.43/24.9”等转录歧义不能强制还原。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 29,
+              "endLine": 29,
+              "quote": "破位了。错位了，我们用我们以上轨作为进口，对吧？"
+            },
+            {
+              "startLine": 33,
+              "endLine": 33,
+              "quote": "比如说未来我们今天有这个上轨。你一个小时一个小时的来看。啊一个小时一个小时来看，特别是第一个小时，也就是我们今天的主要的一个关键点。"
+            }
+          ]
+        },
+        {
+          "name": "日线分时互证并非效果确认",
+          "kind": "context",
+          "formula": null,
+          "periods": [
+            "day",
+            "60m"
+          ],
+          "inputs": [
+            "日线和盘中分时"
+          ],
+          "applicability": [
+            "原文要求研究中复核，未给效果验证。"
+          ],
+          "invalidation": [],
+          "gaps": [
+            "无验证价差、容差和样本。"
+          ],
+          "computability": "reference",
+          "evidence": [
+            {
+              "startLine": 37,
+              "endLine": 37,
+              "quote": "我说的也不保证百分之百。因为盘中我们还会以各种的技术去分析日线和分时线的一个杀毒佐证，一个应用我们学到的知识，去反复去论证的一个过程"
+            }
+          ]
+        }
+      ],
+      "gaps": [
+        "音频未核对；第41行拼接11月10日收盘开头，日期和转录拼接需核查。",
+        "除权相关语句及“半年线固定死”均含糊，不能据此确定复权规则。"
+      ],
+      "attachments": {
+        "present": true,
+        "status": "not_inspected",
+        "note": "仅阅读文字；所列图片、音视频或外部链接未实际检查。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "20221117-早餐-今天回档五日线-原始文件.md",
+      "sourceHash": "72bdf53dfe378e85976ec4e71ae4efebe0060fb84f3d923e99277cceb266ee74",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 9
+      },
+      "summary": "只有股票元数据和一个视频链接，未提供可读的回档五日线论述。",
+      "roles": [
+        "context"
+      ],
+      "tags": [
+        "kind.context",
+        "topic.unknown",
+        "purpose.unknown",
+        "timeframe.unknown",
+        "scope.unknown",
+        "data.attachment",
+        "computability.reference"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.context",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "[video1669088150945.mp4](../_attachments/video1669088150945.mp4)",
+          "reason": "正文只有媒体入口。"
+        },
+        {
+          "tagId": "topic.unknown",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "[video1669088150945.mp4](../_attachments/video1669088150945.mp4)",
+          "reason": "完整正文未说明视频内容，不能从文件名补主题。"
+        },
+        {
+          "tagId": "purpose.unknown",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "[video1669088150945.mp4](../_attachments/video1669088150945.mp4)",
+          "reason": "媒体未核对，没有可读用途说明。"
+        },
+        {
+          "tagId": "timeframe.unknown",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "[video1669088150945.mp4](../_attachments/video1669088150945.mp4)",
+          "reason": "正文没有分析周期。"
+        },
+        {
+          "tagId": "scope.unknown",
+          "startLine": 5,
+          "endLine": 5,
+          "quote": "  - 股票",
+          "reason": "完整正文虽有股票泛称或元数据，但没有限定A股市场及明确适用情境；scope.stock在现有词表标为A股，故保守待补。"
+        },
+        {
+          "tagId": "data.attachment",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "[video1669088150945.mp4](../_attachments/video1669088150945.mp4)",
+          "reason": "视频附件为唯一正文。"
+        },
+        {
+          "tagId": "computability.reference",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "[video1669088150945.mp4](../_attachments/video1669088150945.mp4)",
+          "reason": "无文字条件或公式。"
+        }
+      ],
+      "claims": [],
+      "gaps": [
+        "媒体未核对，全文没有转录；不能沿用其他同名笔记内容。"
+      ],
+      "attachments": {
+        "present": true,
+        "status": "not_inspected",
+        "note": "仅阅读文字；所列图片、音视频或外部链接未实际检查。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "20221221-早盘-海龟+二转三等于博弈.md",
+      "sourceHash": "faded143d20db2e74634b46fc53061ff80459ae2862f95e7bd03de516143937e",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 9
+      },
+      "summary": "仅有标注“海龟+二转三等于博弈”的音频链接，没有方法正文。",
+      "roles": [
+        "context"
+      ],
+      "tags": [
+        "kind.context",
+        "topic.turtle",
+        "topic.phase",
+        "purpose.unknown",
+        "timeframe.unknown",
+        "scope.unknown",
+        "data.attachment",
+        "computability.reference"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.context",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "[1221早餐：海龟+二转三等于博弈.m4a](../_attachments/1221早餐：海龟+二转三等于博弈.m4a)",
+          "reason": "资料为音频入口。"
+        },
+        {
+          "tagId": "topic.turtle",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "[1221早餐：海龟+二转三等于博弈.m4a](../_attachments/1221早餐：海龟+二转三等于博弈.m4a)",
+          "reason": "链接文字标注海龟，只作主题候选，不推断方法。"
+        },
+        {
+          "tagId": "topic.phase",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "[1221早餐：海龟+二转三等于博弈.m4a](../_attachments/1221早餐：海龟+二转三等于博弈.m4a)",
+          "reason": "链接文字标注二转三，内容未检查。"
+        },
+        {
+          "tagId": "purpose.unknown",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "[1221早餐：海龟+二转三等于博弈.m4a](../_attachments/1221早餐：海龟+二转三等于博弈.m4a)",
+          "reason": "全文无可读操作或计算目的。"
+        },
+        {
+          "tagId": "timeframe.unknown",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "[1221早餐：海龟+二转三等于博弈.m4a](../_attachments/1221早餐：海龟+二转三等于博弈.m4a)",
+          "reason": "全文未明确周期。"
+        },
+        {
+          "tagId": "scope.unknown",
+          "startLine": 5,
+          "endLine": 5,
+          "quote": "  - 股票",
+          "reason": "完整正文虽有股票泛称或元数据，但没有限定A股市场及明确适用情境；scope.stock在现有词表标为A股，故保守待补。"
+        },
+        {
+          "tagId": "data.attachment",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "[1221早餐：海龟+二转三等于博弈.m4a](../_attachments/1221早餐：海龟+二转三等于博弈.m4a)",
+          "reason": "仅音频。"
+        },
+        {
+          "tagId": "computability.reference",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "[1221早餐：海龟+二转三等于博弈.m4a](../_attachments/1221早餐：海龟+二转三等于博弈.m4a)",
+          "reason": "无规则正文，不能执行。"
+        }
+      ],
+      "claims": [],
+      "gaps": [
+        "音频未核对；海龟、二转三和博弈的关系无文字定义。"
+      ],
+      "attachments": {
+        "present": true,
+        "status": "not_inspected",
+        "note": "仅阅读文字；所列图片、音视频或外部链接未实际检查。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "20221223 早餐 葛兰碧的时候顺便看看开口几天.md",
+      "sourceHash": "98099cab3a338b77b5e63803ded38f2a5dc0d954b8dd39d02943aace9b210930",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 9
+      },
+      "summary": "仅有“葛兰碧的时候顺便看看开口几天”的音频入口，未给计数或开口条件。",
+      "roles": [
+        "context"
+      ],
+      "tags": [
+        "kind.context",
+        "topic.granville",
+        "purpose.unknown",
+        "timeframe.unknown",
+        "scope.unknown",
+        "data.attachment",
+        "computability.reference"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.context",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "[1223早餐：葛兰碧的时候顺便看看开口几天.m4a](../_attachments/1223早餐：葛兰碧的时候顺便看看开口几天.m4a)",
+          "reason": "只提供音频资料入口。"
+        },
+        {
+          "tagId": "topic.granville",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "[1223早餐：葛兰碧的时候顺便看看开口几天.m4a](../_attachments/1223早餐：葛兰碧的时候顺便看看开口几天.m4a)",
+          "reason": "仅链接名称说明主题，未核对规则。"
+        },
+        {
+          "tagId": "purpose.unknown",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "[1223早餐：葛兰碧的时候顺便看看开口几天.m4a](../_attachments/1223早餐：葛兰碧的时候顺便看看开口几天.m4a)",
+          "reason": "正文未明确计算或操作用途。"
+        },
+        {
+          "tagId": "timeframe.unknown",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "[1223早餐：葛兰碧的时候顺便看看开口几天.m4a](../_attachments/1223早餐：葛兰碧的时候顺便看看开口几天.m4a)",
+          "reason": "标题中的天未定义K线级别或计数方法。"
+        },
+        {
+          "tagId": "scope.unknown",
+          "startLine": 5,
+          "endLine": 5,
+          "quote": "  - 股票",
+          "reason": "完整正文虽有股票泛称或元数据，但没有限定A股市场及明确适用情境；scope.stock在现有词表标为A股，故保守待补。"
+        },
+        {
+          "tagId": "data.attachment",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "[1223早餐：葛兰碧的时候顺便看看开口几天.m4a](../_attachments/1223早餐：葛兰碧的时候顺便看看开口几天.m4a)",
+          "reason": "唯一正文为音频。"
+        },
+        {
+          "tagId": "computability.reference",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "[1223早餐：葛兰碧的时候顺便看看开口几天.m4a](../_attachments/1223早餐：葛兰碧的时候顺便看看开口几天.m4a)",
+          "reason": "缺少可读规则和参数。"
+        }
+      ],
+      "claims": [],
+      "gaps": [
+        "音频未核对；不能据链接名称生成葛兰碧或开口天数公式。"
+      ],
+      "attachments": {
+        "present": true,
+        "status": "not_inspected",
+        "note": "仅阅读文字；所列图片、音视频或外部链接未实际检查。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "20250903-三期震荡确立.md",
+      "sourceHash": "7cd7098ebb407ea87cc2566591ed0144cac2c0942b5d22f0b720b18bdd99b3f7",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 8
+      },
+      "summary": "用布林上轨外、上轨内、横盘、下轨开口下行区分强弱；三期横盘以上轨为潜在压力，反弹需收回五日线，葛兰碧交易以两天或两天半为节奏。",
+      "roles": [
+        "trend",
+        "mode",
+        "method_selection",
+        "granville_stage",
+        "support_resistance",
+        "risk"
+      ],
+      "tags": [
+        "kind.experience",
+        "topic.boll",
+        "topic.phase",
+        "topic.granville",
+        "purpose.trend",
+        "purpose.levels",
+        "timeframe.daily",
+        "scope.sideways",
+        "data.daily",
+        "computability.definition"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "一等股票外面走叫飙升啊。",
+          "reason": "按图形划分强弱的口述经验。"
+        },
+        {
+          "tagId": "topic.boll",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "是在布林线外面啊，就是那个黄色线，布林线在上轨的外面啊。",
+          "reason": "位置以布林线上轨内外为参照。"
+        },
+        {
+          "tagId": "topic.phase",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "三七震荡之前是有一个突然死的，是一个衔接，是从妖股变为横盘走的，一个衔接就是突然死啊。",
+          "reason": "详述三期横盘与主升后变化。"
+        },
+        {
+          "tagId": "topic.granville",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "什么是葛一啊？五日线起步是葛一，我这个理论也讲了，实战也讲了啊。",
+          "reason": "五日线起步与葛兰碧计数。"
+        },
+        {
+          "tagId": "purpose.trend",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "咱们只是用来判断它的一个最强最弱啊。",
+          "reason": "不同形态用于判断强弱。"
+        },
+        {
+          "tagId": "purpose.levels",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "它的布林线上轨啊，就是它的核心的三星横盘震荡的一个顶部。",
+          "reason": "横盘顶以布林上轨作为参照。"
+        },
+        {
+          "tagId": "timeframe.daily",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "什么是葛一啊？五日线起步是葛一，我这个理论也讲了，实战也讲了啊。",
+          "reason": "使用五日线和交易日节奏。"
+        },
+        {
+          "tagId": "scope.sideways",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "但是我一直在有一个震荡区间的一个横盘。",
+          "reason": "核心为三期横盘情境。"
+        },
+        {
+          "tagId": "data.daily",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "什么是葛一啊？五日线起步是葛一，我这个理论也讲了，实战也讲了啊。",
+          "reason": "需日级均线和布林形态，实际K线未提供。"
+        },
+        {
+          "tagId": "computability.definition",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "外面里面，外面里面，可能说也有交替的情况出现啊",
+          "reason": "开口内外、横盘和阶段转换尚无机械定义。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "布林内外横下位置的强弱分类",
+          "kind": "pattern",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "价格相对布林上下轨的位置",
+            "轨道开口方向"
+          ],
+          "applicability": [
+            "先辨明开口飙升、轨内贴行、横盘及下轨开口下行，允许内外交替。"
+          ],
+          "invalidation": [
+            "形态可内外交替，不是永久等级。"
+          ],
+          "gaps": [
+            "缺布林期数倍数、贴轨距离、开口斜率、持续K数和状态转换确认。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 8,
+              "endLine": 8,
+              "quote": "一等股票外面走叫飙升啊。"
+            },
+            {
+              "startLine": 8,
+              "endLine": 8,
+              "quote": "是贴着布林线上轨，但是不开口。"
+            },
+            {
+              "startLine": 8,
+              "endLine": 8,
+              "quote": "四类股票最差的啊，是往下走，我们就不要去做了啊。"
+            }
+          ]
+        },
+        {
+          "name": "三期横盘的上轨压力与失败回落",
+          "kind": "condition",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "先前开口后回落的形态",
+            "布林上下轨和价格"
+          ],
+          "applicability": [
+            "先有开口行情回落、带宽收窄、下轨不向下开口的横盘背景。"
+          ],
+          "invalidation": [
+            "上轨真实开口突破或下轨向下开口时须重判；原文承认突破可能。"
+          ],
+          "gaps": [
+            "“80%”是未给样本的经验断言，不能作验证概率；无横盘窗口或上下轨接近容差。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 8,
+              "endLine": 8,
+              "quote": "它的布林线上轨啊，就是它的核心的三星横盘震荡的一个顶部。"
+            },
+            {
+              "startLine": 8,
+              "endLine": 8,
+              "quote": "我一般的来说，80%的情况上轨是过不去的"
+            },
+            {
+              "startLine": 8,
+              "endLine": 8,
+              "quote": "同样道理，暴跌只要下轨不开口，那么它就是三七横盘震荡。"
+            }
+          ]
+        },
+        {
+          "name": "反弹需收回五日线及模式限制",
+          "kind": "condition",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "价格和五日线",
+            "开口形态"
+          ],
+          "applicability": [
+            "用收回五日线确认所述反弹，并保留原文开口模式偏好。"
+          ],
+          "invalidation": [
+            "重新破位后按原文须重判。"
+          ],
+          "gaps": [
+            "盘中或收盘突破、连续确认、开口和止损条件无定义；反弹确认不等于所有横盘获准交易。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 8,
+              "endLine": 8,
+              "quote": "只要不升回五日线，那都是下跌趋势，下轨来了也不管用啊，一定要突破五日线才能确立反弹来了。"
+            },
+            {
+              "startLine": 8,
+              "endLine": 8,
+              "quote": "除了开口模式可以做，其他任何模式不要去做啊。"
+            }
+          ]
+        },
+        {
+          "name": "葛一从五日线起步并以两天节奏操作",
+          "kind": "pattern",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "五日线起步和盘中上涨段",
+            "已确认的葛兰碧编号"
+          ],
+          "applicability": [
+            "先确认阶段，采用两天或两天半的原文操作偏好。"
+          ],
+          "invalidation": [
+            "卖出后还可能继续涨，不能将卖点理解为未来绝不创新高。"
+          ],
+          "gaps": [
+            "起步阈值、2.5定义、拆段、首次日期未给；26.5等个例没有完整计算式。",
+            "“50天没有破位”“三七/三星”等保留转录歧义，不直接改成MA5或无歧义阶段。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 8,
+              "endLine": 8,
+              "quote": "什么是葛一啊？五日线起步是葛一，我这个理论也讲了，实战也讲了啊。"
+            },
+            {
+              "startLine": 8,
+              "endLine": 8,
+              "quote": "那么大家在做的过程中一定要保持两天或者是两天半的一个操作策略"
+            },
+            {
+              "startLine": 8,
+              "endLine": 8,
+              "quote": "葛二和葛二点五都是主涨主卖"
+            }
+          ]
+        }
+      ],
+      "gaps": [
+        "文字未附实际行情或图；文中微博图未核对。",
+        "原文“绝大多数成功”等没有样本；上述分类和节奏均未验证预测效果。"
+      ],
+      "attachments": {
+        "present": false,
+        "status": "none",
+        "note": "正文未列附件或外部链接；未据提及的图形推断数据。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "20250905-晚小白的挣钱法 海龟战法千股跌停出现.md",
+      "sourceHash": "7699104c27466813803da94d317ae25f26cc4a12e8f6a47e3cd677aae7dc82f1",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 852
+      },
+      "summary": "把股灾式急跌中逆势翻红或拉升的个股、板块称为“海龟”，优先板块与沿五日线开口的强势形态；结合葛兰碧拆K和两天节奏，承认海龟也可能失败。",
+      "roles": [
+        "method_selection",
+        "mode",
+        "trend",
+        "granville_stage",
+        "risk",
+        "context"
+      ],
+      "tags": [
+        "kind.experience",
+        "topic.turtle",
+        "topic.market",
+        "topic.ma5",
+        "topic.boll",
+        "topic.granville",
+        "purpose.screen",
+        "purpose.trend",
+        "timeframe.daily",
+        "timeframe.intraday",
+        "scope.falling",
+        "scope.rising",
+        "data.daily",
+        "data.intraday",
+        "data.sector",
+        "computability.definition"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "startLine": 664,
+          "endLine": 664,
+          "quote": "这个没有技术，就是从经验那么做几次成功了，你就知道该怎么做了。",
+          "reason": "正文自称经验方法。"
+        },
+        {
+          "tagId": "topic.turtle",
+          "startLine": 44,
+          "endLine": 44,
+          "quote": "什么叫做**海龟战法**呢？",
+          "reason": "明确讲海龟战法，非同名外部书籍规则。"
+        },
+        {
+          "tagId": "topic.market",
+          "startLine": 396,
+          "endLine": 396,
+          "quote": "一个板块涨得比较好啊，这里面好多个股长得好，那就是这个板块是海龟啊，板块海龟要优于个股。",
+          "reason": "区分板块与单股海龟。"
+        },
+        {
+          "tagId": "topic.ma5",
+          "startLine": 138,
+          "endLine": 138,
+          "quote": "它是沿着五日线开口往上的单边上涨线，这就是我们要找的主力，",
+          "reason": "优先沿五日线向上的形态。"
+        },
+        {
+          "tagId": "topic.boll",
+          "startLine": 672,
+          "endLine": 672,
+          "quote": "那么妖股啊是我们的毕生的追求目标，就是布林线和均线，一个是五日线，一个是布林线上轨开口啊，这是我们选的啊。",
+          "reason": "选形态还要求布林上轨开口。"
+        },
+        {
+          "tagId": "topic.granville",
+          "startLine": 542,
+          "endLine": 542,
+          "quote": "我顺便讲了啊，这个概念也很重要，拆开线啊，那么9月3号大涨，9月4号早上大涨，是不是完整的两根大阳线的k线两根。",
+          "reason": "讲同一交易日内上涨段拆K。"
+        },
+        {
+          "tagId": "purpose.screen",
+          "startLine": 620,
+          "endLine": 620,
+          "quote": "这个和什么参数，什么东西没有关系，它就是一个选股的技巧。",
+          "reason": "明确称为选股技巧而非参数公式。"
+        },
+        {
+          "tagId": "purpose.trend",
+          "startLine": 138,
+          "endLine": 138,
+          "quote": "它是沿着五日线开口往上的单边上涨线，这就是我们要找的主力，",
+          "reason": "以五日线开口单边上涨作为做多迹象。"
+        },
+        {
+          "tagId": "timeframe.daily",
+          "startLine": 192,
+          "endLine": 192,
+          "quote": "**大盘连续涨了一个多月，就是五日线没破过啊，连续上涨，七月份吧，六月底，七月初啊，七月一个月就一直上涨，**",
+          "reason": "以日线五日均线和连续交易日观察。"
+        },
+        {
+          "tagId": "timeframe.intraday",
+          "startLine": 548,
+          "endLine": 548,
+          "quote": "所以葛二早上涨了72块五毛四之后，那么随后半小时以后就开始逐步下跌了。",
+          "reason": "用盘中半小时路径解释阶段切换。"
+        },
+        {
+          "tagId": "scope.falling",
+          "startLine": 756,
+          "endLine": 756,
+          "quote": "**一定要大盘，不是说大盘下跌就行，大盘每天都有下跌，那行嘛，那出的不是海龟，大盘一定要是什么这种股灾式的急跌。**",
+          "reason": "大盘股灾式急跌是前提。"
+        },
+        {
+          "tagId": "scope.rising",
+          "startLine": 376,
+          "endLine": 376,
+          "quote": "不断拉升，逆势拉升，逆势拉升。",
+          "reason": "个股逆势上涨。"
+        },
+        {
+          "tagId": "data.daily",
+          "startLine": 672,
+          "endLine": 672,
+          "quote": "那么妖股啊是我们的毕生的追求目标，就是布林线和均线，一个是五日线，一个是布林线上轨开口啊，这是我们选的啊。",
+          "reason": "需要五日线及布林线上轨。"
+        },
+        {
+          "tagId": "data.intraday",
+          "startLine": 548,
+          "endLine": 548,
+          "quote": "所以葛二早上涨了72块五毛四之后，那么随后半小时以后就开始逐步下跌了。",
+          "reason": "判断盘中涨跌段和高位维持需盘中数据。"
+        },
+        {
+          "tagId": "data.sector",
+          "startLine": 396,
+          "endLine": 396,
+          "quote": "一个板块涨得比较好啊，这里面好多个股长得好，那就是这个板块是海龟啊，板块海龟要优于个股。",
+          "reason": "判断板块整体上涨需板块与成分数据。"
+        },
+        {
+          "tagId": "computability.definition",
+          "startLine": 756,
+          "endLine": 756,
+          "quote": "**一定要大盘，不是说大盘下跌就行，大盘每天都有下跌，那行嘛，那出的不是海龟，大盘一定要是什么这种股灾式的急跌。**",
+          "reason": "急跌强度和翻红保持均无量化判据。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "海龟筛选限于恐慌式急跌",
+          "kind": "condition",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "大盘及广泛个股的同步跌幅和下跌速度",
+            "个股同时点涨跌及盘中持续性"
+          ],
+          "applicability": [
+            "须是股灾式急跌和市场普遍恐慌，候选逆势翻红或拉升；不是普通两分钟下跌。"
+          ],
+          "invalidation": [
+            "普通微跌或候选同步转弱不符合原文的强烈背景；仍可能选错。"
+          ],
+          "gaps": [
+            "“股灾式”“急”“恐慌”没有窗口、跌速、市场宽度、最低涨幅或维持时长阈值；3%/5%和千股跌停只是例子。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 756,
+              "endLine": 756,
+              "quote": "**一定要大盘，不是说大盘下跌就行，大盘每天都有下跌，那行嘛，那出的不是海龟，大盘一定要是什么这种股灾式的急跌。**"
+            },
+            {
+              "startLine": 762,
+              "endLine": 762,
+              "quote": "它能够泛红，大家都跌绿了，它能泛红，"
+            },
+            {
+              "startLine": 772,
+              "endLine": 772,
+              "quote": "你不要说，哎呀，股市早上啪跌个两分钟哦，我去找海龟。"
+            }
+          ]
+        },
+        {
+          "name": "板块海龟优于孤立个股的经验偏好",
+          "kind": "condition",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "板块及成分股同时点表现",
+            "个股逆势表现"
+          ],
+          "applicability": [
+            "多个同板块个股共同上涨时作为板块海龟候选。"
+          ],
+          "invalidation": [
+            "只有孤立个股上涨不能直接推成整个板块强。"
+          ],
+          "gaps": [
+            "“好多个股”“比较好”和板块优于个股没有数量、权重、涨幅阈值或样本；ETF涨停不证明每个成分都涨停。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 392,
+              "endLine": 396,
+              "quote": "那么这是海龟个股，我们还有海龟板块，也就是说，如果它是一个个股上涨，比如说那天暴跌，只有一个个股上涨，那么它就是个股的海龟。\n\n如果是一个集团，\n\n一个板块涨得比较好啊，这里面好多个股长得好，那就是这个板块是海龟啊，板块海龟要优于个股。"
+            }
+          ]
+        },
+        {
+          "name": "海龟内优先MA5向上和上轨开口形态",
+          "kind": "pattern",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "个股MA5",
+            "布林上轨与价格相对位置",
+            "已确认海龟背景"
+          ],
+          "applicability": [
+            "在海龟候选中再选择原文所谓一线、五日线向上及上轨开口的形态。"
+          ],
+          "invalidation": [
+            "不符合向上形态不能直接标为最强等级。"
+          ],
+          "gaps": [
+            "五日线向上、贴线、一线、开口和龙头的机器定义缺失；没有目标价公式。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 138,
+              "endLine": 138,
+              "quote": "它是沿着五日线开口往上的单边上涨线，这就是我们要找的主力，"
+            },
+            {
+              "startLine": 646,
+              "endLine": 646,
+              "quote": "所以我们就是参与海龟海龟板块，海龟个股我们尽量也要做一线的个股，做五日线往上走的个股，做它的波段也有可能我们选的可能会不太好。"
+            },
+            {
+              "startLine": 672,
+              "endLine": 672,
+              "quote": "那么妖股啊是我们的毕生的追求目标，就是布林线和均线，一个是五日线，一个是布林线上轨开口啊，这是我们选的啊。"
+            }
+          ]
+        },
+        {
+          "name": "盘中拆K重数与两天节奏",
+          "kind": "pattern",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "前日上涨和次日盘中先涨后跌路径",
+            "葛兰碧起步和阶段"
+          ],
+          "applicability": [
+            "正文将次日早上涨视作第二上涨段，其后下跌提前对应下一下跌段；同时偏好一次做两天。"
+          ],
+          "invalidation": [
+            "实际价格路径不同不能硬套该拆分；原文并未保证每次阶段节奏成功。"
+          ],
+          "gaps": [
+            "“明天跌”和“第三天大涨大跌”的说法在邻近段落交错；阶段是自然日还是盘中拆分需明确。",
+            "无拆K的时间、涨跌幅、实体或编号重置门槛；不能从阶段口诀补价格式。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 426,
+              "endLine": 426,
+              "quote": "第三个知识点就是我们一个月只做一次，一次组织做两天，所以我们大多数时候可以休息。"
+            },
+            {
+              "startLine": 542,
+              "endLine": 542,
+              "quote": "我顺便讲了啊，这个概念也很重要，拆开线啊，那么9月3号大涨，9月4号早上大涨，是不是完整的两根大阳线的k线两根。"
+            },
+            {
+              "startLine": 546,
+              "endLine": 546,
+              "quote": "因为连续两天收大阳线，那么明天肯定要跌，如果明天要跌，那我们葛二就得卖。"
+            },
+            {
+              "startLine": 558,
+              "endLine": 558,
+              "quote": "应该逢低买进，博第三天的大涨大跌日。"
+            }
+          ]
+        },
+        {
+          "name": "海龟也可能未扛住且无百分百保证",
+          "kind": "risk",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "MA5和候选后续价格",
+            "市场后续表现"
+          ],
+          "applicability": [
+            "海龟标签不保证继续上涨；五日线尚好时的调整也需区分阶段。"
+          ],
+          "invalidation": [
+            "海龟未扛住或形态破坏时不能继续以标签保证收益。"
+          ],
+          "gaps": [
+            "没有失败判据、止损幅度或退出成交规则；第382行“50线”不能直接改为五日线。"
+          ],
+          "computability": "reference",
+          "evidence": [
+            {
+              "startLine": 676,
+              "endLine": 676,
+              "quote": "当我们突破五日线大涨之后，面临着隔二调整或隔三调整，五日线还完好的情况下，是吧？"
+            },
+            {
+              "startLine": 694,
+              "endLine": 698,
+              "quote": "万一我这个海龟最后没扛住了，有没有油是吧？\n\n海龟没有扛住的也有。\n\n他说只要大盘点个火星子啊，大多数能涨回来，万一帮说万一有涨不回来有是吧？"
+            },
+            {
+              "startLine": 726,
+              "endLine": 726,
+              "quote": "所以我不能说保证方法啊，一定让你百分之百的去成功，但是我方法也是尽心尽责的来讲给大家听。"
+            }
+          ]
+        }
+      ],
+      "gaps": [
+        "关于机构计划书、筹码和收益的叙述中，第290行明确说故事可能虚构，不能当作真实机构输入或受检证据。",
+        "90%/10%、翻倍收益和成功例子无样本核对；ETF成分数和平均涨停推断也未由数据验证。",
+        "“海龟/海归”“450%”“50线”等转录有歧义，保留原文；所描述行情与图形未实查。"
+      ],
+      "attachments": {
+        "present": false,
+        "status": "none",
+        "note": "正文未列附件或外部链接；未据提及的图形推断数据。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "20250908-晚两天反弹葛二各种形态.md",
+      "sourceHash": "afaa924d05f67c384053e1fc28767f50c479a5a82bc9deb7353ed4ab10acffff",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 470
+      },
+      "summary": "比较反弹第二天触及布林上轨、未收回五日线和强势开口等情境；长春高新案例给出上轨差额顺延算例，另讲高开等同葛二到位、回踩强弱及葛三葛四参数跨用。",
+      "roles": [
+        "parameter_formula",
+        "granville_stage",
+        "support_resistance",
+        "method_selection",
+        "risk",
+        "trend"
+      ],
+      "tags": [
+        "kind.formula",
+        "topic.boll",
+        "topic.ma5",
+        "topic.granville",
+        "topic.turtle",
+        "purpose.forecast",
+        "purpose.levels",
+        "timeframe.daily",
+        "timeframe.intraday",
+        "scope.rising",
+        "data.daily",
+        "data.intraday",
+        "computability.definition"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.formula",
+          "startLine": 166,
+          "endLine": 166,
+          "quote": "**现在来回晃啊，那么用布林线上轨幽闭黄色线啊，128块二左右减去星期五的125块零七。**",
+          "reason": "明确有上轨数值相减的参数算例。"
+        },
+        {
+          "tagId": "topic.boll",
+          "startLine": 178,
+          "endLine": 178,
+          "quote": "**所以利用这个差价差了三块钱，所以我们明天的不定上轨按照这个往上套，是不是加了三块钱？**",
+          "reason": "把当期上轨差额再加到下一期上轨估计。"
+        },
+        {
+          "tagId": "topic.ma5",
+          "startLine": 354,
+          "endLine": 354,
+          "quote": "我们说啊，涨回五日线附近是吧？",
+          "reason": "讨论反弹回五日线。"
+        },
+        {
+          "tagId": "topic.granville",
+          "startLine": 224,
+          "endLine": 224,
+          "quote": "一涨二涨，三跌四涨啊。",
+          "reason": "葛兰碧涨跌节奏。"
+        },
+        {
+          "tagId": "topic.turtle",
+          "startLine": 346,
+          "endLine": 346,
+          "quote": "所以归根结底还是在什么海归的一线的涨停股里面去选择。",
+          "reason": "选股偏好海归一线涨停股，保留原字。"
+        },
+        {
+          "tagId": "purpose.forecast",
+          "startLine": 180,
+          "endLine": 180,
+          "quote": "**那么128+3就是131块多，所以今天最高打了131块五毛七，是不是你的参数就出来了？**",
+          "reason": "参数外推是正文内容；不等同预测获证。"
+        },
+        {
+          "tagId": "purpose.levels",
+          "startLine": 336,
+          "endLine": 336,
+          "quote": "多福多也是类似的一个情况，因为它我们有强，中，弱三大自称谓，那么它在最强的后天的支撑位上，明天的支撑位上都属于强势的一种表达。",
+          "reason": "按强中弱支撑解释差异，未给三者公式。"
+        },
+        {
+          "tagId": "timeframe.daily",
+          "startLine": 448,
+          "endLine": 448,
+          "quote": "好了，同学，大家来啊，重温一下9月4号啊，百分之二十的一个涨停，是葛兰密的第一天，然后呢出现了格拉密第二天的一个上涨啊。",
+          "reason": "以相邻交易日的葛一葛二编号。"
+        },
+        {
+          "tagId": "timeframe.intraday",
+          "startLine": 326,
+          "endLine": 326,
+          "quote": "那么我们在之前的广播中啊，碗品种已经讲过了啊，如何去计算啊，如何去计算差价，如何去计算它的差额啊，计算它的平均值，我们去估算啊，这个没有百分之百，它今天在盘中啊，两度在26块七二十七左右啊。",
+          "reason": "有盘中两次接近区间的口述，未查分钟数据。"
+        },
+        {
+          "tagId": "scope.rising",
+          "startLine": 80,
+          "endLine": 80,
+          "quote": "因为通过这个周三周四的一个暴跌，周五的一个反弹呢，包括今天这个反弹啊，带来了参差不齐的一个反弹。",
+          "reason": "研究暴跌后的反弹和分化。"
+        },
+        {
+          "tagId": "data.daily",
+          "startLine": 354,
+          "endLine": 354,
+          "quote": "我们说啊，涨回五日线附近是吧？",
+          "reason": "需要每日五日均线和价格。"
+        },
+        {
+          "tagId": "data.intraday",
+          "startLine": 248,
+          "endLine": 248,
+          "quote": "我们说要科学炒股啊，那么先到智能啊，今天高开啊，55.5左右啊，然后啊，我们看九点半啊，充了57，然后57块七，然后最终从59块一啊，这个四个参数啊，我们都是可以计算出来的啊。",
+          "reason": "早盘多次冲高的参数例需要盘中证据。"
+        },
+        {
+          "tagId": "computability.definition",
+          "startLine": 326,
+          "endLine": 326,
+          "quote": "那么我们在之前的广播中啊，碗品种已经讲过了啊，如何去计算啊，如何去计算差价，如何去计算它的差额啊，计算它的平均值，我们去估算啊，这个没有百分之百，它今天在盘中啊，两度在26块七二十七左右啊。",
+          "reason": "均值、差额和强弱具体口径没有全写出。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "布林上轨差额顺延外推",
+          "kind": "formula",
+          "formula": "U_next_estimate = U_current + (U_current - U_previous)",
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "本期布林上轨U_current（例中盘中约128.2）",
+            "前交易日上轨U_previous（例中125.07）"
+          ],
+          "applicability": [
+            "长春高新葛二例先以上轨差额约3再顺延，所得仍为上轨指标估计，之后才被当成价格参考。"
+          ],
+          "invalidation": [
+            "后续上轨受新价格影响而改变；计算出参数不保证实际价格到达或形成高点。"
+          ],
+          "gaps": [
+            "无布林期数、标准差口径和倍数；本期值是盘中还是完成K线未固定，下一期价格假设未给。",
+            "正文将差额取约3元再算128+3；3.13与3及128/128.2有近似，131.57是口述实际高点而非算式严格输出。",
+            "没有原始行情核对；不能宣称误差已通过用户的严格小于1%验证。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 166,
+              "endLine": 166,
+              "quote": "**现在来回晃啊，那么用布林线上轨幽闭黄色线啊，128块二左右减去星期五的125块零七。**"
+            },
+            {
+              "startLine": 178,
+              "endLine": 180,
+              "quote": "**所以利用这个差价差了三块钱，所以我们明天的不定上轨按照这个往上套，是不是加了三块钱？**\n\n**那么128+3就是131块多，所以今天最高打了131块五毛七，是不是你的参数就出来了？**"
+            }
+          ]
+        },
+        {
+          "name": "普通上轨压力与新热点开口分情境",
+          "kind": "condition",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "布林上轨",
+            "市场急跌转反弹阶段",
+            "热点板块证据"
+          ],
+          "applicability": [
+            "普通反弹上轨作为退出参考；市场转折形成新热点时原文承认可继续开口。"
+          ],
+          "invalidation": [
+            "真正开口突破时不能把上轨当必然最高价。"
+          ],
+          "gaps": [
+            "普通、转折、新热点及开口均无机器标准；“概率高”没有样本。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 94,
+              "endLine": 94,
+              "quote": "**所以今天按照我们短线炒作来说，周五买进第一天葛兰密，第一天今天卖出是葛兰密，第二天我们就是113块多就把它卖掉了。**"
+            },
+            {
+              "startLine": 106,
+              "endLine": 106,
+              "quote": "**比如我们平常正常的航行中，这儿一定是不会开口的，概率会比较高一点。**"
+            },
+            {
+              "startLine": 108,
+              "endLine": 108,
+              "quote": "**但是在春夏之交啊，在大盘掀桌子和溅桌子的这个交合点上，那么就容易形成新的热点，比如说锂电池，比如说这个股票是锂电池，那么它未来大概率还会开口。**"
+            }
+          ]
+        },
+        {
+          "name": "葛二高开到关键点同样可视作上涨到位",
+          "kind": "pattern",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "前交易日价格和葛兰碧编号",
+            "当日开盘和关键点"
+          ],
+          "applicability": [
+            "先确认葛二；高开直接到关键点与盘中涨到关键点均作为原文减仓参考，两天节奏有踏空可能。"
+          ],
+          "invalidation": [
+            "不是葛二或关键点未经生成确认时不可套用；卖出后仍可能涨停。"
+          ],
+          "gaps": [
+            "起步、拆段、关键点和仓位比例未定义；标准一涨二涨三跌四涨与第四天大涨大跌并列，不能保证方向。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 224,
+              "endLine": 224,
+              "quote": "一涨二涨，三跌四涨啊。"
+            },
+            {
+              "startLine": 236,
+              "endLine": 236,
+              "quote": "我们只学1234，不学五六七八啊，两天两天做。"
+            },
+            {
+              "startLine": 284,
+              "endLine": 284,
+              "quote": "就是葛二，他如果说直接开在26块七，我们之前讲过这个案例，好多人就选择不卖，这是不对的，它也是葛二的一种形式，就高开也是葛二。"
+            },
+            {
+              "startLine": 292,
+              "endLine": 292,
+              "quote": "今天高开到十块五和从十块涨到十块五和高开十块五是一样的一个概念，反而越是这种高开，越应该去卖出啊，它极有迷惑性，好多人就在这儿就不卖出了。"
+            }
+          ]
+        },
+        {
+          "name": "收回和回踩五日线的相对强弱观察",
+          "kind": "condition",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "价格与五日线",
+            "反弹和回踩阶段"
+          ],
+          "applicability": [
+            "正文明确五日线的段落将收回与回踩不破作为相对强势依据。"
+          ],
+          "invalidation": [
+            "未收复或回踩破位不能继续按同一强势条件。"
+          ],
+          "gaps": [
+            "盘中或收盘确认、近线容差和持续时间未定义；“50线”“50天”出现多次，不可全局改成MA5。",
+            "第426至430行3810附近和3794只是口述参考，未提供生成过程或可核对时点。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 64,
+              "endLine": 64,
+              "quote": "那么今天是格兰密的第二天啊，大家都呈现了不同的格兰密的第二天，有的格兰b第二天是突破五日线了。"
+            },
+            {
+              "startLine": 66,
+              "endLine": 66,
+              "quote": "有的格兰by第二天没有突破五日线。"
+            },
+            {
+              "startLine": 416,
+              "endLine": 416,
+              "quote": "破了那么也不代表什么，不破那说明你强三跌不破五日线是一种强势啊，所以你可以继续的去操作，是吧？"
+            },
+            {
+              "startLine": 422,
+              "endLine": 422,
+              "quote": "所以我们要求大家一直要做龙头骨，腰骨，做最热的东西啊，那钱最多，最不容易破，那么再往下的就是破位的，不过五日仙的，不过五日仙继续暴跌。"
+            }
+          ]
+        },
+        {
+          "name": "葛三高点与葛四参数跨期参照",
+          "kind": "pattern",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "已确认葛三葛四阶段",
+            "候选葛四参数",
+            "例中当日高点11.1"
+          ],
+          "applicability": [
+            "原文称葛四参数拿到葛三使用，仅记录跨期参照主张。"
+          ],
+          "invalidation": [
+            "阶段或参数未确认时不能生成目标。"
+          ],
+          "gaps": [
+            "“葛三高点由葛四高点决定”和“葛四参数拿来葛三用”没有算式；“往往”不是验证结论，禁止补外推公式。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 464,
+              "endLine": 464,
+              "quote": "哎，就是我们的十一块一的一个今天的一个高点，所以呢大家就体会体会啊，就是葛一涨二涨三跌三d的高点，往往就是因为葛四的高点来决定的啊。"
+            },
+            {
+              "startLine": 466,
+              "endLine": 466,
+              "quote": "而葛四真正要实行的并不是自己当时的今天的啊，就是周葛四的真正的一个参数，而葛四的参数是拿来葛三是用的，要记住啊，会对大家有帮助啊。"
+            }
+          ]
+        }
+      ],
+      "gaps": [
+        "所述实际高低点、盘中反复支撑及图形没有行情核验；第330行明确“能计算出参数，不代表一定正确”。",
+        "弱、中、强支撑的定义及先导智能四个参数未给完整计算过程；不能为补档捏造价位。",
+        "“50线/50天”“61601块五毛多”“主长主麦”等转录歧义保留。"
+      ],
+      "attachments": {
+        "present": false,
+        "status": "none",
+        "note": "正文未列附件或外部链接；未据提及的图形推断数据。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "买卖模式24678.md",
+      "sourceHash": "0c5eade4a3e4b50159872f7dadad0131501275f598768db2b6a6331c9b723723",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 40
+      },
+      "summary": "按上涨和下跌的葛兰碧数字模式列出买卖偏好，强调只做24678；没有定义数字模式与自然日编号的对应。",
+      "roles": [
+        "mode",
+        "granville_stage",
+        "risk"
+      ],
+      "tags": [
+        "kind.principle",
+        "topic.granville",
+        "purpose.screen",
+        "timeframe.unknown",
+        "scope.rising",
+        "scope.falling",
+        "data.attachment",
+        "computability.definition"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.principle",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "对的 上涨的葛兰碧 2卖 4卖 6卖 7买 8卖",
+          "reason": "列出作者认为正确的操作模式。"
+        },
+        {
+          "tagId": "topic.granville",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "对的 上涨的葛兰碧 2卖 4卖 6卖 7买 8卖",
+          "reason": "明确称上涨葛兰碧。"
+        },
+        {
+          "tagId": "purpose.screen",
+          "startLine": 20,
+          "endLine": 28,
+          "quote": "赚钱的数字有24678，\n\n我们只需要在24678模式里\n\n面换钱就好了，偏偏有人选\n\n择-1，-3，-4，-5，-6模式\n\n里面过日子。",
+          "reason": "用赚钱模式筛选参与机会。"
+        },
+        {
+          "tagId": "timeframe.unknown",
+          "startLine": 12,
+          "endLine": 18,
+          "quote": "每一天股票的运行就和人类\n\n一样，从0走到9，有的走到\n\n1，有的走到5，也有走到8，\n\n各个数字和人都有！",
+          "reason": "完整正文虽说每一天，未定义数字为交易日序号或K线级别。"
+        },
+        {
+          "tagId": "scope.rising",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "对的 上涨的葛兰碧 2卖 4卖 6卖 7买 8卖",
+          "reason": "上涨情境的模式表。"
+        },
+        {
+          "tagId": "scope.falling",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "错的 下跌的葛兰碧 1买 3买 4卖 5买 6卖",
+          "reason": "同时给出被作者否定的下跌模式。"
+        },
+        {
+          "tagId": "data.attachment",
+          "startLine": 10,
+          "endLine": 10,
+          "quote": "![6b42514ab9cbba9a8bfa33a8567c1c8e1715704884055.png](../_attachments/6b42514ab9cbba9a8bfa33a8567c1c8e1715704884055.png)",
+          "reason": "模式配图未核对。"
+        },
+        {
+          "tagId": "computability.definition",
+          "startLine": 20,
+          "endLine": 28,
+          "quote": "赚钱的数字有24678，\n\n我们只需要在24678模式里\n\n面换钱就好了，偏偏有人选\n\n择-1，-3，-4，-5，-6模式\n\n里面过日子。",
+          "reason": "只有模式编号，无法从行情识别。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "上涨与下跌模式的买卖偏好",
+          "kind": "pattern",
+          "formula": null,
+          "periods": [
+            "unknown"
+          ],
+          "inputs": [
+            "上涨或下跌阶段",
+            "原文0到9数字模式"
+          ],
+          "applicability": [
+            "原文上涨列2卖4卖6卖7买8卖，并倡导24678；下跌一组被标为错。"
+          ],
+          "invalidation": [
+            "未定义模式时无法以数字直接触发订单；非原文上涨阶段不能沿用该表。"
+          ],
+          "gaps": [
+            "0到9模式的识别、正负号及其与葛兰碧自然日序号的关系未给。",
+            "“赚钱数字24678”和具体买卖表属于原文并列说法，不能自行重写成每个数字都买或每个数字都卖。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 6,
+              "endLine": 6,
+              "quote": "对的 上涨的葛兰碧 2卖 4卖 6卖 7买 8卖"
+            },
+            {
+              "startLine": 8,
+              "endLine": 8,
+              "quote": "错的 下跌的葛兰碧 1买 3买 4卖 5买 6卖"
+            },
+            {
+              "startLine": 20,
+              "endLine": 28,
+              "quote": "赚钱的数字有24678，\n\n我们只需要在24678模式里\n\n面换钱就好了，偏偏有人选\n\n择-1，-3，-4，-5，-6模式\n\n里面过日子。"
+            }
+          ]
+        }
+      ],
+      "gaps": [
+        "图片未核对；254、20k为孤立转录数字，没有定义。"
+      ],
+      "attachments": {
+        "present": true,
+        "status": "not_inspected",
+        "note": "仅阅读文字；所列图片、音视频或外部链接未实际检查。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "二次探底.md",
+      "sourceHash": "55cd9e6122e62b7a100c904a5dbab4c4924b70f5b41ebd462c2eb11d92fd9d53",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 6
+      },
+      "summary": "只记录“一般没有第三次探底”的经验倾向，没有探底定义、周期或样本。",
+      "roles": [
+        "trend",
+        "risk"
+      ],
+      "tags": [
+        "kind.experience",
+        "topic.unknown",
+        "purpose.trend",
+        "timeframe.unknown",
+        "scope.unknown",
+        "data.unknown",
+        "computability.definition"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "一般没有第三次探底",
+          "reason": "“一般”表述经验倾向。"
+        },
+        {
+          "tagId": "topic.unknown",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "一般没有第三次探底",
+          "reason": "全文未明确均线、布林或特定主题，词表无探底专用项。"
+        },
+        {
+          "tagId": "purpose.trend",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "一般没有第三次探底",
+          "reason": "试图判断探底后的路径。"
+        },
+        {
+          "tagId": "timeframe.unknown",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "一般没有第三次探底",
+          "reason": "全文未指定周期。"
+        },
+        {
+          "tagId": "scope.unknown",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "一般没有第三次探底",
+          "reason": "全文未明确市场、证券和形态前提。"
+        },
+        {
+          "tagId": "data.unknown",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "一般没有第三次探底",
+          "reason": "全文未给行情级别和观察窗。"
+        },
+        {
+          "tagId": "computability.definition",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "一般没有第三次探底",
+          "reason": "探底计数尚无定义。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "一般不出现第三次探底",
+          "kind": "pattern",
+          "formula": null,
+          "periods": [
+            "unknown"
+          ],
+          "inputs": [
+            "待定义的价格底部与回测序列"
+          ],
+          "applicability": [
+            "仅保留原文一般性倾向。"
+          ],
+          "invalidation": [
+            "实际出现第三次探底会与该倾向不符，不能据此否认行情。"
+          ],
+          "gaps": [
+            "无周期、底部容差、两次之间窗口、计数重置或统计样本；不可将“一般”改为确定性禁止。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 6,
+              "endLine": 6,
+              "quote": "一般没有第三次探底"
+            }
+          ]
+        }
+      ],
+      "gaps": [],
+      "attachments": {
+        "present": false,
+        "status": "none",
+        "note": "正文未列附件或外部链接；未据提及的图形推断数据。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "偷桃子.md",
+      "sourceHash": "e2c8415c311cdd793bc88e0a02cf6e6f60e80827b6273449f0af58bf31722cbb",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 15
+      },
+      "summary": "把长期反转描述为女鬼、震荡、一次或复合摸线到周K偷桃子的路径，同时提到10周线及不突破20日线的开口震荡。",
+      "roles": [
+        "trend",
+        "mode",
+        "method_selection"
+      ],
+      "tags": [
+        "kind.experience",
+        "topic.phase",
+        "topic.ma",
+        "purpose.trend",
+        "timeframe.weekly",
+        "timeframe.daily",
+        "scope.rising",
+        "data.daily",
+        "computability.definition"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "startLine": 11,
+          "endLine": 11,
+          "quote": "女鬼-震荡-摸线-反转或复合型2次或3次摸线-形成周k偷桃子的摸线或者直接看10周线",
+          "reason": "经验性阶段路径而非公式。"
+        },
+        {
+          "tagId": "topic.phase",
+          "startLine": 11,
+          "endLine": 11,
+          "quote": "女鬼-震荡-摸线-反转或复合型2次或3次摸线-形成周k偷桃子的摸线或者直接看10周线",
+          "reason": "一至三次摸线构成反转路径。"
+        },
+        {
+          "tagId": "topic.ma",
+          "startLine": 11,
+          "endLine": 11,
+          "quote": "女鬼-震荡-摸线-反转或复合型2次或3次摸线-形成周k偷桃子的摸线或者直接看10周线",
+          "reason": "10周线为另一观察参照。"
+        },
+        {
+          "tagId": "purpose.trend",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "长线的反转",
+          "reason": "直接讲长线反转。"
+        },
+        {
+          "tagId": "timeframe.weekly",
+          "startLine": 11,
+          "endLine": 11,
+          "quote": "女鬼-震荡-摸线-反转或复合型2次或3次摸线-形成周k偷桃子的摸线或者直接看10周线",
+          "reason": "明确周K和10周线。"
+        },
+        {
+          "tagId": "timeframe.daily",
+          "startLine": 13,
+          "endLine": 13,
+          "quote": "开口震荡，从不突破20日线",
+          "reason": "另提20日线。"
+        },
+        {
+          "tagId": "scope.rising",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "长线的反转",
+          "reason": "讨论由低位转为上行的反转。"
+        },
+        {
+          "tagId": "data.daily",
+          "startLine": 13,
+          "endLine": 13,
+          "quote": "开口震荡，从不突破20日线",
+          "reason": "20日线判断需日线价格；周K另需周级行情。"
+        },
+        {
+          "tagId": "computability.definition",
+          "startLine": 11,
+          "endLine": 11,
+          "quote": "女鬼-震荡-摸线-反转或复合型2次或3次摸线-形成周k偷桃子的摸线或者直接看10周线",
+          "reason": "复合摸线和偷桃子缺可识别定义。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "长线反转与复合摸线转周K",
+          "kind": "pattern",
+          "formula": null,
+          "periods": [
+            "weekly",
+            "day"
+          ],
+          "inputs": [
+            "长期价格形态",
+            "周K及10周线",
+            "20日线与开口震荡阶段"
+          ],
+          "applicability": [
+            "先分女鬼和震荡，再看一次反转或二三次复合摸线；原文另列直接看10周线的选项。"
+          ],
+          "invalidation": [
+            "实际阶段未确认不能仅凭摸线次数命名偷桃子。"
+          ],
+          "gaps": [
+            "女鬼、摸线、反转和偷桃子的门槛未给。",
+            "“从不突破20日线”适用哪个子阶段、何时转周线及观察窗口均不清；不能改成所有反转永不突破20日线。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 11,
+              "endLine": 11,
+              "quote": "女鬼-震荡-摸线-反转或复合型2次或3次摸线-形成周k偷桃子的摸线或者直接看10周线"
+            },
+            {
+              "startLine": 13,
+              "endLine": 13,
+              "quote": "开口震荡，从不突破20日线"
+            },
+            {
+              "startLine": 15,
+              "endLine": 15,
+              "quote": "复合型摸线，比如2022-10月份医药股2次摸线"
+            }
+          ]
+        }
+      ],
+      "gaps": [
+        "2022年10月医药股只是举例，未提供行情验证。"
+      ],
+      "attachments": {
+        "present": false,
+        "status": "none",
+        "note": "正文未列附件或外部链接；未据提及的图形推断数据。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "关键点.md",
+      "sourceHash": "eaaa9ce34a3898bc701a277f66b7f5d0319e2ea18a0490b0b7621c3f1cf22e8e",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 8
+      },
+      "summary": "把第二天关键点与“前天冲高回落”的最高点联系起来，未固定相对日期的锚点或确认方法。",
+      "roles": [
+        "support_resistance",
+        "parameter_formula"
+      ],
+      "tags": [
+        "kind.experience",
+        "topic.unknown",
+        "purpose.levels",
+        "timeframe.daily",
+        "scope.unknown",
+        "data.daily",
+        "computability.definition"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "第二天的关键点往往是前天冲高回落的最高点",
+          "reason": "“往往”是经验关系。"
+        },
+        {
+          "tagId": "topic.unknown",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "第二天的关键点往往是前天冲高回落的最高点",
+          "reason": "完整正文未涉及词表中的特定指标主题。"
+        },
+        {
+          "tagId": "purpose.levels",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "第二天的关键点往往是前天冲高回落的最高点",
+          "reason": "用历史最高点作为关键点参考。"
+        },
+        {
+          "tagId": "timeframe.daily",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "第二天的关键点往往是前天冲高回落的最高点",
+          "reason": "明确第二天和前天。"
+        },
+        {
+          "tagId": "scope.unknown",
+          "startLine": 5,
+          "endLine": 5,
+          "quote": "  - 股票",
+          "reason": "完整正文虽有股票泛称或元数据，但没有限定A股市场及明确适用情境；scope.stock在现有词表标为A股，故保守待补。"
+        },
+        {
+          "tagId": "data.daily",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "第二天的关键点往往是前天冲高回落的最高点",
+          "reason": "需对应交易日的最高点和冲高回落路径。"
+        },
+        {
+          "tagId": "computability.definition",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "第二天的关键点往往是前天冲高回落的最高点",
+          "reason": "前天相对何日及冲高回落定义不清。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "关键点参照先前冲高回落高点",
+          "kind": "condition",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "原文所谓前天冲高回落的最高价",
+            "待确认的目标日和日期锚点"
+          ],
+          "applicability": [
+            "先明确“第二天”“前天”的相对锚点，再把历史高点作为候选关键点。"
+          ],
+          "invalidation": [
+            "不是冲高回落日，或日期锚点未确认，不能直接引用。"
+          ],
+          "gaps": [
+            "未给无歧义t索引、交易日或自然日口径、冲高回落判据和参考价有效期；因此不补写外推公式。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 8,
+              "endLine": 8,
+              "quote": "第二天的关键点往往是前天冲高回落的最高点"
+            }
+          ]
+        }
+      ],
+      "gaps": [],
+      "attachments": {
+        "present": false,
+        "status": "none",
+        "note": "正文未列附件或外部链接；未据提及的图形推断数据。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "北方华创.md",
+      "sourceHash": "a530a20bcfa542aed1ce60aead699c82948217129ab66a20357980c23b5124d7",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 6
+      },
+      "summary": "仅记录数值314为缺口，缺少日期、上下沿、单位及行情证据。",
+      "roles": [
+        "support_resistance",
+        "context"
+      ],
+      "tags": [
+        "kind.case",
+        "topic.unknown",
+        "purpose.levels",
+        "timeframe.unknown",
+        "scope.unknown",
+        "data.unknown",
+        "computability.reference"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.case",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "314是缺口",
+          "reason": "孤立个股点位记录，无规则。"
+        },
+        {
+          "tagId": "topic.unknown",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "314是缺口",
+          "reason": "全文未明确均线或其他词表主题。"
+        },
+        {
+          "tagId": "purpose.levels",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "314是缺口",
+          "reason": "缺口作为价格区域参考。"
+        },
+        {
+          "tagId": "timeframe.unknown",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "314是缺口",
+          "reason": "全文没有行情周期或日期。"
+        },
+        {
+          "tagId": "scope.unknown",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "314是缺口",
+          "reason": "正文未指明证券或市场，不能仅从文件名补适用范围。"
+        },
+        {
+          "tagId": "data.unknown",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "314是缺口",
+          "reason": "未给行情来源、复权或周期。"
+        },
+        {
+          "tagId": "computability.reference",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "314是缺口",
+          "reason": "只有点位结论无输入和生成法。"
+        }
+      ],
+      "claims": [],
+      "gaps": [
+        "不能确认314指元、指数点、哪侧缺口或是否已回补；不生成交易规则。"
+      ],
+      "attachments": {
+        "present": false,
+        "status": "none",
+        "note": "正文未列附件或外部链接；未据提及的图形推断数据。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "周线.md",
+      "sourceHash": "58250a39e0dc565ab9b1ae313d4e572e5fa4616afc84f29073cebddde5506f6d",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 17
+      },
+      "summary": "以10周线向上开始摸线，记录5周线反转后大盘约6周、个股2至3周的经验时间，并提醒10周线反应慢。",
+      "roles": [
+        "trend",
+        "mode"
+      ],
+      "tags": [
+        "kind.experience",
+        "topic.ma",
+        "topic.phase",
+        "purpose.trend",
+        "timeframe.weekly",
+        "scope.rising",
+        "data.unknown",
+        "computability.definition"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "startLine": 11,
+          "endLine": 11,
+          "quote": "周K5周线反转开始，大盘需要6周时间，个股比较快，2－3周；",
+          "reason": "周数为未检验的经验性时长。"
+        },
+        {
+          "tagId": "topic.ma",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "10周线向上开始摸线；",
+          "reason": "明确10周线。"
+        },
+        {
+          "tagId": "topic.phase",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "10周线向上开始摸线；",
+          "reason": "以周均线上行作为开始摸线参照。"
+        },
+        {
+          "tagId": "purpose.trend",
+          "startLine": 17,
+          "endLine": 17,
+          "quote": "观察周线，10周线反应比较慢。",
+          "reason": "关心周均线反应速度。"
+        },
+        {
+          "tagId": "timeframe.weekly",
+          "startLine": 11,
+          "endLine": 11,
+          "quote": "周K5周线反转开始，大盘需要6周时间，个股比较快，2－3周；",
+          "reason": "明确周K、5周线和周数。"
+        },
+        {
+          "tagId": "scope.rising",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "10周线向上开始摸线；",
+          "reason": "10周线向上情境。"
+        },
+        {
+          "tagId": "data.unknown",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "10周线向上开始摸线；",
+          "reason": "需周级价格和均线；全文无来源，词表无周线行情数据项，不能擅改成日线行情。"
+        },
+        {
+          "tagId": "computability.definition",
+          "startLine": 11,
+          "endLine": 11,
+          "quote": "周K5周线反转开始，大盘需要6周时间，个股比较快，2－3周；",
+          "reason": "反转起点、完成事件和大盘个股分类均未定义。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "10周线向上开始摸线",
+          "kind": "condition",
+          "formula": null,
+          "periods": [
+            "weekly"
+          ],
+          "inputs": [
+            "10周均线",
+            "周K形态"
+          ],
+          "applicability": [
+            "10周线向上是原文开始观察摸线的参照。"
+          ],
+          "invalidation": [
+            "均线未向上不满足该句条件；滞后性仍须考虑。"
+          ],
+          "gaps": [
+            "上行斜率、持续周数、均线计算方式和摸线完成标准未给。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 9,
+              "endLine": 9,
+              "quote": "10周线向上开始摸线；"
+            },
+            {
+              "startLine": 17,
+              "endLine": 17,
+              "quote": "观察周线，10周线反应比较慢。"
+            }
+          ]
+        },
+        {
+          "name": "5周线反转后的经验时长",
+          "kind": "pattern",
+          "formula": null,
+          "periods": [
+            "weekly"
+          ],
+          "inputs": [
+            "5周线反转起点",
+            "大盘或个股分类"
+          ],
+          "applicability": [
+            "原文称大盘约6周、个股较快2至3周。"
+          ],
+          "invalidation": [
+            "实际耗时可能不同，不能作到期必然目标。"
+          ],
+          "gaps": [
+            "没有说明这段时间到什么事件；两个实例日期缺证券和完整价格，不构成统计验证。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 11,
+              "endLine": 11,
+              "quote": "周K5周线反转开始，大盘需要6周时间，个股比较快，2－3周；"
+            },
+            {
+              "startLine": 15,
+              "endLine": 15,
+              "quote": "2022－04－29  2022－7－15"
+            }
+          ]
+        }
+      ],
+      "gaps": [],
+      "attachments": {
+        "present": false,
+        "status": "none",
+        "note": "正文未列附件或外部链接；未据提及的图形推断数据。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "四期第六课-三不做第二不做-次新股.md",
+      "sourceHash": "0c73d68c39f9acf34415d3609aafcefba0604277f2169e9bd2e4e4de3420c7c1",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 56
+      },
+      "summary": "作者从个人交易禁区出发主张不做次新股，以发行估值和价值回归解释风险；银行EPS×市盈率给2至4元算例，同时承认题材、轮动、业绩预期可造成短期拉升。",
+      "roles": [
+        "risk",
+        "method_selection",
+        "context",
+        "parameter_formula"
+      ],
+      "tags": [
+        "kind.principle",
+        "kind.formula",
+        "topic.valuation",
+        "purpose.screen",
+        "purpose.risk",
+        "purpose.valuation",
+        "timeframe.unknown",
+        "scope.stock",
+        "data.financial",
+        "data.sector",
+        "data.attachment",
+        "computability.definition"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.principle",
+          "startLine": 16,
+          "endLine": 16,
+          "quote": "次新股不做。",
+          "reason": "明确个人交易禁区。"
+        },
+        {
+          "tagId": "kind.formula",
+          "startLine": 32,
+          "endLine": 32,
+          "quote": "银行股的市盈率一般是5-10倍，某个银行按照行业市盈率发行的话，他的发行价格4.37元，市盈率5-10倍，业绩0.4元每股，那么他的上市价格应该是2-4元！！！",
+          "reason": "例中每股业绩与市盈率相乘得到估值区间。"
+        },
+        {
+          "tagId": "topic.valuation",
+          "startLine": 32,
+          "endLine": 32,
+          "quote": "市盈率5-10倍，业绩0.4元每股，那么他的上市价格应该是2-4元！！！",
+          "reason": "以EPS和行业市盈率解释价差。"
+        },
+        {
+          "tagId": "purpose.screen",
+          "startLine": 16,
+          "endLine": 16,
+          "quote": "次新股不做。",
+          "reason": "以次新身份排除。"
+        },
+        {
+          "tagId": "purpose.risk",
+          "startLine": 44,
+          "endLine": 44,
+          "quote": "下面是另外一种，由于该新股质地有较好预期，业绩能够释放，扛得住价格；也有大背景行情较好情况下，新股借机炒作时间较长，但是最终还是继续回归本位，特别要当心的是，这类新股一旦下跌可能幅度较大！甚至巨大！",
+          "reason": "即使炒作更久，也提示回落幅度风险。"
+        },
+        {
+          "tagId": "purpose.valuation",
+          "startLine": 32,
+          "endLine": 32,
+          "quote": "市盈率5-10倍，业绩0.4元每股，那么他的上市价格应该是2-4元！！！",
+          "reason": "价格区间来自估值假设。"
+        },
+        {
+          "tagId": "timeframe.unknown",
+          "startLine": 36,
+          "endLine": 36,
+          "quote": "因为他有一个价值回归的过程。",
+          "reason": "全文涉及长期价值回归和短期轮动，未固定估值或过滤窗口；个案上市首日不是统一周期。"
+        },
+        {
+          "tagId": "scope.stock",
+          "startLine": 18,
+          "endLine": 18,
+          "quote": "由于我们中国股市的主要功能是为了振兴我国经济，助力企业脱困，解决国有企业和中小企业的融资难融资贵的问题，所以，为了能实现这些目标，必须吸引广大的机构和投资者打新股的热情。",
+          "reason": "正文明确中国股市股票发行。"
+        },
+        {
+          "tagId": "data.financial",
+          "startLine": 32,
+          "endLine": 32,
+          "quote": "市盈率5-10倍，业绩0.4元每股，那么他的上市价格应该是2-4元！！！",
+          "reason": "估值例需要每股业绩和行业PE。"
+        },
+        {
+          "tagId": "data.sector",
+          "startLine": 36,
+          "endLine": 36,
+          "quote": "遇到了大盘行情比较好的时候，遇到了板块轮动的后期，比如所有板块都翻倍了或者轮播的大涨之后，就剩下次新股板块没动滞后，那么短期资金就会来炒作滞后补涨概念！",
+          "reason": "例外情境涉及板块轮动。"
+        },
+        {
+          "tagId": "data.attachment",
+          "startLine": 40,
+          "endLine": 40,
+          "quote": "![20592df2799a2fcac400b42860921015.png](../_attachments/20592df2799a2fcac400b42860921015.png)",
+          "reason": "相关图表均未检查。"
+        },
+        {
+          "tagId": "computability.definition",
+          "startLine": 16,
+          "endLine": 16,
+          "quote": "次新股不做。",
+          "reason": "次新股上市时长和排除范围尚未定义。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "次新股排除是作者个人交易禁区",
+          "kind": "risk",
+          "formula": null,
+          "periods": [
+            "unknown"
+          ],
+          "inputs": [
+            "证券上市日期与次新分类",
+            "作者个人禁区约定"
+          ],
+          "applicability": [
+            "按原文是个人不愿费力参与的选择，并不等于该类没有行情。"
+          ],
+          "invalidation": [
+            "禁区不能证明每只次新都会亏损；原文承认甚至可有大行情。"
+          ],
+          "gaps": [
+            "次新股上市天数、市场板块范围、解除禁区条件均未给。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 10,
+              "endLine": 10,
+              "quote": "不是不做而且不愿意费力做！不值得浪费精力熬这些个股！"
+            },
+            {
+              "startLine": 16,
+              "endLine": 16,
+              "quote": "次新股不做。"
+            }
+          ]
+        },
+        {
+          "name": "银行EPS乘PE的估值区间算例",
+          "kind": "formula",
+          "formula": "valuation_low = EPS * PE_low; valuation_high = EPS * PE_high",
+          "periods": [
+            "unknown"
+          ],
+          "inputs": [
+            "假设每股业绩EPS=0.4元",
+            "假设可比PE范围5至10倍"
+          ],
+          "applicability": [
+            "按例中已给定EPS和PE算得2至4元，属于估值金额，不是次日预测价。"
+          ],
+          "invalidation": [
+            "EPS口径或可比PE不适用时不能据该区间判断。"
+          ],
+          "gaps": [
+            "每股业绩报告期、摊薄口径、可比样本和估值有效期未给；5至10倍仅为原文假设，不是当前行业结论。"
+          ],
+          "computability": "direct",
+          "evidence": [
+            {
+              "startLine": 32,
+              "endLine": 32,
+              "quote": "银行股的市盈率一般是5-10倍，某个银行按照行业市盈率发行的话，他的发行价格4.37元，市盈率5-10倍，业绩0.4元每股，那么他的上市价格应该是2-4元！！！"
+            }
+          ]
+        },
+        {
+          "name": "次新高估回归的风险主张与绝对措辞",
+          "kind": "risk",
+          "formula": null,
+          "periods": [
+            "unknown"
+          ],
+          "inputs": [
+            "发行和二级市场价格",
+            "公司财务与估值假设"
+          ],
+          "applicability": [
+            "保留作者高估后回归的风险解释。"
+          ],
+          "invalidation": [
+            "短期上涨被原文明确列为可能，不能把“一定跌”当任何时间窗都有效。"
+          ],
+          "gaps": [
+            "99.99%没有样本或统计口径；何谓高估、回归到多少和何时回归均未给。"
+          ],
+          "computability": "reference",
+          "evidence": [
+            {
+              "startLine": 34,
+              "endLine": 34,
+              "quote": "同样的情况发生在99.99%的新股身上，所有的新股都要被高估"
+            },
+            {
+              "startLine": 36,
+              "endLine": 36,
+              "quote": "所以次新股从经验上讲从原则上讲是必须是下跌！！！这就是真理！必须牢记！次新股是一定跌！"
+            },
+            {
+              "startLine": 38,
+              "endLine": 38,
+              "quote": "眼光长远看，短线的炒作不影响价值回归。"
+            }
+          ]
+        },
+        {
+          "name": "补涨题材和业绩预期可造成例外拉升",
+          "kind": "context",
+          "formula": null,
+          "periods": [
+            "unknown"
+          ],
+          "inputs": [
+            "大盘和板块轮动",
+            "题材、业绩预期及价格"
+          ],
+          "applicability": [
+            "作为原文对短期例外的解释，未授权自动启用交易策略。"
+          ],
+          "invalidation": [
+            "缺少背景条件不能直接把任何上涨解释成特定例外。"
+          ],
+          "gaps": [
+            "滞后、质地、背景行情和业绩释放无评分或时间窗；例外存在不等于具备可验证超额收益。"
+          ],
+          "computability": "reference",
+          "evidence": [
+            {
+              "startLine": 36,
+              "endLine": 36,
+              "quote": "那么短期资金就会来炒作滞后补涨概念！滞后补涨概念可以是任何板块个股！"
+            },
+            {
+              "startLine": 38,
+              "endLine": 38,
+              "quote": "由于质地较好或者背景题材特殊，会有机构游资蓄意进行短期的连续拉升"
+            },
+            {
+              "startLine": 44,
+              "endLine": 44,
+              "quote": "下面是另外一种，由于该新股质地有较好预期，业绩能够释放，扛得住价格；也有大背景行情较好情况下，新股借机炒作时间较长，但是最终还是继续回归本位，特别要当心的是，这类新股一旦下跌可能幅度较大！甚至巨大！"
+            }
+          ]
+        }
+      ],
+      "gaps": [
+        "图片未核对；关于发行制度、绿鞋、机构利益及历史事件均为作者解释，未做外部事实核查。",
+        "第32行首日44%为历史例子，不能替代当前按最近完整日K和适用板块涨跌幅筛价的要求。",
+        "“一定跌”“99.99%”与承认短期上涨并存，须保留时间尺度差异和缺失，不能抹掉矛盾或改为验证概率。"
+      ],
+      "attachments": {
+        "present": true,
+        "status": "not_inspected",
+        "note": "仅阅读文字；所列图片、音视频或外部链接未实际检查。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "复合型摸线.md",
+      "sourceHash": "6ef6a0883aec245554d61961c29279b3432ffe3aee7b9ac09072e42dd9fef24b",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 9
+      },
+      "summary": "以低位震荡后摸线、再回低位震荡描述复合型摸线，没有给次数或周期。",
+      "roles": [
+        "mode",
+        "trend"
+      ],
+      "tags": [
+        "kind.experience",
+        "topic.phase",
+        "purpose.explain",
+        "timeframe.unknown",
+        "scope.sideways",
+        "data.unknown",
+        "computability.definition"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "低位震荡摸线，又回到低位震荡",
+          "reason": "形态经验描述。"
+        },
+        {
+          "tagId": "topic.phase",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "低位震荡摸线，又回到低位震荡",
+          "reason": "明确低位摸线循环。"
+        },
+        {
+          "tagId": "purpose.explain",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "低位震荡摸线，又回到低位震荡",
+          "reason": "用于解释复合型形态，未给交易动作。"
+        },
+        {
+          "tagId": "timeframe.unknown",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "低位震荡摸线，又回到低位震荡",
+          "reason": "全文未指定行情周期。"
+        },
+        {
+          "tagId": "scope.sideways",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "低位震荡摸线，又回到低位震荡",
+          "reason": "低位震荡情境。"
+        },
+        {
+          "tagId": "data.unknown",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "低位震荡摸线，又回到低位震荡",
+          "reason": "全文无行情级别和观察窗口。"
+        },
+        {
+          "tagId": "computability.definition",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "低位震荡摸线，又回到低位震荡",
+          "reason": "低位、震荡和摸线均无判据。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "低位震荡摸线后回到低位震荡",
+          "kind": "pattern",
+          "formula": null,
+          "periods": [
+            "unknown"
+          ],
+          "inputs": [
+            "价格形态序列"
+          ],
+          "applicability": [
+            "保留震荡、摸线、再震荡的顺序。"
+          ],
+          "invalidation": [
+            "未出现所述回归顺序不能命名该形态。"
+          ],
+          "gaps": [
+            "低位相对何值、震荡范围、摸线参照、次数和完成条件均未定义。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 9,
+              "endLine": 9,
+              "quote": "低位震荡摸线，又回到低位震荡"
+            }
+          ]
+        }
+      ],
+      "gaps": [],
+      "attachments": {
+        "present": false,
+        "status": "none",
+        "note": "正文未列附件或外部链接；未据提及的图形推断数据。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "妖股上影线.md",
+      "sourceHash": "2e5c492c8870110caec8f880ad8ffcc74c1d902daeca1bc7642ba7a2cb1ed75e",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 8
+      },
+      "summary": "以上影线特别是葛四上影线预期次日下跌，又以该跌不跌改判可能暴涨；没有上下影线幅度或确认窗口。",
+      "roles": [
+        "granville_stage",
+        "trend",
+        "risk"
+      ],
+      "tags": [
+        "kind.experience",
+        "topic.granville",
+        "purpose.forecast",
+        "timeframe.daily",
+        "scope.unknown",
+        "data.daily",
+        "computability.definition"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "拉上影线，第二天看跌，特别是葛四的上影线。如果该跌不跌必有暴涨",
+          "reason": "相反预期分支的经验口述。"
+        },
+        {
+          "tagId": "topic.granville",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "拉上影线，第二天看跌，特别是葛四的上影线。如果该跌不跌必有暴涨",
+          "reason": "特别指出葛四。"
+        },
+        {
+          "tagId": "purpose.forecast",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "拉上影线，第二天看跌，特别是葛四的上影线。如果该跌不跌必有暴涨",
+          "reason": "提出次日看跌和反向预期。"
+        },
+        {
+          "tagId": "timeframe.daily",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "拉上影线，第二天看跌，特别是葛四的上影线。如果该跌不跌必有暴涨",
+          "reason": "明确第二天。"
+        },
+        {
+          "tagId": "scope.unknown",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "拉上影线，第二天看跌，特别是葛四的上影线。如果该跌不跌必有暴涨",
+          "reason": "全文未给适用市场、证券或完整形态条件；不能仅据文件名推广。"
+        },
+        {
+          "tagId": "data.daily",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "拉上影线，第二天看跌，特别是葛四的上影线。如果该跌不跌必有暴涨",
+          "reason": "需日K上下影线及次日走势，盘中确认另需分钟数据。"
+        },
+        {
+          "tagId": "computability.definition",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "拉上影线，第二天看跌，特别是葛四的上影线。如果该跌不跌必有暴涨",
+          "reason": "上影线、该跌不跌和暴涨未量化。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "葛四上影线后的看跌与反向分支",
+          "kind": "condition",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "上影线形态",
+            "葛四阶段",
+            "次日价格路径"
+          ],
+          "applicability": [
+            "先确认上影线及葛四；次日看跌是经验，若实际不跌原文转为上涨预期。"
+          ],
+          "invalidation": [
+            "未下跌会否定先前看跌分支，但不证明之后必然暴涨。"
+          ],
+          "gaps": [
+            "葛四起点、影线占比、跌幅参照、观察截止时刻和暴涨门槛未给；“必有”无验证支持。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 8,
+              "endLine": 8,
+              "quote": "拉上影线，第二天看跌，特别是葛四的上影线。如果该跌不跌必有暴涨"
+            }
+          ]
+        }
+      ],
+      "gaps": [],
+      "attachments": {
+        "present": false,
+        "status": "none",
+        "note": "正文未列附件或外部链接；未据提及的图形推断数据。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "摸线-一期.md",
+      "sourceHash": "19ecdf513053efa7076f53f8d8065a687571b77f5ac47d2bbd976a39a902c2db",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 18
+      },
+      "summary": "记录摸线约18天基本结束、直接涨60%到60日线可不等18天，上轨开口是二转三标志，并把120日线称牛熊分界。",
+      "roles": [
+        "mode",
+        "trend",
+        "method_selection",
+        "context"
+      ],
+      "tags": [
+        "kind.experience",
+        "topic.phase",
+        "topic.boll",
+        "topic.turtle",
+        "topic.ma",
+        "purpose.trend",
+        "timeframe.daily",
+        "scope.rising",
+        "data.daily",
+        "computability.definition"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "十八天摸线 ，摸线基本结束了；",
+          "reason": "以基本结束表述经验时间。"
+        },
+        {
+          "tagId": "topic.phase",
+          "startLine": 12,
+          "endLine": 12,
+          "quote": "摸线二转三的一个标志是达到布林线上轨，开口战",
+          "reason": "明确二转三标志。"
+        },
+        {
+          "tagId": "topic.boll",
+          "startLine": 12,
+          "endLine": 12,
+          "quote": "摸线二转三的一个标志是达到布林线上轨，开口战",
+          "reason": "以布林上轨和开口为标志。"
+        },
+        {
+          "tagId": "topic.turtle",
+          "startLine": 16,
+          "endLine": 16,
+          "quote": "海龟属于摸线一期的热门股票；",
+          "reason": "把海龟归入一期热门股票。"
+        },
+        {
+          "tagId": "topic.ma",
+          "startLine": 10,
+          "endLine": 10,
+          "quote": "半年线（120日线）俗称牛熊分界线！",
+          "reason": "120日线被命名为牛熊分界。"
+        },
+        {
+          "tagId": "purpose.trend",
+          "startLine": 12,
+          "endLine": 12,
+          "quote": "摸线二转三的一个标志是达到布林线上轨，开口战",
+          "reason": "阶段转换和均线条件用于趋势识别。"
+        },
+        {
+          "tagId": "timeframe.daily",
+          "startLine": 18,
+          "endLine": 18,
+          "quote": "如果直接涨60%，到60日线，就不用等摸线18天；（参考学习营20220602晚餐）",
+          "reason": "明确18天和60日线。"
+        },
+        {
+          "tagId": "scope.rising",
+          "startLine": 18,
+          "endLine": 18,
+          "quote": "如果直接涨60%，到60日线，就不用等摸线18天；（参考学习营20220602晚餐）",
+          "reason": "直接上涨60%情境。"
+        },
+        {
+          "tagId": "data.daily",
+          "startLine": 18,
+          "endLine": 18,
+          "quote": "如果直接涨60%，到60日线，就不用等摸线18天；（参考学习营20220602晚餐）",
+          "reason": "需日均线与涨幅路径。"
+        },
+        {
+          "tagId": "computability.definition",
+          "startLine": 18,
+          "endLine": 18,
+          "quote": "如果直接涨60%，到60日线，就不用等摸线18天；（参考学习营20220602晚餐）",
+          "reason": "涨幅基点、直接和摸线起点不清。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "约18天摸线基本结束",
+          "kind": "pattern",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "摸线开始日期和后续形态"
+          ],
+          "applicability": [
+            "只是原文基本结束的经验时长。"
+          ],
+          "invalidation": [
+            "不能机械在第18天认定所有形态结束。"
+          ],
+          "gaps": [
+            "起点和完成事件、交易日或自然日口径未定义；不能从别篇补锚点。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 8,
+              "endLine": 8,
+              "quote": "十八天摸线 ，摸线基本结束了；"
+            }
+          ]
+        },
+        {
+          "name": "直接涨60%到60日线的提前条件",
+          "kind": "condition",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "待定义基点至当前的涨幅",
+            "60日均线及价格"
+          ],
+          "applicability": [
+            "原文同时要求直接涨60%和到60日线，可不等18天。"
+          ],
+          "invalidation": [
+            "未确认两个条件时不能提前套用。"
+          ],
+          "gaps": [
+            "涨幅起算价、直接的时间窗、触及或突破容差、复权口径没有给出，因此不补公式。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 18,
+              "endLine": 18,
+              "quote": "如果直接涨60%，到60日线，就不用等摸线18天；（参考学习营20220602晚餐）"
+            }
+          ]
+        },
+        {
+          "name": "布林上轨开口作为二转三标志",
+          "kind": "condition",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "布林上轨和价格",
+            "摸线二期状态"
+          ],
+          "applicability": [
+            "先处于二期，再判断达到上轨和原文所谓开口战。"
+          ],
+          "invalidation": [
+            "不在二期或未有相关上轨形态时不能标二转三。"
+          ],
+          "gaps": [
+            "布林参数、达到的容差及开口战转录含义、持续确认均不明。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 12,
+              "endLine": 12,
+              "quote": "摸线二转三的一个标志是达到布林线上轨，开口战"
+            }
+          ]
+        },
+        {
+          "name": "120日线牛熊分界的命名",
+          "kind": "context",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "120日均线"
+          ],
+          "applicability": [
+            "仅保留均线命名和背景。"
+          ],
+          "invalidation": [],
+          "gaps": [
+            "没有提供跨越后的必然方向或目标价。"
+          ],
+          "computability": "reference",
+          "evidence": [
+            {
+              "startLine": 10,
+              "endLine": 10,
+              "quote": "半年线（120日线）俗称牛熊分界线！"
+            }
+          ]
+        }
+      ],
+      "gaps": [
+        "学习营音频被提及但没有附件或内容，未核对；不得据来源名补充60%条件。"
+      ],
+      "attachments": {
+        "present": false,
+        "status": "none",
+        "note": "正文未列附件或外部链接；未据提及的图形推断数据。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "摸线-三期.md",
+      "sourceHash": "dcd749b838302e115092274c53d398d95a963cb8029d988ba84b9f1930bcd567",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 36
+      },
+      "summary": "三期以开口和阶段持股纪律为主：过120日线后看五日线，妖股重五日线、震荡攀升重十日线；另给中轨起算18至23天与双高、二八切换的退出提示。",
+      "roles": [
+        "mode",
+        "trend",
+        "risk",
+        "method_selection"
+      ],
+      "tags": [
+        "kind.experience",
+        "topic.phase",
+        "topic.ma5",
+        "topic.ma10",
+        "topic.boll",
+        "topic.double-high",
+        "purpose.risk",
+        "purpose.trend",
+        "timeframe.daily",
+        "scope.rising",
+        "data.daily",
+        "computability.definition"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "startLine": 26,
+          "endLine": 26,
+          "quote": "摸线节奏一般是18天-23天，从超过布林线中轨开始计算；",
+          "reason": "摸线节奏是经验范围。"
+        },
+        {
+          "tagId": "topic.phase",
+          "startLine": 14,
+          "endLine": 14,
+          "quote": "三期变化多端",
+          "reason": "明确三期变化多端。"
+        },
+        {
+          "tagId": "topic.ma5",
+          "startLine": 18,
+          "endLine": 18,
+          "quote": "三期妖股五日线最重要，震荡攀升行情十日线最重要",
+          "reason": "妖股以五日线观察。"
+        },
+        {
+          "tagId": "topic.ma10",
+          "startLine": 18,
+          "endLine": 18,
+          "quote": "三期妖股五日线最重要，震荡攀升行情十日线最重要",
+          "reason": "震荡攀升以十日线观察。"
+        },
+        {
+          "tagId": "topic.boll",
+          "startLine": 32,
+          "endLine": 32,
+          "quote": "中线布林线中轨不破，摸线行情不结束，或20日线；",
+          "reason": "中轨作为中线底线参照。"
+        },
+        {
+          "tagId": "topic.double-high",
+          "startLine": 22,
+          "endLine": 22,
+          "quote": "按照妖股的操作手法，失去双高的时候出局；",
+          "reason": "失去双高作为退出提示，定义未给。"
+        },
+        {
+          "tagId": "purpose.risk",
+          "startLine": 22,
+          "endLine": 22,
+          "quote": "按照妖股的操作手法，失去双高的时候出局；",
+          "reason": "直接给出出局条件。"
+        },
+        {
+          "tagId": "purpose.trend",
+          "startLine": 32,
+          "endLine": 32,
+          "quote": "中线布林线中轨不破，摸线行情不结束，或20日线；",
+          "reason": "中轨或20日线作为行情延续参照。"
+        },
+        {
+          "tagId": "timeframe.daily",
+          "startLine": 26,
+          "endLine": 26,
+          "quote": "摸线节奏一般是18天-23天，从超过布林线中轨开始计算；",
+          "reason": "明确18至23天并提日均线。"
+        },
+        {
+          "tagId": "scope.rising",
+          "startLine": 18,
+          "endLine": 18,
+          "quote": "三期妖股五日线最重要，震荡攀升行情十日线最重要",
+          "reason": "妖股和震荡攀升上涨情境。"
+        },
+        {
+          "tagId": "data.daily",
+          "startLine": 16,
+          "endLine": 16,
+          "quote": "120日线之后的钱将属于上帝，超过后看五日线",
+          "reason": "需120日线及五日线。"
+        },
+        {
+          "tagId": "computability.definition",
+          "startLine": 24,
+          "endLine": 24,
+          "quote": "出现二八切换时出局；",
+          "reason": "二八切换和双高缺机器定义。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "按三期形态选择均线参照",
+          "kind": "condition",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "三期形态",
+            "MA5、MA10、MA20和布林中轨",
+            "价格相对均线位置"
+          ],
+          "applicability": [
+            "原文区分过120日线后的短线、妖股、震荡攀升与中线观察。"
+          ],
+          "invalidation": [
+            "形态改变或对应底线破位后需重判；不能把各均线并成一个固定止损价。"
+          ],
+          "gaps": [
+            "妖股、震荡攀升和破位确认未定义；布林中轨是否等于20日线取决于布林期数，正文未给参数。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 16,
+              "endLine": 16,
+              "quote": "120日线之后的钱将属于上帝，超过后看五日线"
+            },
+            {
+              "startLine": 18,
+              "endLine": 18,
+              "quote": "三期妖股五日线最重要，震荡攀升行情十日线最重要"
+            },
+            {
+              "startLine": 30,
+              "endLine": 30,
+              "quote": "短线是5日线；"
+            },
+            {
+              "startLine": 32,
+              "endLine": 32,
+              "quote": "中线布林线中轨不破，摸线行情不结束，或20日线；"
+            }
+          ]
+        },
+        {
+          "name": "18至23天从超过布林中轨起算",
+          "kind": "pattern",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "首次超过布林中轨的日期",
+            "后续交易日与形态"
+          ],
+          "applicability": [
+            "只在该篇摸线节奏语境下使用该起算参照。"
+          ],
+          "invalidation": [
+            "未明确起点或反复穿越的重置规则时不可机械计数。"
+          ],
+          "gaps": [
+            "超过是盘中还是收盘、自然日还是交易日、结束事件及窗口外变体未定义。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 26,
+              "endLine": 26,
+              "quote": "摸线节奏一般是18天-23天，从超过布林线中轨开始计算；"
+            }
+          ]
+        },
+        {
+          "name": "失去双高或二八切换的退出提示",
+          "kind": "risk",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "待定义双高状态",
+            "二八切换证据",
+            "补涨末端板块表现"
+          ],
+          "applicability": [
+            "原文用妖股操作手法和摸线末端信号提示退出。"
+          ],
+          "invalidation": [
+            "没有可核对双高及切换定义不能仅凭名称触发。"
+          ],
+          "gaps": [
+            "双高的两项指标、切换统计口径、垃圾股和补涨结束定义均缺；不擅改二八为仓位比例。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 22,
+              "endLine": 22,
+              "quote": "按照妖股的操作手法，失去双高的时候出局；"
+            },
+            {
+              "startLine": 24,
+              "endLine": 24,
+              "quote": "出现二八切换时出局；"
+            },
+            {
+              "startLine": 28,
+              "endLine": 28,
+              "quote": "垃圾股最后补涨结束，意味着摸线结束；"
+            }
+          ]
+        },
+        {
+          "name": "过120日线后可能再涨但不保证获利",
+          "kind": "context",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "价格与120日线",
+            "市场氛围"
+          ],
+          "applicability": [
+            "原文承认氛围好可再涨，不能把120日线当绝对上限。"
+          ],
+          "invalidation": [],
+          "gaps": [
+            "氛围好、最终收益比较及观察期限无定义或样本。"
+          ],
+          "computability": "reference",
+          "evidence": [
+            {
+              "startLine": 36,
+              "endLine": 36,
+              "quote": "摸线三期120日线后，如果氛围好，会有一波上涨。但最终很多人的得失和过120日线走一样。"
+            }
+          ]
+        }
+      ],
+      "gaps": [],
+      "attachments": {
+        "present": false,
+        "status": "none",
+        "note": "正文未列附件或外部链接；未据提及的图形推断数据。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "摸线实战.md",
+      "sourceHash": "d9dcb9587e02f6ffee3b1b74e76c6097450be92b404c33cbfd082ea935d9070c",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 23
+      },
+      "summary": "三期以1234四天内出高退出为经验节奏，另讲首轮后破五低买博下一轮、破五破十反弹出货，并要求预先算明后两天五日线。",
+      "roles": [
+        "granville_stage",
+        "mode",
+        "risk",
+        "parameter_formula",
+        "method_selection"
+      ],
+      "tags": [
+        "kind.experience",
+        "topic.phase",
+        "topic.mirror",
+        "topic.ma5",
+        "purpose.forecast",
+        "purpose.risk",
+        "timeframe.daily",
+        "scope.rising",
+        "data.daily",
+        "data.attachment",
+        "computability.definition"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "startLine": 17,
+          "endLine": 17,
+          "quote": "四天内的节奏是12上涨，3调整，4大涨大跌。也有不同的变体，但是都不会超过4天。",
+          "reason": "节奏允许变体但断言不超过四天。"
+        },
+        {
+          "tagId": "topic.phase",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "摸线三期数好1234的节奏，四天内出高点，四天内卖出。",
+          "reason": "明确摸线三期。"
+        },
+        {
+          "tagId": "topic.mirror",
+          "startLine": 15,
+          "endLine": 15,
+          "quote": "破位五日线买入，是因为有个高位照镜子的理论可以兜底。",
+          "reason": "原文以高位照镜子兜底，但无算法。"
+        },
+        {
+          "tagId": "topic.ma5",
+          "startLine": 21,
+          "endLine": 21,
+          "quote": "从摸线结束来看，三期上升过程每一次买入都是正确的。但是为了避免风险，提前算好明后两天的五日线，做好博弈。",
+          "reason": "要求预算明后两天五日线。"
+        },
+        {
+          "tagId": "purpose.forecast",
+          "startLine": 21,
+          "endLine": 21,
+          "quote": "从摸线结束来看，三期上升过程每一次买入都是正确的。但是为了避免风险，提前算好明后两天的五日线，做好博弈。",
+          "reason": "预估未来指标以做博弈。"
+        },
+        {
+          "tagId": "purpose.risk",
+          "startLine": 21,
+          "endLine": 21,
+          "quote": "从摸线结束来看，三期上升过程每一次买入都是正确的。但是为了避免风险，提前算好明后两天的五日线，做好博弈。",
+          "reason": "明确为了避免风险提前计算。"
+        },
+        {
+          "tagId": "timeframe.daily",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "摸线三期数好1234的节奏，四天内出高点，四天内卖出。",
+          "reason": "四天内出高点卖出。"
+        },
+        {
+          "tagId": "scope.rising",
+          "startLine": 21,
+          "endLine": 21,
+          "quote": "从摸线结束来看，三期上升过程每一次买入都是正确的。但是为了避免风险，提前算好明后两天的五日线，做好博弈。",
+          "reason": "结论限定三期上升过程。"
+        },
+        {
+          "tagId": "data.daily",
+          "startLine": 21,
+          "endLine": 21,
+          "quote": "从摸线结束来看，三期上升过程每一次买入都是正确的。但是为了避免风险，提前算好明后两天的五日线，做好博弈。",
+          "reason": "需要五日线及其日线输入。"
+        },
+        {
+          "tagId": "data.attachment",
+          "startLine": 23,
+          "endLine": 23,
+          "quote": "![Screenshot_20231229_072341.jpg](../_attachments/Screenshot_20231229_072341.jpg)",
+          "reason": "正文所列截图未核对。"
+        },
+        {
+          "tagId": "computability.definition",
+          "startLine": 15,
+          "endLine": 15,
+          "quote": "破位五日线买入，是因为有个高位照镜子的理论可以兜底。",
+          "reason": "高位镜像以及未来均线输入假设均缺定义。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "三期1234四天内高点与退出",
+          "kind": "pattern",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "三期起点及1234阶段",
+            "连续日价格路径"
+          ],
+          "applicability": [
+            "先确认三期与首次1234，按原文12上涨3调整4大涨大跌的节奏。"
+          ],
+          "invalidation": [
+            "实际节奏或阶段不同须重判；“都不会超过4天”尚无验证。"
+          ],
+          "gaps": [
+            "起步、四天计数、拆段和高点判据未给；不能把第4天当固定方向或价格。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 9,
+              "endLine": 9,
+              "quote": "摸线三期数好1234的节奏，四天内出高点，四天内卖出。"
+            },
+            {
+              "startLine": 17,
+              "endLine": 17,
+              "quote": "四天内的节奏是12上涨，3调整，4大涨大跌。也有不同的变体，但是都不会超过4天。"
+            }
+          ]
+        },
+        {
+          "name": "首轮后破五买入博第二轮的经验",
+          "kind": "condition",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "首次1234是否完成",
+            "MA5及价格",
+            "高位照镜子参照"
+          ],
+          "applicability": [
+            "原文先要求走好首次1234，才谈其后第二天跌五日线买入博后续2234。"
+          ],
+          "invalidation": [
+            "首次节奏未成立或镜像参照不清不能声称有兜底。"
+          ],
+          "gaps": [
+            "跌五是触及还是破位、第二天锚点、2234和高位镜像窗口未定义；无止损，不可保证正确。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 11,
+              "endLine": 11,
+              "quote": "走好第一次的1234是后面每一次博弈五日线的基础。"
+            },
+            {
+              "startLine": 13,
+              "endLine": 13,
+              "quote": "第一个1234结束后，第二天跌五日线再买入，博弈第二天的2234。"
+            },
+            {
+              "startLine": 15,
+              "endLine": 15,
+              "quote": "破位五日线买入，是因为有个高位照镜子的理论可以兜底。"
+            }
+          ]
+        },
+        {
+          "name": "三期末破五破十后的两天反弹出货",
+          "kind": "risk",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "MA5和MA10破位顺序",
+            "反弹路径和成交量"
+          ],
+          "applicability": [
+            "原文将其作为一种较温和出货方式，还承认更激进情形。"
+          ],
+          "invalidation": [
+            "并非所有三期结束都走同一两天反弹路径。"
+          ],
+          "gaps": [
+            "破位、反弹起点、成交量“有问题”及两天结束标准未给。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 19,
+              "endLine": 19,
+              "quote": "三期结束的出货方式，一般是破五破十后的反弹，反弹两天就会结束，破五那天成交量也会有问题。这是比较优秀的操盘出货还有更加激进的。"
+            }
+          ]
+        },
+        {
+          "name": "预先估计明后两天五日线",
+          "kind": "condition",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "历史日线价格",
+            "明后两日用于估计的价格假设"
+          ],
+          "applicability": [
+            "先把未来MA5指标作为风险参考，不是必然股价。"
+          ],
+          "invalidation": [
+            "未来价格假设改变时估计线随之改变。"
+          ],
+          "gaps": [
+            "正文未给算式、历史输入窗口位置或未来收盘假设，禁止自行补成固定目标价。",
+            "“三期上升每次买入正确”是事后限定的描述，没有失败样本或效果证明。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 21,
+              "endLine": 21,
+              "quote": "从摸线结束来看，三期上升过程每一次买入都是正确的。但是为了避免风险，提前算好明后两天的五日线，做好博弈。"
+            }
+          ]
+        }
+      ],
+      "gaps": [
+        "图片未核对；1234在该篇未直接命名为葛兰碧，不能确认两者完全同义。"
+      ],
+      "attachments": {
+        "present": true,
+        "status": "not_inspected",
+        "note": "仅阅读文字；所列图片、音视频或外部链接未实际检查。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "摸线示意图.md",
+      "sourceHash": "7e8c6fafe857e8c99ee02d75b51f70588263b54a36709ef27babef4d2aaff2af",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 8
+      },
+      "summary": "只有摸线元数据与一张示意图链接，没有可读解释或公式。",
+      "roles": [
+        "context"
+      ],
+      "tags": [
+        "kind.context",
+        "topic.phase",
+        "purpose.unknown",
+        "timeframe.unknown",
+        "scope.unknown",
+        "data.attachment",
+        "computability.reference"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.context",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "![IMG_0011.JPG](../_attachments/IMG_0011.JPG)",
+          "reason": "单一图像入口。"
+        },
+        {
+          "tagId": "topic.phase",
+          "startLine": 5,
+          "endLine": 5,
+          "quote": "  - 摸线",
+          "reason": "仅元数据标注摸线，图像内容未核对。"
+        },
+        {
+          "tagId": "purpose.unknown",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "![IMG_0011.JPG](../_attachments/IMG_0011.JPG)",
+          "reason": "全文无可读用途说明。"
+        },
+        {
+          "tagId": "timeframe.unknown",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "![IMG_0011.JPG](../_attachments/IMG_0011.JPG)",
+          "reason": "全文无周期说明。"
+        },
+        {
+          "tagId": "scope.unknown",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "![IMG_0011.JPG](../_attachments/IMG_0011.JPG)",
+          "reason": "全文无市场或情境说明。"
+        },
+        {
+          "tagId": "data.attachment",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "![IMG_0011.JPG](../_attachments/IMG_0011.JPG)",
+          "reason": "唯一正文为图像。"
+        },
+        {
+          "tagId": "computability.reference",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "![IMG_0011.JPG](../_attachments/IMG_0011.JPG)",
+          "reason": "未核对图片且没有文字规则。"
+        }
+      ],
+      "claims": [],
+      "gaps": [
+        "图像未检查，不能由文件名还原形态、公式或数字。"
+      ],
+      "attachments": {
+        "present": true,
+        "status": "not_inspected",
+        "note": "仅阅读文字；所列图片、音视频或外部链接未实际检查。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "格兰碧.md",
+      "sourceHash": "17869e49700a6e20cb4fc292167693c6fbb178722cc37bc4ee1ef0b894f96ed8",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 26
+      },
+      "summary": "把破五作为第一天，偏好只做一二天；用第二天下跌幅度是否超过第一天衡量强弱，另提示20日线上方的适用语句及破五反抽风险。",
+      "roles": [
+        "granville_stage",
+        "mode",
+        "risk",
+        "method_selection"
+      ],
+      "tags": [
+        "kind.experience",
+        "topic.granville",
+        "topic.ma5",
+        "topic.ma20",
+        "purpose.risk",
+        "timeframe.daily",
+        "scope.unknown",
+        "data.daily",
+        "data.attachment",
+        "computability.definition"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "startLine": 18,
+          "endLine": 18,
+          "quote": "葛兰碧第二天下跌幅度不会超过第一天，超过了说明很弱",
+          "reason": "第二天跌幅比较的经验判断。"
+        },
+        {
+          "tagId": "topic.granville",
+          "startLine": 16,
+          "endLine": 16,
+          "quote": "格兰碧做一二两天 不做三四两天",
+          "reason": "明确一二天操作偏好。"
+        },
+        {
+          "tagId": "topic.ma5",
+          "startLine": 10,
+          "endLine": 10,
+          "quote": "破五是格兰碧第一天",
+          "reason": "破五作为首日参照。"
+        },
+        {
+          "tagId": "topic.ma20",
+          "startLine": 22,
+          "endLine": 22,
+          "quote": "葛兰碧使用场景5日线 20日线之上",
+          "reason": "另限定20日线之上，但主语有歧义。"
+        },
+        {
+          "tagId": "purpose.risk",
+          "startLine": 24,
+          "endLine": 24,
+          "quote": "破五断头过程，反抽五日线十分凶险。",
+          "reason": "明确反抽五日线凶险。"
+        },
+        {
+          "tagId": "timeframe.daily",
+          "startLine": 18,
+          "endLine": 18,
+          "quote": "葛兰碧第二天下跌幅度不会超过第一天，超过了说明很弱",
+          "reason": "明确第一第二天和日均线。"
+        },
+        {
+          "tagId": "scope.unknown",
+          "startLine": 5,
+          "endLine": 5,
+          "quote": "  - 股票",
+          "reason": "完整正文虽有股票泛称或元数据，但没有限定A股市场及明确适用情境；scope.stock在现有词表标为A股，故保守待补。"
+        },
+        {
+          "tagId": "data.daily",
+          "startLine": 10,
+          "endLine": 10,
+          "quote": "破五是格兰碧第一天",
+          "reason": "需日级五日均线和价格。"
+        },
+        {
+          "tagId": "data.attachment",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "![img_20220610_024423_545.jpg](../_attachments/img_20220610_024423_545.jpg)",
+          "reason": "附图未核对。"
+        },
+        {
+          "tagId": "computability.definition",
+          "startLine": 18,
+          "endLine": 18,
+          "quote": "葛兰碧第二天下跌幅度不会超过第一天，超过了说明很弱",
+          "reason": "幅度口径和阶段起点有待定义。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "破五计首日与只做一二天",
+          "kind": "pattern",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "价格与MA5",
+            "破五日期和阶段编号"
+          ],
+          "applicability": [
+            "该篇按破五计第一天，并主张做前两天不做三四天。"
+          ],
+          "invalidation": [
+            "未破五或起点不同不能沿用此处编号。"
+          ],
+          "gaps": [
+            "破位是盘中还是收盘、何时重置、买卖动作和涨跌方向未定义。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 10,
+              "endLine": 10,
+              "quote": "破五是格兰碧第一天"
+            },
+            {
+              "startLine": 16,
+              "endLine": 16,
+              "quote": "格兰碧做一二两天 不做三四两天"
+            }
+          ]
+        },
+        {
+          "name": "第二天下跌超过首日提示弱势",
+          "kind": "condition",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "首日和第二日的下跌幅度"
+          ],
+          "applicability": [
+            "先在同一葛兰碧下跌段比较。"
+          ],
+          "invalidation": [
+            "超过首日则按原文为弱势；不超过也不证明未来上涨。"
+          ],
+          "gaps": [
+            "幅度指元、前收百分比、实体还是最大回撤未给；不能擅写跨基准比较公式。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 18,
+              "endLine": 18,
+              "quote": "葛兰碧第二天下跌幅度不会超过第一天，超过了说明很弱"
+            }
+          ]
+        },
+        {
+          "name": "20日线上方场景和破五反抽风险",
+          "kind": "risk",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "MA5、MA20和价格",
+            "破五后的反抽路径"
+          ],
+          "applicability": [
+            "保留20日线上方的原文场景提示，先确认破五断头背景。"
+          ],
+          "invalidation": [
+            "场景未确认时不可按此句声称适用；反抽不是必然断头。"
+          ],
+          "gaps": [
+            "“使用场景5日线 20日线之上”未说明是价格还是MA5在MA20之上；不能自动等同MA5>MA20。",
+            "凶险无量化止损或概率定义。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 22,
+              "endLine": 22,
+              "quote": "葛兰碧使用场景5日线 20日线之上"
+            },
+            {
+              "startLine": 24,
+              "endLine": 24,
+              "quote": "破五断头过程，反抽五日线十分凶险。"
+            }
+          ]
+        }
+      ],
+      "gaps": [
+        "两张图未检查；暴涨+暴涨、暴跌+暴跌只是片段，没有对应后续结果，不能凭别篇补成公式。"
+      ],
+      "attachments": {
+        "present": true,
+        "status": "not_inspected",
+        "note": "仅阅读文字；所列图片、音视频或外部链接未实际检查。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "海龟_1.md",
+      "sourceHash": "d01faa5b3730eed1741916ffe1e732a5b7cd4adb3ee3cff2184f65362aad01fd",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 8
+      },
+      "summary": "大盘暴跌时偏好逆势上涨且五日线起步、葛兰碧首日或筑底的海龟，并建议做两天至两天半。",
+      "roles": [
+        "method_selection",
+        "granville_stage",
+        "mode",
+        "risk"
+      ],
+      "tags": [
+        "kind.experience",
+        "topic.turtle",
+        "topic.granville",
+        "topic.ma5",
+        "purpose.screen",
+        "timeframe.daily",
+        "scope.falling",
+        "scope.rising",
+        "data.daily",
+        "data.sector",
+        "computability.definition"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "大盘暴跌时，上涨的个股 还是五日线起步第一天，格兰碧第一天，筑底海龟最好",
+          "reason": "选股和阶段经验。"
+        },
+        {
+          "tagId": "topic.turtle",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "大盘暴跌时，上涨的个股 还是五日线起步第一天，格兰碧第一天，筑底海龟最好",
+          "reason": "明确筑底海龟。"
+        },
+        {
+          "tagId": "topic.granville",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "大盘暴跌时，上涨的个股 还是五日线起步第一天，格兰碧第一天，筑底海龟最好",
+          "reason": "提到格兰碧第一天。"
+        },
+        {
+          "tagId": "topic.ma5",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "大盘暴跌时，上涨的个股 还是五日线起步第一天，格兰碧第一天，筑底海龟最好",
+          "reason": "五日线起步第一天。"
+        },
+        {
+          "tagId": "purpose.screen",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "大盘暴跌时，上涨的个股 还是五日线起步第一天，格兰碧第一天，筑底海龟最好",
+          "reason": "暴跌背景选择逆势上涨者。"
+        },
+        {
+          "tagId": "timeframe.daily",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "海龟做两天或者两天半",
+          "reason": "两天或两天半操作时长。"
+        },
+        {
+          "tagId": "scope.falling",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "大盘暴跌时，上涨的个股 还是五日线起步第一天，格兰碧第一天，筑底海龟最好",
+          "reason": "大盘暴跌情境。"
+        },
+        {
+          "tagId": "scope.rising",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "大盘暴跌时，上涨的个股 还是五日线起步第一天，格兰碧第一天，筑底海龟最好",
+          "reason": "个股逆势上涨。"
+        },
+        {
+          "tagId": "data.daily",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "大盘暴跌时，上涨的个股 还是五日线起步第一天，格兰碧第一天，筑底海龟最好",
+          "reason": "需五日线和日级阶段。"
+        },
+        {
+          "tagId": "data.sector",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "大盘暴跌时，上涨的个股 还是五日线起步第一天，格兰碧第一天，筑底海龟最好",
+          "reason": "需大盘背景。"
+        },
+        {
+          "tagId": "computability.definition",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "大盘暴跌时，上涨的个股 还是五日线起步第一天，格兰碧第一天，筑底海龟最好",
+          "reason": "暴跌、筑底和起步无阈值。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "暴跌中优先起步或筑底海龟",
+          "kind": "condition",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "大盘跌幅",
+            "个股涨跌及MA5",
+            "筑底和葛兰碧阶段"
+          ],
+          "applicability": [
+            "先有大盘暴跌，原文并列上涨、五日线起步第一天、格兰碧第一天和筑底海龟偏好。"
+          ],
+          "invalidation": [
+            "非暴跌或阶段未确认不满足原文背景。"
+          ],
+          "gaps": [
+            "没有明确这些特征必须全满足还是可选，也没有暴跌、筑底、起步量化标准。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 6,
+              "endLine": 6,
+              "quote": "大盘暴跌时，上涨的个股 还是五日线起步第一天，格兰碧第一天，筑底海龟最好"
+            }
+          ]
+        },
+        {
+          "name": "海龟两天或两天半的持有节奏",
+          "kind": "condition",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "海龟确认起点",
+            "买入时刻"
+          ],
+          "applicability": [
+            "作为原文操作时长偏好。"
+          ],
+          "invalidation": [
+            "不是继续上涨保证，不能代替风险退出定义。"
+          ],
+          "gaps": [
+            "起算点、半天时段、交易日与自然日、卖出条件和失败止损均未给。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 8,
+              "endLine": 8,
+              "quote": "海龟做两天或者两天半"
+            }
+          ]
+        }
+      ],
+      "gaps": [],
+      "attachments": {
+        "present": false,
+        "status": "none",
+        "note": "正文未列附件或外部链接；未据提及的图形推断数据。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "牛十条.md",
+      "sourceHash": "3b5cfb8499b94b896123fb6bc1828941454c41f83315ca0f7ef278554dbf32d7",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 28
+      },
+      "summary": "以牛市成立后持有和20日线底线为主张，把牛市连到摸线二三期；“每次买对卖错”与末条及时止盈止损并存，并区分一般到120日线与更大行情。",
+      "roles": [
+        "trend",
+        "mode",
+        "risk",
+        "context"
+      ],
+      "tags": [
+        "kind.principle",
+        "topic.phase",
+        "topic.boll",
+        "topic.ma20",
+        "topic.market",
+        "purpose.trend",
+        "purpose.risk",
+        "timeframe.daily",
+        "scope.rising",
+        "data.daily",
+        "computability.definition"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.principle",
+          "startLine": 10,
+          "endLine": 10,
+          "quote": "（一）牛市成立需换牛市思维操作（解释：按以下9条操作）",
+          "reason": "牛市成立后要求转操作思维。"
+        },
+        {
+          "tagId": "topic.phase",
+          "startLine": 16,
+          "endLine": 16,
+          "quote": "（四）牛市就是摸线行情三期后续（解释：突破布林线上轨就是摸线三期）",
+          "reason": "突破布林上轨视作三期。"
+        },
+        {
+          "tagId": "topic.boll",
+          "startLine": 18,
+          "endLine": 18,
+          "quote": "（五）牛市心态：坚持底线心怀远方（解释：底线是布林线中轨，也就是20日线）",
+          "reason": "布林中轨作为底线。"
+        },
+        {
+          "tagId": "topic.ma20",
+          "startLine": 22,
+          "endLine": 22,
+          "quote": "（七）牛市趋势向上组合趴活最好（解释：牛市也有下跌，很容易卖飞，所以最好是趴 着不动，等待大涨，直到破位20日线）",
+          "reason": "以破位20日线作为持有终点参照。"
+        },
+        {
+          "tagId": "topic.market",
+          "startLine": 8,
+          "endLine": 8,
+          "quote": "牛十条（牛市十条）",
+          "reason": "全篇论牛市环境。"
+        },
+        {
+          "tagId": "purpose.trend",
+          "startLine": 24,
+          "endLine": 24,
+          "quote": "（八）牛市源于摸线反转死于底线（解释：牛市起源于摸线二期、然后进入三期，通常 上涨至120日线就到顶，死于底线20日线）",
+          "reason": "说明牛市起源和终结。"
+        },
+        {
+          "tagId": "purpose.risk",
+          "startLine": 28,
+          "endLine": 28,
+          "quote": "应该设置好止盈位或止损位，见好就收，等待下一轮的牛市。",
+          "reason": "明确需设置止盈止损。"
+        },
+        {
+          "tagId": "timeframe.daily",
+          "startLine": 18,
+          "endLine": 18,
+          "quote": "（五）牛市心态：坚持底线心怀远方（解释：底线是布林线中轨，也就是20日线）",
+          "reason": "底线明确20日线。"
+        },
+        {
+          "tagId": "scope.rising",
+          "startLine": 22,
+          "endLine": 22,
+          "quote": "（七）牛市趋势向上组合趴活最好（解释：牛市也有下跌，很容易卖飞，所以最好是趴 着不动，等待大涨，直到破位20日线）",
+          "reason": "趋势向上情境。"
+        },
+        {
+          "tagId": "data.daily",
+          "startLine": 18,
+          "endLine": 18,
+          "quote": "（五）牛市心态：坚持底线心怀远方（解释：底线是布林线中轨，也就是20日线）",
+          "reason": "需要20日线和布林中轨。"
+        },
+        {
+          "tagId": "computability.definition",
+          "startLine": 10,
+          "endLine": 10,
+          "quote": "（一）牛市成立需换牛市思维操作（解释：按以下9条操作）",
+          "reason": "牛市成立条件缺失，规则尚不可机械触发。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "牛市衔接摸线二三期",
+          "kind": "pattern",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "摸线二三期形态",
+            "布林上轨",
+            "MA120"
+          ],
+          "applicability": [
+            "原文以突破上轨为三期并把牛市连到摸线反转；120日线仅称通常，一般与大牛市须分开。"
+          ],
+          "invalidation": [
+            "不能把一般到120日线的描述变成所有牛市绝对顶部；第九条明确大牛市可能更远。"
+          ],
+          "gaps": [
+            "牛市成立、二三期反转、一般与大牛市划分和突破确认均未定义。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 16,
+              "endLine": 16,
+              "quote": "（四）牛市就是摸线行情三期后续（解释：突破布林线上轨就是摸线三期）"
+            },
+            {
+              "startLine": 24,
+              "endLine": 24,
+              "quote": "（八）牛市源于摸线反转死于底线（解释：牛市起源于摸线二期、然后进入三期，通常 上涨至120日线就到顶，死于底线20日线）"
+            },
+            {
+              "startLine": 26,
+              "endLine": 26,
+              "quote": "（九）牛市不言顶利空猜底必踏空（解释：牛市不知道能涨到什么位置，第八条说的120 日线是一般的牛市，大的牛市没有顶，按底线不破20日线持股就好，出利空或去猜底然 后卖出，必然踏空）"
+            }
+          ]
+        },
+        {
+          "name": "20日线或中轨底线的持有纪律",
+          "kind": "risk",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "价格与MA20",
+            "布林中轨及参数"
+          ],
+          "applicability": [
+            "原文趋势向上时偏好持有到20日线破位。"
+          ],
+          "invalidation": [
+            "破位底线不再满足该持有条件。"
+          ],
+          "gaps": [
+            "盘中还是收盘破位、容差及执行价格未给；中轨等于MA20需要布林期数为20，正文未给完整参数。"
+          ],
+          "computability": "needs_definition",
+          "evidence": [
+            {
+              "startLine": 18,
+              "endLine": 18,
+              "quote": "（五）牛市心态：坚持底线心怀远方（解释：底线是布林线中轨，也就是20日线）"
+            },
+            {
+              "startLine": 22,
+              "endLine": 22,
+              "quote": "（七）牛市趋势向上组合趴活最好（解释：牛市也有下跌，很容易卖飞，所以最好是趴 着不动，等待大涨，直到破位20日线）"
+            },
+            {
+              "startLine": 26,
+              "endLine": 26,
+              "quote": "（九）牛市不言顶利空猜底必踏空（解释：牛市不知道能涨到什么位置，第八条说的120 日线是一般的牛市，大的牛市没有顶，按底线不破20日线持股就好，出利空或去猜底然 后卖出，必然踏空）"
+            }
+          ]
+        },
+        {
+          "name": "每次买对卖错的绝对表述与止盈要求并存",
+          "kind": "context",
+          "formula": null,
+          "periods": [
+            "day"
+          ],
+          "inputs": [
+            "预先确认的牛市状态",
+            "实际买卖和底线"
+          ],
+          "applicability": [
+            "保留作者在牛市成立下鼓励持有的表述，同时保留末条适当卖出的要求。"
+          ],
+          "invalidation": [
+            "“牛市每次买对”不能覆盖行情终结或否认风险；不能把两种表述擅自合并成已验证策略。"
+          ],
+          "gaps": [
+            "牛市的实时识别和终点事前不可由本篇确定；绝对措辞无样本支撑，阶段条件与退出要求存在解释张力。"
+          ],
+          "computability": "reference",
+          "evidence": [
+            {
+              "startLine": 12,
+              "endLine": 12,
+              "quote": "（二）牛市每一次买进都是正确的（解释：随便啥时候买都是对的，因为肯定还要涨）"
+            },
+            {
+              "startLine": 14,
+              "endLine": 14,
+              "quote": "（三）牛市每一次卖出都是错误的（解释：随便啥时候卖都是错的，因为肯定还要涨）"
+            },
+            {
+              "startLine": 28,
+              "endLine": 28,
+              "quote": "应该设置好止盈位或止损位，见好就收，等待下一轮的牛市。"
+            }
+          ]
+        },
+        {
+          "name": "牛市持续时长和频次的经验范围",
+          "kind": "context",
+          "formula": null,
+          "periods": [
+            "unknown"
+          ],
+          "inputs": [
+            "待定义的牛市和偷桃子分类",
+            "历史价格样本"
+          ],
+          "applicability": [
+            "仅记录作者月、年尺度的经验叙述，不把持有时长直接当月K或年K信号。"
+          ],
+          "invalidation": [],
+          "gaps": [
+            "样本、起止、频次统计和小级别定义均缺；不能当概率或到期价格预测。"
+          ],
+          "computability": "reference",
+          "evidence": [
+            {
+              "startLine": 28,
+              "endLine": 28,
+              "quote": "一般的牛市行情1个月左右，个别的 会有2-3个月，极个别的偷桃子股票甚至会有2-3年的行情"
+            },
+            {
+              "startLine": 28,
+              "endLine": 28,
+              "quote": "每年其实都会有3-4次小 级别的牛市"
+            }
+          ]
+        }
+      ],
+      "gaps": [
+        "“每次买进正确/每次卖出错误”与第十条适当卖出并存，已保留证据，不消除其条件与时点缺口。",
+        "一般到120日线与大牛市没有顶的说法带限定，未检验其适用边界或预测效果。"
+      ],
+      "attachments": {
+        "present": false,
+        "status": "none",
+        "note": "正文未列附件或外部链接；未据提及的图形推断数据。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "牛市.md",
+      "sourceHash": "df0ac54f85fa2692fd4acef7cb18006063f4e1f0afb98ea07ed63eb0f5c35897",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 9
+      },
+      "summary": "说明牛市计数取决于定义：是否把超跌反弹计入会改变四次或五次的历史计数，并在原笔记时点表达等待下一次的看法。",
+      "roles": [
+        "context",
+        "method_selection"
+      ],
+      "tags": [
+        "kind.context",
+        "topic.market",
+        "purpose.explain",
+        "timeframe.unknown",
+        "scope.unknown",
+        "data.unknown",
+        "computability.reference"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.context",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "牛市标准不同，牛市次数不同",
+          "reason": "历史分类和口径说明。"
+        },
+        {
+          "tagId": "topic.market",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "比如腾讯的超跌反弹涨幅100%，那其实不是牛市，但是说牛市，那么把标准降低也算上牛市了。",
+          "reason": "讨论市场牛市与超跌反弹。"
+        },
+        {
+          "tagId": "purpose.explain",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "这是四个牛市，如果吧2009年的超跌反弹牛市涨幅79.98%也算上的话，就是五个。",
+          "reason": "解释计数依定义而异。"
+        },
+        {
+          "tagId": "timeframe.unknown",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "所以，2001年之前算一个慢牛市，之后两个牛市6124  5178  ，2019年算蓝筹牛市。",
+          "reason": "全文只有历史年份和涨幅，没有分析K线周期或窗口。"
+        },
+        {
+          "tagId": "scope.unknown",
+          "startLine": 5,
+          "endLine": 5,
+          "quote": "  - 股票",
+          "reason": "完整正文混合腾讯与其他历史市场例子，未限定统一证券池；不能仅由股票元数据确定A股适用范围。"
+        },
+        {
+          "tagId": "data.unknown",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "牛市标准不同，牛市次数不同",
+          "reason": "全文没有支持历史计数的行情来源或统一口径。"
+        },
+        {
+          "tagId": "computability.reference",
+          "startLine": 9,
+          "endLine": 9,
+          "quote": "牛市标准不同，牛市次数不同",
+          "reason": "说明分类口径，缺可执行定义。"
+        }
+      ],
+      "claims": [
+        {
+          "name": "牛市历史计数随纳入标准变化",
+          "kind": "context",
+          "formula": null,
+          "periods": [
+            "unknown"
+          ],
+          "inputs": [
+            "牛市和超跌反弹定义",
+            "历史观察范围和样本"
+          ],
+          "applicability": [
+            "先明确分类口径再比较次数，等待第六个是该笔记时点的观点。"
+          ],
+          "invalidation": [],
+          "gaps": [
+            "没有统一涨幅、持续时间、起止和市场范围；100%反弹也不算牛市的例子说明涨幅不能单独定义。",
+            "历史数字未核验，不能当当前行情判断或预测。"
+          ],
+          "computability": "reference",
+          "evidence": [
+            {
+              "startLine": 9,
+              "endLine": 9,
+              "quote": "牛市标准不同，牛市次数不同"
+            },
+            {
+              "startLine": 9,
+              "endLine": 9,
+              "quote": "这是四个牛市，如果吧2009年的超跌反弹牛市涨幅79.98%也算上的话，就是五个。"
+            }
+          ]
+        }
+      ],
+      "gaps": [],
+      "attachments": {
+        "present": false,
+        "status": "none",
+        "note": "正文未列附件或外部链接；未据提及的图形推断数据。"
+      },
+      "userRuleConflicts": []
+    },
+    {
+      "file": "赛力斯.md",
+      "sourceHash": "c49e32421c252e383f185e895a9cb2ef70e218950075565526ba04f5bf054f94",
+      "status": "ai_candidate",
+      "readCoverage": {
+        "fromLine": 1,
+        "throughLine": 16
+      },
+      "summary": "2023-07-18日期下只有前一日/今日的OHLC及日5、日10空表格，没有价格、结论或公式。",
+      "roles": [
+        "context"
+      ],
+      "tags": [
+        "kind.case",
+        "topic.ma5",
+        "topic.ma10",
+        "purpose.unknown",
+        "timeframe.daily",
+        "scope.unknown",
+        "data.daily",
+        "computability.reference"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.case",
+          "startLine": 6,
+          "endLine": 16,
+          "quote": "2023-07-18\n\n| 前一日 | 今日 |\n| --- | --- |\n| 最高点 |  |\n| 收盘点 |  |\n| 开盘点 |  |\n| 最低点 |  |\n| 日 5 |  |\n| 日 10 |  |\n| 日 |  |",
+          "reason": "带日期的记录模板，没有观测结果。"
+        },
+        {
+          "tagId": "topic.ma5",
+          "startLine": 14,
+          "endLine": 14,
+          "quote": "| 日 5 |  |",
+          "reason": "只有日5字段名，解释为候选均线字段，值未填。"
+        },
+        {
+          "tagId": "topic.ma10",
+          "startLine": 15,
+          "endLine": 15,
+          "quote": "| 日 10 |  |",
+          "reason": "只有日10字段名，值未填。"
+        },
+        {
+          "tagId": "purpose.unknown",
+          "startLine": 8,
+          "endLine": 16,
+          "quote": "| 前一日 | 今日 |\n| --- | --- |\n| 最高点 |  |\n| 收盘点 |  |\n| 开盘点 |  |\n| 最低点 |  |\n| 日 5 |  |\n| 日 10 |  |\n| 日 |  |",
+          "reason": "完整正文空表未明确计算、交易或验证目的。"
+        },
+        {
+          "tagId": "timeframe.daily",
+          "startLine": 14,
+          "endLine": 16,
+          "quote": "| 日 5 |  |\n| 日 10 |  |\n| 日 |  |",
+          "reason": "字段明确写日5、日10。"
+        },
+        {
+          "tagId": "scope.unknown",
+          "startLine": 6,
+          "endLine": 6,
+          "quote": "2023-07-18",
+          "reason": "正文仅日期与空表，未写证券代码或市场，不能仅凭文件名补范围。"
+        },
+        {
+          "tagId": "data.daily",
+          "startLine": 10,
+          "endLine": 16,
+          "quote": "| 最高点 |  |\n| 收盘点 |  |\n| 开盘点 |  |\n| 最低点 |  |\n| 日 5 |  |\n| 日 10 |  |\n| 日 |  |",
+          "reason": "模板预留每日最高收盘开盘最低，均无数据。"
+        },
+        {
+          "tagId": "computability.reference",
+          "startLine": 8,
+          "endLine": 16,
+          "quote": "| 前一日 | 今日 |\n| --- | --- |\n| 最高点 |  |\n| 收盘点 |  |\n| 开盘点 |  |\n| 最低点 |  |\n| 日 5 |  |\n| 日 10 |  |\n| 日 |  |",
+          "reason": "全表无数值，也无公式或待算目标，不能标直接可计算。"
+        }
+      ],
+      "claims": [],
+      "gaps": [
+        "表格为空；日5/日10是否确指MA5/MA10仍需作者字段定义。",
+        "缺前一日和当日所有值、证券标识、复权、数据时点及第16行“日”的完整列含义。"
+      ],
+      "attachments": {
+        "present": false,
+        "status": "none",
+        "note": "正文未列附件或外部链接；未据提及的图形推断数据。"
+      },
+      "userRuleConflicts": []
+    }
+  ]
+}

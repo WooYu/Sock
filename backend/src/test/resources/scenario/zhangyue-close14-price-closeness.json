@@ -1,0 +1,37 @@
+{
+  "kind": "retrospective_replay",
+  "forwardEligible": false,
+  "source": "research/zhangyue-scenario-v1/price-evaluation-example-2026-10-15.json",
+  "levels": [
+    30.75,
+    29.75,
+    29.04,
+    28.65,
+    27.69
+  ],
+  "actual": {
+    "candle": {
+      "day": "2026-10-15",
+      "endTime": "2026-10-15",
+      "open": 29.51,
+      "close": 29.01,
+      "high": 32.91,
+      "low": 28.95,
+      "volume": 112231100
+    },
+    "source": {
+      "name": "腾讯公开行情·延时",
+      "fetchedAt": "2026-10-16T05:06:02.090Z",
+      "state": "DELAYED",
+      "online": true
+    },
+    "sourceFile": "/tmp/stockcal-603533-2026-10-16T05-06-00-081Z-day-source.json",
+    "sourceSha256": "4ed1ad37756d99395b7cc6e2221759874c23b9ad55c08a40e174a0e2388d72bb"
+  },
+  "expected": {
+    "totalLevels": 5,
+    "closeLevels": 2,
+    "coveredTargets": 3,
+    "exactLevels": 0
+  }
+}

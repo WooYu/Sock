@@ -1,0 +1,117 @@
+{
+  "definitionVersion": "ohlc-price-closeness-v1",
+  "levels": [
+    {
+      "id": "up-3075",
+      "priceCents": 3075,
+      "groupIds": [],
+      "errors": {
+        "open": 0.042019654354456114,
+        "high": 0.06563354603463993,
+        "low": 0.06217616580310881,
+        "close": 0.05997931747673216
+      },
+      "nearest": "open",
+      "matches": [],
+      "exactMatch": false
+    },
+    {
+      "id": "down-2975",
+      "priceCents": 2975,
+      "groupIds": [],
+      "errors": {
+        "open": 0.008132836326668925,
+        "high": 0.09601944697660286,
+        "low": 0.027633851468048358,
+        "close": 0.0255084453636677
+      },
+      "nearest": "open",
+      "matches": [
+        "open"
+      ],
+      "exactMatch": false
+    },
+    {
+      "id": "down-2904",
+      "priceCents": 2904,
+      "groupIds": [],
+      "errors": {
+        "open": 0.01592680447305998,
+        "high": 0.11759343664539654,
+        "low": 0.0031088082901554403,
+        "close": 0.001034126163391934
+      },
+      "nearest": "close",
+      "matches": [
+        "low",
+        "close"
+      ],
+      "exactMatch": false
+    },
+    {
+      "id": "down-2865",
+      "priceCents": 2865,
+      "groupIds": [],
+      "errors": {
+        "open": 0.029142663503896982,
+        "high": 0.12944393801276208,
+        "low": 0.010362694300518135,
+        "close": 0.012409513960703205
+      },
+      "nearest": "low",
+      "matches": [],
+      "exactMatch": false
+    },
+    {
+      "id": "down-2769",
+      "priceCents": 2769,
+      "groupIds": [],
+      "errors": {
+        "open": 0.06167400881057269,
+        "high": 0.15861440291704648,
+        "low": 0.043523316062176166,
+        "close": 0.045501551189245086
+      },
+      "nearest": "low",
+      "matches": [],
+      "exactMatch": false
+    }
+  ],
+  "targets": {
+    "open": {
+      "priceCents": 2951,
+      "covered": true,
+      "levelIds": [
+        "down-2975"
+      ],
+      "nearestError": 0.008132836326668925
+    },
+    "high": {
+      "priceCents": 3291,
+      "covered": false,
+      "levelIds": [],
+      "nearestError": 0.06563354603463993
+    },
+    "low": {
+      "priceCents": 2895,
+      "covered": true,
+      "levelIds": [
+        "down-2904"
+      ],
+      "nearestError": 0.0031088082901554403
+    },
+    "close": {
+      "priceCents": 2901,
+      "covered": true,
+      "levelIds": [
+        "down-2904"
+      ],
+      "nearestError": 0.001034126163391934
+    }
+  },
+  "totalLevels": 5,
+  "closeLevels": 2,
+  "levelClosenessRatio": 0.4,
+  "coveredTargets": 3,
+  "exactLevels": 0
+}

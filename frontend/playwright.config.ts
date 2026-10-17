@@ -3,6 +3,7 @@ import { defineConfig, devices } from "@playwright/test";
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3000";
 const usesExternalServer = Boolean(process.env.PLAYWRIGHT_BASE_URL);
 const channel = process.env.PLAYWRIGHT_CHANNEL;
+const executablePath = process.env.PLAYWRIGHT_EXECUTABLE_PATH;
 
 export default defineConfig({
   testDir: "./e2e",
@@ -11,6 +12,7 @@ export default defineConfig({
   use: {
     baseURL,
     trace: "retain-on-failure",
+    ...(executablePath ? { launchOptions: { executablePath } } : {}),
   },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"], browserName: "chromium", ...(channel ? { channel } : {}) } },

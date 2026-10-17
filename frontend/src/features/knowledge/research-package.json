@@ -4287,6 +4287,493 @@
       ],
       "references": [],
       "researchTest": "待定义或补数据后检验"
+    },
+    {
+      "id": "manual-20261017-method1-turtle",
+      "version": 1,
+      "type": "experience",
+      "title": "方式一：海龟与9:25到9:30涨速筛选",
+      "originalText": "方式一 海龟\n9:25到9:30涨速排序，再看图形。比如能成为葛一的，大盘跌的时候成功率更大",
+      "interpretation": "",
+      "sourceType": "manual",
+      "status": "unreviewed",
+      "createdAt": "2026-10-17T02:18:40.649Z",
+      "scope": [
+        "A_SHARE"
+      ],
+      "gaps": [
+        "尚未填写解释，原始内容暂不能计算。",
+        "涨速的计算窗口、排序范围与筛选数量尚未明确。",
+        "葛一起点和图形确认条件尚未定义；大盘下跌时成功率更大的说法待检验。"
+      ],
+      "caveats": [
+        "用户原话已保存；形态和效果尚未验证。"
+      ],
+      "references": [
+        {
+          "file": "notes/用户补充/2026-10-17-选股方式与交易原则.md",
+          "startLine": 7,
+          "endLine": 8,
+          "quote": "方式一 海龟\n9:25到9:30涨速排序，再看图形。比如能成为葛一的，大盘跌的时候成功率更大",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "manual-20261017-method2-granville",
+      "version": 1,
+      "type": "experience",
+      "title": "方式二：葛二跌买、葛三葛四与五日线支撑",
+      "originalText": "方式二 葛二跌买，葛三 葛四买，一般五日线买，boll线上轨卖\n昨天涨停第二天调整没太狠的，特别早上十分钟跌的，跌到支撑位的",
+      "interpretation": "",
+      "sourceType": "manual",
+      "status": "unreviewed",
+      "createdAt": "2026-10-17T02:18:40.649Z",
+      "scope": [
+        "A_SHARE"
+      ],
+      "gaps": [
+        "尚未填写解释，原始内容暂不能计算。",
+        "葛阶段起点、调整没太狠的阈值与支撑位选取尚未定义。",
+        "早盘十分钟观察条件及五日线／BOLL参考位的时点与周期待核对。"
+      ],
+      "caveats": [
+        "用户原话已保存；形态和效果尚未验证。"
+      ],
+      "references": [
+        {
+          "file": "notes/用户补充/2026-10-17-选股方式与交易原则.md",
+          "startLine": 9,
+          "endLine": 10,
+          "quote": "方式二 葛二跌买，葛三 葛四买，一般五日线买，boll线上轨卖\n昨天涨停第二天调整没太狠的，特别早上十分钟跌的，跌到支撑位的",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "manual-20261017-method3-moxian",
+      "version": 1,
+      "type": "experience",
+      "title": "方式三：上涨趋势进入摸线二期、突破中轨",
+      "originalText": "方式三 趋势上涨 进入摸线二期\n突破中轨是大涨",
+      "interpretation": "",
+      "sourceType": "manual",
+      "status": "unreviewed",
+      "createdAt": "2026-10-17T02:18:40.649Z",
+      "scope": [
+        "A_SHARE"
+      ],
+      "gaps": [
+        "尚未填写解释，原始内容暂不能计算。",
+        "上涨趋势和摸线二期的可重复识别条件尚未明确。",
+        "突破中轨以盘中还是收盘确认，以及大涨的定义尚未明确。"
+      ],
+      "caveats": [
+        "用户原话已保存；形态和效果尚未验证。"
+      ],
+      "references": [
+        {
+          "file": "notes/用户补充/2026-10-17-选股方式与交易原则.md",
+          "startLine": 11,
+          "endLine": 12,
+          "quote": "方式三 趋势上涨 进入摸线二期\n突破中轨是大涨",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "manual-20261017-method1-turtle",
+      "version": 2,
+      "type": "experience",
+      "title": "盈利模式一：海龟与9:25到9:30涨速筛选",
+      "originalText": "方式一 海龟\n9:25到9:30涨速排序，再看图形。比如能成为葛一的，大盘跌的时候成功率更大",
+      "interpretation": "",
+      "sourceType": "manual",
+      "status": "unreviewed",
+      "createdAt": "2026-10-17T02:23:08.677Z",
+      "scope": [
+        "A_SHARE",
+        "盈利模式"
+      ],
+      "gaps": [
+        "尚未填写解释，原始内容暂不能计算。",
+        "涨速的计算窗口、排序范围与筛选数量尚未明确。",
+        "葛一起点和图形确认条件尚未定义；大盘下跌时成功率更大的说法待检验。"
+      ],
+      "caveats": [
+        "用户原话已保存；形态和效果尚未验证。"
+      ],
+      "references": [
+        {
+          "file": "notes/用户补充/2026-10-17-选股方式与交易原则.md",
+          "startLine": 7,
+          "endLine": 8,
+          "quote": "方式一 海龟\n9:25到9:30涨速排序，再看图形。比如能成为葛一的，大盘跌的时候成功率更大",
+          "url": ""
+        }
+      ],
+      "previousVersion": 1
+    },
+    {
+      "id": "manual-20261017-method2-granville",
+      "version": 2,
+      "type": "experience",
+      "title": "盈利模式二：葛二跌买、葛三葛四与五日线支撑",
+      "originalText": "方式二 葛二跌买，葛三 葛四买，一般五日线买，boll线上轨卖\n昨天涨停第二天调整没太狠的，特别早上十分钟跌的，跌到支撑位的",
+      "interpretation": "",
+      "sourceType": "manual",
+      "status": "unreviewed",
+      "createdAt": "2026-10-17T02:23:08.677Z",
+      "scope": [
+        "A_SHARE",
+        "盈利模式"
+      ],
+      "gaps": [
+        "尚未填写解释，原始内容暂不能计算。",
+        "葛阶段起点、调整没太狠的阈值与支撑位选取尚未定义。",
+        "早盘十分钟观察条件及五日线／BOLL参考位的时点与周期待核对。"
+      ],
+      "caveats": [
+        "用户原话已保存；形态和效果尚未验证。"
+      ],
+      "references": [
+        {
+          "file": "notes/用户补充/2026-10-17-选股方式与交易原则.md",
+          "startLine": 9,
+          "endLine": 10,
+          "quote": "方式二 葛二跌买，葛三 葛四买，一般五日线买，boll线上轨卖\n昨天涨停第二天调整没太狠的，特别早上十分钟跌的，跌到支撑位的",
+          "url": ""
+        }
+      ],
+      "previousVersion": 1
+    },
+    {
+      "id": "manual-20261017-method3-moxian",
+      "version": 2,
+      "type": "experience",
+      "title": "盈利模式三：上涨趋势进入摸线二期、突破中轨",
+      "originalText": "方式三 趋势上涨 进入摸线二期\n突破中轨是大涨",
+      "interpretation": "",
+      "sourceType": "manual",
+      "status": "unreviewed",
+      "createdAt": "2026-10-17T02:23:08.677Z",
+      "scope": [
+        "A_SHARE",
+        "盈利模式"
+      ],
+      "gaps": [
+        "尚未填写解释，原始内容暂不能计算。",
+        "上涨趋势和摸线二期的可重复识别条件尚未明确。",
+        "突破中轨以盘中还是收盘确认，以及大涨的定义尚未明确。"
+      ],
+      "caveats": [
+        "用户原话已保存；形态和效果尚未验证。"
+      ],
+      "references": [
+        {
+          "file": "notes/用户补充/2026-10-17-选股方式与交易原则.md",
+          "startLine": 11,
+          "endLine": 12,
+          "quote": "方式三 趋势上涨 进入摸线二期\n突破中轨是大涨",
+          "url": ""
+        }
+      ],
+      "previousVersion": 1
+    },
+    {
+      "id": "manual-levels",
+      "version": 2,
+      "type": "experience",
+      "title": "三天 MA5 买入参考 / 三天 BOLL 上轨卖出参考",
+      "originalText": "买入：3天5日线；卖出：3天Boll线上轨；当天会打多少个参数，通过最近的振幅去匹配",
+      "interpretation": "未来三交易日的预测 MA5 为候选支撑/买入参考，预测 BOLL 上轨为候选阻力/卖出参考；不解释为连续三日站上均线。",
+      "sourceType": "manual",
+      "status": "unreviewed",
+      "scope": [
+        "A_SHARE",
+        "盈利模式"
+      ],
+      "createdAt": "2026-10-17T02:23:08.677Z",
+      "gaps": [],
+      "caveats": [
+        "MA5=5个收盘价的简单均值，BOLL=20日均值±2倍总体标准差",
+        "使用最近1或2次指标增量预测参考价位",
+        "振幅默认取近20日真实波幅中位数，需要用户确认窗口",
+        "相近价位按0.1%合并（来自参数计算.md），只计可达参考位，不承诺触达或成交",
+        "用户本轮提示尚未确认结构化解释；不自动参与交易。"
+      ],
+      "references": [],
+      "researchTest": "已检验简化的 MA5 / 上轨参考位，触达不等于成交或盈利",
+      "previousVersion": 1
+    },
+    {
+      "id": "manual-t0",
+      "version": 2,
+      "type": "hint",
+      "title": "ETF / 可转债盯盘窗口",
+      "originalText": "ETF或转债：T+0 要注意盯盘，转债要有A股的走势助攻。可转债交易时间10:30-13:50",
+      "interpretation": "需校验每个ETF品种的结算制度；10:30–13:50作为用户观察窗口，不能替代交易所交易时段。",
+      "sourceType": "manual",
+      "status": "unreviewed",
+      "scope": [
+        "ETF",
+        "CONVERTIBLE_BOND",
+        "盈利模式"
+      ],
+      "createdAt": "2026-10-17T02:23:08.677Z",
+      "gaps": [
+        "具体ETF品种",
+        "转债与正股映射",
+        "分时行情与可成交价格"
+      ],
+      "caveats": [
+        "用户本轮提示尚未确认结构化解释；不自动参与交易。"
+      ],
+      "references": [],
+      "researchTest": "待定义或补数据后检验",
+      "previousVersion": 1
+    },
+    {
+      "id": "manual-demon",
+      "version": 2,
+      "type": "experience",
+      "title": "热点强势股的入场与持有纪律",
+      "originalText": "妖股：筛选热点妖股，凭股感竞价杀入，后期遵守双高、跌停和五日线原则，注意是否放量",
+      "interpretation": "原文作为待确认的经验/原则保存，不自动改写成买卖信号。",
+      "sourceType": "manual",
+      "status": "unreviewed",
+      "scope": [
+        "A_SHARE",
+        "盈利模式"
+      ],
+      "createdAt": "2026-10-17T02:23:08.677Z",
+      "gaps": [
+        "热点/妖股标签",
+        "竞价触发标准",
+        "量比阈值"
+      ],
+      "caveats": [
+        "用户本轮提示尚未确认结构化解释；不自动参与交易。"
+      ],
+      "references": [],
+      "researchTest": "待定义或补数据后检验",
+      "previousVersion": 1
+    },
+    {
+      "id": "manual-granville34",
+      "version": 2,
+      "type": "experience",
+      "title": "葛三 / 葛四的均线回撤博弈",
+      "originalText": "博弈葛三或葛四：葛一大涨，葛二或者葛三调整明天5日线的股票，四天为一周期，注意撤离。数葛兰碧有时结合K线拆分和合并。",
+      "interpretation": "原文作为待确认的经验/原则保存，不自动改写成买卖信号。",
+      "sourceType": "manual",
+      "status": "unreviewed",
+      "scope": [
+        "A_SHARE",
+        "盈利模式"
+      ],
+      "createdAt": "2026-10-17T02:23:08.677Z",
+      "gaps": [
+        "葛一至葛四的可重复标注规范",
+        "大涨阈值",
+        "K线拆分/合并方式",
+        "撤离时点"
+      ],
+      "caveats": [
+        "用户本轮提示尚未确认结构化解释；不自动参与交易。"
+      ],
+      "references": [],
+      "researchTest": "待定义或补数据后检验",
+      "previousVersion": 1
+    },
+    {
+      "id": "manual-climb",
+      "version": 2,
+      "type": "principle",
+      "title": "攀升不破底线继续持有",
+      "originalText": "攀升：5日线或Boll线为底线，底线不破，坚决看多。",
+      "interpretation": "原文作为待确认的经验/原则保存，不自动改写成买卖信号。",
+      "sourceType": "manual",
+      "status": "unreviewed",
+      "scope": [
+        "A_SHARE",
+        "盈利模式"
+      ],
+      "createdAt": "2026-10-17T02:23:08.677Z",
+      "gaps": [
+        "攀升状态定义",
+        "具体BOLL轨道",
+        "破位以盘中触及还是收盘确认"
+      ],
+      "caveats": [
+        "用户本轮提示尚未确认结构化解释；不自动参与交易。"
+      ],
+      "references": [],
+      "researchTest": "待定义或补数据后检验",
+      "previousVersion": 1
+    },
+    {
+      "id": "manual-turtle",
+      "version": 2,
+      "type": "experience",
+      "title": "弱市场里的强板块、强个股",
+      "originalText": "海龟：大盘下跌过程，板块和个股涨势较好的股票",
+      "interpretation": "原文作为待确认的经验/原则保存，不自动改写成买卖信号。",
+      "sourceType": "manual",
+      "status": "unreviewed",
+      "scope": [
+        "A_SHARE",
+        "盈利模式"
+      ],
+      "createdAt": "2026-10-17T02:23:08.677Z",
+      "gaps": [
+        "板块历史行情与当时成分",
+        "下跌/相对强度阈值"
+      ],
+      "caveats": [
+        "用户本轮提示尚未确认结构化解释；不自动参与交易。"
+      ],
+      "references": [],
+      "researchTest": "待定义或补数据后检验",
+      "previousVersion": 1
+    },
+    {
+      "id": "manual-granville1",
+      "version": 2,
+      "type": "experience",
+      "title": "强势板块葛二调整再参与",
+      "originalText": "葛一：葛一涨幅较大的板块，遇葛二调整，继续买入，葛三大涨大跌",
+      "interpretation": "原文作为待确认的经验/原则保存，不自动改写成买卖信号。",
+      "sourceType": "manual",
+      "status": "unreviewed",
+      "scope": [
+        "A_SHARE",
+        "盈利模式"
+      ],
+      "createdAt": "2026-10-17T02:23:08.677Z",
+      "gaps": [
+        "板块强度阈值",
+        "葛阶段规范",
+        "葛三的大涨/大跌分支判别"
+      ],
+      "caveats": [
+        "用户本轮提示尚未确认结构化解释；不自动参与交易。"
+      ],
+      "references": [],
+      "researchTest": "待定义或补数据后检验",
+      "previousVersion": 1
+    },
+    {
+      "id": "manual-trend",
+      "version": 2,
+      "type": "hint",
+      "title": "历史趋势线与支撑区间",
+      "originalText": "趋势突破或者上涨：观察股票历史走势，画出上涨趋势和底线支撑位，做区间震荡",
+      "interpretation": "原文作为待确认的经验/原则保存，不自动改写成买卖信号。",
+      "sourceType": "manual",
+      "status": "unreviewed",
+      "scope": [
+        "A_SHARE",
+        "盈利模式"
+      ],
+      "createdAt": "2026-10-17T02:23:08.677Z",
+      "gaps": [
+        "趋势线时间/价格锚点",
+        "画线时点",
+        "区间突破确认条件"
+      ],
+      "caveats": [
+        "用户本轮提示尚未确认结构化解释；不自动参与交易。"
+      ],
+      "references": [],
+      "researchTest": "待定义或补数据后检验",
+      "previousVersion": 1
+    },
+    {
+      "id": "manual-mirror",
+      "version": 2,
+      "type": "experience",
+      "title": "照镜子后等待 MA5 / 趋势线",
+      "originalText": "照镜子止损：盈利是boll线上轨，一般照镜子2天后是下跌。照镜子是等待5日线的过程。如果远离5日线时，趋势线也可以用于照镜子。",
+      "interpretation": "原文作为待确认的经验/原则保存，不自动改写成买卖信号。",
+      "sourceType": "manual",
+      "status": "unreviewed",
+      "scope": [
+        "A_SHARE",
+        "盈利模式"
+      ],
+      "createdAt": "2026-10-17T02:23:08.677Z",
+      "gaps": [
+        "照镜子的事件定义",
+        "远离MA5的距离阈值",
+        "趋势线锚点"
+      ],
+      "caveats": [
+        "用户本轮提示尚未确认结构化解释；不自动参与交易。"
+      ],
+      "references": [],
+      "researchTest": "待定义或补数据后检验",
+      "previousVersion": 1
+    },
+    {
+      "id": "manual-rebound",
+      "version": 2,
+      "type": "principle",
+      "title": "下跌中继反弹未越过 MA5",
+      "originalText": "反弹止损：下跌中继过程，会反弹5日线，反弹不过5日线是耍流氓",
+      "interpretation": "MA20下降，前一日收盘低于MA5，当前最高价仍低于MA5；此为研究代理，非原文完整规则",
+      "sourceType": "manual",
+      "status": "unreviewed",
+      "scope": [
+        "A_SHARE",
+        "盈利模式"
+      ],
+      "createdAt": "2026-10-17T02:23:08.677Z",
+      "gaps": [
+        "下跌中继定义",
+        "反弹的观测周期",
+        "不过MA5是最高价还是收盘价"
+      ],
+      "caveats": [
+        "用户本轮提示尚未确认结构化解释；不自动参与交易。"
+      ],
+      "references": [],
+      "researchTest": "待定义或补数据后检验",
+      "previousVersion": 1
+    },
+    {
+      "id": "manual-20261017-warning-granville4",
+      "version": 1,
+      "type": "experience",
+      "title": "股市警示语：葛四大涨大跌日的开盘下跌",
+      "originalText": "葛四如果是大涨大跌日，开盘下跌是为了更好上涨。",
+      "interpretation": "",
+      "sourceType": "manual",
+      "status": "unreviewed",
+      "createdAt": "2026-10-17T02:23:08.677Z",
+      "scope": [
+        "A_SHARE",
+        "股市警示语",
+        "葛四",
+        "大涨大跌日"
+      ],
+      "gaps": [
+        "尚未填写解释，原始内容暂不能计算。",
+        "需先确认葛四计数和大涨大跌日情境。",
+        "开盘下跌后转强的条件、失效情形及效果尚待核对。"
+      ],
+      "caveats": [
+        "用户经验原话，保留适用前提，作为复盘提醒收集。"
+      ],
+      "references": [
+        {
+          "file": "notes/用户补充/股市警示语.md",
+          "startLine": 7,
+          "endLine": 7,
+          "quote": "葛四如果是大涨大跌日，开盘下跌是为了更好上涨。",
+          "url": ""
+        }
+      ]
     }
   ],
   "backtest": {

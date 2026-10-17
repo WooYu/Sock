@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "symbol": "603533",
+  "adjustment": "none",
+  "apiBase": "http://127.0.0.1:3000",
+  "startedAt": "2026-10-14T23:58:54.020Z",
+  "capturedAt": "2026-10-14T23:58:58.884Z",
+  "status": "captured",
+  "calendar": null,
+  "periods": [
+    {
+      "period": "day",
+      "status": "captured",
+      "requestPath": "/api/market/stocks/603533/candles?period=day&adjustment=none",
+      "capturedAt": "2026-10-14T23:58:56.352Z",
+      "source": {
+        "name": "腾讯公开行情·延时",
+        "fetchedAt": "2026-10-14T23:58:56.339Z",
+        "state": "DELAYED",
+        "online": true
+      },
+      "file": "day.json",
+      "sha256": "66d73cf55cf1f8d0e4151bdfa5800a02482c7d9f1627101ca9db12cb314a9ca4",
+      "bytes": 114724,
+      "count": 640,
+      "closedCount": 640,
+      "lastClosedAt": "2026-10-14T15:00:00+08:00",
+      "limitedHistory": false
+    },
+    {
+      "period": "60m",
+      "status": "captured",
+      "requestPath": "/api/market/stocks/603533/candles?period=60m&adjustment=none",
+      "capturedAt": "2026-10-14T23:58:57.892Z",
+      "source": {
+        "name": "腾讯公开行情·延时",
+        "fetchedAt": "2026-10-14T23:58:57.887Z",
+        "state": "DELAYED",
+        "online": true
+      },
+      "file": "60m.json",
+      "sha256": "ccb16eccfcae2c964911ef5f689a528bb1361914997d4c9520446678d2b026c1",
+      "bytes": 133890,
+      "count": 640,
+      "closedCount": 640,
+      "lastClosedAt": "2026-10-14T15:00:00+08:00",
+      "limitedHistory": false
+    },
+    {
+      "period": "30m",
+      "status": "captured",
+      "requestPath": "/api/market/stocks/603533/candles?period=30m&adjustment=none",
+      "capturedAt": "2026-10-14T23:58:58.881Z",
+      "source": {
+        "name": "腾讯公开行情·延时",
+        "fetchedAt": "2026-10-14T23:58:58.877Z",
+        "state": "DELAYED",
+        "online": true
+      },
+      "file": "30m.json",
+      "sha256": "9de2905e03602efd36e52fb3e6137be3c1a07c50448ebfe0f99af0e91a6ca8e8",
+      "bytes": 133789,
+      "count": 640,
+      "closedCount": 640,
+      "lastClosedAt": "2026-10-14T15:00:00+08:00",
+      "limitedHistory": false
+    }
+  ]
+}

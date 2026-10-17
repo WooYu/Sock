@@ -1,0 +1,135 @@
+{
+  "definitionVersion": "price-learning-replay-v1",
+  "createdAt": "2026-10-16T16:06:03.851Z",
+  "symbol": "603533",
+  "sourceSha256": "4ed1ad37756d99395b7cc6e2221759874c23b9ad55c08a40e174a0e2388d72bb",
+  "latestCompleteDay": "2026-10-15",
+  "period": "day",
+  "horizons": [
+    1,
+    2,
+    3
+  ],
+  "targetMeaning": "next observed complete daily candle; future 1/2/3 indicator levels tested against this one preselected price window",
+  "methods": [
+    "average_delta",
+    "last_delta",
+    "rolling_close",
+    "previous_close"
+  ],
+  "rollingCondition": "future closes stay at origin close; no later price selected",
+  "matching": {
+    "definitionVersion": "ohlc-price-closeness-v1",
+    "fields": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "relativeDenominator": "actual_price",
+    "threshold": 0.01,
+    "operator": "lt",
+    "tickSize": 0.01
+  },
+  "consolidation": {
+    "tolerance": 0.01,
+    "definitionVersion": "reference-mean-1pct-v1"
+  },
+  "band": {
+    "ratio": 0.1,
+    "source": "ordinary_main_board_assumption",
+    "verifiedSpecialStatus": false
+  },
+  "split": {
+    "trainingTargets": [
+      "2026-07-16",
+      "2026-07-17",
+      "2026-07-20",
+      "2026-07-21",
+      "2026-07-22",
+      "2026-07-23",
+      "2026-07-24",
+      "2026-07-27",
+      "2026-07-28",
+      "2026-07-29",
+      "2026-07-30",
+      "2026-07-31",
+      "2026-08-03",
+      "2026-08-04",
+      "2026-08-05",
+      "2026-08-06",
+      "2026-08-07",
+      "2026-08-10",
+      "2026-08-11",
+      "2026-08-12",
+      "2026-08-13",
+      "2026-08-14",
+      "2026-08-17",
+      "2026-08-18",
+      "2026-08-19",
+      "2026-08-20",
+      "2026-08-21",
+      "2026-08-24",
+      "2026-08-25",
+      "2026-08-26",
+      "2026-08-27",
+      "2026-08-28",
+      "2026-08-31",
+      "2026-09-01",
+      "2026-09-02",
+      "2026-09-03",
+      "2026-09-04",
+      "2026-09-07",
+      "2026-09-08",
+      "2026-09-09"
+    ],
+    "validationTargets": [
+      "2026-09-10",
+      "2026-09-11",
+      "2026-09-14",
+      "2026-09-15",
+      "2026-09-16",
+      "2026-09-17",
+      "2026-09-18",
+      "2026-09-21",
+      "2026-09-22",
+      "2026-09-23",
+      "2026-09-24",
+      "2026-09-28",
+      "2026-09-29",
+      "2026-09-30",
+      "2026-10-08",
+      "2026-10-09",
+      "2026-10-12",
+      "2026-10-13",
+      "2026-10-14",
+      "2026-10-15"
+    ]
+  },
+  "regime": {
+    "source": "existing daily directionCandidate; never a confirmed trend or Granville stage",
+    "minimumTrainingSamplesForConditionalChoice": 8
+  },
+  "selection": {
+    "primary": "harmonic mean of mean per-day level precision and mean per-day OHLC target coverage",
+    "zeroCandidateDay": "both per-day level precision and selection score use zero; empty count retained",
+    "tieBreak": [
+      "higher mean target coverage",
+      "fewer mean candidates",
+      "average_delta then last_delta then rolling_close"
+    ],
+    "candidateLimit": "one rule frozen after training; no revisions based on validation results"
+  },
+  "previouslyInspectedValidationDates": [
+    "2026-09-10",
+    "2026-09-11",
+    "2026-10-14",
+    "2026-10-15"
+  ],
+  "constraints": [
+    "No hour or 30m price forecasting requested for this study.",
+    "Validation segment is retrospective and partly previously inspected, not a strict blind or live test.",
+    "No intraday support/resistance score without intraday evidence.",
+    "No automatic activation, changes to original notes, or modification of saved analyses."
+  ]
+}

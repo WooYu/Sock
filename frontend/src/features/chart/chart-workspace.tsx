@@ -44,12 +44,14 @@ function RecoveryPanel({ records, onRestore }: { records: DrawingRecoveryRecord[
   )
 }
 
-export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', errorMessage, onRetry, variant = 'classic', forecastStatus, forecastError, footer, loadSeries }: { snapshot?: MarketSnapshot | null; prediction?: PredictionSnapshot | null; status?: WorkspaceStatus; errorMessage?: string | null; onRetry?: () => void; variant?: 'classic' | 'studio'; forecastStatus?: 'idle' | 'loading' | 'ready' | 'error'; forecastError?: string | null; footer?: React.ReactNode; loadSeries?: ChartSeriesLoader }) {
+export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', errorMessage, onRetry, variant = 'classic', forecastStatus, forecastError, footer, loadSeries, period: controlledPeriod, onPeriodChange }: { snapshot?: MarketSnapshot | null; prediction?: PredictionSnapshot | null; status?: WorkspaceStatus; errorMessage?: string | null; onRetry?: () => void; variant?: 'classic' | 'studio'; forecastStatus?: 'idle' | 'loading' | 'ready' | 'error'; forecastError?: string | null; footer?: React.ReactNode; loadSeries?: ChartSeriesLoader; period?: ChartPeriod; onPeriodChange?: (period: ChartPeriod) => void }) {
   const isStudio = variant === 'studio'
   const [historyWindow, setHistoryWindow] = useState(60)
   const [rightTab, setRightTab] = useState<'prediction' | 'drawings'>('prediction')
   const [activeTool, setActiveTool] = useState<ChartTool>('pointer')
-  const [activePeriod, setActivePeriod] = useState<ChartPeriod>('day')
+  const [internalPeriod, setInternalPeriod] = useState<ChartPeriod>('day')
+  const activePeriod = controlledPeriod ?? internalPeriod
+  const setActivePeriod = (period: ChartPeriod) => { if (controlledPeriod === undefined) setInternalPeriod(period); onPeriodChange?.(period) }
   const symbol = snapshot?.quote.security.code ?? ''
   const { workspace, drawings, selectedId, syncStatus, commands } = useChartWorkspace({ symbol, period: activePeriod, localOnly: symbol === 'DEMO' })
   const indicators = { ...DEFAULT_INDICATORS, ...workspace.indicators }

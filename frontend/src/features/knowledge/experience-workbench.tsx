@@ -1,9 +1,11 @@
 'use client'
 
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { useDeferredValue, useEffect, useMemo, useRef, useState, useSyncExternalStore, type FormEvent, type KeyboardEvent } from 'react'
 import { StudioIcon } from '../research/studio-icon'
 import researchPackage from './research-package.json'
+import noteSummary from './note-tag-summary.json'
 import {
   KNOWLEDGE_STORAGE_KEY, TYPE_LABELS, createManualVersion, isExpired, latestEntries,
   mergeVersions, parseLedger, reviewVersion, reviseSourceInterpretation, shanghaiToday, validateManualDraft,
@@ -11,7 +13,12 @@ import {
 } from './knowledge-types'
 import './experience-workbench.css'
 
-type WorkbenchTab = 'library' | 'backtest'
+type WorkbenchTab = 'library' | 'notes' | 'samples' | 'backtest'
+const TABS: WorkbenchTab[] = ['library', 'notes', 'samples', 'backtest']
+const LearningSamplesView = dynamic(() => import('./learning-samples-view').then(module => module.LearningSamplesView), { loading: () => <p role="status">正在读取学习样本…</p> })
+const NoteTagWorkbench = dynamic(() => import('./note-tag-workbench').then((module) => module.NoteTagWorkbench), {
+  loading: () => <p role="status">正在读取笔记标签目录…</p>,
+})
 const PAGE_SIZE = 12
 const dateTime = new Intl.DateTimeFormat('zh-CN', { timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })
 const displayDate = (value: string) => Number.isFinite(Date.parse(value)) ? dateTime.format(new Date(value)) : value
@@ -74,7 +81,10 @@ export function ExperienceWorkbench({ data = researchPackage as KnowledgePackage
   const detailRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
-    const onLocation = () => setTab(new URL(window.location.href).searchParams.get('view') === 'backtest' ? 'backtest' : 'library')
+    const onLocation = () => {
+      const view = new URL(window.location.href).searchParams.get('view')
+      setTab(view === 'backtest' || view === 'notes' || view === 'samples' ? view : 'library')
+    }
     window.addEventListener('popstate', onLocation)
     return () => window.removeEventListener('popstate', onLocation)
   }, [])
@@ -103,7 +113,7 @@ export function ExperienceWorkbench({ data = researchPackage as KnowledgePackage
   function switchTab(next: WorkbenchTab) {
     setTab(next)
     const url = new URL(window.location.href)
-    if (next === 'backtest') url.searchParams.set('view', 'backtest')
+    if (next !== 'library') url.searchParams.set('view', next)
     else url.searchParams.delete('view')
     window.history.replaceState(null, '', `${url.pathname}${url.search}`)
   }
@@ -172,39 +182,42 @@ export function ExperienceWorkbench({ data = researchPackage as KnowledgePackage
       <nav aria-label="研究导航">
         <Link href="/?symbol=300502">K线工作台</Link>
         <a href="/knowledge" aria-current={tab === 'library' ? 'page' : undefined} onClick={(event) => { event.preventDefault(); switchTab('library') }}>经验与原则</a>
+        <a href="/knowledge?view=notes" aria-current={tab === 'notes' ? 'page' : undefined} onClick={(event) => { event.preventDefault(); switchTab('notes') }}>笔记标签</a>
+        <a href="/knowledge?view=samples" aria-current={tab === 'samples' ? 'page' : undefined} onClick={(event) => { event.preventDefault(); switchTab('samples') }}>学习样本</a>
         <a href="/knowledge?view=backtest" aria-current={tab === 'backtest' ? 'page' : undefined} onClick={(event) => { event.preventDefault(); switchTab('backtest') }}>回测证据</a>
       </nav>
       <span className="kw-header-note"><i />研究档案 · 本地保存</span>
     </header>
 
     <main className="kw-main">
-      <div className="kw-breadcrumb"><StudioIcon name="book" size={15} /><span>研究工作区</span><span>/</span><strong>{tab === 'library' ? '经验与原则' : '回测证据'}</strong></div>
+      <div className="kw-breadcrumb"><StudioIcon name="book" size={15} /><span>研究工作区</span><span>/</span><strong>{tab === 'library' ? '经验与原则' : tab === 'notes' ? '笔记标签' : tab === 'samples' ? '学习样本' : '回测证据'}</strong></div>
       <div className="kw-page-heading">
-        <div><h1>经验与原则</h1><p>保留原话，核对解释，让每条经验在被使用前先经得起检查。</p></div>
-        <div className="kw-actions"><button className="kw-button" onClick={exportRecords} type="button"><StudioIcon name="layers" size={16} />导出记录</button><button className="kw-button kw-primary" disabled={!ready} onClick={() => { setEditor('new'); setWriteError('') }} type="button"><StudioIcon name="plus" size={16} />新增记录</button></div>
+        <div><h1>{tab === 'notes' ? '笔记标签' : tab === 'samples' ? '学习样本' : '经验与原则'}</h1><p>{tab === 'notes' ? '按主题、用途与计算条件整理笔记，保留每次分类的原文依据。' : tab === 'samples' ? '把保存时的计算、所用笔记与实际行情连在一起，保留每次核对结果。' : '保留原话，核对解释，让每条经验在被使用前先经得起检查。'}</p></div>
+        {tab !== 'notes' && tab !== 'samples' ? <div className="kw-actions"><button className="kw-button" onClick={exportRecords} type="button"><StudioIcon name="layers" size={16} />导出记录</button><button className="kw-button kw-primary" disabled={!ready} onClick={() => { setEditor('new'); setWriteError('') }} type="button"><StudioIcon name="plus" size={16} />新增记录</button></div> : null}
       </div>
 
       {storageError ? <div className="kw-alert" role="alert"><span>{storageError}</span><button type="button" onClick={ledger.refresh}>重新读取</button></div> : null}
       {writeError && !editor ? <div className="kw-alert" role="alert">{writeError}</div> : null}
       {message ? <div className="kw-notice" role="status"><StudioIcon name="book" size={16} /><span>{message}</span><button type="button" aria-label="关闭保存提示" onClick={() => setMessage('')}><StudioIcon name="close" size={14} /></button></div> : null}
 
-      <div className="kw-summary" aria-label="知识库概况">
-        <div><span>来源资料</span><strong>{data.docCount}<small>篇</small></strong><p>保留 GitHub 原文与行号</p></div>
+      {tab !== 'samples' ? <div className="kw-summary" aria-label="知识库概况">
+        <div><span>{tab === 'notes' ? '当前笔记目录' : '原研究来源'}</span><strong>{tab === 'notes' ? noteSummary.documents : data.docCount}<small>篇</small></strong><p>保留 GitHub 原文与行号</p></div>
         <div><span>经验与原则</span><strong>{entries.length}<small>条</small></strong><p>包括 {counts.manual} 条手工记录</p></div>
         <div><span>待核对解释</span><strong>{counts.pending}<small>条</small></strong><p>确认含义后再开展研究</p></div>
         <div className="kw-summary-note"><StudioIcon name="layers" size={24} /><p><strong>经验 ≠ 可执行规则</strong><span>定义缺失时保持参考；确认解释不代表启用交易。</span></p></div>
-      </div>
+      </div> : null}
 
       <div className="kw-tabs" role="tablist" aria-label="知识工作区视图" onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
         if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
           event.preventDefault()
-          const next = event.key === 'Home' ? 'library' : event.key === 'End' ? 'backtest' : tab === 'library' ? 'backtest' : 'library'
+          const next = event.key === 'Home' ? 'library' : event.key === 'End' ? 'backtest'
+            : TABS[(TABS.indexOf(tab) + (event.key === 'ArrowRight' ? 1 : -1) + TABS.length) % TABS.length]
           switchTab(next)
           document.getElementById(`kw-tab-${next}`)?.focus()
         }
       }}>
-        {(['library', 'backtest'] as const).map((key) => <button id={`kw-tab-${key}`} key={key} role="tab" tabIndex={tab === key ? 0 : -1} aria-selected={tab === key} aria-controls={`kw-panel-${key}`} onClick={() => switchTab(key)} type="button"><StudioIcon name={key === 'library' ? 'book' : 'chart'} size={16} />{key === 'library' ? '经验库' : '回测证据'}{key === 'library' ? <span>{entries.length}</span> : null}</button>)}
-        <span className="kw-tabs-caption">资料更新 {data.generatedAt.slice(0, 10)}</span>
+        {TABS.map((key) => <button id={`kw-tab-${key}`} key={key} role="tab" tabIndex={tab === key ? 0 : -1} aria-selected={tab === key} aria-controls={`kw-panel-${key}`} onClick={() => switchTab(key)} type="button"><StudioIcon name={key === 'backtest' || key === 'samples' ? 'chart' : 'book'} size={16} />{key === 'library' ? '经验库' : key === 'notes' ? '笔记标签' : key === 'samples' ? '学习样本' : '回测证据'}{key === 'library' ? <span>{entries.length}</span> : null}</button>)}
+        <span className="kw-tabs-caption">{tab === 'samples' ? '保存版本与实际核对' : (tab === 'notes' ? '标签目录更新 ' + shanghaiToday(new Date(noteSummary.generatedAt)) : '原研究更新 ' + data.generatedAt.slice(0, 10))}</span>
       </div>
 
       {tab === 'library' ? <div id="kw-panel-library" role="tabpanel" aria-labelledby="kw-tab-library" className="kw-library">
@@ -254,8 +267,9 @@ export function ExperienceWorkbench({ data = researchPackage as KnowledgePackage
             {!historical ? <div className="kw-detail-actions"><span>{viewed.status === 'reviewed' ? '解释已核对，边界仍然保留' : '核对原话与解释是否一致'}</span><div><button className="kw-button" type="button" disabled={!ready} onClick={() => { setEditor(viewed); setWriteError('') }}>{viewed.sourceType === 'manual' ? '编辑记录' : '修正解释'}</button><button className="kw-button kw-primary" type="button" disabled={!ready || viewed.status === 'reviewed' || !viewed.interpretation.trim() || isExpired(viewed, today)} onClick={confirmInterpretation}>{viewed.status === 'reviewed' ? '解释已确认' : '确认解释'}</button></div><small>确认仅记录审阅状态，不会启用交易或改变生产预测。</small></div> : null}
           </> : <div className="kw-empty"><StudioIcon name="book" size={28} /><h3>{entries.length ? '等待选择记录' : '从一条经验开始'}</h3><p>{entries.length ? '调整左侧筛选，查看记录详情。' : '新增记录，保留你当时的观察和判断。'}</p></div>}
         </section>
-      </div> : <BacktestEvidence data={data} />}
-      <footer className="kw-footer"><span>StockCal · 研究、记录、验证</span><span>来源版本 {data.sourceCommit.slice(0, 8)} · 记录保存在当前浏览器</span>{externalUrl(data.sourceRepository) ? <a href={externalUrl(data.sourceRepository)} target="_blank" rel="noopener noreferrer">查看来源仓库<StudioIcon name="arrow" size={13} /></a> : null}</footer>
+      </div> : tab === 'notes' ? <div id="kw-panel-notes" role="tabpanel" aria-labelledby="kw-tab-notes"><NoteTagWorkbench /></div>
+        : tab === 'samples' ? <div id="kw-panel-samples" role="tabpanel" aria-labelledby="kw-tab-samples"><LearningSamplesView /></div> : <BacktestEvidence data={data} />}
+      <footer className="kw-footer"><span>StockCal · 研究、记录、验证</span><span>{tab === 'samples' ? '计算与核对版本保存在研究记录服务' : `来源版本 ${(tab === 'notes' ? noteSummary.sourceCommit : data.sourceCommit).slice(0, 8)} · 记录保存在当前浏览器`}</span>{externalUrl(data.sourceRepository) ? <a href={tab === 'notes' ? 'https://github.com/WooYu/Sock/tree/agent/local-first-watchlist/notes' : externalUrl(data.sourceRepository)} target="_blank" rel="noopener noreferrer">查看来源仓库<StudioIcon name="arrow" size={13} /></a> : null}</footer>
     </main>
     {editor ? <EntryEditor key={editor === 'new' ? 'new' : `${editor.id}-${editor.version}`} entry={editor === 'new' ? undefined : editor} today={today} error={writeError} onCancel={() => { setEditor(null); setWriteError('') }} onSave={saveEntry} /> : null}
   </div>

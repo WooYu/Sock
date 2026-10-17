@@ -26,6 +26,20 @@ const prediction: PredictionSnapshot = {
 const renderChart = () => render(<ChartWorkspace prediction={prediction} snapshot={snapshot} />)
 
 describe('ChartWorkspace', () => {
+  test('accepts_external_period_and_reports_toolbar_changes', async () => {
+    const onPeriodChange = vi.fn()
+    const loadSeries = async (symbol: string, period: import('./chart-periods').ChartPeriod) => ({
+      symbol, period, adjustment: 'none' as const, kind: 'candles' as const, bars: period === 'day' ? snapshot.dailyCandles
+        : snapshot.dailyCandles.slice(0, 3).map((bar, i) => ({ ...bar, day: '2026-09-01T' + ['10:30', '11:30', '14:00'][i] + ':00+08:00' })),
+      source: snapshot.source, limitedHistory: true,
+    })
+    const { rerender } = render(<ChartWorkspace variant="studio" snapshot={snapshot} period="60m" onPeriodChange={onPeriodChange} loadSeries={loadSeries} />)
+    expect(screen.getByLabelText('分钟K线周期')).toHaveValue('60m')
+    await userEvent.selectOptions(screen.getByLabelText('分钟K线周期'), '30m')
+    expect(onPeriodChange).toHaveBeenCalledWith('30m')
+    rerender(<ChartWorkspace variant="studio" snapshot={snapshot} period="30m" onPeriodChange={onPeriodChange} loadSeries={loadSeries} />)
+    expect(screen.getByLabelText('分钟K线周期')).toHaveValue('30m')
+  })
   test('reveals a saved marker outside the current window from the drawing list', async () => {
     saveChartWorkspace(workspaceFixture({ drawings: [drawingFixture({ kind: 'text', text: '早期观察', points: [{ time: snapshot.dailyCandles[0].day, price: 1430 }] })] }))
     render(<ChartWorkspace variant="studio" prediction={prediction} snapshot={snapshot} />)

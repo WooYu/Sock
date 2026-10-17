@@ -1,10 +1,12 @@
 'use client'
 
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { StockWorkspaceProvider, useStockWorkspace } from '../workspace/stock-workspace-provider'
 import type { Security } from '../workspace/stock-workspace-types'
 import { ChartWorkspace } from '../chart/chart-workspace'
+import type { ChartPeriod } from '../chart/chart-periods'
 import { WebAccountButton } from '../account/web-account-button'
 import { StockPicker } from './stock-picker'
 import { ResearchEvidence } from './research-evidence'
@@ -12,6 +14,10 @@ import { StudioIcon } from './studio-icon'
 import { createPreviewData, loadPreviewSeries } from './preview-data'
 import { browserMarketClient } from '@/lib/api/browser-client'
 import './research-studio.css'
+const ScenarioAnalysisPanel = dynamic(() => import('../scenario/scenario-analysis-panel').then(m => m.ScenarioAnalysisPanel), {
+  loading: () => <p role="status">正在准备多周期分析…</p>,
+})
+const previewScenarioClient = { series: loadPreviewSeries }
 
 export function ResearchStudio({ initialSymbol = '600519', initialPreview = false }: { initialSymbol?: string; initialPreview?: boolean }) {
   return <StockWorkspaceProvider initialSymbol={initialPreview ? undefined : initialSymbol}><Studio initialPreview={initialPreview} initialSymbol={initialSymbol} /></StockWorkspaceProvider>
@@ -21,10 +27,16 @@ function Studio({ initialPreview, initialSymbol }: { initialPreview: boolean; in
   const workspace = useStockWorkspace()
   const [demo, setDemo] = useState(initialPreview)
   const [pickerOpen, setPickerOpen] = useState(false)
+  const [analysisOpen, setAnalysisOpen] = useState(false)
+  const [chartSelection, setChartSelection] = useState<{ owner: string; period: ChartPeriod } | null>(null)
   const mobileSearch = useRef<HTMLButtonElement>(null)
   const pickerPanel = useRef<HTMLDivElement>(null)
   const preview = useMemo(() => createPreviewData(), [])
-  const current = workspace.current ?? workspace.lastSuccessful
+  const selectedSymbol = demo ? 'DEMO' : workspace.selectedSymbol ?? initialSymbol
+  const chartPeriod = chartSelection?.owner === selectedSymbol ? chartSelection.period : 'day'
+  const changePeriod = (period: ChartPeriod) => setChartSelection({ owner: selectedSymbol, period })
+  const cached = workspace.current ?? workspace.lastSuccessful
+  const current = cached?.symbol === selectedSymbol ? cached : null
   const market = demo ? preview.market : current?.market
   const prediction = demo ? preview.prediction : current?.prediction ?? null
   const security = market?.quote.security ?? workspace.selectedSecurity
@@ -32,6 +44,9 @@ function Studio({ initialPreview, initialSymbol }: { initialPreview: boolean; in
   const change = market?.quote.previousClose && price !== undefined ? price - market.quote.previousClose : null
   const changePercent = change !== null && market?.quote.previousClose ? change / market.quote.previousClose * 100 : null
   const loading = !demo && (workspace.status === 'loading' || workspace.status === 'refreshing')
+  const scenarioPanel = analysisOpen ? <ScenarioAnalysisPanel symbol={selectedSymbol} sourceMode={demo ? 'demo' : 'real'}
+    activePeriod={chartPeriod} onPeriodChange={changePeriod} client={demo ? previewScenarioClient : browserMarketClient} security={security ?? undefined} />
+    : <section className="rs-scenario-launch" aria-label="多周期分析入口"><div><h2>日线起步，按需核对下一级</h2><p>核对趋势、葛阶段与盈利模式；规律明确即停止，最多再核对一个下级周期。</p></div><button type="button" className="rs-button rs-button-primary" onClick={() => setAnalysisOpen(true)}>开始多周期分析</button></section>
   const updateUrl = (symbol: string, example = false) => { const url = new URL(window.location.href); url.searchParams.set('symbol', symbol); if (example) url.searchParams.set('example', '1'); else url.searchParams.delete('example'); window.history.pushState(null, '', `${url.pathname}${url.search}`) }
   const closePicker = () => { setPickerOpen(false); mobileSearch.current?.focus() }
   const select = (selection: Security) => { setDemo(false); setPickerOpen(false); updateUrl(selection.code); void workspace.selectStock(selection.code, selection) }
@@ -70,7 +85,8 @@ function Studio({ initialPreview, initialSymbol }: { initialPreview: boolean; in
           <dl className="rs-quote-facts">{([['开盘', market?.quote.open], ['最高', market?.quote.high], ['最低', market?.quote.low]] as const).map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value?.toFixed(2) ?? '—'}</dd></div>)}</dl>
           <button className="rs-refresh rs-icon-button" title="刷新行情与预测" aria-label="刷新行情与预测" disabled={loading || demo} onClick={refresh} type="button"><StudioIcon name="refresh" /><span>{loading ? '刷新中' : '刷新'}</span></button>
         </section>
-        {market && market.dailyCandles.length ? <ChartWorkspace key={market.quote.security.code} variant="studio" loadSeries={demo ? loadPreviewSeries : browserMarketClient.series} snapshot={market} prediction={prediction} status={demo ? 'ready' : workspace.status} errorMessage={demo ? null : workspace.errorMessage} onRetry={refresh} forecastStatus={demo ? 'ready' : workspace.predictionStatus} forecastError={demo ? null : workspace.predictionError} footer={<ResearchEvidence candles={market.dailyCandles} analysis={demo ? null : current?.analysis} rules={demo ? [] : current?.publishedRules} rulesStatus={demo ? 'ready' : current?.rulesStatus} demo={demo} />} /> : <section className="rs-empty-workspace" aria-live="polite"><div className="rs-empty-chart-icon"><StudioIcon name="chart" size={38} /></div><h2>{loading ? '正在加载 K 线' : '从走势，开始你的研究'}</h2><p>{loading ? '正在获取历史行情与未来预测…' : workspace.status === 'error' ? '行情暂时未连接。你可以重新加载，或先用示例体验完整工作台。' : '搜索股票，查看 K 线、标记关键位置，再与未来推演对照。'}</p><div><button className="rs-button rs-button-primary" onClick={refresh} disabled={loading} type="button"><StudioIcon name="refresh" size={16} />{loading ? '正在加载' : '重新加载行情'}</button><button className="rs-button" onClick={showExample} type="button">用示例体验<StudioIcon name="arrow" size={16} /></button></div><div className="rs-empty-features"><span>趋势线与关键位标记</span><span>未来 3 日价格、MA、BOLL</span><span>笔记与历史走势对照</span></div></section>}
+        {market && market.dailyCandles.length ? <ChartWorkspace key={market.quote.security.code} variant="studio" period={chartPeriod} onPeriodChange={changePeriod} loadSeries={demo ? loadPreviewSeries : browserMarketClient.series} snapshot={market} prediction={prediction} status={demo ? 'ready' : workspace.status} errorMessage={demo ? null : workspace.errorMessage} onRetry={refresh} forecastStatus={demo ? 'ready' : workspace.predictionStatus} forecastError={demo ? null : workspace.predictionError} footer={<>{scenarioPanel}<ResearchEvidence candles={market.dailyCandles} analysis={demo ? null : current?.analysis} rules={demo ? [] : current?.publishedRules} rulesStatus={demo ? 'ready' : current?.rulesStatus} demo={demo} /></>} /> : <section className="rs-empty-workspace" aria-live="polite"><div className="rs-empty-chart-icon"><StudioIcon name="chart" size={38} /></div><h2>{loading ? '正在加载 K 线' : '从走势，开始你的研究'}</h2><p>{loading ? '正在获取历史行情与未来预测…' : workspace.status === 'error' ? '行情暂时未连接。你可以重新加载，或先用示例体验完整工作台。' : '搜索股票，查看 K 线、标记关键位置，再与未来推演对照。'}</p><div><button className="rs-button rs-button-primary" onClick={refresh} disabled={loading} type="button"><StudioIcon name="refresh" size={16} />{loading ? '正在加载' : '重新加载行情'}</button><button className="rs-button" onClick={showExample} type="button">用示例体验<StudioIcon name="arrow" size={16} /></button></div><div className="rs-empty-features"><span>趋势线与关键位标记</span><span>未来 3 日价格、MA、BOLL</span><span>笔记与历史走势对照</span></div></section>}
+        {(!market || !market.dailyCandles.length) ? scenarioPanel : null}
         <footer className="rs-page-footer"><span>StockCal · 研究、记录、验证</span><span>{demo ? '示例不对应任何真实证券' : '预测为技术推演，仅供研究参考'}</span><Link href="/settings">设置</Link></footer>
       </main>
     </div>

@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 
 export default async function KnowledgePage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
   const { view } = await searchParams
-  return <ExperienceWorkbench initialTab={view === 'backtest' ? 'backtest' : 'library'} />
+  return <ExperienceWorkbench initialTab={view === 'backtest' || view === 'notes' || view === 'samples' ? view : 'library'} />
 }

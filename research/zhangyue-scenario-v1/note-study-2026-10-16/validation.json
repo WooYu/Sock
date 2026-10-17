@@ -1,0 +1,17 @@
+{
+  "verified": true,
+  "complete": true,
+  "pendingBatches": [],
+  "sourceQuoteChecks": 1863,
+  "claims": 271,
+  "documents": 146,
+  "tagAssignments": 1367,
+  "originalSourceHashesMatch": true,
+  "originalTagCatalogUnchanged": true,
+  "allSevenTagDimensionsCovered": true,
+  "allProposalsRemainAICandidates": true,
+  "sourceQuoteFailures": 0,
+  "scope": "Text evidence and structural audit; semantic proposals remain untested and attachments uninspected.",
+  "calculationResearchEntries": 8,
+  "calculationResearchQuoteChecks": 9
+}

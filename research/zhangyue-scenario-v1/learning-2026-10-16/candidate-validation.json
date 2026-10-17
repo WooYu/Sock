@@ -1,0 +1,93 @@
+{
+  "definitionVersion": "candidate-validation-v1",
+  "candidateId": "603533-daily-direction-method-candidate-001",
+  "candidateSha256": "231ca591d8d8b806a4fc7b6096b54d8dd54551e753af689bbc0c9b8c52400f88",
+  "evaluatedAt": "2026-10-16T16:13:35.035180+00:00",
+  "status": "not_promoted",
+  "active": false,
+  "defaultAlgorithmChanged": false,
+  "validationDays": 20,
+  "validationStart": "2026-09-10",
+  "validationEnd": "2026-10-15",
+  "candidateMetrics": {
+    "samples": 20,
+    "meanDailyPrecision": 0.37,
+    "meanDailyCoverage": 0.575,
+    "selectionScore": 0.45026455026455026,
+    "totalLevels": 110,
+    "closeLevels": 38,
+    "exactLevels": 1,
+    "microPrecision": 0.34545454545454546,
+    "meanCandidates": 5.5,
+    "emptyDays": 0,
+    "targetCoverage": {
+      "open": 0.65,
+      "high": 0.6,
+      "low": 0.5,
+      "close": 0.55
+    },
+    "meanNearestTargetRelativeError": {
+      "open": 0.009061669749574133,
+      "high": 0.017819821309320312,
+      "low": 0.011989560701325078,
+      "close": 0.01566723523141187
+    }
+  },
+  "strongestFixedMethodOnThisValidation": "rolling_close",
+  "strongestFixedMethodMetrics": {
+    "samples": 20,
+    "meanDailyPrecision": 0.45285714285714296,
+    "meanDailyCoverage": 0.625,
+    "selectionScore": 0.5251822398939696,
+    "totalLevels": 109,
+    "closeLevels": 47,
+    "exactLevels": 0,
+    "microPrecision": 0.43119266055045874,
+    "meanCandidates": 5.45,
+    "emptyDays": 0,
+    "targetCoverage": {
+      "open": 0.75,
+      "high": 0.6,
+      "low": 0.55,
+      "close": 0.6
+    },
+    "meanNearestTargetRelativeError": {
+      "open": 0.007051929183458569,
+      "high": 0.016943434249462198,
+      "low": 0.011226377650099182,
+      "close": 0.014549315607278504
+    }
+  },
+  "baselineMetrics": {
+    "samples": 20,
+    "meanDailyPrecision": 0.85,
+    "meanDailyCoverage": 0.3375,
+    "selectionScore": 0.48315789473684206,
+    "totalLevels": 20,
+    "closeLevels": 17,
+    "exactLevels": 0,
+    "microPrecision": 0.85,
+    "meanCandidates": 1,
+    "emptyDays": 0,
+    "targetCoverage": {
+      "open": 0.55,
+      "high": 0.3,
+      "low": 0.2,
+      "close": 0.3
+    },
+    "meanNearestTargetRelativeError": {
+      "open": 0.012787824708148057,
+      "high": 0.03891781248174005,
+      "low": 0.026738629325556373,
+      "close": 0.037463012274187406
+    }
+  },
+  "reasons": [
+    "The training-derived conditional selector did not outperform the stronger fixed formulas on the separate time segment.",
+    "Its small improvement over the default average-delta method coincided with more candidate levels.",
+    "This is retrospective and partly previously inspected validation, not a blind or live result."
+  ],
+  "nextResearchQuestion": "Rising-candidate rolling-close branch is a small-sample lead; any revised rule requires a new validation window.",
+  "newMathematicalFormulaEstablished": false,
+  "intradaySupportResistanceEvaluated": false
+}
