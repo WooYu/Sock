@@ -165,7 +165,7 @@ function HistoricalLayer({ candles, transform, keyLevels, showKeyLevels, kind = 
       {showKeyLevels && kind === 'candles' ? <g data-testid="key-level-layer">{keyLevels.filter(Number.isFinite).map((price, index) => <g key={price}><line className="sc-key-level-line" x1={transform.rect.left} x2={transform.rect.left + transform.rect.width} y1={transform.yForPrice(price)} y2={transform.yForPrice(price)} /><text className="sc-key-level-label" x={transform.rect.left + transform.rect.width - 78} y={transform.yForPrice(price) - 5}>{index === 0 ? '近20根高点' : '近20根低点'} {priceText(price)}</text></g>)}</g> : null}
       <g className="sc-volume-bars">{candles.map((candle) => {
         if (!Number.isFinite(candle.volume) || candle.volume <= 0) return null
-        const height = (candle.volume / maxVolume) * volumeHeight
+        const height = Number(((candle.volume / maxVolume) * volumeHeight).toFixed(4))
         return <rect height={height} key={candle.day} width={candleWidth} x={transform.xForTime(candle.day) - candleWidth / 2} y={volumeTop + volumeHeight - height} />
       })}</g>
       <text className="sc-volume-label" x={transform.rect.left} y={volumeTop - 7}>成交量</text>
