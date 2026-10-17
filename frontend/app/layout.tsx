@@ -10,7 +10,7 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   title: "StockCal",
-  description: "面向手机浏览器的股票分析工作区",
+  description: "整理资料、观察趋势与验证想法的研究空间",
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {
