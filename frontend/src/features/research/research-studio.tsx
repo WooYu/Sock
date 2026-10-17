@@ -8,6 +8,7 @@ import type { Security } from '../workspace/stock-workspace-types'
 import { ChartWorkspace } from '../chart/chart-workspace'
 import type { ChartPeriod } from '../chart/chart-periods'
 import { ResearchHeader } from '../navigation/research-header'
+import { ForecastAudit } from './forecast-audit'
 import { ResearchJournal } from './research-journal'
 import { StockPicker } from './stock-picker'
 import { useAutomaticForecast } from './use-automatic-forecast'
@@ -16,7 +17,7 @@ import type { MergedLevel } from '../scenario/scenario-types'
 import { ResearchEvidence } from './research-evidence'
 import { StudioIcon } from './studio-icon'
 import { createPreviewData, loadPreviewSeries } from './preview-data'
-import { browserMarketClient } from '@/lib/api/browser-client'
+import { browserMarketClient, clearMarketReads } from '@/lib/api/browser-client'
 import './research-studio.css'
 const ScenarioAnalysisPanel = dynamic(() => import('../scenario/scenario-analysis-panel').then(m => m.ScenarioAnalysisPanel), {
   loading: () => <p role="status">正在准备多周期分析…</p>,
@@ -39,7 +40,7 @@ function WorkspacePlaceholder({ loading, failed, onRetry, onExample }: { loading
 }
 
 export function ResearchStudio({ initialSymbol = '600519', initialPreview = false }: { initialSymbol?: string; initialPreview?: boolean }) {
-  return <StockWorkspaceProvider initialSymbol={initialPreview ? undefined : initialSymbol}><Studio initialPreview={initialPreview} initialSymbol={initialSymbol} /></StockWorkspaceProvider>
+  return <StockWorkspaceProvider loadPrediction={false} initialSymbol={initialPreview ? undefined : initialSymbol}><Studio initialPreview={initialPreview} initialSymbol={initialSymbol} /></StockWorkspaceProvider>
 }
 
 function Studio({ initialPreview, initialSymbol }: { initialPreview: boolean; initialSymbol: string }) {
@@ -73,7 +74,7 @@ function Studio({ initialPreview, initialSymbol }: { initialPreview: boolean; in
   const updateUrl = (symbol: string, example = false) => { const url = new URL(window.location.href); url.searchParams.set('symbol', symbol); if (example) url.searchParams.set('example', '1'); else url.searchParams.delete('example'); window.history.pushState(null, '', `${url.pathname}${url.search}`) }
   const closePicker = () => { setPickerOpen(false); mobileSearch.current?.focus() }
   const select = (selection: Security) => { setDemo(false); closePicker(); updateUrl(selection.code); void workspace.selectStock(selection.code, selection) }
-  const refresh = () => { if (!demo) { void workspace.refresh(); void automatic.refresh() } }
+  const refresh = () => { if (!demo) { clearMarketReads(); void workspace.refresh(); void automatic.refresh() } }
   const showExample = () => { setDemo(true); setPickerOpen(false); updateUrl(workspace.selectedSymbol ?? initialSymbol, true) }
   const exitExample = () => { setDemo(false); updateUrl(workspace.selectedSymbol ?? initialSymbol); if (!workspace.current) void workspace.selectStock(workspace.selectedSymbol ?? initialSymbol) }
   const restoreLocation = useCallback(() => { const url = new URL(window.location.href); const example = url.searchParams.get('example') === '1'; setDemo(example); if (!example) { const symbol = url.searchParams.get('symbol') ?? initialSymbol; if (symbol !== workspace.selectedSymbol) void workspace.selectStock(symbol) } }, [initialSymbol, workspace])
@@ -121,7 +122,7 @@ function Studio({ initialPreview, initialSymbol }: { initialPreview: boolean; in
           <dl className="rs-quote-facts">{([['开盘', market?.quote.open], ['最高', market?.quote.high], ['最低', market?.quote.low]] as const).map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value?.toFixed(2) ?? '—'}</dd></div>)}</dl>
           <button className="rs-refresh rs-icon-button" title="刷新行情与预测" aria-label="刷新行情与预测" disabled={loading || demo} onClick={refresh} type="button"><StudioIcon name="refresh" /><span>{loading ? '刷新中' : '刷新'}</span></button>
         </section>
-        {market ? <><p className="rs-data-timestamps" role="status">行情更新：{new Date(market.source.fetchedAt).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })} · 最新日K：{market.dailyCandles.at(-1)?.day ?? '—'} · {market.source.online ? '在线来源' : '离线缓存'} · 指标预测：{automatic.loading ? '计算中' : automatic.error ? '计算失败' : automatic.analysis ? `基于 ${new Date(automatic.analysis.input.asOf).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })}` : '暂无可用结果'}</p>{automatic.error ? <p role="alert">预测计算失败：{automatic.error}<button type="button" onClick={() => void automatic.refresh()}>重试预测</button></p> : null}<ResearchJournal key={selectedSymbol + ':' + demo} market={market} demo={demo} /></> : null}
+        {market ? <><p className="rs-data-timestamps" role="status">行情更新：{new Date(market.source.fetchedAt).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })} · 最新日K：{market.dailyCandles.at(-1)?.day ?? '—'} · {market.source.online ? '在线来源' : '离线缓存'} · 指标预测：{automatic.loading ? '计算中' : automatic.error ? '计算失败' : automatic.analysis ? `基于 ${new Date(automatic.analysis.input.asOf).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })}` : '暂无可用结果'}</p>{automatic.error ? <p role="alert">预测计算失败：{automatic.error}<button type="button" onClick={() => void automatic.refresh()}>重试预测</button></p> : null}<ForecastAudit key={selectedSymbol + '-audit'} market={market} /><ResearchJournal key={selectedSymbol + ':' + demo} market={market} demo={demo} /></> : null}
         {market && market.dailyCandles.length ? <ChartWorkspace key={market.quote.security.code} variant="studio" period={chartPeriod} onPeriodChange={changePeriod} loadSeries={demo ? loadPreviewSeries : browserMarketClient.series} snapshot={market} prediction={null} forecastPanel={forecastPanel} forecastReferences={automatic.analysis?.references.filter(ref => ref.method === 'average_delta')} status={demo ? 'ready' : workspace.status} errorMessage={demo ? null : workspace.errorMessage} onRetry={refresh} forecastStatus={demo ? 'ready' : workspace.predictionStatus} forecastError={demo ? null : workspace.predictionError} footer={<><AutomaticForecastPanel forecast={automatic} selected={selectedLevel} onSelect={selectLevel} rules={demo ? [] : current?.publishedRules} stockAnalysis={current?.analysis} /><ResearchEvidence candles={market.dailyCandles} analysis={demo ? null : current?.analysis} rules={demo ? [] : current?.publishedRules} rulesStatus={demo ? 'ready' : current?.rulesStatus} demo={demo} scenario={scenarioPanel} scenarioInitiallyOpen={analysisOpen} selectedLevel={selectedLevel} /></>} /> : <WorkspacePlaceholder loading={loading} failed={workspace.status === 'error'} onRetry={refresh} onExample={showExample} />}
 
         <footer className="rs-page-footer"><span>研究 · 记录 · 验证</span><span>{demo ? '示例不对应任何真实证券' : '推演仅供研究参考'}</span><Link href="/settings">设置</Link></footer>

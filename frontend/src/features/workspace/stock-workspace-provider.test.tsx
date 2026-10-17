@@ -273,3 +273,14 @@ describe('StockWorkspaceProvider', () => {
     expect(await screen.findByText('状态：ready')).toBeInTheDocument()
   })
 })
+
+test('market is visible before optional rules resolve and unused prediction can be skipped', async () => {
+  let complete!: (rules: []) => void
+  let predictions = 0
+  const client: MarketClient = { snapshot: async symbol => demoMarketSnapshot(symbol), publishedRules: () => new Promise(resolve => { complete = resolve }), prediction: async symbol => { predictions++; return predictionSnapshot(symbol) } }
+  render(<StockWorkspaceProvider client={client} initialSymbol="600519" loadPrediction={false}><PredictionProbe /></StockWorkspaceProvider>)
+  await screen.findByText('Status: ready')
+  expect(predictions).toBe(0)
+  await act(async () => complete([]))
+  expect(screen.getByText('Status: ready')).toBeInTheDocument()
+})

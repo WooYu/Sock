@@ -4,10 +4,11 @@ import Link from 'next/link'
 import { currentTagRecords, parseTagLedger, NOTE_TAG_STORAGE_KEY, type NoteCatalog } from '../knowledge/note-tags'
 import type { MarketSnapshot } from '../workspace/stock-workspace-types'
 import { projectIndicators, type IndicatorProjection } from '../chart/indicator-projection'
+import { ProjectionEvaluation } from '../chart/projection-evaluation'
 import { scenarioCalendar } from '../scenario/scenario-calendar-data'
 
 type Citation = { id: string; title: string; sourceUrl: string; sourceHash: string; excerpt: string; version: number; tags: string[] }
-type Judgment = { id: string; createdAt: string; judgment: string; invalidation: string; next: string; anchorPrice: number; marketAsOf: string; barDay: string; citations: Citation[]; forecast: IndicatorProjection[] }
+type Judgment = { adjustment?: 'none' | 'qfq' | 'hfq'; basisClose?: number; id: string; createdAt: string; judgment: string; invalidation: string; next: string; anchorPrice: number; marketAsOf: string; barDay: string; citations: Citation[]; forecast: IndicatorProjection[] }
 type Journal = { schemaVersion: 1; stage: string; next: string; records: Judgment[] }
 const stages = ['关注中', '研究中', '待验证', '已结束']
 export const journalKey = (symbol: string) => 'stockcal.research-journal.v1:' + symbol
@@ -48,7 +49,7 @@ export function ResearchJournal({ market, demo = false }: { market: MarketSnapsh
     try {
       const current = parseJournal(localStorage.getItem(journalKey(symbol)))
       const record: Judgment = { id: crypto.randomUUID(), createdAt: new Date().toISOString(), judgment: judgment.trim(), invalidation: invalidation.trim(), next: journal.next,
-        anchorPrice: market.quote.price, marketAsOf: market.source.fetchedAt, barDay: market.dailyCandles.at(-1)?.day ?? '',
+        adjustment: market.adjustment ?? 'none', basisClose: market.dailyCandles.at(-1)?.close, anchorPrice: market.quote.price, marketAsOf: market.source.fetchedAt, barDay: market.dailyCandles.at(-1)?.day ?? '',
         citations: currentTagRecords(catalog?.documents ?? [], parseTagLedger(localStorage.getItem(NOTE_TAG_STORAGE_KEY))).filter(n => noteIds.includes(n.id)).map(n => ({ id: n.id, title: n.title, sourceUrl: n.sourceUrl, sourceHash: n.sourceHash, excerpt: n.sourceExcerpt, version: n.version, tags: [...n.tags] })),
         forecast: projectIndicators(market.dailyCandles, 'day', scenarioCalendar) }
       write({ ...current, stage: '待验证', records: [record, ...current.records] })
@@ -70,7 +71,7 @@ export function ResearchJournal({ market, demo = false }: { market: MarketSnapsh
       <button className="rs-button" type="submit" disabled={!ready || !Number.isFinite(market.quote.price) || market.quote.price <= 0}>保存判断与日线预测快照</button>
     </form>
     <div className="rs-journal-links"><button type="button" className="rs-button" disabled={!ready} onClick={exportJournal}>导出研究记录</button><Link href={`/knowledge?view=samples&symbol=${encodeURIComponent(symbol)}`}>查看这只股票的学习样本与核对结果</Link></div>
-    {journal.records.slice(0, 10).map(record => <article key={record.id}><strong>{new Date(record.createdAt).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })} · 当时 {record.anchorPrice.toFixed(2)}</strong><p>{record.judgment}</p><p>失效条件：{record.invalidation}</p>{record.next ? <p>当时下一步：{record.next}</p> : null}<p>当前较记录时价格变化：{((market.quote.price / record.anchorPrice - 1) * 100).toFixed(2)}% · 价格对照不等于判断已验证</p><small>行情截至 {record.marketAsOf} · 最新日K {record.barDay}</small><div>{record.citations.map(note => <a key={note.id} href={note.sourceUrl} target="_blank" rel="noopener noreferrer">{note.title} · v{note.version} 原文 ↗</a>)}</div><details><summary>保存时的4日日线指标预测</summary>{record.forecast.map(point => <p key={point.day}>{point.estimated ? '预计 ' : ''}{point.day}：{Object.entries(point.values).map(([key, value]) => `${key.toUpperCase()} ${value?.toFixed(2) ?? '—'}`).join(' / ')}</p>)}</details></article>)}
+    {journal.records.slice(0, 10).map(record => <article key={record.id}><strong>{new Date(record.createdAt).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })} · 当时 {record.anchorPrice.toFixed(2)}</strong><p>{record.judgment}</p><p>失效条件：{record.invalidation}</p>{record.next ? <p>当时下一步：{record.next}</p> : null}<p>当前较记录时价格变化：{((market.quote.price / record.anchorPrice - 1) * 100).toFixed(2)}% · 价格对照不等于判断已验证</p><small>行情截至 {record.marketAsOf} · 最新日K {record.barDay}</small><div>{record.citations.map(note => <a key={note.id} href={note.sourceUrl} target="_blank" rel="noopener noreferrer">{note.title} · v{note.version} 原文 ↗</a>)}</div><details><summary>保存时的4日日线指标预测</summary>{record.forecast.map(point => <p key={point.day}>{point.estimated ? '预计 ' : ''}{point.day}：{Object.entries(point.values).map(([key, value]) => `${key.toUpperCase()} ${value?.toFixed(2) ?? '—'}`).join(' / ')}</p>)}</details><ProjectionEvaluation points={record.forecast} candles={market.dailyCandles} fetchedAt={market.source.fetchedAt} basisValid={(record.adjustment ?? 'none') === (market.adjustment ?? 'none') && record.basisClose !== undefined && Math.abs((market.dailyCandles.find(bar => bar.day === record.barDay)?.close ?? NaN) - record.basisClose) < 0.005} /></article>)}
     {journal.records.length > 10 ? <p>显示最近10次；导出包含全部历史。</p> : null}
   </details>
 }

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
-import { browserMarketClient } from './browser-client'
+import { browserMarketClient, clearMarketReads } from './browser-client'
 import type { PredictionSnapshot } from '@/features/chart/chart-types'
 
 const prediction: PredictionSnapshot = {
@@ -61,4 +61,32 @@ describe('browserMarketClient.publishedRules', () => {
 
     expect(rules?.map((rule) => rule.ruleId)).toEqual(['valid'])
   })
+})
+
+afterEach(() => { clearMarketReads(); vi.unstubAllGlobals() })
+test('chart and forecast share one forward-adjusted daily snapshot; cancellation is per consumer', async () => {
+  let finish!: (response: Response) => void
+  const fetcher = vi.fn(() => new Promise<Response>(resolve => { finish = resolve }))
+  vi.stubGlobal('fetch', fetcher)
+  const controller = new AbortController()
+  const cancelled = browserMarketClient.snapshot('600519', controller.signal).catch(e => e.name)
+  const series = browserMarketClient.series('600519', 'day')
+  controller.abort()
+  finish(Response.json({ adjustment: 'qfq', quote: { security: { code: '600519' } }, dailyCandles: [], source: {} }))
+  expect(await cancelled).toBe('AbortError')
+  expect((await series).adjustment).toBe('qfq')
+  expect(fetcher).toHaveBeenCalledTimes(1)
+  clearMarketReads()
+  const refreshed = browserMarketClient.snapshot('600519')
+  finish(Response.json({ adjustment: 'qfq' }))
+  await refreshed
+  expect(fetcher).toHaveBeenCalledTimes(2)
+})
+test('minutes stay raw while longer periods default to forward adjustment', async () => {
+  const fetcher = vi.fn<typeof fetch>(async () => Response.json({}))
+  vi.stubGlobal('fetch', fetcher)
+  await browserMarketClient.series('600519', '60m')
+  await browserMarketClient.series('600519', 'week')
+  expect(fetcher.mock.calls[0][0]).toContain('adjustment=none')
+  expect(fetcher.mock.calls[1][0]).toContain('adjustment=qfq')
 })

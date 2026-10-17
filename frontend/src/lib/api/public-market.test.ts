@@ -12,7 +12,7 @@ describe('Tencent public market adapter', () => {
   afterEach(() => { vi.unstubAllGlobals(); vi.useRealTimers(); vi.restoreAllMocks() })
 
   test('uses unadjusted daily data by default, converts lots to shares, and preserves actual provider identity', async () => {
-    const fetcher = vi.fn<typeof fetch>(async () => Response.json(payload('day', daily)))
+    const fetcher = vi.fn<typeof fetch>(async () => Response.json({ code: 0, data: { sz300502: { ...payload('day', daily).data.sz300502, qfqday: daily } } }))
     vi.stubGlobal('fetch', fetcher)
     const { getPublicChartSeries, getPublicMarketSnapshot } = await load()
     const series = await getPublicChartSeries('300502')
@@ -20,7 +20,8 @@ describe('Tencent public market adapter', () => {
     const snapshot = await getPublicMarketSnapshot('300502')
     expect(snapshot.quote).toMatchObject({ security: { code: '300502', name: '新易盛', exchange: 'SZ' }, price: 12, previousClose: 11, volume: 15000 })
     expect(snapshot.source).toMatchObject({ name: '腾讯公开行情·延时', state: 'DELAYED', online: true })
-    expect(fetcher).toHaveBeenCalledTimes(1)
+    expect(snapshot.adjustment).toBe('qfq')
+    expect(fetcher).toHaveBeenCalledTimes(2)
     expect(new URL(fetcher.mock.calls[0][0] as string).searchParams.get('param')).toBe('sz300502,day,,,640,')
   })
 

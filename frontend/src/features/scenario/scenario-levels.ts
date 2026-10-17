@@ -16,7 +16,7 @@ export function mergeReferenceLevels(refs: PriceReference[], tolerance = PRICE_M
   const inclusiveLimit = tolerance > 0 ? tolerance + 8 * Number.EPSILON : 0
   for (const ref of sorted) {
     const group = groups.at(-1)
-    if (group && group.every(other => Math.abs(ref.value! - other.value!) / (ref.value! / 2 + other.value! / 2) <= inclusiveLimit)) group.push(ref)
+    if (group && group.every(other => (ref.adjustment ?? 'none') === (other.adjustment ?? 'none') && Math.abs(ref.value! - other.value!) / (ref.value! / 2 + other.value! / 2) <= inclusiveLimit)) group.push(ref)
     else groups.push([ref])
   }
   return groups.map(group => {
@@ -33,7 +33,8 @@ export function consolidateReferencePrices(refs: PriceReference[], scenarios: Cl
     const chosen = candidates.find(s => s.id === selection.scenarioIds[period]) ?? candidates.find(s => s.kind === 'base')
     if (chosen) scenarioIds[period] = chosen.id
   }
-  const selected = refs.filter(r => r.method === selection.method && (r.method !== 'rolling_close' || r.scenarioId === scenarioIds[r.period]))
+  const basis = refs.find(r => r.period === 'day')?.adjustment ?? 'none'
+  const selected = refs.filter(r => (r.adjustment ?? 'none') === basis && r.method === selection.method && (r.method !== 'rolling_close' || r.scenarioId === scenarioIds[r.period]))
   return { mergedLevels: mergeReferenceLevels(selected), consolidation: { definitionVersion: 'reference-mean-1pct-v1',
     tolerance: PRICE_MERGE_TOLERANCE, aggregation: 'arithmetic_mean', method: selection.method, scenarioIds } }
 }

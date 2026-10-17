@@ -56,7 +56,7 @@ describe('scenario candle boundaries', () => {
     expect(normalizeScenarioSeries(series, series.source.fetchedAt).closed).toEqual([])
   })
   test('rejects unsupported adjustment and period', () => {
-    expect(() => normalizeScenarioSeries({ ...seriesFixture(), adjustment: 'qfq' }, '2026-12-31T23:00:00Z')).toThrow(/口径/)
+    expect(() => normalizeScenarioSeries({ ...seriesFixture(), adjustment: 'hfq' }, '2026-12-31T23:00:00Z')).toThrow(/口径/)
     expect(() => normalizeScenarioSeries({ ...seriesFixture(), period: 'week' }, '2026-12-31T23:00:00Z')).toThrow(/周期/)
   })
 })

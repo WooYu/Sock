@@ -24,7 +24,14 @@ public class ScenarioEvaluationService {
         var resolution=history.isEmpty()?new TargetResolution(1,"pending",null,List.of("尚无后续完整日K")):history.getLast().targetResolution();
         String status="pending";ActualProvenance provenance=null;com.stockcal.market.MarketProvider.Candle actual=null;PriceClosenessResult result=null;
         try {
-            var series=source.fetch(record.symbol());
+            String adjustment=record.snapshot().path("input").path("periods").path("day").path("adjustment").asText("none");
+            var series=source.fetch(record.symbol(),adjustment);
+            if(!adjustment.equals(series.adjustment()))throw new IllegalStateException("实际行情口径不一致");
+            if("qfq".equals(adjustment)) {
+                var anchor=series.candles().stream().filter(c -> c.day().equals(record.anchorDay())).findFirst().orElseThrow();
+                double frozen=record.snapshot().path("dailyPriceLadder").path("anchor").path("close").asDouble();
+                if(Math.abs(anchor.close()-frozen)>0.005)throw new IllegalStateException("复权基准已变化，禁止跨基准评分");
+            }
             var observedAt=clock.instant();
             resolution=new TargetResolver().resolve(record,history,series,observedAt);
             var day=resolution.targetDay();

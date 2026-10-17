@@ -21,7 +21,7 @@ describe('independent scenario inputs', () => {
     expect(input.loadIssues['60m']).toContain('小时数据不可用')
   })
   test('rejects_wrong_symbol_period_or_adjustment', async () => {
-    for (const override of [{ symbol: '600519' }, { period: '30m' as const }, { adjustment: 'qfq' as const }]) {
+    for (const override of [{ symbol: '600519' }, { period: '30m' as const }, { adjustment: 'hfq' as const }]) {
       const input = await loadScenarioInputs({ symbol: '603533', asOf, calendar: null, client: {
         series: async (_symbol, period) => ({ ...seriesFixture({ period: period as AnalysisPeriod }), ...override }),
       } })

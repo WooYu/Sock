@@ -35,7 +35,7 @@ public final class ScenarioRecordValidator {
         var periods=input.path("periods"); require(periods.isObject() && periods.has("day"),"完整日线基准未就绪");
         for(var entry:periods.properties()) {
             String period=entry.getKey(); var p=entry.getValue();
-            require(PERIODS.contains(period) && period.equals(text(p,"period")) && symbol.equals(text(p,"symbol")) && "none".equals(text(p,"adjustment")),"周期股票或复权口径不一致");
+            require(PERIODS.contains(period) && period.equals(text(p,"period")) && symbol.equals(text(p,"symbol")) && ("none".equals(text(p,"adjustment")) || ("day".equals(period) && "qfq".equals(text(p,"adjustment")))),"周期股票或复权口径不一致");
             require(asOf.equals(Instant.parse(text(p,"asOf"))),"周期时点不一致");
             Instant fetched=Instant.parse(text(p.path("source"),"fetchedAt"));
             var bars=p.path("closed"); require(bars.isArray(),"完整柱列表缺失"); String prior="";
@@ -69,7 +69,7 @@ public final class ScenarioRecordValidator {
             }
             if(ref.path("valid").asBoolean()) {
                 double value=number(ref,"value"); require(value>0,"参考价无效");
-                if(method.equals(refMethod) && (!"rolling_close".equals(method) || ref.path("scenarioId").asText().equals(selection.path("scenarioIds").path(period).asText()))) selected.add(ref);
+                if(text(periods.path("day"),"adjustment").equals(text(periods.path(period),"adjustment")) && method.equals(refMethod) && (!"rolling_close".equals(method) || ref.path("scenarioId").asText().equals(selection.path("scenarioIds").path(period).asText()))) selected.add(ref);
             }
         }
         selected.sort(Comparator.comparingDouble((JsonNode r)->r.path("value").asDouble()).thenComparing(r->r.path("id").asText()));

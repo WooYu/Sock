@@ -19,7 +19,7 @@ export function validExecutionWindow(window: ExecutionWindow): boolean {
     && Date.parse(window.startAt) < Date.parse(window.endAt)
 }
 function periodValid(input: PeriodInput, snapshot: ScenarioAnalysis): boolean {
-  if (!input || input.symbol !== snapshot.input.symbol || input.asOf !== snapshot.input.asOf || input.adjustment !== 'none'
+  if (!input || input.symbol !== snapshot.input.symbol || input.asOf !== snapshot.input.asOf || !(input.adjustment === 'none' || (input.period === 'day' && input.adjustment === 'qfq'))
     || !ANALYSIS_PERIODS.includes(input.period) || !input.source || !isIsoTimestamp(input.source.fetchedAt)
     || typeof input.source.name !== 'string' || typeof input.source.online !== 'boolean' || typeof input.source.state !== 'string'
     || !Array.isArray(input.closed) || !Array.isArray(input.observed) || !strings(input.issues)) return false

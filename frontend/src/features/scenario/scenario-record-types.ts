@@ -26,7 +26,7 @@ export type PriceEvaluation = {
   id: string; forecastId: string; version: number; previousEvaluationId: string | null; targetResolution: TargetResolution
   status: 'pending' | 'target_unverified' | 'scored' | 'source_error'; eligibility: { forwardEligible: boolean; reasons: string[] }
   actual: { day: string; open: number; high: number; low: number; close: number; volume: number } | null
-  source: { provider: string; symbol: string; adjustment: 'none'; fetchedAt: string; candleHash: string | null; responseHash: string; responseHashKind: string } | null
+  source: { provider: string; symbol: string; adjustment: 'none' | 'qfq'; fetchedAt: string; candleHash: string | null; responseHash: string; responseHashKind: string } | null
   result: PriceClosenessResult | null; evaluatedAt: string; nextRetryAt: string | null; scoreEvaluationId?: string | null
 }
 export type EvaluationView = { latestStatus: PriceEvaluation | null; latestSuccessful: PriceEvaluation | null }

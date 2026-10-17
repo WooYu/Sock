@@ -36,9 +36,10 @@ type ProviderProps = {
   children: React.ReactNode
   client?: MarketClient
   initialSymbol?: string
+  loadPrediction?: boolean
 }
 
-export function StockWorkspaceProvider({ children, client = browserMarketClient, initialSymbol }: ProviderProps) {
+export function StockWorkspaceProvider({ children, client = browserMarketClient, initialSymbol, loadPrediction = true }: ProviderProps) {
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(initialSymbol ?? null)
   const [selectedSecurity, setSelectedSecurity] = useState<Security | null>(initialSymbol ? { code: initialSymbol, name: initialSymbol } : null)
   const [cycle, setCycleState] = useState<OperationCycle>('short')
@@ -52,6 +53,7 @@ export function StockWorkspaceProvider({ children, client = browserMarketClient,
   const requestVersion = useRef(0)
   const abortController = useRef<AbortController | null>(null)
   const initialLoadSymbol = useRef<string | null>(null)
+  const recent = useRef(new Map<string, StockWorkspaceSnapshot>())
 
   const load = useCallback(async (symbol: string, security: Security, nextCycle: OperationCycle, preserving: boolean) => {
     const version = ++requestVersion.current
@@ -62,10 +64,10 @@ export function StockWorkspaceProvider({ children, client = browserMarketClient,
     let resolvedPrediction: StockWorkspaceSnapshot['prediction'] = null
     setStatus(preserving ? 'refreshing' : 'loading')
     setErrorMessage(null)
-    setPredictionStatus(client.prediction ? 'loading' : 'idle')
+    setPredictionStatus(client.prediction && loadPrediction ? 'loading' : 'idle')
     setPredictionError(null)
     if (!preserving) setCurrent(null)
-    if (client.prediction) {
+    if (client.prediction && loadPrediction) {
       void Promise.resolve()
         .then(() => client.prediction?.(symbol, controller.signal))
         .then((prediction) => {
@@ -86,11 +88,9 @@ export function StockWorkspaceProvider({ children, client = browserMarketClient,
         })
     }
     try {
-      const [market, ruleResult] = await Promise.all([
-        client.snapshot(symbol, controller.signal),
-        client.publishedRules ? client.publishedRules(controller.signal).then((rules) => ({ rules, status: 'ready' as const })).catch(() => ({ rules: [], status: 'error' as const })) : Promise.resolve({ rules: [], status: 'ready' as const }),
-      ])
-      const rules = ruleResult.rules
+      const rulesPromise = client.publishedRules ? client.publishedRules(controller.signal).then((rules) => ({ rules, status: 'ready' as const })).catch(() => ({ rules: [], status: 'error' as const })) : Promise.resolve({ rules: [], status: 'ready' as const })
+      const market = await client.snapshot(symbol, controller.signal)
+      const rules = preserving ? recent.current.get(symbol)?.publishedRules ?? [] : []
       if (version !== requestVersion.current) return
       const snapshot: StockWorkspaceSnapshot = {
         symbol,
@@ -101,19 +101,28 @@ export function StockWorkspaceProvider({ children, client = browserMarketClient,
         generatedAt: new Date().toISOString(),
         prediction: resolvedPrediction,
         publishedRules: rules,
-        rulesStatus: ruleResult.status,
+        rulesStatus: client.publishedRules ? 'loading' : 'ready',
       }
       publishedSnapshot = snapshot
       setCurrent(snapshot)
       setLastSuccessful(snapshot)
       setStatus(market.source?.online === false ? 'offline' : 'ready')
+      recent.current.set(symbol, snapshot)
+      if (recent.current.size > 20) recent.current.delete(recent.current.keys().next().value!)
+      void rulesPromise.then(result => {
+        if (controller.signal.aborted || version !== requestVersion.current) return
+        const enriched = { ...publishedSnapshot!, publishedRules: result.rules, rulesStatus: result.status, analysis: analyzeMarketSnapshot(market, nextCycle, result.rules) }
+        publishedSnapshot = enriched
+        recent.current.set(symbol, enriched)
+        setCurrent(enriched); setLastSuccessful(enriched)
+      })
     } catch (error) {
       if (version !== requestVersion.current) return
       if (controller.signal.aborted) return
       setErrorMessage(error instanceof Error ? error.message : '行情加载失败')
       setStatus(preserving && lastSuccessful ? 'stale' : 'error')
     }
-  }, [client, lastSuccessful])
+  }, [client, lastSuccessful, loadPrediction])
 
   const search = useCallback(async (query: string) => {
     if (!('search' in client)) return
@@ -132,9 +141,10 @@ export function StockWorkspaceProvider({ children, client = browserMarketClient,
     const resolvedSecurity = security ?? { code: symbol, name: symbol }
     setSelectedSymbol(symbol)
     setSelectedSecurity(resolvedSecurity)
-    setCurrent(null)
-    setLastSuccessful(null)
-    await load(symbol, resolvedSecurity, cycle, false)
+    const cached = recent.current.get(symbol)
+    setCurrent(cached ?? null)
+    setLastSuccessful(cached ?? null)
+    await load(symbol, resolvedSecurity, cycle, Boolean(cached))
   }, [cycle, load])
 
   const setCycle = useCallback(async (nextCycle: OperationCycle) => {

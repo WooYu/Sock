@@ -21,7 +21,7 @@ function knownMinuteGap(before: string, next: string, period: AnalysisPeriod): b
 }
 export function normalizeScenarioSeries(series: ChartSeries, asOf: string): PeriodInput {
   if (!ANALYSIS_PERIODS.includes(series.period as AnalysisPeriod) || series.kind !== 'candles') throw new Error('分析周期无效')
-  if (series.adjustment !== 'none') throw new Error('行情必须使用不复权口径')
+  if (series.adjustment !== 'none' && !(series.period === 'day' && series.adjustment === 'qfq')) throw new Error('行情复权口径无效')
   if (!/^(?:\d{6}|DEMO)$/.test(series.symbol)) throw new Error('股票代码无效')
   if (!isIsoTimestamp(asOf) || !series.source || !isIsoTimestamp(series.source.fetchedAt) || !Array.isArray(series.bars)) throw new Error('行情来源或截止时间无效')
   const period = series.period as AnalysisPeriod
@@ -70,7 +70,7 @@ export function normalizeScenarioSeries(series: ChartSeries, asOf: string): Peri
   if (issues.some(i => i.startsWith('invalid_bar_time'))) closed = []
   if (!closed.length) issues.push('closed_history_empty')
   return {
-    symbol: series.symbol, period, asOf, adjustment: 'none', source: { ...series.source }, closed, observed,
+    symbol: series.symbol, period, asOf, adjustment: series.adjustment, source: { ...series.source }, closed, observed,
     lastClosedAt: closed.length ? barEndAt(period, closed.at(-1)!.day) : null, issues: [...new Set(issues)],
   }
 }

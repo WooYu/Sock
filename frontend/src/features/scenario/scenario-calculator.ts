@@ -19,7 +19,7 @@ export function createFlatScenario(input: PeriodInput): CloseScenario {
 export function computeReferences(input: AnalysisInput, options: ReferenceOptions): PriceReference[] {
   const periodInput = input.periods[options.period]
   if (!periodInput?.closed.length) return []
-  if (periodInput.symbol !== input.symbol || periodInput.asOf !== input.asOf || periodInput.adjustment !== 'none') throw new Error('分析输入口径或时间不一致')
+  if (periodInput.symbol !== input.symbol || periodInput.asOf !== input.asOf || !(periodInput.adjustment === 'none' || (periodInput.period === 'day' && periodInput.adjustment === 'qfq'))) throw new Error('分析输入口径或时间不一致')
   const origin = periodInput.closed.at(-1)!
   const rolling = options.method === 'rolling_close'
   if (!['rolling_close', 'average_delta', 'last_delta'].includes(options.method)) throw new Error('参数计算方法无效')
@@ -56,7 +56,7 @@ export function computeReferences(input: AnalysisInput, options: ReferenceOption
       const valid = value !== null && Number.isFinite(value) && value > 0
       return {
         id: [input.symbol, options.period, origin.day, options.method, scenario?.id ?? '', indicator, target.horizon].join('|'),
-        period: options.period, indicator, method: options.method, scenarioId: scenario?.id ?? null,
+        ...(periodInput.adjustment === 'qfq' ? { adjustment: 'qfq' as const } : {}), period: options.period, indicator, method: options.method, scenarioId: scenario?.id ?? null,
         originBarKey: origin.day, originEndAt: barEndAt(options.period, origin.day), asOf: input.asOf,
         target, executionWindow: options.executionWindow, value, valid, issues,
       } satisfies PriceReference

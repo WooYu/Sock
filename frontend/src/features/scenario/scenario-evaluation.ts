@@ -4,6 +4,12 @@ import { validExecutionWindow } from './scenario-ledger'
 import { indicatorSeries } from './scenario-calculator'
 export type CoverageResult = { eligible: boolean; issues: string[]; references: Array<{ referenceId: string; covered: boolean | null }>; coveredCount: number; anyCovered: boolean | null }
 export type IndicatorErrorResult = { issues: string[]; references: Array<{ referenceId: string; actualValue: number | null; absoluteError: number | null; relativeError: number | null; status: 'evaluated' | 'insufficient' | 'invalid'; issues: string[] }> }
+function basisChanged(snapshot: ScenarioAnalysis, actual: PeriodInput): boolean {
+  if (actual.adjustment !== 'qfq') return false
+  const origin = snapshot.input.periods[actual.period]?.closed.at(-1)
+  const current = actual.closed.find(bar => bar.day === origin?.day)
+  return !origin || !current || Math.abs(current.close - origin.close) > 0.005
+}
 function barStartAt(period: PeriodInput['period'], key: string): string {
   if (period === 'day') return key + 'T09:30:00+08:00'
   const end = key.slice(11, 16)
@@ -19,7 +25,8 @@ export function evaluateRangeCoverage(snapshot: ScenarioAnalysis, actual: Period
   if (!validExecutionWindow(window)) issues.push('invalid_execution_window')
   if (snapshot.kind !== 'live' || snapshot.input.sourceMode !== 'real') issues.push('not_a_live_forward_plan')
   if (!(Date.parse(snapshot.createdAt) < start && Date.parse(snapshot.input.asOf) < start)) issues.push('plan_after_window_start')
-  if (actual.symbol !== snapshot.input.symbol || actual.adjustment !== 'none') issues.push('actual_symbol_or_adjustment_mismatch')
+  if (actual.symbol !== snapshot.input.symbol || actual.adjustment !== snapshot.input.periods[actual.period]?.adjustment) issues.push('actual_symbol_or_adjustment_mismatch')
+  if (basisChanged(snapshot, actual)) issues.push('adjustment_basis_changed')
   if (actual.period !== window.period) issues.push('actual_period_mismatch')
   if (Date.parse(actual.asOf) < end || Date.parse(actual.source.fetchedAt) < end) issues.push('window_not_finished')
   const selectedRefs = snapshot.references.filter(r => r.executionWindow?.startAt === window.startAt
@@ -46,7 +53,8 @@ export function evaluateRangeCoverage(snapshot: ScenarioAnalysis, actual: Period
 }
 export function evaluateIndicatorError(snapshot: ScenarioAnalysis, actual: PeriodInput): IndicatorErrorResult {
   const issues: string[] = []
-  if (actual.symbol !== snapshot.input.symbol || actual.adjustment !== 'none') issues.push('actual_symbol_or_adjustment_mismatch')
+  if (actual.symbol !== snapshot.input.symbol || actual.adjustment !== snapshot.input.periods[actual.period]?.adjustment) issues.push('actual_symbol_or_adjustment_mismatch')
+  if (basisChanged(snapshot, actual)) issues.push('adjustment_basis_changed')
   const indicators = indicatorSeries(actual.closed)
   const references = snapshot.references.filter(r => r.period === actual.period).map(ref => {
     const row: IndicatorErrorResult['references'][number] = { referenceId: ref.id, actualValue: null, absoluteError: null,

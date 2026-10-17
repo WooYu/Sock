@@ -28,7 +28,7 @@ const issues: Record<string, string> = {
   invalid_execution_window: '执行窗口时间无效', window_not_finished: '执行窗口尚未结束', finer_bars_required: '此窗口需要更小周期K线',
   execution_bars_missing: '执行窗口行情缺失', coverage_calendar_unverified: '跨日窗口的交易日历未核实',
   no_planned_valid_references: '缺少为此窗口预先保存的有效参考位', target_indicator_unavailable: '目标K线或指标尚不可用',
-  invalid_reference: '参考位无效', actual_symbol_or_adjustment_mismatch: '核对行情的股票或价格口径不同', actual_period_mismatch: '核对行情周期不同',
+  adjustment_basis_changed: '复权基准已变化，暂不跨基准评分', invalid_reference: '参考位无效', actual_symbol_or_adjustment_mismatch: '核对行情的股票或价格口径不同', actual_period_mismatch: '核对行情周期不同',
 }
 export function issueLabel(issue: string): string {
   if (issue.startsWith('source_missing:')) return '缺少对应原文版本'

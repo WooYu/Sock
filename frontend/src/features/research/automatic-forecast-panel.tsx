@@ -27,12 +27,12 @@ export function AutomaticForecastPanel({ forecast, selected, onSelect, rules = [
     {forecast.error ? <p role="alert">{forecast.error}</p> : null}
     {!analysis ? <p role="status">{forecast.loading ? '正在计算指标预测…' : '暂无有效预测数据，可重新计算。'}</p> : null}
     {!compact && analysis ? <><nav aria-label="预测计算周期" className="rs-auto-periods">{(['day', '60m', '30m'] as const).map(p => <button type="button" key={p} aria-pressed={period === p} disabled={!analysis.input.periods[p]} onClick={() => setPeriod(p)}>{PERIOD_NAMES[p]}{analysis.input.loadIssues[p] ? ' · 数据缺项' : ''}</button>)}</nav>
-      <p className="rs-auto-table-hint">表格可左右滑动，查看历史3根与未来4根的全部指标值。</p>
+      <p className="rs-auto-table-hint">{analysis.input.periods[period]?.adjustment === 'qfq' ? '前复权' : '不复权'} · 表格可左右滑动，查看历史3根与未来4根的全部指标值。</p>
       {analysis.input.periods[period] ? <ScenarioReferenceTable analysis={analysis} period={period} method="average_delta" scenarioId={null} horizons={FORECAST_HORIZONS} historyCount={3} /> : <p>该周期暂无有效数据。</p>}
       <p className="rs-auto-method">按最近3根指标的平均增量外推4根；未来值为条件参考；日期未核实时按第1～4根展示，不推定具体交易日。各周期分别按本周期的4根计算。</p>
       {forecast.issues.map(issue => <p className="rs-auto-method" role="status" key={issue}>{issue}</p>)}</> : null}
     {analysis ? <><h3>{compact ? '最近的3个候选价位' : `合并候选价位 · ${levels.length} 个`}</h3>
-      {!compact ? <p className="rs-auto-method">仅合并有效的前三根平均增量预测：组内任意两值偏差不超过1%，取算术平均；保留各周期与目标根数。不同周期不视为同一到达时间。</p> : null}
+      {!compact ? <p className="rs-auto-method">仅合并与日线价格口径一致的有效平均增量预测（日线前复权时，分钟不复权参考值单独展示）：组内任意两值偏差不超过1%，取算术平均；保留各周期与目标根数。不同周期不视为同一到达时间。</p> : null}
       <div className="rs-auto-levels">{[...levels].sort((a, b) => Math.abs(a.value - close) - Math.abs(b.value - close)).slice(0, compact ? 3 : undefined).map(level => {
         const basis = levelEvidence(level, close, rules, stockAnalysis, history)
         return <button type="button" key={level.id} aria-pressed={selected?.id === level.id} onClick={() => onSelect(level)}>

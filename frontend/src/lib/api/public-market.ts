@@ -214,7 +214,7 @@ export async function getPublicChartSeries(symbol: string, period: ChartPeriod =
 
 export async function getPublicMarketSnapshot(symbol: string): Promise<MarketSnapshot> {
   const code = marketCode(symbol)
-  const loaded = await nativeSeries(symbol, 'day', 'none')
+  const loaded = await nativeSeries(symbol, 'day', 'qfq')
   const fields = quoteFields(loaded.entry, code)
   if (!fields || fields[2] !== symbol || typeof fields[1] !== 'string' || !fields[1].trim()) throw invalidData()
   const price = positive(fields[3])
@@ -222,7 +222,7 @@ export async function getPublicMarketSnapshot(symbol: string): Promise<MarketSna
   if ((high !== undefined && high < Math.max(price, open ?? price)) || (low !== undefined && low > Math.min(price, open ?? price))) throw invalidData()
   const amount = typeof fields[35] === 'string' ? fields[35].split('/')[2] : undefined
   const turnover = amount ? number(amount) : optionalPositive(fields[37]) !== undefined ? number(fields[37]) * 10000 : undefined
-  return { quote: { security: { code: symbol, name: fields[1].trim(), exchange: code.slice(0, 2).toUpperCase() }, price, previousClose: optionalPositive(fields[4]), open, high, low, volume: fields[6] === undefined ? undefined : number(fields[6]) * 100, turnover }, dailyCandles: loaded.bars.map((bar) => ({ ...bar })), source: source(loaded.fetchedAt) }
+  return { adjustment: 'qfq', quote: { security: { code: symbol, name: fields[1].trim(), exchange: code.slice(0, 2).toUpperCase() }, price, previousClose: optionalPositive(fields[4]), open, high, low, volume: fields[6] === undefined ? undefined : number(fields[6]) * 100, turnover }, dailyCandles: loaded.bars.map((bar) => ({ ...bar })), source: source(loaded.fetchedAt) }
 }
 
 export async function searchPublicSecurities(query: string): Promise<Security[]> {

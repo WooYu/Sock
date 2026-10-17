@@ -5,7 +5,7 @@ export type Horizon = 1 | 2 | 3 | 4
 export type Indicator = 'ma5' | 'ma10' | 'ma20' | 'ma30' | 'ma60' | 'ma90' | 'ma120' | 'ma250' | 'bollUpper' | 'bollMiddle' | 'bollLower'
 export type TradingCalendar = { fromDay: string; throughDay: string; tradingDays: string[]; sourceUrl: string; verifiedAt: string }
 export type PeriodInput = {
-  symbol: string; period: AnalysisPeriod; asOf: string; adjustment: 'none'
+  symbol: string; period: AnalysisPeriod; asOf: string; adjustment: 'none' | 'qfq'
   source: MarketSnapshot['source']; closed: Candle[]; observed: Candle[]
   lastClosedAt: string | null; issues: string[]
 }
@@ -21,7 +21,7 @@ export type CloseScenario = {
   kind: 'base' | 'continuation' | 'pullback'; closes: number[]; condition: string; selectedAt: string; evidence: EvidenceRef[]
 }
 export type PriceReference = {
-  id: string; period: AnalysisPeriod; indicator: Indicator; method: 'average_delta' | 'last_delta' | 'rolling_close'
+  id: string; adjustment?: 'none' | 'qfq'; period: AnalysisPeriod; indicator: Indicator; method: 'average_delta' | 'last_delta' | 'rolling_close'
   scenarioId: string | null; originBarKey: string; originEndAt: string; asOf: string; target: BarTarget
   executionWindow: ExecutionWindow | null; value: number | null; valid: boolean; issues: string[]
 }

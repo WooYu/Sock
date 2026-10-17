@@ -300,3 +300,13 @@
 @keyframes rs-loading-wave { from { opacity: .45; transform: scaleY(.7); } to { opacity: 1; transform: scaleY(1); } }
 @media (max-width: 760px) { .rs-empty-workspace.rs-workspace-placeholder { min-height: 360px; padding: 32px 18px; } .rs-workspace-placeholder .rs-empty-features { flex-direction: row; gap: 16px; } }
 @media (prefers-reduced-motion: reduce) { .rs-workspace-placeholder[aria-busy=true] .rs-loading-preview span { animation: none; } }
+
+.rs-price-basis { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 10px 14px; font-size: 12px; color: #64718a; background: #fafaff; border-bottom: 1px solid #e9ecf1; }
+.rs-price-basis select { padding: 6px 8px; border: 1px solid #d9deea; border-radius: 6px; background: white; color: #334158; }
+.rs-projection-comparison { max-width: 100%; overflow: auto; }
+.rs-projection-comparison th, .rs-projection-comparison td { text-align: right; padding: 5px 12px; white-space: nowrap; }
+
+.rs-forecast-audit { margin: 12px 0; padding: 14px 18px; background: #fff; border: 1px solid #e6e9f0; border-radius: 8px; min-width: 0; }
+.rs-forecast-audit summary { cursor: pointer; color: #536078; }
+.rs-forecast-audit p, .rs-forecast-audit small { color: #748096; font-size: 12px; }
+.rs-forecast-audit section { margin-top: 14px; border-top: 1px solid #edf0f5; padding-top: 12px; }

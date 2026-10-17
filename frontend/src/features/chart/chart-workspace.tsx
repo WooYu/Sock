@@ -25,7 +25,7 @@ import type { PriceReference } from '../scenario/scenario-types'
 import { ForecastPanel } from '../research/forecast-panel'
 import { StudioChartControls } from '../research/studio-chart-controls'
 import { DrawingList } from '../research/drawing-list'
-import { CHART_PERIODS, DEFAULT_INDICATORS, MA_COLORS, MA_PERIODS, PERIOD_LABELS, canonicalPeriodTime, type IndicatorKey, type IndicatorValue, type MaKey } from './chart-periods'
+import { isIntradayPeriod, CHART_PERIODS, DEFAULT_INDICATORS, MA_COLORS, MA_PERIODS, PERIOD_LABELS, canonicalPeriodTime, type IndicatorKey, type IndicatorValue, type MaKey } from './chart-periods'
 import { useChartSeries, type ChartSeriesLoader } from './use-chart-series'
 
 export { aggregateCandles } from './chart-math'
@@ -57,7 +57,9 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
   const activePeriod = controlledPeriod ?? internalPeriod
   const setActivePeriod = (period: ChartPeriod) => { if (controlledPeriod === undefined) setInternalPeriod(period); onPeriodChange?.(period) }
   const symbol = snapshot?.quote.security.code ?? ''
-  const { workspace, drawings, selectedId, syncStatus, commands } = useChartWorkspace({ symbol, period: activePeriod, localOnly: symbol === 'DEMO' })
+  const [adjustment, setAdjustment] = useState<'none' | 'qfq' | 'hfq'>(snapshot?.adjustment ?? 'none')
+  const priceBasis = isIntradayPeriod(activePeriod) ? 'none' : adjustment
+  const { workspace, drawings, selectedId, syncStatus, commands } = useChartWorkspace({ symbol: priceBasis === 'none' ? symbol : `${symbol}-${priceBasis}`, period: activePeriod, localOnly: symbol === 'DEMO' })
   const [maVisible, setMaVisible] = useState(true)
   const configuredIndicators = { ...DEFAULT_INDICATORS, ...workspace.indicators }
   const indicators = { ...configuredIndicators, ...(maVisible ? {} : Object.fromEntries(MA_PERIODS.map(period => [`ma${period}`, false]))) }
@@ -72,7 +74,7 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
   const viewportState = useRef({ key: '', predictionKey: '', userPanned: false })
   const revealedDrawingLocation = useRef('')
 
-  const series = useChartSeries(snapshot, activePeriod, loadSeries)
+  const series = useChartSeries(snapshot, activePeriod, loadSeries, priceBasis)
   const intraday = activePeriod === 'intraday'
   const sourceCandles = useMemo(() => [...(series.data?.bars ?? [])].sort((a, b) => a.day.localeCompare(b.day)), [series.data?.bars])
   const allCandles = sourceCandles
@@ -90,13 +92,13 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
   const projection = useMemo(() => {
     if (!isStudio || activePrediction) return []
     return projectIndicators(allCandles, activePeriod, scenarioCalendar).map(point => {
-      const refs = forecastReferences?.filter(ref => ref.period === activePeriod && ref.target.horizon === point.horizon && ref.originBarKey === allCandles.at(-1)?.day) ?? []
+      const refs = forecastReferences?.filter(ref => (ref.adjustment ?? 'none') === priceBasis && ref.period === activePeriod && ref.target.horizon === point.horizon && ref.originBarKey === allCandles.at(-1)?.day) ?? []
       const target = refs.find(ref => ref.target.barKey)?.target.barKey
       const ranges = { ...point.ranges }
       for (const ref of refs) if (!ref.valid) delete ranges[ref.indicator]
       return { ...point, ranges, ...(target ? { day: target, estimated: false } : {}), values: { ...point.values, ...Object.fromEntries(refs.map(ref => [ref.indicator, ref.valid ? ref.value : null])) } }
     })
-  }, [activePeriod, activePrediction, allCandles, isStudio, forecastReferences])
+  }, [activePeriod, activePrediction, allCandles, isStudio, forecastReferences, priceBasis])
   const sessionProjection = useMemo(() => isStudio && layers.prediction ? projectSessionIndicators(allCandles, activePeriod, scenarioCalendar) : null, [activePeriod, allCandles, isStudio, layers.prediction])
   const visibleProjection = useMemo(() => layers.prediction && viewport.atLatest ? projection : [], [layers.prediction, viewport.atLatest, projection])
   const visiblePrediction = layers.prediction && (!isStudio || viewport.atLatest) ? activePrediction : null
@@ -273,6 +275,7 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
         <aside aria-label="桌面绘图工具" className="sc-chart-left-tools"><ChartToolbar activeTool={activeTool} onToolChange={setActiveTool} compact={isStudio} />{!isStudio ? <button aria-pressed={crosshair} className={crosshair ? 'is-active' : ''} onClick={() => setCrosshair((value) => !value)} title="十字光标" type="button">十字光标</button> : null}</aside>
 
         <div className="sc-kline-main-column">
+          {isStudio ? <div className="rs-price-basis"><label>价格口径 <select aria-label="价格复权方式" value={priceBasis} disabled={isIntradayPeriod(activePeriod) || symbol === 'DEMO'} onChange={event => setAdjustment(event.target.value as typeof adjustment)}><option value="qfq">前复权（默认）</option><option value="none">不复权</option><option value="hfq">后复权</option></select></label><span>{isIntradayPeriod(activePeriod) ? '分钟数据仅提供不复权' : 'MA按本周期收盘价计算；跨软件对照需统一日期、周期与复权方式'}</span></div> : null}
           {isStudio ? <StudioChartControls period={activePeriod} onPeriod={setActivePeriod} maVisible={maVisible} onMaVisibility={() => setMaVisible(value => !value)} indicators={indicators} onIndicator={(key, value) => setIndicators((old) => ({ ...old, [key]: value }))} predictionVisible={layers.prediction} onPrediction={(value) => setLayers((old) => ({ ...old, prediction: value }))} zoom={zoom} onZoom={setZoom} onReset={resetView} onUndo={commands.undo} onRedo={commands.redo} crosshair={crosshair} onCrosshair={() => setCrosshair((value) => !value)} /> : <div className="sc-kline-controls sc-kline-control-card">
             <div className="sc-kline-control-row" aria-label="K线周期"><span className="sc-kline-group-label">K线周期</span><div className="sc-kline-segmented" role="tablist" aria-label="K线周期">{periods.map(([period, label]) => <button aria-selected={activePeriod === period} className={activePeriod === period ? 'is-active' : ''} key={period} onClick={() => setActivePeriod(period)} role="tab" type="button">{label}</button>)}</div><span className="sc-kline-hint">当前：{periods.find(([period]) => period === activePeriod)?.[1]}</span></div>
             <div className="sc-kline-control-row" aria-label="指标设置"><span className="sc-kline-group-label">指标设置</span><div className="sc-kline-indicator-buttons">{indicatorOptions.map(([key, label]) => <label className={`sc-kline-indicator ${indicators[key] ? 'is-active' : ''}`} key={key} style={{ '--indicator-color': indicatorColors[key] } as React.CSSProperties}><input aria-label={label} checked={indicators[key]} onChange={(event) => setIndicators((old) => ({ ...old, [key]: event.target.checked }))} role="switch" type="checkbox" /><span>{label}</span></label>)}</div><span className="sc-kline-hint">MA5 / 10 / 20 / 30 / 60 / 90 / 120 / 250 · BOLL 20, 2</span></div>
@@ -294,7 +297,7 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
             </div> : null}
             {!intraday && !series.loading && MA_PERIODS.some((period) => indicators[`ma${period}`] && allCandles.length < period) ? <p className="rs-history-warning">{MA_PERIODS.filter((period) => indicators[`ma${period}`] && allCandles.length < period).map((period) => `MA${period}`).join('、')} 历史不足：当前提供 {allCandles.length} 根{PERIOD_LABELS[activePeriod]}。均线数字表示当前周期根数。</p> : null}
             {series.data?.note ? <p className="rs-series-note">{series.data.note}</p> : null}
-            <div className="sc-kline-statusbar"><span>已加载 {allCandles[0]?.day.slice(0, 10)} ～ {allCandles.at(-1)?.day.slice(0, 10)} · 共 {allCandles.length} {intraday ? '个分时点' : '根 K 线'}</span><span>当前周期：{PERIOD_LABELS[activePeriod]}</span><span>数据源：{series.data?.source.name ?? snapshot.source.name}</span><span>不复权 · 当前数据窗口，非上市全量</span><span>{symbol === 'DEMO' ? '示例绘图仅保存在本机' : syncStatus === '本机保存' ? '本机保存 · 登录后跨设备同步' : syncStatus}</span></div>
+            <div className="sc-kline-statusbar"><span>已加载 {allCandles[0]?.day.slice(0, 10)} ～ {allCandles.at(-1)?.day.slice(0, 10)} · 共 {allCandles.length} {intraday ? '个分时点' : '根 K 线'}</span><span>当前周期：{PERIOD_LABELS[activePeriod]}</span><span>数据源：{series.data?.source.name ?? snapshot.source.name}</span><span>{series.data?.adjustment === 'qfq' ? '前复权' : series.data?.adjustment === 'hfq' ? '后复权' : '不复权'} · 当前数据窗口，非上市全量</span><span>{symbol === 'DEMO' ? '示例绘图仅保存在本机' : syncStatus === '本机保存' ? '本机保存 · 登录后跨设备同步' : syncStatus}</span></div>
           </div>
           {!isStudio && (activeTool === 'rectangle' || activeTool === 'trend-line') && <button className="sc-kline-add-annotation" onClick={addRectangle} type="button">添加矩形标注</button>}
           {activePeriod !== 'day' && layers.prediction && !forecastReferences ? <section aria-live="polite" className="sc-prediction-unavailable">未来推演仅支持日线周期</section> : null}

@@ -27,8 +27,12 @@ class ScenarioRecordValidatorTest {
         assertThatThrownBy(() -> validate(future)).isInstanceOf(IllegalArgumentException.class);
         var foreign=fixture(); ((ObjectNode)foreign.path("input").path("periods").path("day")).put("symbol","600519");
         assertThatThrownBy(() -> validate(foreign)).isInstanceOf(IllegalArgumentException.class);
-        var adjusted=fixture(); ((ObjectNode)adjusted.path("input").path("periods").path("day")).put("adjustment","qfq");
+        var adjusted=fixture(); ((ObjectNode)adjusted.path("input").path("periods").path("day")).put("adjustment","hfq");
         assertThatThrownBy(() -> validate(adjusted)).isInstanceOf(IllegalArgumentException.class);
+    }
+    @Test void acceptsForwardAdjustedDailySnapshot() {
+        var adjusted=fixture(); ((ObjectNode)adjusted.path("input").path("periods").path("day")).put("adjustment","qfq");
+        assertThat(validate(adjusted).symbol()).isEqualTo("603533");
     }
     @Test void rejectsChangedMergeOrLadder() {
         var merged=fixture(); ((ObjectNode)merged.path("mergedLevels").get(0)).put("value",1000);
