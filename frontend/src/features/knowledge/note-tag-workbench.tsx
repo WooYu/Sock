@@ -62,6 +62,21 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
   const [writeError, setWriteError] = useState('')
   const [message, setMessage] = useState('')
   const detailRef = useRef<HTMLElement>(null)
+  useEffect(() => {
+    const onBack = () => { setEditor(null); setWriteError('') }
+    window.addEventListener('popstate', onBack)
+    return () => window.removeEventListener('popstate', onBack)
+  }, [])
+
+  function openEditor(record: NoteTagRecord) {
+    window.history.pushState({ ...window.history.state, stockcalTagEditor: true }, '', window.location.href)
+    setEditor(record); setWriteError('')
+  }
+
+  function closeEditor() {
+    setEditor(null); setWriteError('')
+    if (window.history.state?.stockcalTagEditor) window.history.back()
+  }
   const filtered = useMemo(() => filterTagRecords(current.filter((record) => record.level === level && (status === 'all' || record.status === status)), { query: deferredQuery, facets }), [current, level, status, deferredQuery, facets])
   const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const currentPage = Math.min(page, pages - 1)
@@ -86,7 +101,7 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
     if (!editor) return
     try {
       persist(reviseTags(editor, draft, new Date().toISOString()), editor)
-      setEditor(null)
+      closeEditor()
       setFacets({}); setQuery(''); setStatus('all'); setPage(0)
     } catch (cause) { setWriteError(`保存失败：${cause instanceof Error ? cause.message : '请检查存储权限。'} 输入已保留。`) }
   }
@@ -151,12 +166,12 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
           {viewed.gaps.length ? <section className="kw-detail-section"><h4>待补定义与边界</h4><ul>{viewed.gaps.map((gap, index) => <li key={index}>{gap}</li>)}</ul></section> : null}
           <details className="nt-evidence"><summary>标签依据 · {viewed.evidence.length} 条</summary>{viewed.evidence.map((evidence, index) => <div key={`${evidence.tagId}-${index}`}><strong>{TAG_LABELS[evidence.tagId]} · L{evidence.startLine}–{evidence.endLine}</strong><small>{evidence.method === 'manual' ? '人工引用' : evidence.method === 'catalog' ? '旧解析／目录候选' : '术语匹配候选'}</small><blockquote>{evidence.quote}</blockquote><p>{evidence.reason}</p></div>)}</details>
           <details className="kw-history"><summary>标签历史 · {history.length} 个版本</summary><ol>{history.map((record) => <li key={tagVersionKey(record)}><div><strong>v{record.version}{record.sourceHash !== selected?.sourceHash ? ' · 旧原文' : ''}</strong><span>{formatTime(record.createdAt)}</span><small>{record.revisionReason}</small></div><button type="button" aria-label={`查看标签 v${record.version}`} aria-pressed={tagVersionKey(record) === tagVersionKey(viewed)} onClick={() => setViewedKey(tagVersionKey(record))}>查看 v{record.version}</button></li>)}</ol></details>
-          {!historical ? <div className="nt-detail-actions"><button type="button" className="kw-button" disabled={!ready || Boolean(error)} onClick={() => { setEditor(viewed); setWriteError('') }}>编辑标签</button><button type="button" className="kw-button kw-primary" disabled={!ready || Boolean(error) || viewed.status === 'reviewed'} onClick={confirmTags}>{viewed.status === 'reviewed' ? '标签已核对' : '确认标签'}</button></div> : null}
+          {!historical ? <div className="nt-detail-actions"><button type="button" className="kw-button" disabled={!ready || Boolean(error)} onClick={() => openEditor(viewed)}>编辑标签</button><button type="button" className="kw-button kw-primary" disabled={!ready || Boolean(error) || viewed.status === 'reviewed'} onClick={confirmTags}>{viewed.status === 'reviewed' ? '标签已核对' : '确认标签'}</button></div> : null}
           <p className="nt-source-hash">原文 SHA-256：{viewed.sourceHash}<br />标签保存在当前浏览器；导出可保留修订历史。</p>
         </> : <div className="kw-empty"><h3>选择一篇笔记查看标签依据</h3></div>}
       </section>
     </div>
-    {editor ? <TagEditor key={tagVersionKey(editor)} record={editor} error={writeError} onSave={save} onCancel={() => { setEditor(null); setWriteError('') }} /> : null}
+    {editor ? <TagEditor key={tagVersionKey(editor)} record={editor} error={writeError} onSave={save} onCancel={closeEditor} /> : null}
   </section>
 }
 
