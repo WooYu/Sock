@@ -41,7 +41,7 @@ export function mergeSharedData(remote: unknown, local: unknown): unknown {
 export class SharedDataSync {
   private state: State
   private running = false
-  constructor(private storage: Storage, private request: typeof fetch = fetch) {
+  constructor(private storage: Storage, private request: typeof fetch = globalThis.fetch.bind(globalThis)) {
     const raw = storage.getItem(stateKey)
     this.state = raw ? JSON.parse(raw) as State : { cursor: 0, observed: {}, pending: {} }
     if (!Number.isSafeInteger(this.state.cursor) || !this.state.observed || !this.state.pending) throw new Error('共享同步记录损坏，原值已保留')

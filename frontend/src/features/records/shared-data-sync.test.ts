@@ -38,3 +38,12 @@ test('shares edits and merges frozen records across independent devices, retaini
 test('never shares credentials, client identity or market caches', () => {
   for (const key of ['stockcal.accessToken', 'stockcal.refreshToken', 'stockcal:sync-client-id', 'stockcal:shared-sync:v1', 'stockcal:market-history:v1']) expect(isSharedDataKey(key)).toBe(false)
 })
+
+test('binds the native browser fetch receiver for background sync', async () => {
+  vi.stubGlobal('fetch', function (this: unknown) {
+    expect(this).toBe(globalThis)
+    return Promise.resolve(Response.json({ nextCursor: 0, changes: [] }))
+  })
+  try { await new SharedDataSync(memoryStorage()).sync() }
+  finally { vi.unstubAllGlobals() }
+})
