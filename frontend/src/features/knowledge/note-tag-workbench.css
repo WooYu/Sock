@@ -1,4 +1,10 @@
 .nt-workbench { min-width: 0; }
+.nt-study-detail { min-width: 0; scroll-margin-top: 16px; }
+.nt-study-list .nt-study-record { display: grid; gap: 7px; width: 100%; min-height: 44px; padding: 15px 18px; border: 0; border-top: 1px solid #edf0f5; background: #fff; color: #334158; text-align: left; cursor: pointer; overflow-wrap: anywhere; }
+.nt-study-list .nt-study-record > span { font-size: 12px; line-height: 1.7; }
+.nt-study-list .nt-study-record:hover { background: #f8f8fc; }
+.nt-study-list .nt-study-record[aria-pressed=true] { background: #f2f0fc; box-shadow: inset 3px 0 #7d70cf; }
+.nt-study-list .nt-study-record:focus-visible { outline: 2px solid #5952cf; outline-offset: -3px; }
 .nt-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 20px 0 12px; }
 .nt-heading h2 { font-size: 22px; color: #283247; }
 .nt-heading p, .nt-context { color: #69758a; font-size: 12px; margin-top: 5px !important; }

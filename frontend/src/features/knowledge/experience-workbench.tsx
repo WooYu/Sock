@@ -181,15 +181,15 @@ export function ExperienceWorkbench({ data = researchPackage as KnowledgePackage
     <main className="kw-main">
       <div className="kw-breadcrumb"><StudioIcon name="book" size={15} /><span>研究工作区</span><span>/</span><strong>{tab === 'library' ? '经验与原则' : tab === 'notes' ? '笔记标签' : tab === 'samples' ? '学习样本' : '回测证据'}</strong></div>
       <div className="kw-page-heading">
-        <div><h1>{tab === 'notes' ? '笔记标签' : tab === 'samples' ? '学习样本' : tab === 'backtest' ? '回测证据' : '经验与原则'}</h1><p>{tab === 'notes' ? '按主题、用途与计算条件整理笔记，保留每次分类的原文依据。' : tab === 'samples' ? '把保存时的计算、所用笔记与实际行情连在一起，保留每次核对结果。' : '保留原话，核对解释，让每条经验在被使用前先经得起检查。'}</p></div>
-        {tab !== 'notes' && tab !== 'samples' ? <div className="kw-actions"><button className="kw-button" onClick={exportRecords} type="button"><StudioIcon name="layers" size={16} />导出记录</button><button className="kw-button kw-primary" disabled={!ready} onClick={() => { setEditor('new'); setWriteError('') }} type="button"><StudioIcon name="plus" size={16} />新增记录</button></div> : null}
+        <div><h1>{tab === 'notes' ? '笔记标签' : tab === 'samples' ? '学习样本' : tab === 'backtest' ? '回测证据' : '经验与原则'}</h1><p>{tab === 'notes' ? '按主题、用途与计算条件整理笔记，保留每次分类的原文依据。' : tab === 'samples' ? '把保存时的计算、所用笔记与实际行情连在一起，保留每次核对结果。' : tab === 'backtest' ? '对照历史数据与基线方法，检验经验规则是否改善预测。' : '保留原话，核对解释，让每条经验在被使用前先经得起检查。'}</p></div>
+        {tab === 'library' ? <div className="kw-actions"><button className="kw-button" onClick={exportRecords} type="button"><StudioIcon name="layers" size={16} />导出记录</button><button className="kw-button kw-primary" disabled={!ready} onClick={() => { setEditor('new'); setWriteError('') }} type="button"><StudioIcon name="plus" size={16} />新增记录</button></div> : null}
       </div>
 
       {storageError ? <div className="kw-alert" role="alert"><span>{storageError}</span><button type="button" onClick={ledger.refresh}>重新读取</button></div> : null}
       {writeError && !editor ? <div className="kw-alert" role="alert">{writeError}</div> : null}
       {message ? <div className="kw-notice" role="status"><StudioIcon name="book" size={16} /><span>{message}</span><button type="button" aria-label="关闭保存提示" onClick={() => setMessage('')}><StudioIcon name="close" size={14} /></button></div> : null}
 
-      {tab !== 'samples' && tab !== 'notes' ? <div className="kw-summary" aria-label="知识库概况">
+      {tab === 'library' ? <div className="kw-summary" aria-label="知识库概况">
         <div><span>原研究来源</span><strong>{data.docCount}<small>篇</small></strong><p>保留 GitHub 原文与行号</p></div>
         <div><span>经验与原则</span><strong>{entries.length}<small>条</small></strong><p>包括 {counts.manual} 条手工记录</p></div>
         <div><span>待核对解释</span><strong>{counts.pending}<small>条</small></strong><p>确认含义后再开展研究</p></div>
@@ -309,14 +309,16 @@ function EntryEditor({ entry, today, error, onCancel, onSave }: { entry?: Experi
 
 function BacktestEvidence({ data }: { data: KnowledgePackage }) {
   const [horizon, setHorizon] = useState(3)
+  const [sort, setSort] = useState('default')
   const result = data.backtest
-  const models = result.models.filter((model) => model.horizon === horizon)
+  const models = result.models.filter((model) => model.horizon === horizon).sort((a, b) => sort === 'error' ? a.mape - b.mape : sort === 'direction' ? (b.direction ?? -1) - (a.direction ?? -1) : 0)
   const maxMape = Math.max(...models.map((model) => model.mape), 0.01)
   return <section className="kw-backtest" id="kw-panel-backtest" role="region" aria-labelledby="research-nav-backtest">
     <div className="kw-backtest-heading"><div><span className="kw-eyebrow">历史回溯验证</span><h2>新易盛 <span>300502</span></h2><p>用真实历史日 K，检验经验能否改善未来 {horizon} 日推演。</p></div><div className="kw-horizon" role="group" aria-label="预测时间范围">{[3, 4].map((day) => <button type="button" key={day} aria-pressed={horizon === day} onClick={() => setHorizon(day)}>未来 {day} 日</button>)}</div></div>
     <div className="kw-evidence-verdict"><StudioIcon name="target" size={25} /><div><span>本次研究结论</span><h3>尚未证实经验规则带来稳定优势</h3><p>价格预测误差与方向判断需要对照基线评估；这些结果不构成交易收益证明。</p></div></div>
     <dl className="kw-backtest-facts"><div><dt>行情区间</dt><dd>{result.start} — {result.end}</dd></div><div><dt>日 K 样本</dt><dd>{result.sessions} <small>个交易日</small></dd></div><div><dt>留出测试起点</dt><dd>{result.holdoutStart}</dd></div><div><dt>资料生成日期</dt><dd>{data.generatedAt.slice(0, 10)}</dd></div></dl>
-    <div className="kw-comparison-heading"><h3>模型对照</h3><p>MAPE 越低，价格的平均相对误差越小</p></div>
+    <div className="kw-comparison-heading"><h3>模型对照</h3><p>切换期限后，表格同步展示对应结果。</p><label className="kw-sort">排列方式<select value={sort} onChange={event => setSort(event.target.value)}><option value="default">默认顺序</option><option value="error">价格误差从低到高</option><option value="direction">方向一致率从高到低</option></select></label></div>
+    <details className="ls-advanced"><summary>如何读懂这些指标？</summary><p>价格误差 MAPE 越低越好，表示预测价与实际价的平均相对偏差；方向一致率越高，表示涨跌方向判断越准确。“不适用”表示该方法没有方向评分。测试样本是参与该项评价的记录数，不等于盈利次数。</p><p>这里展示新易盛已有的历史研究；学习样本则记录你每次保存计算后的实际核对。</p></details>
     <div className="kw-table-scroll" tabIndex={0} role="region" aria-label="模型误差对照表"><table><thead><tr><th scope="col">预测方法</th><th scope="col">价格误差 MAPE</th><th scope="col">方向一致率</th><th scope="col">测试样本</th></tr></thead><tbody>{models.map((model) => <tr key={`${model.horizon}-${model.id}`}><th scope="row">{model.label}<small>{model.id}</small></th><td><strong>{model.mape.toFixed(2)}%</strong><div className="kw-metric-track" aria-hidden="true"><i style={{ width: `${Math.max(2, model.mape / maxMape * 100)}%` }} /></div></td><td>{model.direction === null ? <span className="kw-muted">不适用</span> : `${model.direction.toFixed(2)}%`}</td><td>{model.samples}</td></tr>)}</tbody></table>{!models.length ? <p className="kw-empty">当前资料没有这个期限的结果。</p> : null}</div>
     <div className="kw-evidence-grid"><section><h3>结果如何理解</h3><ul>{result.findings.map((finding, index) => <li key={index}>{finding}</li>)}</ul></section><section><h3>验证方法</h3><ol>{result.methodology.map((method, index) => <li key={index}>{method}</li>)}</ol></section></div>
     <details className="kw-source-quality"><summary>数据口径与局限</summary><ul>{result.sourceQuality.map((quality, index) => <li key={index}>{quality}</li>)}</ul><p>来源文档 {data.docCount} 份 · 知识版本 <code>{data.sourceCommit}</code></p></details>

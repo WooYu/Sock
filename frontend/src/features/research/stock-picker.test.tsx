@@ -41,3 +41,12 @@ test('selects the next result with arrow keys and Enter', async () => {
   await user.keyboard('{ArrowDown}{Enter}')
   expect(onSelect).toHaveBeenCalledWith(securities[1])
 })
+
+test('restores a saved index and selects it with its qualified symbol', async () => {
+  const index = { code: 'sh000001', name: '上证指数', exchange: 'SH' }
+  localStorage.setItem('stockcal:research-list:v1', JSON.stringify({ recent: [index], favorites: [index] }))
+  const onSelect = vi.fn()
+  render(<StockPicker selectedSymbol={null} onSelect={onSelect} onClose={vi.fn()} />)
+  await userEvent.click(screen.getByRole('button', { name: /上证指数.*SH sh000001/ }))
+  expect(onSelect).toHaveBeenCalledWith(index)
+})

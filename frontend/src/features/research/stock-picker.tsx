@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
+import { validMarketSymbol } from '@/lib/api/market-symbol'
 import { browserMarketClient } from '@/lib/api/browser-client'
 import type { MarketSnapshot, Security } from '../workspace/stock-workspace-types'
 import { StudioIcon } from './studio-icon'
@@ -14,7 +15,7 @@ function read() { try { return localStorage.getItem(storageKey) ?? emptyList } c
 function parse(raw: string): SavedList {
   try {
     const value = JSON.parse(raw)
-    const valid = (items: unknown): Security[] => Array.isArray(items) ? items.filter((item) => item && typeof item.code === 'string' && /^\d{6}$/.test(item.code) && typeof item.name === 'string') : []
+    const valid = (items: unknown): Security[] => Array.isArray(items) ? items.filter((item) => item && typeof item.code === 'string' && validMarketSymbol.test(item.code) && typeof item.name === 'string') : []
     return { recent: valid(value.recent), favorites: valid(value.favorites) }
   } catch { return { recent: [], favorites: [] } }
 }
@@ -48,7 +49,7 @@ export function StockPicker({ selectedSymbol, market, onSelect, onClose }: { sel
 
   useEffect(() => {
     const security = market?.quote.security
-    if (!security || !/^\d{6}$/.test(security.code)) return
+    if (!security || !validMarketSymbol.test(security.code)) return
     const old = parse(read())
     save({ recent: [security, ...old.recent.filter((item) => item.code !== security.code)].slice(0, 20), favorites: old.favorites.map((item) => item.code === security.code ? security : item) })
   }, [market?.quote.security])
@@ -75,7 +76,7 @@ export function StockPicker({ selectedSymbol, market, onSelect, onClose }: { sel
   const visible = query.trim() ? results : tab === 'favorites' ? saved.favorites : saved.recent.length ? saved.recent : initialSecurities
   return <aside aria-label="股票选择" className="rs-stock-picker">
     <div className="rs-picker-heading"><strong>A 股市场</strong><button aria-label="关闭选股" className="rs-mobile-only rs-icon-button" onClick={onClose} type="button"><StudioIcon name="close" /></button><span className="rs-desktop-only">沪 · 深 · 北</span></div>
-    <form className="rs-search" onSubmit={(event) => { event.preventDefault(); if (results[activeIndex] && query.trim()) choose(results[activeIndex]); else if (/^\d{6}$/.test(query.trim())) choose({ code: query.trim(), name: query.trim() }) }}>
+    <form className="rs-search" onSubmit={(event) => { event.preventDefault(); if (results[activeIndex] && query.trim()) choose(results[activeIndex]); else if (validMarketSymbol.test(query.trim())) choose({ code: query.trim(), name: query.trim() }) }}>
       <StudioIcon name="search" size={16} /><input aria-label="搜索 A 股" aria-describedby="rs-search-help" aria-autocomplete="list" aria-controls="rs-stock-results" aria-expanded={Boolean(query.trim())} aria-activedescendant={query.trim() && results[activeIndex] ? `rs-result-${activeIndex}` : undefined} role="combobox" ref={input} value={query} onChange={(event) => { setQuery(event.target.value); setResults([]); setActiveIndex(0); setSearchState(event.target.value.trim() ? 'loading' : 'idle') }} onKeyDown={(event) => { if (event.nativeEvent.isComposing) return; if (event.key === 'Escape' && query) { event.stopPropagation(); clearSearch() } if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && results.length) { event.preventDefault(); setActiveIndex((index) => (index + (event.key === 'ArrowDown' ? 1 : -1) + results.length) % results.length) } }} placeholder="代码 / 名称 / 拼音" autoComplete="off" />{query ? <button className="rs-search-clear" aria-label="清空搜索" type="button" onClick={clearSearch}><StudioIcon name="close" size={16} /></button> : <kbd title="Ctrl+K / ⌘K">Ctrl K</kbd>}
     </form>
     <p id="rs-search-help" className="rs-search-help">输入代码或名称，↑↓ 选择，回车查看</p>
@@ -92,7 +93,7 @@ export function StockPicker({ selectedSymbol, market, onSelect, onClose }: { sel
         </div>
       })}
       {!visible.length && searchState !== 'loading' ? <p className="rs-list-empty">{query.trim() ? '暂无匹配股票，请尝试六位代码。' : '点击股票旁的星标，加入你的自选。'}</p> : null}
-      {query.trim() && /^\d{6}$/.test(query.trim()) && !results.length && searchState !== 'loading' ? <button className="rs-direct-open" onClick={() => choose({ code: query.trim(), name: query.trim() })} type="button">直接查看 {query.trim()}<StudioIcon name="arrow" size={15} /></button> : null}
+      {query.trim() && validMarketSymbol.test(query.trim()) && !results.length && searchState !== 'loading' ? <button className="rs-direct-open" onClick={() => choose({ code: query.trim(), name: query.trim() })} type="button">直接查看 {query.trim()}<StudioIcon name="arrow" size={15} /></button> : null}
     </div>
     {notice ? <p role="status" className="rs-list-empty">{notice}</p> : null}
     <div className="rs-picker-footer"><StudioIcon name="search" /><strong>从一只股票开始</strong><p>搜索全市场，图表与预测随股票一起切换。</p><small>自选与最近查看保存在本机</small></div>

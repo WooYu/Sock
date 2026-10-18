@@ -194,6 +194,13 @@ describe('experience workbench', () => {
     await user.click(screen.getByRole('link', { name: '回测证据' }))
     expect(screen.getByText('经验规则代理尚未显示稳定优势。')).toBeInTheDocument()
     expect(screen.getByText('3.10%')).toBeInTheDocument()
+    await user.selectOptions(screen.getByLabelText('排列方式'), 'error')
+    const table = screen.getByRole('region', { name: '模型误差对照表' })
+    const errors = within(table).getAllByRole('row').slice(1).map(row => Number(within(row).getAllByRole('cell')[0].textContent?.replace('%', '')))
+    expect(errors).toEqual([...errors].sort((a, b) => a - b))
+    await user.click(screen.getByText('如何读懂这些指标？'))
+    expect(screen.getByText(/测试样本是参与该项评价的记录数/)).toBeVisible()
+
     await user.click(screen.getByRole('button', { name: '未来 4 日' }))
     expect(screen.getByText('3.60%')).toBeInTheDocument()
     expect(screen.queryByText('4.30%')).not.toBeInTheDocument()

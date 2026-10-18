@@ -1,9 +1,11 @@
+import { matchesShanghaiComposite, shanghaiComposite } from '@/lib/api/market-symbol'
 import { NextResponse } from 'next/server'
 import { searchSecurities } from '@/lib/api/backend-client'
 import { searchPublicSecurities, PublicMarketError } from '@/lib/api/public-market'
 
 export async function GET(request: Request) {
   const query = new URL(request.url).searchParams.get('q') ?? ''
+  if (query.trim() !== '000001' && matchesShanghaiComposite(query)) return NextResponse.json([{ ...shanghaiComposite }])
   try {
     return NextResponse.json(await (process.env.STOCKCAL_API_BASE_URL ? searchSecurities(query) : searchPublicSecurities(query)))
   } catch (error) {

@@ -146,6 +146,23 @@ describe('Tencent public market adapter', () => {
     expect(await (await load()).searchPublicSecurities('xys')).toEqual([{ code: '300502', name: '新易盛', exchange: 'SZ', initials: 'xys' }])
   })
 
+  test.each(['上证指数', '上证', '上证综指', 'SH000001', 'szzs'])('finds the index by %s without a stock-code collision', async query => {
+    const fetcher = vi.fn(); vi.stubGlobal('fetch', fetcher)
+    expect(await (await load()).searchPublicSecurities(query)).toEqual([{ code: 'sh000001', name: '上证指数', exchange: 'SH', initials: 'szzs' }])
+    expect(fetcher).not.toHaveBeenCalled()
+  })
+
+  test('loads raw index history and keeps its qualified identity separate from Ping An Bank', async () => {
+    const data = payload('day', daily, 'sh000001')
+    data.data.sh000001.qt.sh000001[1] = '上证指数'
+    const fetcher = vi.fn<typeof fetch>(async () => Response.json(data)); vi.stubGlobal('fetch', fetcher)
+    const api = await load()
+    const snapshot = await api.getPublicMarketSnapshot('sh000001')
+    expect(snapshot).toMatchObject({ adjustment: 'none', quote: { security: { code: 'sh000001', name: '上证指数', exchange: 'SH' } } })
+    expect(await api.getPublicChartSeries('sh000001', 'day', 'qfq')).toMatchObject({ symbol: 'sh000001', adjustment: 'none', bars: [{ close: 11 }, { close: 12 }] })
+    expect(new URL(fetcher.mock.calls[0][0] as string).searchParams.get('param')).toBe('sh000001,day,,,640,')
+  })
+
   test('does not evaluate script returned by smartbox', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => new Response('globalThis.pwned = true;')))
     await expect((await load()).searchPublicSecurities('xys')).rejects.toMatchObject({ status: 502 })

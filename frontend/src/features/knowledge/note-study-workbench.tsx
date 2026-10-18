@@ -17,6 +17,14 @@ async function proposalRequest<T>(file: string | null, signal: AbortSignal): Pro
 export function NoteStudyWorkbench({ currentTags = [] }: { currentTags?: NoteTagRecord[] }) {
   const [index, setIndex] = useState<NoteStudyIndex | null>(null), [query, setQuery] = useState(''), [file, setFile] = useState('')
   const [error, setError] = useState(''), [reload, setReload] = useState(0)
+  const detailRef = useRef<HTMLDivElement>(null)
+  function choose(file: string) {
+    setFile(file)
+    if (window.matchMedia?.('(max-width: 760px)').matches) {
+      detailRef.current?.scrollIntoView({ block: 'start', behavior: 'instant' })
+      detailRef.current?.focus({ preventScroll: true })
+    }
+  }
   useEffect(() => {
     const controller = new AbortController()
     void proposalRequest<NoteStudyIndex>(null, controller.signal).then(value => { if (!controller.signal.aborted) { setIndex(value); setError('') } }).catch(cause => { if (!controller.signal.aborted) setError(cause.message) })
@@ -29,10 +37,11 @@ export function NoteStudyWorkbench({ currentTags = [] }: { currentTags?: NoteTag
     <p className="nt-disclaimer">AI候选与人工标签分开保存；解释被选用、定义可计算和预测效果已验证分别记录。</p>
     {error ? <p role="alert">{error} <button type="button" onClick={() => setReload(n => n + 1)}>重试学习资料</button></p> : null}
     <label className="nt-study-search">搜索逐篇学习<input value={query} onChange={e => setQuery(e.target.value)} placeholder="笔记名、趋势、方法、MA5…" /></label>
-    <div className="nt-layout"><section className="nt-list nt-study-list" aria-label="逐篇学习目录">
-      {entries.map(entry => <button type="button" key={entry.file} aria-pressed={entry.file === selected?.file} onClick={() => setFile(entry.file)}><strong>{entry.title}</strong><small>{entry.file}</small><span>{entry.claimCount}条主张 · {entry.roles.map(r => ROLES[r] ?? r).join('、')}</span><small>{entry.attachmentStatus === 'not_inspected' ? '文字已读，附件未核对' : '文字已读'}</small></button>)}
+    <div className="nt-columns"><section className="nt-list nt-study-list" aria-label="逐篇学习目录">
+      <div className="nt-list-heading"><strong>研究笔记</strong><span role="status">{entries.length} 条结果</span></div>
+      {entries.map(entry => <button className="nt-record nt-study-record" type="button" key={entry.file} aria-label={`查看学习建议：${entry.title}`} aria-pressed={entry.file === selected?.file} onClick={() => choose(entry.file)}><strong>{entry.title}</strong><small>{entry.file}</small><span>{entry.claimCount}条主张 · {entry.roles.map(r => ROLES[r] ?? r).join('、')}</span><small>{entry.attachmentStatus === 'not_inspected' ? '文字已读，附件未核对' : '文字已读'}</small></button>)}
       {index && !entries.length ? <p>没有匹配的研究笔记。</p> : null}
-    </section>{selected ? <StudyDetail key={selected.file} file={selected.file} currentTags={currentTags} /> : null}</div>
+    </section>{selected ? <div ref={detailRef} tabIndex={-1} className="nt-study-detail"><StudyDetail key={selected.file} file={selected.file} currentTags={currentTags} /></div> : null}</div>
   </section>
 }
 function StudyDetail({ file, currentTags }: { file: string; currentTags: NoteTagRecord[] }) {

@@ -79,3 +79,18 @@ describe('market BFF source selection', () => {
     expect(JSON.stringify(await response.json())).not.toContain('secret')
   })
 })
+
+test('supports index search and snapshots with a legacy backend configured', async () => {
+  vi.stubEnv('STOCKCAL_API_BASE_URL', 'https://backend.example/')
+  const fetcher = vi.fn<typeof fetch>(async () => Response.json({ code: 0, data: { sh000001: { day: [['2026-09-16', '10', '11', '12', '9', '100']], qt: { sh000001: ['1', '上证指数', '000001', '11', '10', '10', '100'] } } } }))
+  vi.stubGlobal('fetch', fetcher)
+  try {
+    const search = await callSearch('上证指数')
+    expect(await search.json()).toMatchObject([{ code: 'sh000001', name: '上证指数' }])
+    expect(fetcher).not.toHaveBeenCalled()
+    const snapshot = await callSnapshot('sh000001')
+    expect(snapshot.status).toBe(200)
+    expect(await snapshot.json()).toMatchObject({ adjustment: 'none', quote: { security: { code: 'sh000001', exchange: 'SH' } } })
+    expect(String(fetcher.mock.calls[0][0])).toContain('web.ifzq.gtimg.cn')
+  } finally { vi.unstubAllGlobals(); vi.unstubAllEnvs() }
+})
