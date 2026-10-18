@@ -23,30 +23,30 @@ class ScenarioResearchApiTest {
     @MockitoBean ScenarioRecordService records;
     @MockitoBean ScenarioEvaluationService evaluations;
     @MockitoBean NoteStudyService notes;
-    @Test void requiresAuthenticationAndOnlyReadsOwnedRecord() throws Exception {
+    @Test void requiresAuthenticationAndSharesRecordsAcrossAccounts() throws Exception {
         mvc.perform(get("/api/v1/scenario-records")).andExpect(status().isUnauthorized());
         var record=ScenarioTestFixtures.forecast(Instant.now(),"replay");
-        when(store.findOwned("alice",record.id())).thenReturn(Optional.of(record));
+        when(store.findOwned("shared",record.id())).thenReturn(Optional.of(record));
         mvc.perform(get("/api/v1/scenario-records/"+record.id()).with(user("alice"))).andExpect(status().isOk()).andExpect(jsonPath("$.id").value(record.id()));
-        mvc.perform(get("/api/v1/scenario-records/"+record.id()).with(user("bob"))).andExpect(status().isNotFound());
-        mvc.perform(get("/api/v1/scenario-records/"+record.id()+"/evaluations").with(user("bob"))).andExpect(status().isNotFound());
+        mvc.perform(get("/api/v1/scenario-records/"+record.id()).with(user("bob"))).andExpect(status().isOk());
+        mvc.perform(get("/api/v1/scenario-records/"+record.id()+"/evaluations").with(user("bob"))).andExpect(status().isOk());
     }
     @Test void invalidPayloadAndConflictKeepHttpStatus() throws Exception {
         mvc.perform(post("/api/v1/scenario-records").with(user("alice")).contentType(MediaType.APPLICATION_JSON).content("{bad"))
             .andExpect(status().isBadRequest());
-        when(records.save(eq("alice"),any())).thenThrow(new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.CONFLICT,"version conflict"));
+        when(records.save(eq("shared"),any())).thenThrow(new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.CONFLICT,"version conflict"));
         mvc.perform(post("/api/v1/scenario-records").with(user("alice")).contentType(MediaType.APPLICATION_JSON).content("{\"snapshot\":{},\"noteBindings\":[]}"))
             .andExpect(status().isConflict());
     }
     @Test void pendingEvaluationIsSuccessfulRequestAndIdentityIsServerDerived() throws Exception {
-        var empty=new EvaluationView(null,null);when(evaluations.evaluate("alice","record")).thenReturn(empty);
+        var empty=new EvaluationView(null,null);when(evaluations.evaluate("shared","record")).thenReturn(empty);
         mvc.perform(post("/api/v1/scenario-records/record/evaluate?owner=bob").header("X-Client-Id","pretend").with(user("alice")))
             .andExpect(status().isOk()).andExpect(jsonPath("$.latestSuccessful").isEmpty());
-        verify(evaluations).evaluate("alice","record");
+        verify(evaluations).evaluate("shared","record");
     }
     @Test void developmentIdentityRequiresBoundedClientIdAndPrincipalTakesPrecedence() {
-        assertThat(ResearchIdentity.resolve(null,"one")).isEqualTo("web:one");
-        assertThat(ResearchIdentity.resolve(()->"alice","one")).isEqualTo("alice");
+        assertThat(ResearchIdentity.resolve(null,"one")).isEqualTo("shared");
+        assertThat(ResearchIdentity.resolve(()->"alice","one")).isEqualTo("shared");
         for(String id:new String[]{null,"","a".repeat(101)})assertThatThrownBy(()->ResearchIdentity.resolve(null,id)).isInstanceOf(org.springframework.web.server.ResponseStatusException.class);
     }
 }

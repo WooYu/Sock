@@ -44,6 +44,15 @@ export function RulesPage({ initialRules = [], client = defaultClient }: { initi
   const [selectedRule, setSelectedRule] = useState<RuleRecord | null>(null)
   const [query, setQuery] = useState('')
   const [serverStatistics, setServerStatistics] = useState<{ total: number; published: number; enabled: number; drafts: number } | null>(null)
+  const [sharedRefresh, setSharedRefresh] = useState(0)
+  useEffect(() => {
+    const reloadShared = () => setSharedRefresh(n => n + 1)
+    const localChanged = (event: StorageEvent) => { if (event.key === 'stockcal:rules') setRules(initialRulesWithBuiltIns()) }
+    window.addEventListener('storage', localChanged)
+    window.addEventListener('focus', reloadShared)
+    const timer = setInterval(reloadShared, 10000)
+    return () => { clearInterval(timer); window.removeEventListener('focus', reloadShared); window.removeEventListener('storage', localChanged) }
+  }, [])
   const visibleRules = rules.filter((rule) => `${rule.title} ${rule.description ?? ''}`.toLowerCase().includes(query.trim().toLowerCase()))
 
   useEffect(() => {
@@ -70,7 +79,7 @@ export function RulesPage({ initialRules = [], client = defaultClient }: { initi
       })
     }).catch(() => undefined)
     return () => { active = false }
-  }, [client])
+  }, [client, sharedRefresh])
 
   const toggleRule = async (rule: RuleRecord) => {
     const enabled = !(enabledRules[rule.id] ?? rule.status === 'published')

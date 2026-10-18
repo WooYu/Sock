@@ -43,14 +43,15 @@ public class AccountPortfolioController {
             @RequestHeader(value = "X-Client-Id", required = false) String clientId,
             @Valid @RequestBody TradeRequest request) {
         var userId = identity(principal, clientId);
+        jdbc.sql("select id from shared_sync_lock where id=1 for update").query(Integer.class).single();
         var side = request.side().toLowerCase();
         if (!side.equals("buy") && !side.equals("sell")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "side must be buy or sell");
         }
         var current = jdbc.sql("""
-                select revision from account_trade where user_id=:userId and id=:id
+                select revision from account_trade where id=:id
                 """)
-            .param("userId", userId).param("id", request.id())
+            .param("id", request.id())
             .query(Long.class).optional().orElse(null);
         if (current != null && request.revision() <= current) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "revision conflict");
@@ -71,9 +72,9 @@ public class AccountPortfolioController {
                     update account_trade set symbol=:symbol, side=:side, quantity=:quantity,
                     price=:price, fee=:fee, traded_at=:tradedAt, note=:note,
                     revision=:revision, updated_at=current_timestamp
-                    where user_id=:userId and id=:id
+                    where id=:id
                     """)
-                .param("id", request.id()).param("userId", userId)
+                .param("id", request.id())
                 .param("symbol", request.symbol()).param("side", side)
                 .param("quantity", request.quantity()).param("price", request.price())
                 .param("fee", request.fee()).param("tradedAt", Timestamp.from(request.tradedAt()))
@@ -90,9 +91,9 @@ public class AccountPortfolioController {
         var userId = identity(principal, clientId);
         var trades = jdbc.sql("""
                 select id,symbol,side,quantity,price,fee,traded_at,note,revision
-                from account_trade where user_id=:userId order by traded_at, id
+                from account_trade order by traded_at, id
                 """)
-            .param("userId", userId).query(this::mapTrade).list();
+            .query(this::mapTrade).list();
         return new PortfolioResponse(trades, calculateHoldings(trades));
     }
 

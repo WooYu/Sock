@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { addRecord, createRecordId, loadRecords } from '../records/record-store'
 import type { PredictionRecord, TradeRecord } from '../records/record-types'
 import { getAuthorizationHeader, getClientId, syncRecord } from '../records/record-sync'
@@ -17,6 +17,14 @@ export function TradingPage({ symbol, initialTab = 'positions' }: { symbol?: str
   const [trades, setTrades] = useState<TradeRecord[]>(() => loadRecords<TradeRecord>('trades'))
   const [predictions, setPredictions] = useState<PredictionRecord[]>(() => loadRecords<PredictionRecord>('predictions'))
 
+  useEffect(() => {
+    const reload = (event: StorageEvent) => {
+      if (event.key === 'stockcal:trades') setTrades(loadRecords<TradeRecord>('trades'))
+      if (event.key === 'stockcal:predictions') setPredictions(loadRecords<PredictionRecord>('predictions'))
+    }
+    window.addEventListener('storage', reload)
+    return () => window.removeEventListener('storage', reload)
+  }, [])
   const label = tabs.find(([key]) => key === tab)?.[1] ?? '持仓'
   const visibleTrades = symbol ? trades.filter((trade) => trade.symbol === symbol) : trades
   const visiblePredictions = symbol ? predictions.filter((prediction) => prediction.symbol === symbol) : predictions

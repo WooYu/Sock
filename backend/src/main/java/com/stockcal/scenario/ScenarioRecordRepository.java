@@ -44,12 +44,12 @@ public class ScenarioRecordRepository {
         return existing;
     }
     private Optional<ForecastRecord> byClientKey(String owner,String client,int version) {
-        return jdbc.sql("select payload_text from scenario_forecast_record where owner_id=:owner and client_record_id=:client and client_version=:version")
-            .param("owner",owner).param("client",client).param("version",version).query(String.class).optional().map(s->ResearchJson.JSON.readValue(s,ForecastRecord.class));
+        return jdbc.sql("select payload_text from scenario_forecast_record where client_record_id=:client and client_version=:version order by received_at,id limit 1")
+            .param("client",client).param("version",version).query(String.class).optional().map(s->ResearchJson.JSON.readValue(s,ForecastRecord.class));
     }
     public Optional<ForecastRecord> findOwned(String owner,String id) {
-        return jdbc.sql("select payload_text from scenario_forecast_record where owner_id=:owner and id=:id")
-            .param("owner",owner).param("id",id).query(String.class).optional().map(s->ResearchJson.JSON.readValue(s,ForecastRecord.class));
+        return jdbc.sql("select payload_text from scenario_forecast_record where id=:id")
+            .param("id",id).query(String.class).optional().map(s->ResearchJson.JSON.readValue(s,ForecastRecord.class));
     }
     public Optional<ForecastRecord> findInternal(String id) {
         return jdbc.sql("select payload_text from scenario_forecast_record where id=:id").param("id",id).query(String.class).optional().map(s->ResearchJson.JSON.readValue(s,ForecastRecord.class));
@@ -123,7 +123,7 @@ public class ScenarioRecordRepository {
         var cursor=ResearchCursor.read(rawCursor,ResearchJson.hash(ResearchJson.canonical(Map.of("kind","samples","owner",owner,"filters",f))),jdbc);
         var query=jdbc.sql("""
             with owned as (
-                select * from scenario_forecast_record where owner_id=:owner and received_at<=:asof
+                select * from scenario_forecast_record where received_at<=:asof
                 and pg_visible_in_snapshot(created_xid,cast(:snapshot as pg_snapshot))
                 and (:symbol='' or symbol=:symbol) and (:method='' or method=:method) and (:definition='' or definition_version=:definition)
                 and (:fromDay='' or anchor_day>=cast(nullif(:fromDay,'') as date)) and (:throughDay='' or anchor_day<=cast(nullif(:throughDay,'') as date))
@@ -150,7 +150,7 @@ public class ScenarioRecordRepository {
                 where b->'study'->>'sourceFile'=:noteFile or b->'inlineVersion'->>'file'=:noteFile))
             and (:hasCursor=false or f.received_at<:position or (f.received_at=:position and f.id<:positionId))
             order by f.received_at desc,f.id desc limit :limit
-            """).param("owner",owner).param("asof",Timestamp.from(cursor.asOf())).param("snapshot",cursor.visibilitySnapshot()).param("symbol",empty(f.symbol())).param("method",empty(f.method()))
+            """).param("asof",Timestamp.from(cursor.asOf())).param("snapshot",cursor.visibilitySnapshot()).param("symbol",empty(f.symbol())).param("method",empty(f.method()))
             .param("definition",empty(f.forecastDefinitionVersion())).param("fromDay",f.anchorFrom()==null?"":f.anchorFrom().toString())
             .param("throughDay",f.anchorThrough()==null?"":f.anchorThrough().toString()).param("evaluationDefinition",empty(f.evaluationDefinitionVersion()).isEmpty()?SCORE_VERSION:f.evaluationDefinitionVersion())
             .param("status",empty(f.status())).param("filterEligibility",f.forwardEligible()!=null).param("eligible",Boolean.TRUE.equals(f.forwardEligible()))

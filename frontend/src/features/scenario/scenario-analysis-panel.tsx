@@ -81,6 +81,15 @@ function ScenarioPanel({ symbol, sourceMode, activePeriod, onPeriodChange, clien
     }).catch(() => { if (active) setKnowledgeError('笔记来源暂未加载，请刷新后再确认模式。') })
     return () => { active = false }
   }, [])
+  useEffect(() => {
+    const reload = (event: StorageEvent) => {
+      if (event.key !== SCENARIO_STORAGE_KEY) return
+      try { setRecords(parseScenarioLedger(localStorage.getItem(SCENARIO_STORAGE_KEY))); setStorageError(null) }
+      catch { setStorageError('共享分析记录不可读取，原值已保留') }
+    }
+    window.addEventListener('storage', reload)
+    return () => window.removeEventListener('storage', reload)
+  }, [])
   const horizons = useMemo(() => horizonChoice.split(',').map(Number) as Horizon[], [horizonChoice])
   const scopedInput = useMemo(() => loader.input ? scopedPeriodInput(loader.input, annotations) : null, [loader.input, annotations])
   const plan = useMemo(() => scopedInput ? adaptivePeriodPlan(scopedInput, annotations) : null, [scopedInput, annotations])

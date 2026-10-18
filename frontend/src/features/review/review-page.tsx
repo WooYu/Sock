@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { createRecordId, loadRecords, saveRecords } from '../records/record-store'
 import type { PredictionRecord, ReviewRecord, TradeRecord } from '../records/record-types'
 import { syncRecord } from '../records/record-sync'
@@ -24,6 +24,12 @@ function serializeDailyDraft(draft: DailyDraft) { return dailySections.map((sect
 
 export function ReviewPage({ initialTab = 'daily', tradeId, predictionId }: { initialTab?: ReviewTab; tradeId?: string | null; predictionId?: string | null }) {
   const [tab, setTab] = useState<ReviewTab>(initialTab)
+  const [, refreshShared] = useState(0)
+  useEffect(() => {
+    const reload = (event: StorageEvent) => { if (['stockcal:reviews', 'stockcal:trades', 'stockcal:predictions'].includes(event.key ?? '')) refreshShared(n => n + 1) }
+    window.addEventListener('storage', reload)
+    return () => window.removeEventListener('storage', reload)
+  }, [])
   const label = tabs.find(([key]) => key === tab)?.[1] ?? '当日总结'
   return <section className="sc-review-workspace"><div className="sc-review-header"><div><RecordSyncButton /><p className="text-sm text-[var(--sc-muted)]">复盘工作台</p><h1 className="mt-1 text-2xl font-semibold">{label}</h1></div></div><div className="sc-workspace-tabs" role="tablist" aria-label="复盘内容">{tabs.map(([key, name]) => <Link className={tab === key ? 'is-active' : ''} data-active={tab === key} href={`/review/${key}`} key={key} onClick={() => setTab(key)} role="tab" aria-selected={tab === key}>{name}</Link>)}</div><div className="sc-review-content">{tab === 'daily' ? <DailyReview /> : null}{tab === 'trade' ? <TradeReview tradeId={tradeId} predictionId={predictionId} /> : null}{tab === 'history' ? <ReviewHistory /> : null}{tab === 'backtest' ? <Backtest /> : null}</div></section>
 }

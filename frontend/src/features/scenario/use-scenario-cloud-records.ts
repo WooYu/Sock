@@ -54,13 +54,16 @@ export function useScenarioCloudRecords({ symbol, localRecords }: { symbol: stri
         if (!mounted.current || current !== epoch.current || !next.isCurrent()) return
         identity.current = next
         setIdentityScope(next.scope)
-        const stored = readLedger().scopes[next.scope] ?? {}
+        const stored: Record<string, CloudEntry> = {}
+        for (const entries of Object.values(readLedger().scopes)) for (const [key, entry] of Object.entries(entries)) {
+          if (!stored[key] || entry.status === 'stored') stored[key] = entry
+        }
         const restored = Object.fromEntries(Object.entries(stored).map(([key, entry]) => [key, entry.status === 'pending' ? { ...entry, status: 'retry' as const, error: '上次请求尚未确认，请重试原版本' } : entry]))
         entriesRef.current = restored; setEntries(restored); setError(''); setReady(true)
       } catch (cause) { if (mounted.current && current === epoch.current) { setError(cause instanceof Error ? cause.message : '回执不可读取'); setReady(true) } }
     }
     queueMicrotask(() => { if (mounted.current) void reload() })
-    const onStorage = (e: StorageEvent) => { if (e.key === 'stockcal.accessToken' || e.key === 'stockcal:sync-client-id' || e.key === null) void reload() }
+    const onStorage = (e: StorageEvent) => { if (e.key === CLOUD_RECORDS_STORAGE_KEY || e.key === 'stockcal.accessToken' || e.key === 'stockcal:sync-client-id' || e.key === null) void reload() }
     const onIdentity = () => { void reload() }
     window.addEventListener('storage', onStorage); window.addEventListener(RESEARCH_IDENTITY_EVENT, onIdentity)
     return () => { mounted.current = false; invalidate(); pendingControllers.forEach(c => c.abort()); window.removeEventListener('storage', onStorage); window.removeEventListener(RESEARCH_IDENTITY_EVENT, onIdentity) }

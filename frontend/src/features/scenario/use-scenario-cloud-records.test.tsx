@@ -41,9 +41,9 @@ test('late response after identity switch cannot mark the new identity stored or
   act(() => { saving = result.current.saveFrozen(snapshot, []) })
   await waitFor(() => expect(result.current.entries[cloudRecordKey(snapshot)]?.status).toBe('pending'))
   act(() => { localStorage.setItem('stockcal.accessToken', 'secret-token-B'); window.dispatchEvent(new Event('stockcal:identity-change')) })
-  await waitFor(() => expect(result.current.entries[cloudRecordKey(snapshot)]).toBeUndefined())
+  await waitFor(() => expect(result.current.entries[cloudRecordKey(snapshot)]?.status).toBe('retry'))
   await act(async () => { resolve(Response.json(researchRecord(snapshot))); await saving })
-  expect(result.current.entries[cloudRecordKey(snapshot)]).toBeUndefined()
+  expect(result.current.entries[cloudRecordKey(snapshot)]?.status).toBe('retry')
   expect(localStorage.getItem(CLOUD_RECORDS_STORAGE_KEY)).not.toContain('secret-token')
 })
 test('rejects acknowledgement that belongs to another snapshot', async () => {

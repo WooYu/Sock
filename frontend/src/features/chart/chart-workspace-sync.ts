@@ -1,7 +1,7 @@
 ﻿import { migrateWorkspace, type ChartPeriod, type ChartWorkspaceV2 } from './chart-types'
 import { deserializeChartWorkspace, isChartWorkspaceV2, mergeChartWorkspace, serializeChartWorkspace } from './chart-workspace-state'
 
-const cursorKey = 'stockcal:chart-sync-cursor'
+const cursorKey = 'stockcal:chart-shared-sync-cursor:v1'
 const queueKey = 'stockcal:chart-sync-queue:v2'
 const journalPrefix = 'stockcal:chart-sync-mutation:v2:'
 const acknowledgedPrefix = 'stockcal:chart-sync-ack:v2:'

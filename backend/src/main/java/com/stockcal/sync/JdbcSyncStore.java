@@ -8,6 +8,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -22,14 +23,17 @@ public class JdbcSyncStore {
         this.json = json;
     }
 
+    @Transactional
     public ApplyResponse apply(String userId, SyncMutation mutation) {
+        // Serialize revisions and cursor commits across backend instances.
+        jdbc.sql("select id from shared_sync_lock where id=1 for update").query(Integer.class).single();
         var existing = cursorFor(userId, mutation.idempotencyKey());
         if (existing != null) return new ApplyResponse(false, existing);
         var current = jdbc.sql("""
                 select coalesce(max(revision), 0) from sync_change
-                where user_id = :userId and entity_type = :type and entity_id = :entityId
+                where entity_type = :type and entity_id = :entityId
                 """)
-            .param("userId", userId).param("type", mutation.entityType())
+            .param("type", mutation.entityType())
             .param("entityId", mutation.entityId()).query(Long.class).single();
         if (mutation.revision() <= current) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "revision conflict");
@@ -53,9 +57,9 @@ public class JdbcSyncStore {
     public PullResponse pull(String userId, long cursor) {
         List<SyncChange> changes = jdbc.sql("""
                 select cursor, entity_type, entity_id, operation, revision, payload, changed_at
-                from sync_change where user_id = :userId and cursor > :cursor order by cursor
+                from sync_change where cursor > :cursor order by cursor
                 """)
-            .param("userId", userId).param("cursor", cursor)
+            .param("cursor", cursor)
             .query(this::map).list();
         var next = changes.isEmpty() ? cursor : changes.getLast().cursor();
         return new PullResponse(next, changes);

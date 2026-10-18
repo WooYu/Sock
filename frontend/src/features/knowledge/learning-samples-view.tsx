@@ -37,6 +37,12 @@ export function LearningSamplesView() {
     window.addEventListener('popstate', restore); window.addEventListener(RESEARCH_IDENTITY_EVENT, identityChanged); window.addEventListener('storage', storageChanged)
     return () => { window.removeEventListener('popstate', restore); window.removeEventListener(RESEARCH_IDENTITY_EVENT, identityChanged); window.removeEventListener('storage', storageChanged) }
   }, [])
+  useEffect(() => {
+    const reloadShared = () => { if (!cursor && !selected) setRefresh(n => n + 1) }
+    window.addEventListener('focus', reloadShared)
+    const timer = setInterval(reloadShared, 10000)
+    return () => { clearInterval(timer); window.removeEventListener('focus', reloadShared) }
+  }, [cursor, selected])
   const key = JSON.stringify({ filters, cursor, refresh, identityEpoch })
   useEffect(() => {
     if (!ready) return

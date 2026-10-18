@@ -28,7 +28,9 @@ export function ForecastAudit({ market }: { market: MarketSnapshot }) {
         setRecords(saved); setError('')
       } catch (cause) { setError(cause instanceof Error ? cause.message : '核验记录暂不可用。') }
     })
-    return () => { active = false }
+    const reload = (event: StorageEvent) => { if (event.key === key) { try { const value = JSON.parse(localStorage.getItem(key) ?? '[]'); if (Array.isArray(value)) setRecords(value) } catch { setError('共享核验记录不可读取') } } }
+    window.addEventListener('storage', reload)
+    return () => { active = false; window.removeEventListener('storage', reload) }
   }, [key, market])
-  return <details className="rs-forecast-audit"><summary>预测核验记录 · 自动留存 {records.length} 次</summary><p>打开工作台时，留存最近已收盘日的首次预测，随后与实际指标对照。最多保留 90 次，记录位于当前浏览器；未打开期间不会补造历史预测。</p>{error ? <p role="alert">{error}</p> : null}{records.slice(0, 12).map(record => <section key={record.origin}><h4>原点 {record.origin} · {market.adjustment === 'qfq' ? '前复权' : '不复权'}</h4><small>记录于 {record.createdAt}</small><ProjectionEvaluation recordedAt={record.createdAt} points={record.points} candles={market.dailyCandles} fetchedAt={market.source.fetchedAt} basisValid={Math.abs((market.dailyCandles.find(bar => bar.day === record.origin)?.close ?? NaN) - record.close) < 0.005} /></section>)}</details>
+  return <details className="rs-forecast-audit"><summary>预测核验记录 · 自动留存 {records.length} 次</summary><p>打开工作台时，留存最近已收盘日的首次预测，随后与实际指标对照。最多保留 90 次，记录由所有账号共享并自动同步；未打开期间不会补造历史预测。</p>{error ? <p role="alert">{error}</p> : null}{records.slice(0, 12).map(record => <section key={record.origin}><h4>原点 {record.origin} · {market.adjustment === 'qfq' ? '前复权' : '不复权'}</h4><small>记录于 {record.createdAt}</small><ProjectionEvaluation recordedAt={record.createdAt} points={record.points} candles={market.dailyCandles} fetchedAt={market.source.fetchedAt} basisValid={Math.abs((market.dailyCandles.find(bar => bar.day === record.origin)?.close ?? NaN) - record.close) < 0.005} /></section>)}</details>
 }

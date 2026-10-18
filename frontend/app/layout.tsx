@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import type { ReactNode } from "react"
 import { Geist, Geist_Mono } from "next/font/google"
+import { SharedDataSyncProvider } from "@/features/records/shared-data-sync-provider"
 import "./globals.css"
 import "./workspace-polish.css"
 import "./kline-layout.css"
@@ -19,7 +20,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       lang="zh-CN"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col"><SharedDataSyncProvider />{children}</body>
     </html>
   )
 }

@@ -206,3 +206,6 @@ create table if not exists note_study_revision (
     unique(owner_id,channel,legacy_record_id,legacy_level,source_hash,legacy_tag_version)
 );
 create index if not exists note_study_file_versions on note_study_revision(owner_id,source_file,created_at desc,id desc);
+
+create table if not exists shared_sync_lock (id integer primary key);
+insert into shared_sync_lock (id) select 1 where not exists (select 1 from shared_sync_lock where id=1);

@@ -10,7 +10,7 @@ function read(): Ledger {
   for (const values of Object.values(data.scopes)) if (!Array.isArray(values) || values.some(v => !/^[a-f0-9-]{36}$/i.test(v.revisionId) || !/^[a-f0-9]{64}$/.test(v.sourceHash) || !v.sourceFile || !v.channel || !Number.isFinite(Date.parse(v.selectedAt)))) throw new Error('研究选择版本无效，原值已保留')
   return data
 }
-export function loadStudySelections(identityScope: string): StudySelection[] { return structuredClone(read().scopes[identityScope] ?? []) }
+export function loadStudySelections(identityScope: string): StudySelection[] { const scopes = read().scopes; return structuredClone(Object.values(scopes).flat().concat(scopes[identityScope] ?? []).filter((v, i, all) => all.findIndex(other => other.revisionId === v.revisionId) === i)) }
 export function saveStudySelection(identityScope: string, revision: NoteStudyRevision): StudySelection[] {
   if (!identityScope || !/^[a-f0-9-]{36}$/i.test(revision.id) || !/^[a-f0-9]{64}$/.test(revision.sourceHash) || !revision.sourceFile || !revision.channel) throw new Error('请先保存并核对服务器研究回执')
   const ledger = read(), previous = ledger.scopes[identityScope] ?? []

@@ -34,9 +34,9 @@ class ScenarioRecordPostgresTest {
             assertThat(jdbc.sql("select count(*) from scenario_forecast_record").query(Integer.class).single()).isEqualTo(1);
         }
     }
-    @Test void sameKeyDifferentPayloadConflictsAndOwnerCannotReadAnotherOwner() {
+    @Test void sameKeyDifferentPayloadConflictsAndOtherAccountsCanRead() {
         var record=store.save("web:one",valid(),Instant.now());
-        assertThat(store.findOwned("web:two",record.id())).isEmpty();
+        assertThat(store.findOwned("web:two",record.id())).isPresent();
         var changed=new ScenarioRecordValidatorTest().fixture();changed.put("kind","replay");
         assertThatThrownBy(()->store.save("web:one",new ScenarioRecordValidator().validate(new SaveForecastRequest(changed,List.of())),Instant.now()))
             .isInstanceOf(ResponseStatusException.class).hasMessageContaining("409");
@@ -51,9 +51,8 @@ class ScenarioRecordPostgresTest {
         assertThat(exact.getFirst().revisionId()).isEqualTo(one.id());
         var otherVersion=new LegacyNoteKey("old-id","document",base.sourceHash(),2,"legacy");
         assertThat(notes.resolveBindings("web:one",List.of(new NoteBindingInput(null,base.sourceHash(),otherVersion,base.payload()))).getFirst().status()).isEqualTo("unresolved");
-        assertThat(notes.resolveBindings("web:two",List.of(new NoteBindingInput(null,base.sourceHash(),key,base.payload()))).getFirst().status()).isEqualTo("unresolved");
-        assertThatThrownBy(()->notes.resolveBindings("web:two",List.of(new NoteBindingInput(one.id(),base.sourceHash(),null,null))))
-            .isInstanceOf(ResponseStatusException.class).hasMessageContaining("404");
+        assertThat(notes.resolveBindings("web:two",List.of(new NoteBindingInput(null,base.sourceHash(),key,base.payload()))).getFirst().status()).isEqualTo("resolved");
+        assertThat(notes.resolveBindings("web:two",List.of(new NoteBindingInput(one.id(),base.sourceHash(),null,null))).getFirst().revisionId()).isEqualTo(one.id());
     }
     @Test void exactLegacyKeyWithDifferentInlineContentConflicts() {
         var base=NoteStudyValidatorTest.valid();var key=new LegacyNoteKey("old-id","document",base.sourceHash(),1,"legacy");

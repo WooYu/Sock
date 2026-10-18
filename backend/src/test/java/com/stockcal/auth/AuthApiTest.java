@@ -171,7 +171,7 @@ class AuthApiTest {
 
         org.junit.jupiter.api.Assertions.assertEquals(0,
             jdbc.sql("select count(*) from app_user").query(Integer.class).single());
-        org.junit.jupiter.api.Assertions.assertEquals(0,
+        org.junit.jupiter.api.Assertions.assertEquals(1,
             jdbc.sql("select count(*) from sync_change").query(Integer.class).single());
         org.junit.jupiter.api.Assertions.assertEquals(0,
             jdbc.sql("select count(*) from sync_mutation").query(Integer.class).single());

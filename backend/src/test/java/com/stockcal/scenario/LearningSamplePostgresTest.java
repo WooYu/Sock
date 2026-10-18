@@ -35,7 +35,7 @@ class LearningSamplePostgresTest {
         var second=store.listSamples("web:test",filters("rising"),first.nextCursor(),1);
         assertThat(second.items()).hasSize(1);assertThat(second.items().getFirst().forecast().clientRecordId()).isEqualTo("wanted-first");assertThat(second.nextCursor()).isNull();
         assertThatThrownBy(()->store.listSamples("web:test",filters("falling"),first.nextCursor(),1)).isInstanceOf(IllegalArgumentException.class);
-        assertThat(store.listSamples("web:other",filters("rising"),null,25).items()).isEmpty();
+        assertThat(store.listSamples("web:other",filters("rising"),null,25).items()).hasSize(2);
     }
     @Test void latestSuccessfulActiveTargetOnlyAndFailedRecheckRetainsSuccess() {
         var r=save("target","rising",20);var now=Instant.parse("2026-10-12T08:00:00Z");

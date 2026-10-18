@@ -58,6 +58,19 @@ function StudyDetail({ file, currentTags }: { file: string; currentTags: NoteTag
     }).catch(() => { if (!controller.signal.aborted) setHistoryError('研究版本库暂未连接，仍可阅读文字建议。') })
     return () => controller.abort()
   }, [file, reload])
+  useEffect(() => {
+    const controller = new AbortController()
+    const reloadShared = () => {
+      if (busy) return
+      void listStudyVersions(file, undefined, controller.signal).then(page => {
+        if (controller.signal.aborted) return
+        setVersions(old => [...page.items, ...old.filter(v => !page.items.some(next => next.id === v.id))])
+      }).catch(() => undefined)
+    }
+    const timer = setInterval(reloadShared, 10000)
+    window.addEventListener('focus', reloadShared)
+    return () => { controller.abort(); clearInterval(timer); window.removeEventListener('focus', reloadShared) }
+  }, [file, busy])
   const study = proposal?.study, current = currentTags.find(r => r.level === 'document' && r.file === file)
   const added = study?.tags.filter(t => !current?.tags.includes(t)) ?? [], removed = current?.tags.filter(t => !study?.tags.includes(t)) ?? []
   const exactStored = [stored, ...versions].find(v => v?.channel === 'ai_semantic' && v.sourceHash === study?.sourceHash && v.payload.studyRevisionId === study?.studyRevisionId) ?? null

@@ -139,3 +139,11 @@ cd ../backend
 研究数据库专项验证在 `backend/` 运行 `bash scripts/test-scenario-postgres.sh`，复用开发PostgreSQL并创建／清理独立测试schema。浏览器验证在 `frontend/` 运行 `npm run test:e2e -- e2e/scenario-research.spec.ts e2e/scenario-analysis.spec.ts e2e/note-tags.spec.ts`。可用 `PLAYWRIGHT_EXECUTABLE_PATH=/usr/bin/chromium` 复用系统浏览器；`SCENARIO_REAL_RESEARCH=true` 仅在已准备独立测试后端／数据库的集成环境中设置，详见验收记录。逐篇学习原文核验使用 `npm run notes:study -- --check`，只检查而不重建历史研究结论。
 
 请以交接说明中的最新验证记录为准。金融计算与预测仍应经过领域专家复核，应用不构成投资建议。
+
+### 全账号共享与多端同步
+
+业务数据由所有账号共享：自选、研究日志、图表标注、推演记录、笔记研究与标签、交易及复盘。身份验证和设备凭证仍独立管理。已有后端历史数据直接共享读取，注销账号不会删除共享业务记录。
+
+网页每3秒同步本机业务修改，图表每5秒同步；学习样本首页、笔记研究版本和规则每10秒刷新。断网修改保存在本机，联网后重试。历史冻结记录合并保留；同一可修改字段的并发编辑以最后成功保存的内容为准。已有本机数据需在原设备打开新版页面，连接后才能上传供其他设备查看。
+
+前后端需同时更新，后端自动执行Flyway V17，新增共享写入锁和交易ID唯一索引；历史重名交易重新分配确定性ID并保留每条记录。

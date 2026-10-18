@@ -34,6 +34,7 @@ class ChartWorkspaceController {
   private listeners = new Set<() => void>()
   private timer: ReturnType<typeof setTimeout> | undefined
   private saving = false
+  private poll: ReturnType<typeof setInterval> | undefined
 
   constructor(private readonly symbol: string, private readonly period: ChartPeriod, private readonly localOnly = false) {
     this.state = { workspace: emptyWorkspace(symbol, period), selectedId: null, syncStatus: '本机保存' }
@@ -52,7 +53,9 @@ class ChartWorkspaceController {
       window.addEventListener('storage', this.onStored)
       window.addEventListener('online', this.onOnline)
       window.addEventListener('offline', this.onOffline)
-      if (!this.localOnly && this.symbol && navigator.onLine && authorization()) {
+      window.addEventListener('focus', this.onOnline)
+      if (!this.localOnly) this.poll = setInterval(this.onOnline, 5000)
+      if (!this.localOnly && this.symbol && navigator.onLine) {
         void this.pull()
         this.schedule()
       }
@@ -61,6 +64,8 @@ class ChartWorkspaceController {
       this.listeners.delete(listener)
       if (!this.listeners.size) {
         clearTimeout(this.timer)
+        clearInterval(this.poll)
+        window.removeEventListener('focus', this.onOnline)
         window.removeEventListener(chartWorkspaceChangedEvent, this.onStored)
         window.removeEventListener('storage', this.onStored)
         window.removeEventListener('online', this.onOnline)
@@ -83,7 +88,6 @@ class ChartWorkspaceController {
     const pending = loadChartSyncQueue().length
     if (!navigator.onLine) return '离线'
     if (hasChartSyncRecovery()) return '待同步'
-    if (!authorization()) return '本机保存'
     return pending ? '待同步' : '已同步'
   }
 
@@ -110,7 +114,7 @@ class ChartWorkspaceController {
   private async pull() {
     if (this.localOnly) return
     const auth = authorization()
-    if (!auth || !navigator.onLine || !this.symbol) return
+    if (!navigator.onLine || !this.symbol) return
     try {
       await pullChartWorkspace(loadChartSyncCursor(), clientId(), auth)
       this.refresh()
@@ -122,14 +126,14 @@ class ChartWorkspaceController {
   private schedule() {
     clearTimeout(this.timer)
     if (this.localOnly) return
-    if (navigator.onLine && authorization()) this.timer = setTimeout(() => { void this.flush() }, 350)
+    if (navigator.onLine) this.timer = setTimeout(() => { void this.flush() }, 350)
   }
 
   flush = async (): Promise<void> => {
     clearTimeout(this.timer)
     if (this.localOnly) return
     const auth = authorization()
-    if (!navigator.onLine || !auth) { this.setStatus(this.idleStatus()); return }
+    if (!navigator.onLine) { this.setStatus(this.idleStatus()); return }
     if (!loadChartSyncQueue().length) { this.setStatus(this.idleStatus()); return }
     this.setStatus('同步中')
     try {
