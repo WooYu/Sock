@@ -18,7 +18,7 @@ describe('note tagging workbench', () => {
     const fetchMock = vi.fn().mockResolvedValue(Response.json({ id: original.id, sourceHash: original.sourceHash, candidate, models: [{ name: 'DeepSeek', tags: ['topic.ma', 'purpose.trend'] }, { name: 'Codex', tags: ['topic.ma'] }] }))
     vi.stubGlobal('fetch', fetchMock)
     render(<NoteTagWorkbench catalog={fixture} />)
-    fireEvent.click(screen.getByRole('button', { name: '双 AI 重新提取标签' }))
+    fireEvent.click(screen.getByRole('button', { name: 'AI 重新提取标签' }))
     await screen.findByRole('button', { name: '采用本次结果并编辑' })
     expect(screen.getByText('模型分歧（未采用）')).toBeInTheDocument()
     expect(parseTagLedger(localStorage.getItem(NOTE_TAG_STORAGE_KEY))).toHaveLength(0)
@@ -41,7 +41,7 @@ describe('note tagging workbench', () => {
     const original = currentTagRecords(fixture.documents, [])[0]
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ id: original.id, sourceHash: original.sourceHash, candidate: null, models: [{ name: 'DeepSeek', tags: ['topic.ma'] }, { name: 'Codex', error: 'Codex 未配置' }] })))
     render(<NoteTagWorkbench catalog={fixture} />)
-    fireEvent.click(screen.getByRole('button', { name: '双 AI 重新提取标签' }))
+    fireEvent.click(screen.getByRole('button', { name: 'AI 重新提取标签' }))
     await screen.findByText('Codex 未配置')
     expect(screen.queryByRole('button', { name: '采用本次结果并编辑' })).not.toBeInTheDocument()
     expect(parseTagLedger(localStorage.getItem(NOTE_TAG_STORAGE_KEY))).toHaveLength(0)

@@ -27,18 +27,18 @@ export function NoteTagReextract({ record, disabled, onAdopt }: { record: NoteTa
   const added = candidate?.tags.filter(tag => !record.tags.includes(tag)) ?? []
   const removed = candidate ? record.tags.filter(tag => !candidate.tags.includes(tag)) : []
   const labels = (tags: string[]) => tags.map(tag => TAG_LABELS[tag]).join('、') || '无'
-  return <section className="nt-extraction nt-reextract" aria-label="双 AI 重新提取">
-    <h4>双 AI 原文标签</h4>
-    <p>DeepSeek 与本地 Codex 独立读取完整原文，仅将一致标签作为候选。提取后可预览变化，再保存新版本。</p>
-    <button type="button" className="kw-button" disabled={disabled || busy} onClick={reextract}>{busy ? '双 AI 正在提取…' : '双 AI 重新提取标签'}</button>
-    {busy ? <p role="status">两侧模型正在独立提取，可能需要几分钟。当前标签保持不变。</p> : null}
+  return <section className="nt-extraction nt-reextract" aria-label="AI 重新提取">
+    <h4>AI 原文标签</h4>
+    <p>从完整原文重新提取核心标签，结果会标明使用的模型。可预览标签变化，再保存新版本。</p>
+    <button type="button" className="kw-button" disabled={disabled || busy} onClick={reextract}>{busy ? 'AI 正在提取…' : 'AI 重新提取标签'}</button>
+    {busy ? <p role="status">正在读取原文并提取标签，可能需要几分钟。当前标签保持不变。</p> : null}
     {error ? <p role="alert">{error}</p> : null}
     {result ? <div className="nt-reextract-result" aria-live="polite">
       {result.models.map(model => <details key={model.name} open={Boolean(model.error)}><summary>{model.name} · {model.error ? '未完成' : `${model.tags?.length ?? 0} 个标签`}</summary>{model.error ? <p role="alert">{model.error}</p> : <><p>{labels(model.tags ?? [])}</p><p>{model.note}</p>{model.evidence?.map(item => <blockquote className="nt-source" key={item.tagId}>{TAG_LABELS[item.tagId]} · L{item.startLine}–{item.endLine}<br />{item.quote}<br />{item.reason}</blockquote>)}</>}</details>)}
-      {candidate ? <><p><strong>双模型一致：</strong>{labels(candidate.tags)}</p><p>新增：{labels(added)}<br />移除：{labels(removed)}</p>{!candidate.tags.length ? <p>本次没有一致标签，采用后将得到空标签候选，请先核对原文。</p> : null}
+      {candidate ? <><p><strong>{candidate.extraction.models.length === 1 ? '单模型候选：' : '双模型一致：'}</strong>{labels(candidate.tags)}</p><p>新增：{labels(added)}<br />移除：{labels(removed)}</p>{!candidate.tags.length ? <p>本次没有可采用标签，采用后将得到空标签候选，请先核对原文。</p> : null}
         {candidate.extraction.disagreements.length ? <div><strong>模型分歧（未采用）</strong><ul>{candidate.extraction.disagreements.map(item => <li key={`${item.model}:${item.tagId}`}>{TAG_LABELS[item.tagId]} · {item.model}</li>)}</ul></div> : null}
         <button type="button" className="kw-button" disabled={disabled} onClick={() => onAdopt(candidate)}>采用本次结果并编辑</button>
-      </> : <p>两侧尚未全部成功，不能作为双 AI 共识采用。可重试，或继续手动编辑标签。</p>}
+      </> : <p>{result.models.length === 1 ? '本次提取未完成。' : '两侧尚未全部成功，不能作为双 AI 共识采用。'}可重试，或继续手动编辑标签。</p>}
     </div> : null}
   </section>
 }

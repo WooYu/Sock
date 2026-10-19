@@ -9,8 +9,7 @@ services:
     environment:
       PORT: "3010"
       CODEX_HOME: /tmp/codex
-    volumes:
-      - /root/stockcal-tag-worker/codex-config.toml:/run/secrets/codex-config.toml:ro
+      STOCKCAL_CODEX_ENABLED: "false"
     read_only: true
     tmpfs:
       - /tmp:uid=1000,gid=1000,mode=1777

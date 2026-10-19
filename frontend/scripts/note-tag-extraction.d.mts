@@ -10,7 +10,7 @@ export function codexCommand(bin?: string, env?: Record<string, string | undefin
 export function parseCodexOutput(stdout: string, source: string): Extraction & { usage: unknown }
 export function parseCodexBatch(stdout: string, documents: Array<{ file: string; source: string }>): { results: Array<{ file: string; result: Extraction }>; usage: unknown }
 
-export type ExtractionModel = { provider: string; model: string; baseUrl?: string; apiKey?: string; bin?: string }
+export type ExtractionModel = { provider: string; model: string; baseUrl?: string; apiKey?: string; bin?: string; enabled?: boolean }
 export function extract(model: ExtractionModel, source: string): Promise<Extraction>
 export function extractDualModels(models: ExtractionModel[], source: string, identity: { id: string; sourceHash: string }): Promise<import('../src/features/knowledge/note-tags').DualTagResult>
 export function assembleDualResult(outcomes: PromiseSettledResult<Extraction>[], names: string[], identity: { id: string; sourceHash: string }): import('../src/features/knowledge/note-tags').DualTagResult

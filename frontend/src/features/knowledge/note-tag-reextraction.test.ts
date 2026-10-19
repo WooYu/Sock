@@ -1,13 +1,29 @@
 // @vitest-environment node
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { createHash } from 'node:crypto'
 import { bindSource, codexCommand, compareExtractions, loadModels, locateEvidence, parseCodexBatch, parseCodexOutput, validateExtraction } from '../../../scripts/reextract-note-tags.mjs'
+import { extract, extractDualModels } from '../../../scripts/note-tag-extraction.mjs'
 
 const source = '当5日均线从下方向上穿越20日均线时，形成金叉。\n成交量温和放大时才确认。'
 const tag = (tagId: string, quote = '形成金叉', startLine = 1, endLine = 1) => ({ tagId, quote, startLine, endLine, reason: '原文主要讨论金叉' })
 const extraction = (tags = [tag('topic.ma5')]) => ({ tags, note: '只保留核心主题' })
 
 describe('conservative independent model extraction', () => {
+  it('returns explicitly single-model candidates when cloud Codex is disabled', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(Response.json({ choices: [{ message: { content: JSON.stringify(extraction()) } }] }))
+    vi.stubGlobal('fetch', fetchMock)
+    try {
+      const result = await extractDualModels([{ provider: 'api', model: 'deepseek-chat', baseUrl: 'https://api.test', apiKey: 'test' }, { provider: 'codex', model: 'unused', enabled: false }], source, { id: 'note:test.md', sourceHash: 'a'.repeat(64) })
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+      expect(result.models).toHaveLength(1)
+      expect(result.candidate?.tags).toEqual(['topic.ma5'])
+      expect(result.candidate?.extraction.models).toEqual(['DeepSeek · deepseek-chat'])
+      expect(result.candidate?.extraction.disagreements).toEqual([])
+    } finally { vi.unstubAllGlobals() }
+  })
+  it('reports missing cloud Codex configuration immediately instead of spawning an unavailable CLI', async () => {
+    await expect(extract({ provider: 'codex', model: 'local-config-default', enabled: false }, source)).rejects.toThrow('CODEX_NOT_CONFIGURED')
+  })
   it('accepts Windows checkout line endings but refuses actual source edits', () => {
     const expectedHash = createHash('sha256').update('第一行\n第二行\n').digest('hex')
     const bound = bindSource(Buffer.from('第一行\r\n第二行\r\n'), expectedHash)

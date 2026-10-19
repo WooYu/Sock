@@ -1,0 +1,1 @@
+export function suggestSupplement(input: { source: string; tags: string[]; supplement: string }, config: { baseUrl: string; apiKey: string; model: string }): Promise<import('../src/features/knowledge/note-tags').TagSuggestion[]>

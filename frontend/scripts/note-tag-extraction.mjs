@@ -87,7 +87,7 @@ export function loadModels(env) {
   const mainUrl = env.STOCKCAL_AI_BASE_URL || 'https://api.deepseek.com'
   const models = [
     { provider: 'api', model: env.STOCKCAL_TAG_MODEL_1 || env.STOCKCAL_AI_MODEL || 'deepseek-chat', baseUrl: mainUrl.replace(/\/+$/, ''), apiKey: env.AI_API_KEY },
-    { provider: 'codex', model: env.STOCKCAL_CODEX_MODEL || 'local-config-default', bin: env.STOCKCAL_CODEX_BIN },
+    { provider: 'codex', model: env.STOCKCAL_CODEX_MODEL || 'local-config-default', bin: env.STOCKCAL_CODEX_BIN, enabled: env.STOCKCAL_CODEX_ENABLED !== 'false' },
   ]
   for (const item of models.filter(item => item.provider === 'api')) {
     const url = new URL(item.baseUrl)
@@ -185,6 +185,7 @@ export async function extractCodexBatch(model, documents) {
 }
 
 export async function extract(model, source) {
+  if (model.provider === 'codex' && model.enabled === false) throw new Error('CODEX_NOT_CONFIGURED')
   if (model.provider === 'codex') return extractCodex(model, source)
   if (!model.apiKey?.trim()) throw new Error('DeepSeek 缺少 AI_API_KEY，请在 frontend/.env.local 配置；本地 Codex 可独立续跑')
   const messages = [
@@ -214,6 +215,16 @@ export async function extract(model, source) {
 
 export async function extractDualModels(models, source, identity) {
   const names = [`DeepSeek · ${models[0].model}`, `Codex · ${models[1].model === 'local-config-default' ? '本地配置' : models[1].model}`]
+  if (models[1].enabled === false) {
+    const outcomes = await Promise.allSettled([extract(models[0], source)])
+    const outcome = outcomes[0]
+    if (outcome.status !== 'fulfilled') return { ...identity, models: [{ name: names[0], error: 'DeepSeek 提取失败，请检查模型配置或稍后重试。' }], candidate: null }
+    const evidence = outcome.value.tags.map(item => ({ ...item, method: 'ai', reason: `${names[0]}：${item.reason}` }))
+    const tags = evidence.map(item => item.tagId)
+    return { ...identity, models: [{ name: names[0], tags, evidence, note: outcome.value.note }], candidate: {
+      ...identity, tags, evidence, extraction: { models: [names[0]], note: outcome.value.note, disagreements: [], generatedAt: new Date().toISOString(), promptHash: hash(PROMPT) },
+    } }
+  }
   const outcomes = await Promise.allSettled(models.map(model => extract(model, source)))
   return assembleDualResult(outcomes, names, identity)
 }
@@ -221,7 +232,7 @@ export async function extractDualModels(models, source, identity) {
 export function assembleDualResult(outcomes, names, identity) {
   const results = outcomes.map((outcome, index) => outcome.status === 'fulfilled'
     ? { name: names[index], tags: outcome.value.tags.map(item => item.tagId), evidence: outcome.value.tags.map(item => ({ ...item, method: 'ai' })), note: outcome.value.note }
-    : { name: names[index], error: index === 0 ? 'DeepSeek 提取失败，请检查模型配置或稍后重试。' : 'Codex 提取失败，请检查提取服务的 CLI 配置与认证。' })
+    : { name: names[index], error: index === 0 ? 'DeepSeek 提取失败，请检查模型配置或稍后重试。' : outcome.reason?.message === 'CODEX_NOT_CONFIGURED' ? 'Codex 尚未配置云端可访问的服务，当前仅展示 DeepSeek 结果。' : 'Codex 提取失败，请检查提取服务的 CLI 配置与认证。' })
   if (outcomes[0].status !== 'fulfilled' || outcomes[1].status !== 'fulfilled') return { ...identity, models: results, candidate: null }
   const comparison = compareExtractions(outcomes[0].value, outcomes[1].value, [])
   return { ...identity, models: results, candidate: {
