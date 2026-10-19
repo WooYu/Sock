@@ -54,6 +54,24 @@ const baseProps = {
 }
 
 describe('ChartCanvas', () => {
+  test('historical change uses previous close and amplitude uses the high-low range', () => {
+    render(<ChartCanvas {...baseProps} prediction={null} />)
+    fireEvent.pointerMove(screen.getByRole('img', { name: 'K线主图' }), { pointerId: 3, clientX: transform.xForTime(candles[1].day), clientY: 172 })
+    const tooltip = screen.getByTestId('crosshair-tooltip')
+    expect(tooltip).toHaveTextContent('当日涨跌 +1.00 / +1.00%')
+    expect(tooltip).toHaveTextContent('振幅 4.00 / 4.00%')
+    expect(tooltip).toHaveTextContent('前收 100.00')
+    expect(screen.getByTestId('crosshair-axis-labels')).toHaveTextContent('2026-09-07')
+  })
+
+  test.each([undefined, 0, Number.NaN, 105])('first visible candle uses only a valid preceding close: %s', precedingClose => {
+    render(<ChartCanvas {...baseProps} prediction={null} precedingClose={precedingClose} previousClose={999} />)
+    fireEvent.pointerMove(screen.getByRole('img', { name: 'K线主图' }), { pointerId: 3, clientX: transform.xForTime(candles[0].day), clientY: 172 })
+    const tooltip = screen.getByTestId('crosshair-tooltip')
+    expect(tooltip).toHaveTextContent(precedingClose === 105 ? '当日涨跌 -5.00 / -4.76%' : '当日涨跌 -- / --')
+    expect(tooltip).toHaveTextContent(precedingClose === 105 ? '振幅 5.00 / 4.76%' : '振幅 5.00 / --')
+  })
+
   test('owns the svg and renders chart layers in the required order', () => {
     const { container } = render(<ChartCanvas {...baseProps} />)
 
