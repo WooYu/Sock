@@ -45,5 +45,5 @@ createServer(async (request, response) => {
       pending.set(key, task)
     }
     respond(response, 200, await task)
-  } catch { respond(response, 502, { message: '双 AI 提取失败，当前标签未修改' }) }
+  } catch { respond(response, 502, { message: 'AI 提取失败，当前标签未修改' }) }
 }).listen(Number(process.env.PORT || 3010), '0.0.0.0')

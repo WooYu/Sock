@@ -22,6 +22,8 @@ it('accepts grounded suggestions and rejects fabricated quotes', async () => {
   const fetchMock = vi.fn().mockImplementation(() => Promise.resolve(Response.json({ choices: [{ message: { content: JSON.stringify({ suggestions: [suggestion] }) } }] })))
   vi.stubGlobal('fetch', fetchMock)
   expect((await POST(request())).status).toBe(200)
+  const sent = JSON.parse(fetchMock.mock.calls[0][1].body)
+  expect(sent.messages.some((message: { content: string }) => /json/i.test(message.content))).toBe(true)
   suggestion.quote = '不存在的引用'
   expect((await POST(request())).status).toBe(502)
 })
