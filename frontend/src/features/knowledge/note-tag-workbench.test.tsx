@@ -1,19 +1,94 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import catalogData from './note-tag-catalog.json'
 import { NoteTagWorkbench } from './note-tag-workbench'
-import { NOTE_TAG_STORAGE_KEY, parseTagLedger, type NoteCatalog } from './note-tags'
+import { NOTE_TAG_STORAGE_KEY, applyAIOriginalTags, currentTagRecords, parseTagLedger, reviewTags, type NoteCatalog } from './note-tags'
 
 const complete = catalogData as NoteCatalog
 const files = ['选股总结.md', '股票价格.md', '01-ma-golden-cross.md']
 const fixture: NoteCatalog = { ...complete, documents: complete.documents.filter((record) => files.includes(record.file)), fragments: complete.fragments.filter((record) => files.includes(record.file)) }
 beforeEach(() => localStorage.clear())
+afterEach(() => vi.unstubAllGlobals())
 
 describe('note tagging workbench', () => {
+  it('previews fresh dual-model results and appends a version only after editor save', async () => {
+    const original = currentTagRecords(fixture.documents, [])[0]
+    const candidate = { id: original.id, sourceHash: original.sourceHash, tags: ['topic.ma'], evidence: [{ ...original.evidence[0], tagId: 'topic.ma', method: 'ai', reason: '本次双模型提取' }], extraction: { models: ['DeepSeek', 'Codex'], note: '本次全文提取', disagreements: [{ tagId: 'purpose.trend', model: 'DeepSeek' }] } }
+    const fetchMock = vi.fn().mockResolvedValue(Response.json({ id: original.id, sourceHash: original.sourceHash, candidate, models: [{ name: 'DeepSeek', tags: ['topic.ma', 'purpose.trend'] }, { name: 'Codex', tags: ['topic.ma'] }] }))
+    vi.stubGlobal('fetch', fetchMock)
+    render(<NoteTagWorkbench catalog={fixture} />)
+    fireEvent.click(screen.getByRole('button', { name: '双 AI 重新提取标签' }))
+    await screen.findByRole('button', { name: '采用本次结果并编辑' })
+    expect(screen.getByText('模型分歧（未采用）')).toBeInTheDocument()
+    expect(parseTagLedger(localStorage.getItem(NOTE_TAG_STORAGE_KEY))).toHaveLength(0)
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ id: original.id, sourceHash: original.sourceHash })
+    fireEvent.click(screen.getByRole('button', { name: '采用本次结果并编辑' }))
+    let editor = screen.getByRole('dialog')
+    expect(within(editor).getByRole('checkbox', { name: '均线' })).toBeChecked()
+    fireEvent.click(within(editor).getByRole('button', { name: '取消标签编辑' }))
+    expect(parseTagLedger(localStorage.getItem(NOTE_TAG_STORAGE_KEY))).toHaveLength(0)
+    fireEvent.click(screen.getByRole('button', { name: '采用本次结果并编辑' }))
+    editor = screen.getByRole('dialog')
+    fireEvent.click(within(editor).getByRole('button', { name: '保存标签新版本' }))
+    const versions = parseTagLedger(localStorage.getItem(NOTE_TAG_STORAGE_KEY))
+    expect(versions.map(item => item.version)).toEqual([1, 2])
+    expect(versions[0].tags).toEqual(original.tags)
+    expect(versions[1].tags).toEqual(candidate.tags)
+    expect(versions[1].extraction?.note).toBe('本次全文提取')
+  })
+  it('shows partial extraction failure without offering consensus adoption', async () => {
+    const original = currentTagRecords(fixture.documents, [])[0]
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ id: original.id, sourceHash: original.sourceHash, candidate: null, models: [{ name: 'DeepSeek', tags: ['topic.ma'] }, { name: 'Codex', error: 'Codex 未配置' }] })))
+    render(<NoteTagWorkbench catalog={fixture} />)
+    fireEvent.click(screen.getByRole('button', { name: '双 AI 重新提取标签' }))
+    await screen.findByText('Codex 未配置')
+    expect(screen.queryByRole('button', { name: '采用本次结果并编辑' })).not.toBeInTheDocument()
+    expect(parseTagLedger(localStorage.getItem(NOTE_TAG_STORAGE_KEY))).toHaveLength(0)
+  })
+  it('previews AI tag adoption and retains the actual previous manual version', () => {
+    const original = fixture.documents[0]
+    const reviewed = reviewTags(original, '2026-10-20T01:00:00Z')
+    localStorage.setItem(NOTE_TAG_STORAGE_KEY, JSON.stringify({ schemaVersion: 1, records: [original, reviewed] }))
+    const aiCatalog = applyAIOriginalTags(fixture, [{ id: original.id, sourceHash: original.sourceHash, tags: ['topic.ma'], evidence: [{ ...original.evidence[0], tagId: 'topic.ma', method: 'ai' }], extraction: { models: ['DeepSeek', 'Codex'], note: '仅保留核心主题', disagreements: [] } }])
+    render(<NoteTagWorkbench catalog={aiCatalog} />)
+    fireEvent.click(screen.getByRole('button', { name: '采用 AI 精简标签' }))
+    const editor = screen.getByRole('dialog')
+    expect(within(editor).getByRole('checkbox', { name: '均线' })).toBeChecked()
+    expect(within(editor).getByRole('checkbox', { name: 'MA5' })).not.toBeChecked()
+    expect(parseTagLedger(localStorage.getItem(NOTE_TAG_STORAGE_KEY))).toHaveLength(2)
+    fireEvent.click(within(editor).getByRole('button', { name: '保存标签新版本' }))
+    const versions = parseTagLedger(localStorage.getItem(NOTE_TAG_STORAGE_KEY))
+    expect(versions).toHaveLength(3)
+    expect(versions[1].tags).toEqual(reviewed.tags)
+    expect(versions[2].tags).toEqual(['topic.ma'])
+    expect(versions[2].evidence[0].method).toBe('ai')
+  })
+  it('previews supplementary suggestions before applying and saves them in one version', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ suggestions: [{ tagId: 'timeframe.weekly', action: 'add', quote: '周线研究', reason: '用户补充研究周期', conflict: '原文仅提到日线' }] })))
+    const view = render(<NoteTagWorkbench catalog={fixture} />)
+    fireEvent.click(screen.getByRole('button', { name: '补充说明' }))
+    const editor = screen.getByRole('dialog')
+    expect(within(editor).getByLabelText('补充说明')).toHaveFocus()
+    fireEvent.change(within(editor).getByLabelText('补充说明'), { target: { value: '增加周线研究' } })
+    fireEvent.click(within(editor).getByRole('button', { name: '根据说明建议标签' }))
+    await screen.findByText('待确认的标签变化')
+    expect(within(editor).getByRole('checkbox', { name: '周线' })).not.toBeChecked()
+    fireEvent.click(within(editor).getByRole('checkbox', { name: /新增 · 周线/ }))
+    fireEvent.click(within(editor).getByRole('button', { name: '应用所选建议到勾选标签' }))
+    expect(within(editor).getByRole('checkbox', { name: '周线' })).toBeChecked()
+    fireEvent.click(within(editor).getByRole('button', { name: '保存标签新版本' }))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    const saved = parseTagLedger(localStorage.getItem(NOTE_TAG_STORAGE_KEY))
+    expect(saved).toHaveLength(2)
+    expect(saved[1].supplementEvidence?.[0].quote).toBe('周线研究')
+    view.unmount()
+    render(<NoteTagWorkbench catalog={fixture} />)
+    expect(screen.getByText('增加周线研究')).toBeInTheDocument()
+  })
   it('opens the selected original from both the catalog and detail heading', () => {
     render(<NoteTagWorkbench catalog={fixture} />)
-    const record = fixture.documents[0]
+    const record = currentTagRecords(fixture.documents, [])[0]
     const link = screen.getByRole('link', { name: `查看原文：${record.title}` })
     expect(link).toHaveAttribute('href', record.sourceUrl)
     expect(link).toHaveAttribute('target', '_blank')
@@ -30,7 +105,7 @@ describe('note tagging workbench', () => {
     await user.click(screen.getByRole('button', { name: '重置标签筛选' }))
     await user.selectOptions(screen.getByLabelText('标注层级'), 'fragment')
     await user.type(screen.getByRole('textbox', { name: '搜索笔记与标签' }), '金叉')
-    expect(within(list).getByRole('button', { name: '查看标签：01-ma-golden-cross' })).toBeInTheDocument()
+    expect(within(list).getByRole('button', { name: '查看标签：均线金叉' })).toBeInTheDocument()
   })
 
   it('saves tag revisions with reasons, restores them after reload and retains the old source and tags', async () => {

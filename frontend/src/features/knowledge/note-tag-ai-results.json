@@ -1,0 +1,5120 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-19T18:04:23.450Z",
+  "promptHash": "a302d3bf4efbc85748132b6f9e56b7bdd15a53fa6df2e8098d3eb6b727ca96e2",
+  "models": [
+    "DeepSeek · deepseek-chat",
+    "Codex · gpt-6.1-sol"
+  ],
+  "records": [
+    {
+      "id": "note:01-ma-golden-cross.md",
+      "sourceHash": "02c05834d53b07623d0ad1056d256d6149c4a3679c69d5484eaf648c15722402",
+      "tags": [
+        "topic.ma"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.ma",
+          "quote": "当5日均线从下方向上穿越20日均线时，形成金叉，是短线买入信号。",
+          "startLine": 1,
+          "endLine": 1,
+          "reason": "双模型一致：全文核心是5日均线与20日均线交叉形成的金叉信号；复核：全文核心是5日与20日均线交叉形成的买入信号，以均线概括该组合规则。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文只有一条金叉规则，主题与用途集中，未涉及其他周期或内容类型。\nCodex · gpt-6.1-sol：原文为金叉交易经验，核心是两条均线的交叉及成交量确认；未明确图表周期。",
+        "disagreements": [
+          {
+            "tagId": "purpose.levels",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.principle",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.volume",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:02-ma-death-cross.md",
+      "sourceHash": "89ba2fb5198f4798536e38bc8632159f4d89ce46d3eeb49696e7349ca09f7af1",
+      "tags": [
+        "topic.ma"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.ma",
+          "quote": "当5日均线从上方向下穿越20日均线时，形成死叉，是短线卖出或减仓信号。",
+          "startLine": 1,
+          "endLine": 1,
+          "reason": "双模型一致：全文核心是均线交叉（5日与20日均线死叉）及其信号含义；复核：全文核心是两条均线交叉形成的死叉信号。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文仅一句，围绕5日与20日均线死叉展开，故只设均线主题；因比较两均线交叉，未单列MA5/MA20。\nCodex · gpt-6.1-sol：原文仅说明均线死叉对应的卖出或减仓规则，采用泛化均线标签，不拆分MA5与MA20；未明确图表周期。",
+        "disagreements": [
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:03-stop-loss.md",
+      "sourceHash": "95dca677c3a277fac9962a59a759669e46aae4594f8ea9331fd09cb2f8c602d1",
+      "tags": [
+        "purpose.risk"
+      ],
+      "evidence": [
+        {
+          "tagId": "purpose.risk",
+          "quote": "买入后若股价跌破成本价 7%，无条件止损离场，不抱侥幸心理，防止亏损扩大。",
+          "startLine": 1,
+          "endLine": 1,
+          "reason": "双模型一致：全文唯一内容，核心意图是止损控制亏损，属于风险控制；复核：全文主要意图是通过止损限制亏损扩大。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：仅一行原文，主题为固定比例止损规则；未涉及具体均线、量价等主题，故只选风险控制用途标签。\nCodex · gpt-6.1-sol：原文为明确的止损纪律，未涉及具体技术主题或周期。",
+        "disagreements": [
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:04-position-sizing.md",
+      "sourceHash": "ff098791ebbe324bf40601389a9531487aec969da3ab70638267113bfbe10e38",
+      "tags": [
+        "topic.position"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.position",
+          "quote": "单只股票持仓市值不超过总资产的 20%，避免持仓过度集中导致单一风险暴露过大。",
+          "startLine": 1,
+          "endLine": 1,
+          "reason": "双模型一致：全文唯一内容，核心讲单只股票持仓上限与集中度控制；复核：全文核心是限制单只股票的持仓比例。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：全文仅一条关于持仓集中度的规则，无周期或其他主题证据。\nCodex · gpt-6.1-sol：原文明确规定单只股票的仓位上限，核心意图是控制集中持仓风险。",
+        "disagreements": [
+          {
+            "tagId": "purpose.risk",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:05-breakout-buy.md",
+      "sourceHash": "94edf9eeb016fa24d5a1a93a599a3fb9c56cc88fd1def00d41a270928b3d1be4",
+      "tags": [
+        "topic.volume",
+        "purpose.trend"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.volume",
+          "quote": "当股价放量突破前期箱体或整理平台的高点时，是趋势启动信号，可跟进买入。",
+          "startLine": 1,
+          "endLine": 1,
+          "reason": "双模型一致：全文以放量突破为触发条件，量价关系是核心主题；复核：放量配合价格突破是全文核心条件。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.trend",
+          "quote": "是趋势启动信号",
+          "startLine": 1,
+          "endLine": 1,
+          "reason": "双模型一致：主要用途是判断趋势启动并据此跟进买入；复核：主要意图是通过突破识别趋势启动。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：仅一句原文，主题聚焦放量突破与趋势启动；未提及具体均线、周期或风险控制，故不选相关标签。\nCodex · gpt-6.1-sol：原文仅一句，核心为放量突破的趋势信号及买入经验，未明确周期。",
+        "disagreements": [
+          {
+            "tagId": "kind.experience",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:06-trend-filter.md",
+      "sourceHash": "dd895a26d47f94d86e719c082666a3acb03432d55eba2e72cc6843bcda6b669b",
+      "tags": [
+        "topic.ma20"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.ma20",
+          "quote": "仅当20日均线向上、且股价站稳20日均线上方时才参与做多",
+          "startLine": 1,
+          "endLine": 1,
+          "reason": "双模型一致：全文以20日均线的方向和股价相对位置作为操作前提，是核心主题；复核：全文围绕20日均线方向及股价相对位置制定交易条件。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文仅一句，主题为20日均线趋势判断；未涉及选股、估值或周期等维度。\nCodex · gpt-6.1-sol：原文明确给出基于20日均线的做多与空仓规则，未限定图表周期。",
+        "disagreements": [
+          {
+            "tagId": "purpose.trend",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.risk",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:1234.md",
+      "sourceHash": "613c02a5837657351b976a9aca25a91bf4f75ddfe7175cbad25e5b83f111860d",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅两句碎片化交易口诀，无完整论述，无法确认均线、量价等核心主题，内容不足，故为空数组。\nCodex · gpt-6.1-sol：正文过短且语义不完整，无法可靠确定核心主题及交易规则。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:2021 台历.md",
+      "sourceHash": "fc2583df242cf53da40ff275cd3c2547433cc180239f98cde8b35ae96a23b670",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅包含元数据和附件图片链接，无可引用的文字内容，因此无法提取标签。\nCodex · gpt-6.1-sol：仅有图片附件，无可用于标签判断的正文。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:20220908_收盘_关于参数的计算.md",
+      "sourceHash": "f2d79d08910e9919c5bbc98e77e0b0f5c553a8a237c2133cfbb06764e2fb3e80",
+      "tags": [
+        "topic.boll",
+        "purpose.forecast"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.boll",
+          "quote": "我们进入了布林线中轨的攻坚战",
+          "startLine": 13,
+          "endLine": 13,
+          "reason": "双模型一致：以布林线中轨与上下轨解释高低点；复核：全文持续依据布林线中轨、上轨和下轨解释指数运行及参数位置。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.forecast",
+          "quote": "如果正常的算明天的五日线应该是多少？",
+          "startLine": 33,
+          "endLine": 33,
+          "reason": "双模型一致：全文主要意图是演示参数推演次日点位；复核：主要意图是演示如何根据既有数值变化推演后续参数。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为盘中收评，兼有解释复盘成分，但主意图为参数推演与公式演示；均线仅作为计算示例，未单列。\nCodex · gpt-6.1-sol：核心是通过盘中布林轨道和五日线变化推算指数参数。",
+        "disagreements": [
+          {
+            "tagId": "topic.phase",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.formula",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.ma5",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.case",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "timeframe.intraday",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:20220913_参数的算法.md",
+      "sourceHash": "2509541908f70f4dfd46c7ea02ba44fb4e96d7710aba7659f27e28bd40f5b875",
+      "tags": [
+        "topic.boll",
+        "purpose.forecast",
+        "timeframe.intraday"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.boll",
+          "quote": "也就是我们60分钟布林线三期开口的攀升",
+          "startLine": 26,
+          "endLine": 26,
+          "reason": "双模型一致：全文核心围绕BOLL开口攀升及上轨压力计算；复核：布林上轨是全文计算开盘及反攻目标参数的主要依据。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.forecast",
+          "quote": "那么怎么去算呢？",
+          "startLine": 14,
+          "endLine": 14,
+          "reason": "双模型一致：全文意图是通过多周期参数推算当日高低点；复核：全文主要讲解多个指数备选点位的推算方法。",
+          "method": "ai"
+        },
+        {
+          "tagId": "timeframe.intraday",
+          "quote": "我们打开30分钟的K线",
+          "startLine": 14,
+          "endLine": 14,
+          "reason": "双模型一致：分析基于30分钟、60分钟等盘中周期；复核：分析明确使用三十分钟及六十分钟等盘中周期。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为音频转写，含语音识别错误（如“开口素笑天笑”应为“开口竖笑/三期开口”），标签依据上下文可辨内容提取。\nCodex · gpt-6.1-sol：以当日指数为案例，结合布林轨道与照镜子技术说明参数算法；涉及多种均线，但均线比较并非核心。",
+        "disagreements": [
+          {
+            "tagId": "topic.phase",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.mirror",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.case",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:20220913_收盘_关于长线下跌趋势个股的底部博弈问题.md",
+      "sourceHash": "9debff5268a08faae43d7998d725ca2d68f7e5e65d295f29cb6172ad0b45c7f9",
+      "tags": [
+        "kind.experience"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "quote": "我从头至尾都是在主力的踪迹寻求主力的太子。寻找主力做多的迹象，从而达到跟着主力赚钱，跟着主力逃跑的一个目的。",
+          "startLine": 22,
+          "endLine": 22,
+          "reason": "双模型一致：全文核心是跟随主力做多迹象的经验性交易思路；复核：正文以一般化的走势观察和经验判断展开，没有具体个股案例或计算公式。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：录音转写文本，内容为高开低开与主力动向的经验性讨论，未涉及具体均线、公式或估值。\nCodex · gpt-6.1-sol：正文主要讨论高低开后反弹与否所反映的多空强弱，未充分展开文件名中的长线底部博弈主题。",
+        "disagreements": [
+          {
+            "tagId": "timeframe.intraday",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.market",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.trend",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:20220915_午盘_三分法分析板块冷热.md",
+      "sourceHash": "8f2e396d35d87763cc37e26dc29ca6f767e66eb33b30c8ecac8bcfd660438ce9",
+      "tags": [
+        "topic.phase",
+        "topic.market"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.phase",
+          "quote": "目前在三期的主升浪当中",
+          "startLine": 41,
+          "endLine": 41,
+          "reason": "双模型一致：全文以摸线二期转三期的框架判断板块冷热，是核心分析线索；复核：摸线二期、三期及阶段转换是识别板块冷热和参与方向的核心框架。",
+          "method": "ai"
+        },
+        {
+          "tagId": "topic.market",
+          "quote": "好了，我们就说大盘。那么再说说创业板的指数",
+          "startLine": 33,
+          "endLine": 33,
+          "reason": "双模型一致：全文主要围绕大盘与创业板板块的热点冰点展开；复核：全文从大盘走势延伸到新能源与金融地产等板块的强弱比较。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为盘面广播，核心是用摸线三期判断板块趋势并提示风险；purpose仅保留risk，因趋势判断与风险提醒并存时风险意图更集中。\nCodex · gpt-6.1-sol：核心是运用摸线三期识别板块冷热并选择参与方向；盘中点位与葛兰碧节奏属于前段复盘内容。",
+        "disagreements": [
+          {
+            "tagId": "purpose.risk",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "timeframe.daily",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.screen",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.case",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:20220915_收盘_月线炒股法.md",
+      "sourceHash": "9e5c5f704bf2304960de07da7d09d19645a69e3f4d1b19ca8ced7414e31bc3ca",
+      "tags": [
+        "timeframe.monthly"
+      ],
+      "evidence": [
+        {
+          "tagId": "timeframe.monthly",
+          "quote": "第一个是月线的炒股法。这个话题比较大，月线拿来炒股是一个独特的方法",
+          "startLine": 13,
+          "endLine": 13,
+          "reason": "双模型一致：全文核心是围绕月线周期炒股的方法讲解；复核：月线级别交易是全文主要讨论的周期。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为录音转写，主体讲月线炒股法的经验与心态要求，兼有对指数方向的判断，故取月线、经验、趋势判断三个标签。\nCodex · gpt-6.1-sol：核心是月线级别交易的耐心、计划与心态要求；具体指数点位主要用于举例。",
+        "disagreements": [
+          {
+            "tagId": "kind.experience",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.trend",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:20220916_午盘_破五断头后反抽五日线.md",
+      "sourceHash": "1890849e63891b8277be4165829ee8a249e1f05b299c51eacb5c6c60fea2ffed",
+      "tags": [
+        "topic.ma5",
+        "purpose.risk"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.ma5",
+          "quote": "反抽五日线比较凶险",
+          "startLine": 9,
+          "endLine": 9,
+          "reason": "双模型一致：全文唯一正文内容即围绕5日均线反抽的交易风险提示，主题为MA5；复核：唯一正文直接围绕五日线反抽展开。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.risk",
+          "quote": "反抽五日线比较凶险",
+          "startLine": 9,
+          "endLine": 9,
+          "reason": "双模型一致：整句核心意图是提示五日线反抽的风险，属于风险控制；复核：正文的主要意图是提示反抽风险。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅一句话加一张附件图片，内容不足，未据此推断周期或更多维度；图片不作证据。\nCodex · gpt-6.1-sol：正文仅一句，可确认五日线反抽风险，不能依据图片或文件名补充其他内容。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:20220916_早盘_关键点和目标位心态调整.md",
+      "sourceHash": "d1461dc6382d08281f6e8114b413b0ba3d83f02e656808d8ea62e49fea2e170a",
+      "tags": [
+        "kind.case"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.case",
+          "quote": "案例：房地产板块摸线半年线附近，关键点卖出，却涨停了。",
+          "startLine": 9,
+          "endLine": 9,
+          "reason": "双模型一致：全文以一次关键点卖出的实际案例为核心内容；复核：全文以一次关键点卖出经历及其结果为主体。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：内容简短，以案例复盘为主；未涉及均线具体周期公式或明确交易原则，故仅提取案例与板块标签。\nCodex · gpt-6.1-sol：内容简短，主要记录关键点卖出的案例及结果；数字未明确周期，不据此推断。",
+        "disagreements": [
+          {
+            "tagId": "topic.market",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.explain",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:20221108_晚评_葛兰碧第四天大涨大跌日.md",
+      "sourceHash": "c4a595396c3fafbea98e8d92ce0a306f9db54bb4f71e63ddf6d0e81bdc57f7bf",
+      "tags": [
+        "topic.granville",
+        "purpose.trend"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.granville",
+          "quote": "这是从我们中期五日线角度",
+          "startLine": 21,
+          "endLine": 21,
+          "reason": "双模型一致：以葛兰碧日数节奏判断大盘当前位置，是全文的分析框架；复核：葛兰碧阶段计数贯穿全文，是分析行情节点的主要框架。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.trend",
+          "quote": "那么未来会怎么走？是走第一个，就是五日线不破位的继续强攻型",
+          "startLine": 33,
+          "endLine": 33,
+          "reason": "双模型一致：全文主要意图是判断后续走势强弱及可能演变；复核：全文主要判断后续行情的强、中、弱走势。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为语音转录复盘，主题集中于均线节奏与趋势强弱判断，另含葛兰碧周期分析。\nCodex · gpt-6.1-sol：主要用葛兰碧阶段及五日线是否破位判断后续走势强弱；其他均线是分支情景中的参照。",
+        "disagreements": [
+          {
+            "tagId": "topic.ma",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.ma5",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "timeframe.daily",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:20221111-早盘-复合型摸线照镜子算参数.md",
+      "sourceHash": "ec7a97a48a66bd5cf7ed3105d96bb064f6c46948dd473be0544d25957efd6f58",
+      "tags": [
+        "topic.boll",
+        "topic.mirror",
+        "timeframe.intraday"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.boll",
+          "quote": "他反复呈现以布林线上轨，所以照镜子的一个走",
+          "startLine": 21,
+          "endLine": 21,
+          "reason": "双模型一致：全文核心围绕布林线开口与上下轨判断走势；复核：结合前文明确的布林线上轨，开口与上轨构成主要分析对象。",
+          "method": "ai"
+        },
+        {
+          "tagId": "topic.mirror",
+          "quote": "照镜子呢这个就是110分钟线上",
+          "startLine": 21,
+          "endLine": 21,
+          "reason": "双模型一致：以照镜子方法分析分钟级别上轨表现；复核：正文围绕照镜子方法展开，后续继续讨论镜子破位与上轨参照。",
+          "method": "ai"
+        },
+        {
+          "tagId": "timeframe.intraday",
+          "quote": "就是60分钟，对吧？参数为中心啊",
+          "startLine": 25,
+          "endLine": 25,
+          "reason": "双模型一致：分析以60分钟及盘中分钟级别为主；复核：主要分析落在小时级别及开盘后的盘中观察。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为语音转写，夹杂错讹；核心为布林线开口与分钟级别走势判断。topic仅取boll与mirror两项。\nCodex · gpt-6.1-sol：转写错漏较多；可辨认的核心是分钟级别照镜子、布林上轨及参数推演，不据标题补选摸线标签。",
+        "disagreements": [
+          {
+            "tagId": "purpose.trend",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.forecast",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:20221117-早餐-今天回档五日线-原始文件.md",
+      "sourceHash": "72bdf53dfe378e85976ec4e71ae4efebe0060fb84f3d923e99277cceb266ee74",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅为附件视频链接，无实质文字内容，无法提取核心标签。\nCodex · gpt-6.1-sol：仅有视频附件链接，没有可用于标签提取的正文。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:20221117-早餐-今天回档五日线.md",
+      "sourceHash": "bfd9030aa0987b45150015d1e0abc9a1a4d214a4db3a36edb607ccc6d46df3b6",
+      "tags": [
+        "topic.mirror",
+        "topic.granville"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.mirror",
+          "quote": "照镜子有何种？昨天有朋友问啊，我每一句话里面都有知识点，还请大家要好好听，然后结合盘面的图研究一下啊，这叫照镜子啊。",
+          "startLine": 17,
+          "endLine": 17,
+          "reason": "双模型一致：全文核心主题，多次作为主要技术方法讲解和案例应用。；复核：照镜子反抽及其卖出策略贯穿主要案例分析。",
+          "method": "ai"
+        },
+        {
+          "tagId": "topic.granville",
+          "quote": "格拉比。第一天我们从5日线上起步开始博弈这个炮架子哦。我就已经决定了第二次一定要做什么？叫做一定要走。",
+          "startLine": 85,
+          "endLine": 85,
+          "reason": "双模型一致：全文围绕葛兰碧法则的买卖点展开大量讨论和案例应用。；复核：全文反复围绕葛兰碧第一天起步、第二天卖出及后续调整展开。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为语音转录，存在识别错误，但核心围绕照镜子、葛兰碧、支撑压力等日线技术分析。\nCodex · gpt-6.1-sol：原文转写错字较多；核心是结合个股走势讲解葛兰碧节奏与照镜子操作。",
+        "disagreements": [
+          {
+            "tagId": "purpose.levels",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "timeframe.daily",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.explain",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.case",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:20221221-早盘-海龟+二转三等于博弈.md",
+      "sourceHash": "faded143d20db2e74634b46fc53061ff80459ae2862f95e7bd03de516143937e",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅有音频附件链接和元数据，无实质性文字内容，无法提取核心检索标签。\nCodex · gpt-6.1-sol：仅有元数据和音频附件，无正文证据，留空。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:20221223 午餐 葛兰碧第二天反弹.md",
+      "sourceHash": "5e8cfd7cd225577e4671e027b555e86f3893e1fac04f6eeba0b322e29d090766",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅为音频附件链接，没有可提取核心标签的正文内容。\nCodex · gpt-6.1-sol：仅有元数据和音频附件，无正文证据，留空。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:20221223 早餐 葛兰碧的时候顺便看看开口几天.md",
+      "sourceHash": "98099cab3a338b77b5e63803ded38f2a5dc0d954b8dd39d02943aace9b210930",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅为音频附件链接，无可提取的实质内容，标签为空。\nCodex · gpt-6.1-sol：仅有元数据和音频附件，无正文证据，留空。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:2025-03-21 三期走势.md",
+      "sourceHash": "77174af4652a290bec1907e6d7ef3aa8701ab0e88f3a3a8971db28a6d05862ea",
+      "tags": [
+        "topic.phase"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.phase",
+          "quote": "三期主升浪失败，进入三期震荡区间走势",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：摸线／三期是全文实际运用的核心知识点之一，概括本周阶段走势；复核：以三期主升失败及其后续走势作为整段复盘框架。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为周度复盘清单，罗列多个知识点但以经验总结为主，故只选一个kind；未选用途与周期标签，因无明确单一主要意图或K线周期。\nCodex · gpt-6.1-sol：正文为本周实际知识点的简短复盘；未将“本周”视为周线周期证据。",
+        "disagreements": [
+          {
+            "tagId": "topic.ma5",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.mirror",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "purpose.explain",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:202509 ximi开课 - 831晚上拆k线直播.md",
+      "sourceHash": "2cd7d43b72741d97b8322ca20b0b0c476f95209a7daf356604bf622a5cc04ec3",
+      "tags": [
+        "topic.granville",
+        "kind.experience"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.granville",
+          "quote": "一掌二长三跌，这是基础理由。",
+          "startLine": 534,
+          "endLine": 534,
+          "reason": "双模型一致：全文核心是围绕葛兰碧（格兰密）日形态推演涨跌节奏；复核：葛兰碧节奏及一天内拆分上涨、下跌阶段是主要教学内容。",
+          "method": "ai"
+        },
+        {
+          "tagId": "kind.experience",
+          "quote": "我是在我们我们第一大的私募里面做的，是我学的，我跟我师傅学的就是这门手艺",
+          "startLine": 336,
+          "endLine": 336,
+          "reason": "双模型一致：内容以讲经验心得和机构操盘内情为主；复核：内容以参数运用心得和观察规律为主，未提供完整计算公式。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为直播口语稿，含大量闲谈与找主播内容；核心知识为葛兰碧形态与次日参数推演。\nCodex · gpt-6.1-sol：核心为支撑压力参数的运用及葛兰碧拆K线；大盘月度展望属于后段补充，不扩展为全文主题或周期。",
+        "disagreements": [
+          {
+            "tagId": "purpose.forecast",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "timeframe.daily",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.levels",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "timeframe.intraday",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:20250901晚评.md",
+      "sourceHash": "4d35bdffe6883e963cfe75b361740ca6dbadd1797f6b472fd1c7be4683bda5be",
+      "tags": [
+        "topic.granville"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.granville",
+          "quote": "那么什么是格兰比呢？格兰比，大家要去百度学习格兰威尔八大法则",
+          "startLine": 24,
+          "endLine": 24,
+          "reason": "双模型一致：全文大段讲解格兰威尔八大法则及葛一、葛二、葛三的识别与应用，是最核心主题。；复核：全文主要讲解葛一、葛二的识别和运用，并反复以个股说明。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为收盘点评，核心围绕格兰威尔法则与五日线应用，并用计算方法推算压力位；大盘、板块、民生银行等内容作背景提及，未展开为核心主题，故不单独标主题。\nCodex · gpt-6.1-sol：核心是葛兰碧起步形态及五日线运用；参数计算等为辅助内容，不另选主题或周期。",
+        "disagreements": [
+          {
+            "tagId": "purpose.forecast",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "timeframe.weekly",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.ma5",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "purpose.explain",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:20250902-再接再厉再创辉煌.md",
+      "sourceHash": "e1a35823805ea9f143df44bc6fce3d94bf5e5bfc3db8336ccfb9f6155b83c179",
+      "tags": [
+        "topic.ma5",
+        "topic.granville"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.ma5",
+          "quote": "今天的下跌呢，没有跌破五日线啊",
+          "startLine": 16,
+          "endLine": 16,
+          "reason": "双模型一致：全文以是否跌破五日线作为核心判断基准，多只个股案例均围绕五日线破位展开；复核：拓维信息、神州数码等案例围绕五日线持股及破位退出展开。",
+          "method": "ai"
+        },
+        {
+          "tagId": "topic.granville",
+          "quote": "这是葛一啊，这是葛一。五日线起步嘛，是葛一，那么葛一他遇到了葛二",
+          "startLine": 38,
+          "endLine": 38,
+          "reason": "双模型一致：后半篇以贵州茅台、国轩高科为例系统讲解葛兰碧一涨二涨三跌节奏；复核：茅台及国轩高科等大段内容讲解葛兰碧阶段和操作节奏。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为音频文字稿，仅保留有明确原文证据的核心标签；大盘支撑位属局部提及，未作为主要用途单列。\nCodex · gpt-6.1-sol：五日线破位应对与葛兰碧操作节奏并列展开；用途保守选解释与复盘。",
+        "disagreements": [
+          {
+            "tagId": "purpose.trend",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "timeframe.daily",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.explain",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:20250903-三期震荡确立.md",
+      "sourceHash": "7cd7098ebb407ea87cc2566591ed0144cac2c0942b5d22f0b720b18bdd99b3f7",
+      "tags": [
+        "topic.boll"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.boll",
+          "quote": "一等股票外面走啊，对吧？一等的股票在外面走，就是在布林线外面啊",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：布林线是解释个股形态和买卖点的核心工具，构成多个知识点。；复核：以布林线上下轨、开口与收口区分强弱及震荡走势，是全文主要分析框架。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为音频晚评文字稿，包含葛兰碧、布林线及多只个股的日线级别走势讲解。\nCodex · gpt-6.1-sol：正文集中于原始第8行。核心为三期形态与布林线位置判断，葛兰碧问答为次要内容。",
+        "disagreements": [
+          {
+            "tagId": "topic.granville",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.explain",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "timeframe.daily",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.phase",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "purpose.trend",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:20250904-###为什么没有葛二很重要###.md",
+      "sourceHash": "cf0801b81ca3812b932b6ba1100d0120f8d5f4685e39cde859d27da3ded9d03c",
+      "tags": [
+        "topic.granville"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.granville",
+          "quote": "为什么同样的图，这个有葛二，那个没葛二？",
+          "startLine": 13,
+          "endLine": 13,
+          "reason": "双模型一致：全文围绕葛兰碧第一天为何常无葛二展开，葛兰碧是核心主题；复核：全文围绕葛一之后为何缺少葛二、葛三展开讲解。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：内容为课程讲解，以经验复盘解释葛兰碧与布林线上轨关系，未涉及具体选股、参数推演或周期判断。\nCodex · gpt-6.1-sol：核心是三期位置对葛兰碧后续表现的限制；布林线上轨是解释机制，受主题数量限制不另列。",
+        "disagreements": [
+          {
+            "tagId": "topic.boll",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.phase",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "purpose.explain",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:20250905-晚小白的挣钱法 海龟战法千股跌停出现.md",
+      "sourceHash": "7699104c27466813803da94d317ae25f26cc4a12e8f6a47e3cd677aae7dc82f1",
+      "tags": [
+        "kind.experience",
+        "topic.turtle",
+        "purpose.screen"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "quote": "一种啊，傻瓜式的一种炒股赚钱方法",
+          "startLine": 40,
+          "endLine": 40,
+          "reason": "双模型一致：全文核心是以经验方式介绍自创的傻瓜式炒股方法；复核：内容以讲者长期实践经验和成功实例介绍选股方法。",
+          "method": "ai"
+        },
+        {
+          "tagId": "topic.turtle",
+          "quote": "叫做海龟战法。",
+          "startLine": 42,
+          "endLine": 42,
+          "reason": "双模型一致：海龟战法是全文贯穿的核心主题概念；复核：全文系统介绍海龟方法的原理、识别条件及应用案例。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.screen",
+          "quote": "它就是一个选股的技巧。",
+          "startLine": 620,
+          "endLine": 620,
+          "reason": "双模型一致：全文主要意图是提供大盘暴跌时筛选逆势个股的选股方法；复核：主要目的是在市场恐慌急跌时筛选逆势强势个股和板块。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：文章以经验方式讲海龟战法选股技巧，除选股过滤外未明确单一用途；提到五日线但非核心主题，周期未明确，故未选。\nCodex · gpt-6.1-sol：这里的海龟指讲者自定义的暴跌中逆势选股方法；个股案例用于说明方法。",
+        "disagreements": [
+          {
+            "tagId": "topic.market",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:20250908-晚-5日线破位要走.md",
+      "sourceHash": "4bb6c1b9554177e856c9710c95fb8041afe09def9509e17aa386dad2401444bc",
+      "tags": [
+        "topic.ma5",
+        "topic.turtle",
+        "purpose.risk"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.ma5",
+          "quote": "破五日线是一个标准，特别是我们做妖股的时候啊，特别是我们做妖股的时候，五日线是我们的救命线",
+          "startLine": 182,
+          "endLine": 182,
+          "reason": "双模型一致：全文核心围绕五日线破位是否要走展开，是贯穿始终的主题；复核：全文反复论证五日线破位的意义与退出要求。",
+          "method": "ai"
+        },
+        {
+          "tagId": "topic.turtle",
+          "quote": "这就是我海龟战法的胜利，结果成为了我的罪。",
+          "startLine": 136,
+          "endLine": 136,
+          "reason": "双模型一致：以海龟板块为关键论据，讨论海龟战法的有效性边界；复核：海龟板块成功、跟风股补涨及海龟失败是全文另一条持续展开的讨论线索。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.risk",
+          "quote": "所以我一定要把怎么走告诉你，否则我们这里就是亏钱的大本营，因为这是一个高风险，高收益。",
+          "startLine": 228,
+          "endLine": 228,
+          "reason": "双模型一致：强调破五日线必须走的保命手段，主要意图是风险控制；复核：主要意图是维护退出纪律，防止因后续上涨或偶然成功放弃风控。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：全文以五日线破位是否应走为核心，结合海龟战法案例与个人经验谈风险控制，属日线级别操作讨论。\nCodex · gpt-6.1-sol：重点是坚持五日线破位退出的风控原则，同时说明海龟方法有失败及后续变化。",
+        "disagreements": [
+          {
+            "tagId": "kind.experience",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "timeframe.daily",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:20250908-晚两天反弹葛二各种形态.md",
+      "sourceHash": "afaa924d05f67c384053e1fc28767f50c479a5a82bc9deb7353ed4ab10acffff",
+      "tags": [
+        "topic.granville"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.granville",
+          "quote": "三四五暴跌加暴跌等于反弹，这是和我们葛兰密理论是有相吻合的地方",
+          "startLine": 12,
+          "endLine": 12,
+          "reason": "双模型一致：全文围绕葛兰碧第一至第四天的节奏展开，是核心理论主题；复核：全文围绕葛一至葛四的节奏，重点解释葛二不同表现与操作。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：topic仅取granville与boll两个维度代表全文核心；五日线为辅助判断，未再单列以避免维度超限。\nCodex · gpt-6.1-sol：核心是葛二反弹的不同形态及五日线强弱判断；BOLL参数为辅助案例，不另列主题。",
+        "disagreements": [
+          {
+            "tagId": "topic.boll",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.levels",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.ma5",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "purpose.explain",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:20250909-晚海龟锂电池-案例分析.md",
+      "sourceHash": "7e6da045286230bf26d9f6cecc75de9817ef091bdc14bfcc49c3b1ad627ee83e",
+      "tags": [
+        "topic.granville"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.granville",
+          "quote": "葛一就是从五日线上竖起来的大阳线",
+          "startLine": 346,
+          "endLine": 346,
+          "reason": "双模型一致：葛兰碧法则贯穿多个个股案例的判断；复核：多个个股问答集中辨认葛一、葛二、葛三与2.5的操作节奏。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：全文还大量涉及五日线与布林线上轨，但受topic维度最多2条限制，仅保留最概括全文的主题。\nCodex · gpt-6.1-sol：内容涵盖参数记录和多个个股问答，核心仍是五日线与葛兰碧操作；海龟主要作为行情称呼出现。",
+        "disagreements": [
+          {
+            "tagId": "topic.phase",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.forecast",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.ma5",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "purpose.explain",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.case",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:20250910-锂电池按照计划进行（前三天后三天算参数）.md",
+      "sourceHash": "71daf097ea7080147052b9b2eec447d577443bc3d51ef3a90bb88fee63871f2b",
+      "tags": [
+        "topic.boll",
+        "purpose.forecast"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.boll",
+          "quote": "他每天的高点都是明天的布林线上轨",
+          "startLine": 14,
+          "endLine": 14,
+          "reason": "双模型一致：布林线上轨预测高点是全文核心计算方法之一；复核：围绕BOLL上轨推算攀升形态高点，并以多个个股验证。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.forecast",
+          "quote": "预期的预期不一定准，但是预期的预期一定准",
+          "startLine": 14,
+          "endLine": 14,
+          "reason": "双模型一致：全文主要意图是用参数推算次日高低点与买卖点，属参数推演；复核：主要意图是讲解提前估算未来指标参数和买卖价格的方法。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为口播晚评，围绕日线五日线与布林线上轨推算高低点；purpose.forecast 引文为原文近似句，若严格匹配请以原文为准。\nCodex · gpt-6.1-sol：核心为五日线与BOLL上轨的提前参数估算；原文第16行很长，引用均为该行连续原文。",
+        "disagreements": [
+          {
+            "tagId": "topic.ma",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "timeframe.daily",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.ma5",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.formula",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:20250911-科技股三期回升...参数的验证（前三后三，预期的预期）.md",
+      "sourceHash": "e58321b1e3a666bb43b8f81809bbed3850172e13ea64dde12419d41b4e62f26a",
+      "tags": [
+        "topic.boll",
+        "topic.phase",
+        "purpose.forecast"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.boll",
+          "quote": "布林线的上轨在28块八左右",
+          "startLine": 490,
+          "endLine": 490,
+          "reason": "双模型一致：全文核心围绕布林线上轨计算与三期布林震荡判断反弹强弱；复核：BOLL中轨、下轨和上轨用于区分反弹强弱，并贯穿后续参数验证。",
+          "method": "ai"
+        },
+        {
+          "tagId": "topic.phase",
+          "quote": "三期震荡呢，其实基本上是在布林线的下轨以上",
+          "startLine": 142,
+          "endLine": 142,
+          "reason": "双模型一致：三期震荡与三期开口主升浪是全文反复强调的主题；复核：全文强调三期开口主升浪与三期横盘震荡的区别。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.forecast",
+          "quote": "明天你还要去计算参数",
+          "startLine": 510,
+          "endLine": 510,
+          "reason": "双模型一致：全文主要意图是用布林线参数提前推算次日高点与买卖点；复核：主要讲解提前计算参数及通过后续指标变化验证预测。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为口播整理，主题集中在BOLL上轨参数推算与三期震荡，兼有照镜子经验分享。\nCodex · gpt-6.1-sol：三期形态的区分与BOLL参数验证构成主要内容；科技板块上涨是分析背景。",
+        "disagreements": [
+          {
+            "tagId": "kind.experience",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "timeframe.daily",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.case",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:20250912晚 顶部怎么确认.md",
+      "sourceHash": "a7cab414782dddfc7585061dcc50df0d8cbf2eaf7ce005b84d04d7d73516d39b",
+      "tags": [
+        "topic.ma5"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.ma5",
+          "quote": "目前五日线没有破位",
+          "startLine": 84,
+          "endLine": 84,
+          "reason": "双模型一致：五日线是判断继续看多与否的核心依据；复核：五日线是否破位是看多及顶部确认的核心判断依据。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文前半为加群通知；核心炒股内容集中于大盘点位、布林线上轨和五日线判断，并强调经验性预判。\nCodex · gpt-6.1-sol：篇幅较多用于群通知；股票正文主要讨论五日线如何确认顶部，参数误差为辅助说明。",
+        "disagreements": [
+          {
+            "tagId": "topic.boll",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.levels",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.trend",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:20250915-晚破位之后再起行情问题和三期震荡模式.md",
+      "sourceHash": "5e9589081ebb959c1283dedea49e49ce124627c7296c1b483561e3274bce784b",
+      "tags": [
+        "kind.principle",
+        "topic.ma5"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.principle",
+          "quote": "五日线破位，你不走，天王老子来了也救不了你。",
+          "startLine": 100,
+          "endLine": 100,
+          "reason": "双模型一致：全文核心反复强调破五日线必须出局的交易原则。；复核：全文以案例维护破位出局、出现新情况再判断的交易原则。",
+          "method": "ai"
+        },
+        {
+          "tagId": "topic.ma5",
+          "quote": "我们首先说破五出局啊，这个是不能更改的东西啊。",
+          "startLine": 14,
+          "endLine": 14,
+          "reason": "双模型一致：MA5（五日线）是全文讨论和决策的核心均线依据。；复核：全文反复讨论五日线破位后的退出及重新上涨时的处理。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文以破五日线出局的交易原则和MA5为核心，辅以BOLL工具与横盘震荡走势判断；维度标签未超限。\nCodex · gpt-6.1-sol：核心是破五日线退出纪律与主升浪结束后的三期震荡模式；BOLL用于解释震荡区间，不另扩展主题。",
+        "disagreements": [
+          {
+            "tagId": "topic.boll",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.trend",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.phase",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "purpose.risk",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:20250916-晚－三期参数.md",
+      "sourceHash": "8ab2e71fbbc743e89709e5baff1b9700777fbde28dbe598678d21fbc5f27aaf0",
+      "tags": [
+        "topic.granville",
+        "purpose.explain",
+        "timeframe.daily"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.granville",
+          "quote": "按照所谓的格兰密，第二天买了一个股票",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：全文围绕葛兰碧八法的买卖点展开个股答疑，是核心主题；复核：全文围绕葛兰碧各阶段的买卖及预期偏差展开。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.explain",
+          "quote": "问第八天为什么没有大涨？",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：主要意图是解释学员买点后未大涨的原因并做复盘；复核：主要意图是解释实际交易中走势为何不符合提问者预期。",
+          "method": "ai"
+        },
+        {
+          "tagId": "timeframe.daily",
+          "quote": "连续上涨七天了是吧？那么第七天",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：分析基于日线连续走势与逐日买卖点；复核：核心案例按交易日分析走势与五日线位置。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：内容为盘后答疑，涉及葛兰碧、照镜子与板块强弱，未涉及估值、仓位等维度。\nCodex · gpt-6.1-sol：以多个个股复盘解释葛兰碧买卖节奏与五日线操作；其他理论属于局部补充。",
+        "disagreements": [
+          {
+            "tagId": "topic.mirror",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.ma5",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.case",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:20250917-晚.md",
+      "sourceHash": "9163dae729fcd1fa8dec87df50c08daccb9af0cff9566eaa9a2f0af4e5e526cd",
+      "tags": [
+        "topic.boll",
+        "kind.experience"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.boll",
+          "quote": "布林线的横盘震荡形态",
+          "startLine": 11,
+          "endLine": 11,
+          "reason": "双模型一致：全文以布林线上轨、开口与横盘震荡解释大盘走势，是核心主题之一；复核：布林线贯穿上涨、加速、开口结束及震荡的形态解释。",
+          "method": "ai"
+        },
+        {
+          "tagId": "kind.experience",
+          "quote": "老王计算大盘的参数算得比较准",
+          "startLine": 11,
+          "endLine": 11,
+          "reason": "双模型一致：整体为个人盘面回顾与操作经验分享，而非公式或系统原理；复核：以历史观察和常见走势经验解释盘面与后续可能变化。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：全文为盘面回顾与经验分享，核心工具为布林线与五日线，主要意图为走势预判。\nCodex · gpt-6.1-sol：核心是大盘走势复盘及布林线形态解释；拆K线和复权是辅助讨论。",
+        "disagreements": [
+          {
+            "tagId": "topic.ma5",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.forecast",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.market",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "purpose.explain",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "timeframe.daily",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:32.5.md",
+      "sourceHash": "466aa0142da6fcb3a09b191165e51b905e18bbd1ababbbbbf30c45206eb8d57d",
+      "tags": [
+        "topic.boll",
+        "topic.phase"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.boll",
+          "quote": "三期往下靠近布林线中轨，突然大涨反抽布林线上轨。",
+          "startLine": 10,
+          "endLine": 10,
+          "reason": "双模型一致：全文核心是布林线中轨与上轨的形态描述；复核：正文主要描述价格在布林线中轨与上轨之间的运动。",
+          "method": "ai"
+        },
+        {
+          "tagId": "topic.phase",
+          "quote": "条件：摸线三期",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：以摸线三期作为判断前提，是全文主题之一；复核：明确限定所记录形态的核心阶段条件。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：仅有条件与形态描述，未涉及具体买卖规则；引用仅取正文，排除标题元数据。\nCodex · gpt-6.1-sol：正文仅记录三期中的布林线反抽形态，未充分展开高点计算或具体操作用途。",
+        "disagreements": [
+          {
+            "tagId": "purpose.explain",
+            "model": "DeepSeek · deepseek-chat"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:5日线.md",
+      "sourceHash": "ebe91370fd09443c1b0cac114546424431618cdd4299e631c0fc13d3c05c0d3b",
+      "tags": [
+        "topic.granville",
+        "topic.ma5"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.granville",
+          "quote": "葛兰碧二天低点猜五日线",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：标题唯一实质内容，核心围绕葛兰碧法则应用；复核：明确以葛兰碧第二天为推测条件。",
+          "method": "ai"
+        },
+        {
+          "tagId": "topic.ma5",
+          "quote": "葛兰碧二天低点猜五日线",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：明确涉及五日线；复核：五日线是整句所述低点推测的核心依据。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅一行标题及图片附件，内容不足，仅能提取标题中的核心概念。\nCodex · gpt-6.1-sol：正文只有一句经验性低点推测，未给出计算公式或明确K线周期。",
+        "disagreements": [
+          {
+            "tagId": "purpose.forecast",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:A股权重.md",
+      "sourceHash": "3516eb206346f00ff1a5d4de779b916c7de98a3f82f7a5457dedd8e92d8cf623",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅为股票名称列表，无实质内容或明确主题，无法提取核心标签。\nCodex · gpt-6.1-sol：正文仅为股票名称清单，未说明权重关系、板块分析或筛选用途，保守不标。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:三期开口的标识.md",
+      "sourceHash": "94c982bfbe3756c56d3ff6001548d2ceff53fcb567e73359235099cd4b082b4a",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：内容极短，仅一句关于大阳线突破前期区间的描述，未明确用途与周期\nCodex · gpt-6.1-sol：正文仅描述大阳线突破前面二期区间，缺少三期开口及所用指标的明确说明，保守不标。",
+        "disagreements": [
+          {
+            "tagId": "topic.phase",
+            "model": "DeepSeek · deepseek-chat"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:上证指数.md",
+      "sourceHash": "8ca206f67f948ad8cca687ea8d8a48ae018c6a29ee6a963418bd6c2732060a05",
+      "tags": [
+        "topic.market"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.market",
+          "quote": "大盘周线处于调整的位置  下周看涨    下周3230",
+          "startLine": 14,
+          "endLine": 14,
+          "reason": "双模型一致：全文围绕大盘位置与走势判断展开；复核：全文围绕上证指数位置及同期热门板块展开记录。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：内容为简略位置记录表，主题以大盘位置判断为主；部分行留空。\nCodex · gpt-6.1-sol：以指数位置和热门板块记录为主；单次周线判断不足以概括全文周期。",
+        "disagreements": [
+          {
+            "tagId": "purpose.levels",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "timeframe.weekly",
+            "model": "DeepSeek · deepseek-chat"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:下跌三部曲.md",
+      "sourceHash": "d29618961d2e1e41783b3b64beff9893b0b297e6dcd4a2fc7626a51e00d172ea",
+      "tags": [
+        "topic.ma",
+        "kind.experience"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.ma",
+          "quote": "破五反抽五反抽十断头去二十",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：全文围绕均线的下跌反抽节奏展开，均线是核心主题；复核：核心内容是价格跌破及反抽不同均线的演变顺序。",
+          "method": "ai"
+        },
+        {
+          "tagId": "kind.experience",
+          "quote": "下跌三部曲:",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：以口诀形式总结均线下跌节奏的实战经验，全文属经验总结；复核：以口诀概括下跌过程中的经验性规律。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为简短均线下跌口诀，主题统一归为均线，不再拆分上下位均线标签；未给出明确选股、风控等用途，不选用途标签。\nCodex · gpt-6.1-sol：记录多条均线参与的下跌演变经验，采用泛化均线标签。",
+        "disagreements": [
+          {
+            "tagId": "purpose.trend",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:下跌扭转.md",
+      "sourceHash": "a7ba7cad8abac49ff2c76c0293aa42ee55d1f4bc997840daa77c77fe06b3b3c8",
+      "tags": [
+        "topic.ma"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.ma",
+          "quote": "过5日线，且20日线转头向上",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：全文核心是5日线与20日线关系，属均线主题；复核：全文核心是价格与均线及均线方向的组合关系。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：内容极短，仅一句均线条件，未见明确用途或周期说明\nCodex · gpt-6.1-sol：以两条均线的组合条件判断下跌扭转，不拆分为两个具体均线标签。",
+        "disagreements": [
+          {
+            "tagId": "purpose.trend",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:不做原则.md",
+      "sourceHash": "d85726380b8fd3389ef516b972ca817ef7e1a59a149fb8d6a249def496da860a",
+      "tags": [
+        "topic.turtle",
+        "purpose.screen"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.turtle",
+          "quote": "筑底海龟最好",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：全文以海龟形态作为主要判断依据，是核心主题之一；复核：海龟形态既是优选对象，也有单独的操作时长说明。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.screen",
+          "quote": "大盘暴跌时，上涨的个股 还是五日线起步第一天，格兰碧第一天，筑底海龟最好",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：全文意图是在大盘暴跌环境下用多个条件过滤选出个股；复核：正文主要给出大盘暴跌时优先选择的个股形态。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：笔记简短，集中列举暴跌环境下的选股条件；格兰碧仅作为条件之一，未展开，故不单列主题。\nCodex · gpt-6.1-sol：正文侧重暴跌环境下的形态选择与海龟操作时长，未明确给出禁止交易条件。",
+        "disagreements": [
+          {
+            "tagId": "topic.ma5",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:中国芯片.md",
+      "sourceHash": "08aac619b8e3a9c6e20c45414ef5e32903d7173b966b103f9b8e55db9b57606b",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：全文仅陈述芯片产业链相关公司分工，无股票学习笔记主题内容，无法归入给定词典。\nCodex · gpt-6.1-sol：内容为芯片产业链分工资料；词典没有对应产业主题，不扩展为大盘与板块。",
+        "disagreements": [
+          {
+            "tagId": "kind.context",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:主力切换.md",
+      "sourceHash": "716370a3239bc47f480e7137924f7ac11db54f4dc3cf3d71a3d113ec7b6dd628",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅一句标题式描述，无实质内容，无法提取核心检索标签。\nCodex · gpt-6.1-sol：仅有一条板块观察提示，未提供具体判断方法或操作规则。",
+        "disagreements": [
+          {
+            "tagId": "topic.market",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:买卖模式24678.md",
+      "sourceHash": "0c5eade4a3e4b50159872f7dadad0131501275f598768db2b6a6331c9b723723",
+      "tags": [
+        "topic.granville",
+        "kind.principle"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.granville",
+          "quote": "上涨的葛兰碧 2卖 4卖 6卖 7买 8卖",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：全文以葛兰碧买卖点的对错归类开篇，是核心讨论主题；复核：全文以葛兰碧买卖模式区分可参与与应回避的交易。",
+          "method": "ai"
+        },
+        {
+          "tagId": "kind.principle",
+          "quote": "我们只需要在24678模式里\n\n面换钱就好了",
+          "startLine": 22,
+          "endLine": 24,
+          "reason": "双模型一致：作者给出只做特定模式交易的原则性主张；复核：核心是限定参与模式的操作原则。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文较短，主要是葛兰碧买卖点对错与只做特定模式的简短原则，未涉及均线、量价等具体指标。\nCodex · gpt-6.1-sol：以葛兰碧模式取舍为核心，未据模式数字推断周期。",
+        "disagreements": [
+          {
+            "tagId": "purpose.screen",
+            "model": "DeepSeek · deepseek-chat"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:买股原则.md",
+      "sourceHash": "83c73a5ea098fa2cccaade2a743fed0a140751027dad8ca47e943741e59166b9",
+      "tags": [
+        "topic.market",
+        "purpose.screen"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.market",
+          "quote": "分析大盘走势",
+          "startLine": 14,
+          "endLine": 14,
+          "reason": "双模型一致：全文按外围、大盘、板块展开，大盘与板块是核心主题之一；复核：以大盘走势和热门板块作为买股判断的主要框架。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.screen",
+          "quote": "找出五日线以上，布林线中轨以上，格兰碧第一天",
+          "startLine": 18,
+          "endLine": 18,
+          "reason": "双模型一致：全文主要意图是给出买股筛选条件；复核：明确列出寻找候选股票的过滤条件。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为买股原则要点清单；提及布林线、格兰碧和海龟但均为一句带过，为控制主题维度数量未列入核心标签。\nCodex · gpt-6.1-sol：多个技术条件并列，未将单次提及的技术指标各自列为核心主题。",
+        "disagreements": [
+          {
+            "tagId": "topic.ma5",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:买股原则2.md",
+      "sourceHash": "468799a1fbd8e0ce02cb570d75637af745d99b21862552b27b4aa7f562be25de",
+      "tags": [
+        "topic.phase",
+        "purpose.screen"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.phase",
+          "quote": "要素一、该股票整体处于摸线三分法的哪个位置？",
+          "startLine": 16,
+          "endLine": 16,
+          "reason": "双模型一致：全文以摸线三期位置作为买入审核的首要条件，是核心主题；复核：摸线阶段是全文组织买入、回避与退出规则的主要框架。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.screen",
+          "quote": "买股票的时候，短线必须审核的要素：",
+          "startLine": 12,
+          "endLine": 12,
+          "reason": "双模型一致：全文主要意图是给出买入前审核过滤的要素清单；复核：全文主要提供买入前审核股票与交易场景的条件。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：主题限选摸线与葛兰碧两个；5日线虽反复出现但作为葛兰碧及持股底线的一部分，不单列为核心主题。\nCodex · gpt-6.1-sol：核心主题选取贯穿操作规则的摸线阶段与MA5；用途取买入前审查过滤。",
+        "disagreements": [
+          {
+            "tagId": "topic.granville",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.ma5",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:二八.md",
+      "sourceHash": "913eb3179ac95626e08008d5c74f3b487ead4734608771074bf4a04b2a82f96d",
+      "tags": [
+        "topic.market"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.market",
+          "quote": "二八股票有轮动，特别是节前",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：全文唯一内容，核心是市场板块间的轮动现象；复核：唯一正文讨论二八股票轮动。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：内容极简，仅一句关于节前二八轮动的观察；无明确选股、趋势或风控意图，故不选用途和周期标签。\nCodex · gpt-6.1-sol：正文仅一句，保留明确的轮动主题与经验性质，不推断具体板块或周期。",
+        "disagreements": [
+          {
+            "tagId": "kind.experience",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:二次探底.md",
+      "sourceHash": "55cd9e6122e62b7a100c904a5dbab4c4924b70f5b41ebd462c2eb11d92fd9d53",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅有一句经验性判断，未展开主题、用途或周期，内容不足，允许空数组。\nCodex · gpt-6.1-sol：内容仅一句探底次数经验，缺少可对应词典的明确主题、用途和周期。",
+        "disagreements": [
+          {
+            "tagId": "kind.experience",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:五日线.md",
+      "sourceHash": "57024c9912caf327a4e2da50892f93c2ad6dbbeff653fcf1e0666143a089515a",
+      "tags": [
+        "topic.ma5",
+        "kind.experience"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.ma5",
+          "quote": "反弹不过五日线都是耍流氓",
+          "startLine": 16,
+          "endLine": 16,
+          "reason": "双模型一致：全文围绕五日线展开，五日线是判断反弹与破位的核心依据；复核：全文围绕五日线位置、反弹能否突破及跌破后的走势展开。",
+          "method": "ai"
+        },
+        {
+          "tagId": "kind.experience",
+          "quote": "反弹不过五日线都是耍流氓，特别是20日线以下的",
+          "startLine": 16,
+          "endLine": 16,
+          "reason": "双模型一致：属于实战经验口诀式总结，而非严格公式；复核：正文以走势规律和风险表现的经验归纳为主。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：短小经验笔记，围绕五日线反弹与破五后的走法；未明确周期级别故不选时间标签，避免均线泛标签与topic.ma5重复。\nCodex · gpt-6.1-sol：以五日线附近的反弹和破位走势经验为核心；零散时间描述不足以确定全文周期或单一用途。",
+        "disagreements": [
+          {
+            "tagId": "purpose.trend",
+            "model": "DeepSeek · deepseek-chat"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:今日分析.md",
+      "sourceHash": "7dfb4e6da66609eebc1970697f6758f07314d6a3c19fa577f4a62026ba431b24",
+      "tags": [
+        "topic.market"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.market",
+          "quote": "分析上证指数、A50指数",
+          "startLine": 16,
+          "endLine": 16,
+          "reason": "双模型一致：开头分析步骤以上证与A50的大盘板块判断为核心；复核：大盘及热门题材分析构成全文分析流程的主要内容。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：内容为分析步骤与摸线记录，主题偏摸线/三期与大盘；压力位仅一句不作为用途标签。\nCodex · gpt-6.1-sol：以市场分析、题材选股和持仓规则为主；涉及多个周期，不选单一周期标签。",
+        "disagreements": [
+          {
+            "tagId": "topic.phase",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.trend",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.position",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "purpose.screen",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:低位炒作.md",
+      "sourceHash": "c13b3294962a05fced85613080e7a64bb668daa3e50811100b857b9ec0cfa684",
+      "tags": [
+        "topic.market"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.market",
+          "quote": "源于中国股市求稳，只能把低位个股轮番来一遍",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：全文核心是对中国股市整体行情特征的判断，属于大盘与板块主题；复核：全文围绕市场中低位个股轮番炒作的现象。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：全文仅一句，核心为中国股市整体特征的观察，无周期、用途或公式证据，标签仅取主题一项。\nCodex · gpt-6.1-sol：正文仅一句，保留其直接表达的市场轮动观察，不扩展操作用途。",
+        "disagreements": [
+          {
+            "tagId": "kind.experience",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:保险的影响.md",
+      "sourceHash": "3d92e15e59e5c1f1cf5e1d478ee4cf44067a282fb4dbc680627e951042c49636",
+      "tags": [
+        "topic.market",
+        "kind.experience"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.market",
+          "quote": "保险 银行 券商一体",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：全文围绕保险、银行、券商板块的联动关系展开，属于大盘与板块主题；复核：全文讨论保险、银行和券商之间的板块联动。",
+          "method": "ai"
+        },
+        {
+          "tagId": "kind.experience",
+          "quote": "保险上涨 去买券商和小盘银行",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：这是基于板块联动观察得出的操作经验，全文以经验性结论为主；复核：以简短操作经验记录板块联动的应对方式。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：短文仅两条内容，主题为金融板块联动；用途未明确展开，故未选用途标签。\nCodex · gpt-6.1-sol：正文简短，但明确表达金融板块联动及据此选择买入对象的经验。",
+        "disagreements": [
+          {
+            "tagId": "purpose.screen",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:信托股.md",
+      "sourceHash": "f0c5f98967c1ce3e6fc00d284f610f14b775947307ac403497fd00ed17f37203",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅一句标题和一张截图附件，缺少实质性股票内容，无法提取核心标签。\nCodex · gpt-6.1-sol：唯一正文“农业银行  有一天变了”含义不清，图片附件不能作为正文证据，内容不足以提取核心标签。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:偷桃子.md",
+      "sourceHash": "e2c8415c311cdd793bc88e0a02cf6e6f60e80827b6273449f0af58bf31722cbb",
+      "tags": [
+        "topic.phase",
+        "timeframe.weekly",
+        "kind.experience"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.phase",
+          "quote": "女鬼-震荡-摸线-反转或复合型2次或3次摸线",
+          "startLine": 11,
+          "endLine": 11,
+          "reason": "双模型一致：以摸线与震荡阶段作为长线反转的识别框架；复核：摸线及复合型摸线贯穿全文，是反转形态描述的核心。",
+          "method": "ai"
+        },
+        {
+          "tagId": "timeframe.weekly",
+          "quote": "形成周k偷桃子的摸线或者直接看10周线",
+          "startLine": 11,
+          "endLine": 11,
+          "reason": "双模型一致：周期明确落在周K级别；复核：目标形态明确落在周K及10周线观察上。",
+          "method": "ai"
+        },
+        {
+          "tagId": "kind.experience",
+          "quote": "复合型摸线，比如2022-10月份医药股2次摸线",
+          "startLine": 15,
+          "endLine": 15,
+          "reason": "双模型一致：以具体板块个股经历总结摸线规律，属经验性记录；复核：正文记录形态识别经验，并用医药股摸线作简短例证。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文极短，主要是长线反转中摸线与10周线的经验描述；未涉及选股、支撑压力等用途。\nCodex · gpt-6.1-sol：核心是通过摸线识别长线反转及周K形态；10周线和20日线作为观察条件，不另列均线主题。",
+        "disagreements": [
+          {
+            "tagId": "topic.ma10",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.trend",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:关于近期热议的限售股转融通流程梳理.md",
+      "sourceHash": "afd078d4a5face4ae874ba579a11433a050cd74f8079b7bde9d8d07e0818a57a",
+      "tags": [
+        "kind.context"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.context",
+          "quote": "近期新闻热点，限售股转融通伤了股民的心",
+          "startLine": 18,
+          "endLine": 18,
+          "reason": "双模型一致：全文围绕限售股转融通这一制度背景展开，属于背景资料型内容；复核：全文主要提供融资融券、转融通及相关交易规定的背景知识。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：文章主要梳理限售股转融通的制度流程与背景，属背景资料；未涉及具体股票技术分析方法或选股、趋势判断等用途，故仅提取背景资料标签。\nCodex · gpt-6.1-sol：核心为限售股转融通的概念、规定和操作流程，词典没有直接对应主题；末尾避损建议不足以代表全文用途。混入的无关故事、评论和推荐内容不作标签依据。",
+        "disagreements": [
+          {
+            "tagId": "purpose.explain",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:关键点.md",
+      "sourceHash": "eaaa9ce34a3898bc701a277f66b7f5d0319e2ea18a0490b0b7621c3f1cf22e8e",
+      "tags": [
+        "kind.experience"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "quote": "第二天的关键点往往是前天冲高回落的最高点",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：全文仅一句经验性观察，属于交易经验总结；复核：以“往往”表述价位观察经验。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：内容仅一句经验描述，未涉及具体周期、公式或明确用途；日期等元数据不作证据。\nCodex · gpt-6.1-sol：单句经验，核心是次日关键价位的识别。",
+        "disagreements": [
+          {
+            "tagId": "purpose.levels",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:关键点目标位20251024晚评.md",
+      "sourceHash": "ec3b0eedcacd57160739415a3c5603b6c6eb804100ab645d01fe3d58d41ebb40",
+      "tags": [
+        "topic.boll",
+        "topic.ma5"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.boll",
+          "quote": "关键点向上是boll线",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：全文核心内容之一，直接指出关键点向上对应BOLL线；复核：BOLL是全文界定向上关键点的核心指标。",
+          "method": "ai"
+        },
+        {
+          "tagId": "topic.ma5",
+          "quote": "向下是五日线",
+          "startLine": 10,
+          "endLine": 10,
+          "reason": "双模型一致：全文核心内容之一，直接指出关键点向下对应5日均线；复核：五日线是全文界定向下关键点的核心指标。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文极短，仅两句对关键点方向与BOLL、五日线对应关系的经验表述，未提及其他维度。\nCodex · gpt-6.1-sol：正文用BOLL与五日线分别界定上下关键点。",
+        "disagreements": [
+          {
+            "tagId": "kind.principle",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.levels",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:凯莱英.md",
+      "sourceHash": "5fe054d5fed1414bf7d031bc2284dd92159fdb88cd9f3eb88f7292d814b229d0",
+      "tags": [
+        "purpose.levels"
+      ],
+      "evidence": [
+        {
+          "tagId": "purpose.levels",
+          "quote": "主打反弹  压力137  关键136  支撑134",
+          "startLine": 10,
+          "endLine": 10,
+          "reason": "双模型一致：全文唯一实质内容是给出压力、关键位与支撑价位，主要意图是标注支撑压力；复核：主要内容是列出压力、关键位与支撑。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文仅有一行价位记录，无主题、周期或内容类型证据，故只提取支撑压力用途标签。\nCodex · gpt-6.1-sol：正文是一条具体日期的个股价位记录。",
+        "disagreements": [
+          {
+            "tagId": "kind.case",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:利好不涨隔日涨，利空不跌隔日跌.md",
+      "sourceHash": "7d5d072d497a282a2fc55de58795969139685a13bdef89beb0f481e4500b3e73",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文为空，仅含元数据，无内容可提取标签。\nCodex · gpt-6.1-sol：正文为空，仅有文件名与元数据，无法提取正文标签。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:北方华创.md",
+      "sourceHash": "a530a20bcfa542aed1ce60aead699c82948217129ab66a20357980c23b5124d7",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：内容不足，仅在元数据后提及一句缺口，无足够正文证据进行核心标签提取。\nCodex · gpt-6.1-sol：正文仅记录“314是缺口”，不足以确定主要用途或核心主题。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:十不做.md",
+      "sourceHash": "6f657b011a855477cef9b2fe7b8cc3832cc3b20b9ad598b6bcda69cd3b5998ca",
+      "tags": [
+        "kind.principle"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.principle",
+          "quote": "十不做：",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：全文是交易纪律式的禁做原则清单；复核：通过明确不参与交易的条件约束交易行为，属于交易原则。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：全文为十条禁做原则清单，主题以破位、止损及葛兰碧规则为主；照镜子因topic维度已满2个未纳入。\nCodex · gpt-6.1-sol：全文是禁止交易条件清单，各技术概念仅为清单条目，不单独提升为全文主题。",
+        "disagreements": [
+          {
+            "tagId": "topic.ma5",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.granville",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.risk",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:参数计算.md",
+      "sourceHash": "5236f14e7c9eee49c0c40bae494a5e69dd498863c44587bb5bed614fa85364aa",
+      "tags": [
+        "topic.boll",
+        "topic.ma"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.boll",
+          "quote": "年季月周 布林线3个位置 当前点附近均线",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：全文核心围绕布林线多周期位置展开；复核：布林线位置是全文参数推演的核心依据之一。",
+          "method": "ai"
+        },
+        {
+          "tagId": "topic.ma",
+          "quote": "年季月周 布林线3个位置 当前点附近均线",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：当前点附近均线与布林线位置共同构成分析框架；复核：当前点附近均线是参数计算的核心对象之一，未限定某条均线。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为简短笔记提纲，内容较简略；周期涉及日、周、月、季及30/60分钟，选择周线作为多周期校准的代表。\nCodex · gpt-6.1-sol：核心是结合布林线、均线及多周期位置推演参数；涉及多个周期，不单选周期标签。",
+        "disagreements": [
+          {
+            "tagId": "purpose.levels",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "timeframe.weekly",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.forecast",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:参数计算_1.md",
+      "sourceHash": "923452521d5124fbb7ca5d2101ecf0f44fb14670257f8100866ed486f71d289e",
+      "tags": [
+        "topic.ma5",
+        "kind.experience"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.ma5",
+          "quote": "5日线以下时算5日线，突破5日线后算10日线。",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：全文围绕5日线与10日线的使用切换展开；复核：5日线及其未来数值贯穿主要判断规则。",
+          "method": "ai"
+        },
+        {
+          "tagId": "kind.experience",
+          "quote": "下跌过程：强（今天5日线）、中（明天5日线）、弱（后天5日线）、很弱（大后天5日线）",
+          "startLine": 10,
+          "endLine": 10,
+          "reason": "双模型一致：以时间推移对照均线描述强弱变化，属经验性判断；复核：内容以操作经验和强弱规律表述，没有给出明确计算公式。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：内容简短，核心是5日线与10日线切换及涨跌过程中的强弱经验描述，未涉及具体选股或风控等主要用途。\nCodex · gpt-6.1-sol：主要围绕5日线参数与涨跌强弱展开，10日线仅作为突破后的计算对象，不另列核心主题。",
+        "disagreements": [
+          {
+            "tagId": "topic.ma10",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.forecast",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:参数计算注意点（20251023-晚评）.md",
+      "sourceHash": "253db2347019bcce8e0405b1e9173a37b4af78f007e181002bb2530a62fc8cbf",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：内容简短，主题为参数计算，涉及葛兰碧；未明确周期。\nCodex · gpt-6.1-sol：核心是参数推演的经验修正规则；葛兰碧仅是一项调整依据，不单列主题。",
+        "disagreements": [
+          {
+            "tagId": "topic.granville",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.formula",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.forecast",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:周线.md",
+      "sourceHash": "58250a39e0dc565ab9b1ae313d4e572e5fa4616afc84f29073cebddde5506f6d",
+      "tags": [
+        "topic.phase",
+        "timeframe.weekly",
+        "kind.experience"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.phase",
+          "quote": "10周线向上开始摸线；",
+          "startLine": 9,
+          "endLine": 9,
+          "reason": "双模型一致：全文以摸线阶段为核心主题，标题与正文均围绕摸线展开；复核：摸线启动条件是正文的核心判断之一。",
+          "method": "ai"
+        },
+        {
+          "tagId": "timeframe.weekly",
+          "quote": "观察周线，10周线反应比较慢。",
+          "startLine": 17,
+          "endLine": 17,
+          "reason": "双模型一致：全文以周线为观察周期；复核：正文明确以周线为观察周期。",
+          "method": "ai"
+        },
+        {
+          "tagId": "kind.experience",
+          "quote": "周K5周线反转开始，大盘需要6周时间，个股比较快，2－3周；",
+          "startLine": 11,
+          "endLine": 11,
+          "reason": "双模型一致：给出周线反转所需时间的经验性结论，全文为经验记录；复核：以大盘与个股反转耗时的经验规律为主要内容。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：内容简短，以摸线阶段与周线观察为核心；未选均线主题因仅提10周线、5周线而未比较不同均线。\nCodex · gpt-6.1-sol：讨论周线均线反转与摸线的经验；5周线、10周线统一归入均线主题。",
+        "disagreements": [
+          {
+            "tagId": "topic.ma",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "purpose.trend",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:四期第一课.md",
+      "sourceHash": "dd97e317b49adcf2d12769167c270d2cb3050c6f7f129134b5c28a2dbbd2e581",
+      "tags": [
+        "kind.principle",
+        "purpose.risk",
+        "topic.position"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.principle",
+          "quote": "永远不要借钱炒股！！！",
+          "startLine": 26,
+          "endLine": 26,
+          "reason": "双模型一致：全文前部核心纪律，是课程首要交易原则；复核：正文主体由多项要求长期遵守的交易底线构成。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.risk",
+          "quote": "所以，奉劝各位朋友，远离杠杆！不能沾染！！！",
+          "startLine": 38,
+          "endLine": 38,
+          "reason": "双模型一致：全文主要意图是风险警示与交易纪律；复核：全文以避免借款、杠杆、满仓以及设置止损来控制交易风险。",
+          "method": "ai"
+        },
+        {
+          "tagId": "topic.position",
+          "quote": "永远不要满仓做股票！",
+          "startLine": 40,
+          "endLine": 40,
+          "reason": "双模型一致：仓位管理是全文贯穿的核心主题之一；复核：避免满仓、重仓是反复强调的核心纪律之一。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：全文为首课开篇的纪律与经验分享，核心为借钱杠杆、满仓、止损等风险控制原则；未展开具体技术指标或周期分析。\nCodex · gpt-6.1-sol：核心是资金、仓位、止损和决策纪律；末尾5日线案例不构成全文主题。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:四期第七课-三不做第三不做-除权股不做.md",
+      "sourceHash": "cd9dbfd39f23087ea6db244b2e853f634f28e910532669a27e86ef0f2b291c83",
+      "tags": [
+        "purpose.screen"
+      ],
+      "evidence": [
+        {
+          "tagId": "purpose.screen",
+          "quote": "所以，我本人制定了一些禁区，禁区的板块个股我坚决不做。",
+          "startLine": 11,
+          "endLine": 11,
+          "reason": "双模型一致：核心意图是建立不做清单以过滤掉不擅长的板块个股；复核：全文主要提出并解释排除除权股的选股过滤规则。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：文章为选股禁区经验分享，主要讲除权股不做；示例中市盈率估值仅为故事例子，未展开为估值主题，故不选估值标签。\nCodex · gpt-6.1-sol：核心是排除除权股的选股禁区原则；词典没有除权股主题，估值与葛兰碧仅为例证。",
+        "disagreements": [
+          {
+            "tagId": "kind.experience",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:四期第三课.md",
+      "sourceHash": "7aa8247a45257502dc1c8a0c8cddff6abc7d16523ff084eb0e5935d17d48ab9b",
+      "tags": [
+        "topic.position",
+        "kind.principle",
+        "purpose.risk"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.position",
+          "quote": "永远不要满仓做股票！",
+          "startLine": 41,
+          "endLine": 41,
+          "reason": "双模型一致：仓位控制是全文警告的核心议题之一，反复强调不满仓；复核：仓位纪律是反复强调并通过学员经历展开的核心内容。",
+          "method": "ai"
+        },
+        {
+          "tagId": "kind.principle",
+          "quote": "永远不要借钱炒股！！！",
+          "startLine": 21,
+          "endLine": 21,
+          "reason": "双模型一致：全文是必须牢记的炒股铁律，属交易原则；复核：全文以必须遵守的交易纪律为主，案例用于强化原则。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.risk",
+          "quote": "满仓的人的心态是失衡的！不能做出正确的判断，仓位越重越难以客观面对自己和股票！",
+          "startLine": 45,
+          "endLine": 45,
+          "reason": "双模型一致：全文主要意图是警示风险、劝诫控制风险；复核：全文主要意图是警示借款、杠杆和满仓带来的风险。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：本文为风险警示与交易纪律类文章，核心是不借钱、不加杠杆、不满仓；无具体技术指标或周期分析，故不选周期标签，kind仅保留最主要的交易原则。\nCodex · gpt-6.1-sol：核心是资金与仓位纪律及风险警示，其他技术概念仅为举例。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:四期第二课-关键点（目标位）.md",
+      "sourceHash": "4211ab0cf31cf42d235850a0f8e73f9d3e14c98455e4e48be1893ada2f974cd5",
+      "tags": [
+        "purpose.levels",
+        "kind.principle"
+      ],
+      "evidence": [
+        {
+          "tagId": "purpose.levels",
+          "quote": "王斌关键点单指的是压力位！",
+          "startLine": 24,
+          "endLine": 24,
+          "reason": "双模型一致：全文核心是定义一个特定的压力位（关键点）及其判断规则；复核：全文围绕关键压力位的识别意义、到达及突破后的处理展开。",
+          "method": "ai"
+        },
+        {
+          "tagId": "kind.principle",
+          "quote": "王斌关键点突破就是该跌不跌必有大涨！",
+          "startLine": 44,
+          "endLine": 44,
+          "reason": "双模型一致：主要阐述关键点突破/未达成的交易判断原则，而非计算公式；复核：正文主要给出关键点的使用原则和相应交易规则。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文以文字定义关键点与压力位及葛兰碧结合规则为主，未给出具体计算公式；虽自称有计算，但正文无公式内容，故不选kind.formula。\nCodex · gpt-6.1-sol：核心是关键压力位的定义与使用规则；葛兰碧仅为结合使用的局部内容，未提供计算公式。",
+        "disagreements": [
+          {
+            "tagId": "topic.granville",
+            "model": "DeepSeek · deepseek-chat"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:四期第二课-第一讲.md",
+      "sourceHash": "ca684e079c2e8db2b3b1cb6fe03d67f2fd278f25f30062d57138fd95a5fef9eb",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文为空，仅有元数据，无内容可提取标签。\nCodex · gpt-6.1-sol：仅有元数据和空行，无正文证据。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:四期第五课-摸线八字箴言.md",
+      "sourceHash": "feeb97a523af9a745c8d9e7851fa489fed7e46a33abd4d9cfb0775ce13e87ecc",
+      "tags": [
+        "topic.phase"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.phase",
+          "quote": "摸线就是超跌反弹",
+          "startLine": 14,
+          "endLine": 14,
+          "reason": "双模型一致：全文围绕摸线（摸线／三期）行情展开，是核心主题；复核：全文持续讨论摸线反弹的特性、操作及实践观察。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文以图片展示摸线走势，正文为经验性叙述，未涉及具体指标公式或周期。\nCodex · gpt-6.1-sol：围绕摸线反弹的持有判断与操作原则展开；图片不作为标签证据。",
+        "disagreements": [
+          {
+            "tagId": "kind.experience",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.trend",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:四期第八课-五不做第一不做-信托股.md",
+      "sourceHash": "4ab912291989fc27f2ea05662834cbcadfd21d837cb8cc0f786f5e8a1cb18dcc",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：全文围绕'五不做'中信托操盘股展开，仅第一项有正文，其余四项未涉及；内容为经验性风险规避，非均线等具体技术主题。\nCodex · gpt-6.1-sol：词典没有信托股主题，保留选股过滤用途和交易原则；摸线、日K与周K均非全文核心主题或周期。",
+        "disagreements": [
+          {
+            "tagId": "kind.experience",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.risk",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.screen",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:四期第八课-五不做第二不做-高速公路.md",
+      "sourceHash": "2eedfad83ffe9ede519e7722d5fde4aecbf6052aeab4e49b453d1830c68ceead",
+      "tags": [
+        "kind.experience",
+        "topic.market",
+        "purpose.screen"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "quote": "以上只是王斌个人经验之谈，凭此操作，后果自负哦！",
+          "startLine": 48,
+          "endLine": 48,
+          "reason": "双模型一致：全文是作者分享'五不做'的个人炒股经验，核心为经验类内容；复核：文章结合个人参与经历解释通常不做高速公路股票的经验。",
+          "method": "ai"
+        },
+        {
+          "tagId": "topic.market",
+          "quote": "高速公路股票属于蓝筹股范围，波动性小，盘子比较大",
+          "startLine": 36,
+          "endLine": 36,
+          "reason": "双模型一致：全文围绕高速公路板块这一具体板块展开讨论；复核：全文集中分析高速公路板块的整体特征与参与价值。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.screen",
+          "quote": "五不做：第二：不高速公路股票！",
+          "startLine": 14,
+          "endLine": 14,
+          "reason": "双模型一致：主要内容是选股排除规则，指导投资者过滤掉高速公路股票；复核：主要意图是依据活跃度和机会成本过滤不适合短线参与的股票。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：全文为选股排除经验，涉及板块特征但未深入均线等技术指标；图片链接未作证据。\nCodex · gpt-6.1-sol：核心是高速公路板块的活跃度及短线筛选经验；摸线仅为补充讨论，不据日线描述限定全文周期。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:四期第六课-三不做第二不做-次新股.md",
+      "sourceHash": "0c73d68c39f9acf34415d3609aafcefba0604277f2169e9bd2e4e4de3420c7c1",
+      "tags": [
+        "topic.valuation",
+        "purpose.screen"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.valuation",
+          "quote": "价格围绕着价值上下波段",
+          "startLine": 34,
+          "endLine": 34,
+          "reason": "双模型一致：全文核心是次新股因高溢价发行而最终价值回归，估值是贯穿全文的主线；复核：新股价格高估及后续价值回归是全文论证不做次新股的核心依据。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.screen",
+          "quote": "我本人制定了一些禁区，禁区的板块个股我坚决不做",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：文章主要意图是建立禁区、过滤不做的板块个股；复核：全文主要意图是解释排除不适合参与的股票，并具体提出次新股过滤规则。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：文章以经验方式讲不做次新股的选股禁区，并解释新股估值虚高回归逻辑；插图较多未引用。\nCodex · gpt-6.1-sol：全文以次新股高估及价值回归解释不参与的选股原则；未标注仅在例子中出现的技术概念或周期。",
+        "disagreements": [
+          {
+            "tagId": "kind.experience",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.market",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:四期第四课-三不做第一不做-女鬼.md",
+      "sourceHash": "ab0b8b1687709aaf4637a596a9805e8719bc5ee8b94a2e46f21ff48a1b9576ff",
+      "tags": [
+        "purpose.screen"
+      ],
+      "evidence": [
+        {
+          "tagId": "purpose.screen",
+          "quote": "我们尽量不要从这样的走势中选取个股来赚钱",
+          "startLine": 75,
+          "endLine": 75,
+          "reason": "双模型一致：全文主要意图是识别下跌女鬼走势并据此过滤不做的个股；复核：全文主要意图是排除下跌趋势个股，选择上行趋势个股。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为学习营课程文字稿，主题是三不做中的女鬼（下跌趋势）识别，以BOLL中轨为地平线，用于选股过滤。仅保留最核心的两个主题维度。\nCodex · gpt-6.1-sol：核心是识别并排除下跌趋势个股；BOLL仅为辅助界定，未单列主题，未明确分析周期。",
+        "disagreements": [
+          {
+            "tagId": "topic.phase",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.boll",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.ma",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:国科微.md",
+      "sourceHash": "53eccb37c5cc7cca243af7f7045560b6dfbf8f08a1bdead34743c7221dface9b",
+      "tags": [
+        "topic.phase",
+        "purpose.levels"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.phase",
+          "quote": "摸线三期结束触底反弹",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：全文核心主题为摸线三期结束后的触底反弹状态；复核：正文以摸线三期结束后的反弹状态为核心判断。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.levels",
+          "quote": "92支撑位  95压力位  92.7关键位",
+          "startLine": 11,
+          "endLine": 11,
+          "reason": "双模型一致：全文主要给出支撑位、压力位与关键位；复核：表格主要记录支撑、压力与关键价位。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：内容简短，主要为日期与支撑压力位表格，主题为摸线与支撑压力判断\nCodex · gpt-6.1-sol：正文简短，核心为摸线三期及支撑、压力价位记录；未明确周期。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:图片 从 建党节.md",
+      "sourceHash": "07478dbefd5bf0f6cac589cb2f4db3ca4750a3ae8f6c38915ab1909187f25649",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅含时间戳、附件图片及笔记链接，没有可提取的实质内容，标签为空。\nCodex · gpt-6.1-sol：原文仅含图片附件及课程笔记链接，缺少可供判断全文核心主题的正文，故不提取标签。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:图片 从 建党节_1.md",
+      "sourceHash": "21a05ee2c5c9b0f825e108d7e67d5bea0d0ca26dc6fe17f6037726fb452170ab",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文只有图片、内部链接和元数据，没有可引用的实质内容，无法提取核心标签。\nCodex · gpt-6.1-sol：正文仅有图片附件及课程链接，缺少可据以判断全文核心主题的实质内容，暂不提取标签。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:地平线原理.md",
+      "sourceHash": "93b7317bd326ffc935bd7aa79d04e7ee8c71e8710ba61553116785d815132d8a",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文仅一句模糊表述，缺少明确主题、用途、内容类型或周期证据，无法从词典中选取标签。\nCodex · gpt-6.1-sol：正文仅一句简短交易判断，未明确具体指标或周期。",
+        "disagreements": [
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "purpose.trend",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:复合型摸线.md",
+      "sourceHash": "6ef6a0883aec245554d61961c29279b3432ffe3aee7b9ac09072e42dd9fef24b",
+      "tags": [
+        "topic.phase"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.phase",
+          "quote": "低位震荡摸线，又回到低位震荡",
+          "startLine": 9,
+          "endLine": 9,
+          "reason": "双模型一致：全文仅一句，核心是低位震荡与摸线阶段的变化，属于摸线／三期主题；复核：全文记录摸线后回到低位震荡的形态变化。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：内容极短，仅一句描述低位震荡摸线状态；无足够证据判断用途、周期或公式等维度。\nCodex · gpt-6.1-sol：正文仅一句，保留明确的摸线主题及经验性质。",
+        "disagreements": [
+          {
+            "tagId": "kind.experience",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:复合型摸线_1.md",
+      "sourceHash": "f0e44b22586f839604eb49950a5375bf551ebcc1acde315985d3979c902dbd51",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：全文仅两句，内容简短；仅能提取摸线主题与案例类型，未涉及均线、周线或其他用途。\nCodex · gpt-6.1-sol：正文简短，年线触及后的下跌是核心，案例未展开。",
+        "disagreements": [
+          {
+            "tagId": "topic.phase",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.case",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.ma",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:大事件.md",
+      "sourceHash": "09f5d8ca4165badf6cf75b43e3c8098b857452fd732970a22abe37af6ee34f9a",
+      "tags": [
+        "topic.phase",
+        "topic.market"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.phase",
+          "quote": "2022-12-23 至2023-1-30 经历18个工作日到达摸线三期顶部",
+          "startLine": 28,
+          "endLine": 28,
+          "reason": "双模型一致：全文核心之一为按时间记录摸线一至三期进程；复核：摸线阶段及历次时间记录构成全文另一主要部分。",
+          "method": "ai"
+        },
+        {
+          "tagId": "topic.market",
+          "quote": "2023-06-29 电力-能源-减速器-机器人",
+          "startLine": 10,
+          "endLine": 10,
+          "reason": "双模型一致：大事件段落以大盘题材与板块轮动记录为主；复核：全文主要记录大盘事件及板块行情变化。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为事件与摸线经验混合笔记，未涉及具体公式或均线数值。\nCodex · gpt-6.1-sol：以市场事件和摸线时间记录为主，末尾交易原则属于局部内容。",
+        "disagreements": [
+          {
+            "tagId": "kind.experience",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.context",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:大四喜总结.md",
+      "sourceHash": "b760e73f38e35b356c079189930457d28a602cffdf344333f18057d754f7d2d0",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅有图片附件，无可用文本内容，无法提取标签。\nCodex · gpt-6.1-sol：仅有图片附件，没有可用于提取标签的正文。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:大时代.md",
+      "sourceHash": "3179a47593b743fc6c409cdd3c4ae2d22b24b4b99ed84362b4ceae0205223f77",
+      "tags": [
+        "topic.market",
+        "topic.phase"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.market",
+          "quote": "记录大盘大事件，比如政策底、市场底、政策风险、摸线",
+          "startLine": 12,
+          "endLine": 12,
+          "reason": "双模型一致：全文围绕大盘大事件展开，明确点出记录大盘事件的核心目的；复核：创建目的明确将大盘重要事件作为记录核心。",
+          "method": "ai"
+        },
+        {
+          "tagId": "topic.phase",
+          "quote": "2023-10-30反弹4天后到达中轨附近，代表摸线确立。",
+          "startLine": 28,
+          "endLine": 28,
+          "reason": "双模型一致：摸线／三期是贯穿全文的核心概念，多处记录摸线节点与二期操作原则；复核：正文持续记录摸线确立、历次摸线及阶段经验，是主要主题之一。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：内容为股票纪实式大盘事件与摸线记录，含明确日期与点位；BOLL仅作为事件描述出现一次，未选BOLL主题。\nCodex · gpt-6.1-sol：核心是大盘事件与摸线历史记录；BOLL用于个别事件描述，不另列为全文主题。",
+        "disagreements": [
+          {
+            "tagId": "kind.case",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "timeframe.daily",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.context",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:大盘反弹.md",
+      "sourceHash": "2089f46d63b631f2ed8fd68413ea7194f3b842b376008c2d5c626410416e76a7",
+      "tags": [
+        "topic.market",
+        "kind.experience"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.market",
+          "quote": "大盘下跌一段时间后，出现大阳线或者大金针探底的时候，说明要反弹了。",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：全文核心围绕大盘下跌后出现反弹信号及其操作展开；复核：全文围绕大盘下跌后的反弹展开。",
+          "method": "ai"
+        },
+        {
+          "tagId": "kind.experience",
+          "quote": "大盘下跌一段时间后，出现大阳线或者大金针探底的时候，说明要反弹了。",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：全文是作者基于大盘反弹信号的个人操作经验总结；复核：内容以经验性语言描述反弹时的买入和持有做法。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：全文为简短经验感悟，主题集中在大盘反弹信号与五日线持股，四天为一阶段仅有提及，证据不足未单独成标签。\nCodex · gpt-6.1-sol：主要讲大盘反弹信号与应对经验；五日线为附带持有条件，不单独列为核心主题。",
+        "disagreements": [
+          {
+            "tagId": "topic.ma5",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.trend",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:大盘反弹2.md",
+      "sourceHash": "0ed56742d265aac8fda202eb8c770d4501ed685ed59e3199475e0337cb9e8fa7",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅为附件链接，无可用正文内容，无法提取核心标签。\nCodex · gpt-6.1-sol：仅有附件链接，无正文可供提取。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:大盘股摸线表象.md",
+      "sourceHash": "7c7a9e836b65fa5d4b32806f8ec73e652fc65019d023e80daa98517ba602035c",
+      "tags": [
+        "topic.boll",
+        "purpose.trend",
+        "kind.experience"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.boll",
+          "quote": "突然反弹，经历4天或者6天或者8天后到达布林线中轨",
+          "startLine": 10,
+          "endLine": 10,
+          "reason": "双模型一致：全文核心围绕布林线中轨及轨道的价格行为展开；复核：布林线中轨、上轨是主要走势描述的参照。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.trend",
+          "quote": "突破中轨后或者30日线后是大涨",
+          "startLine": 11,
+          "endLine": 11,
+          "reason": "双模型一致：主要意图是借助中轨和均线判断后续趋势方向；复核：主要用于判断突破及回调后的走势。",
+          "method": "ai"
+        },
+        {
+          "tagId": "kind.experience",
+          "quote": "利润最大化的方式是做T，其次是做2天，2天没及时撤离的，也有很多补救机会。",
+          "startLine": 12,
+          "endLine": 12,
+          "reason": "双模型一致：全文以个人操作经验总结为主，属于经验型内容；复核：正文以走势观察和操作经验归纳为主。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为多条交易感悟与例子，主题集中在布林线和均线；周期未明确提及，未选周期标签。\nCodex · gpt-6.1-sol：核心是摸线过程及布林线附近的走势经验；不同均线用于描述反弹层次。",
+        "disagreements": [
+          {
+            "tagId": "topic.ma",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.phase",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:妖股上影线.md",
+      "sourceHash": "2e5c492c8870110caec8f880ad8ffcc74c1d902daeca1bc7642ba7a2cb1ed75e",
+      "tags": [
+        "kind.experience"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "quote": "拉上影线，第二天看跌，特别是葛四的上影线。如果该跌不跌必有暴涨",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：全文为一条操盘经验总结，核心是上影线后的看跌与例外情形；复核：全文是一条关于上影线后续表现的经验判断。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：仅一句话经验记录，未见明确周期与具体用途，故不选周期及用途标签。\nCodex · gpt-6.1-sol：葛四只是特别指出的情形，不单独扩展为全文主题。",
+        "disagreements": [
+          {
+            "tagId": "topic.granville",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.trend",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:妖股原则.md",
+      "sourceHash": "e59b67606439a853306cc13efe0de1e2bdcf27b60cefbb0001daea695b00695b",
+      "tags": [
+        "topic.double-high",
+        "topic.ma5",
+        "purpose.risk",
+        "timeframe.intraday"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.double-high",
+          "quote": "双高五日线，妖股破位五日线卖出",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：全文围绕“双高”配合五日线的交易形态展开，是核心主题之一。；复核：双高被重复提出，并给出高低点比较条件。",
+          "method": "ai"
+        },
+        {
+          "tagId": "topic.ma5",
+          "quote": "未跌破五日线，主力还在，跌破了必须走",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：五日线是全文判断持有与卖出的核心依据。；复核：五日线是全文反复强调的持有和退出依据。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.risk",
+          "quote": "跌停也是出局的一个信号",
+          "startLine": 14,
+          "endLine": 14,
+          "reason": "双模型一致：全文主要意图是界定破位、跌停等出局风险信号以控制风险。；复核：主要意图是通过破位退出控制风险。",
+          "method": "ai"
+        },
+        {
+          "tagId": "timeframe.intraday",
+          "quote": "妖股看参数到30分钟线",
+          "startLine": 16,
+          "endLine": 16,
+          "reason": "双模型一致：明确提到30分钟线，属于分钟／盘中的观察周期。；复核：明确指定30分钟线作为观察周期。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为短线交易口诀，重点围绕双高与五日线的持有/出局判断；30分钟线仅作妖股参数参考。\nCodex · gpt-6.1-sol：核心为双高与五日线退出规则；明确提到30分钟观察周期。",
+        "disagreements": [
+          {
+            "tagId": "kind.experience",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:学习营课程大纲.md",
+      "sourceHash": "09472b48c2b8637c4ee80f8e034e3b3c6371b8372b7f3c54e6b4f4ae780ec7f9",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：全文为课程链接目录与附件图片，无实质正文内容，不提取标签。\nCodex · gpt-6.1-sol：仅有图片和课程目录链接，缺少课程正文，不据标题推断核心标签。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:宁德时代.md",
+      "sourceHash": "9ab724849cd8f914c4f8d5704618eeac3e824a1235629f7a29f28ee9fab965f5",
+      "tags": [
+        "topic.granville"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.granville",
+          "quote": "完成格兰碧2天半，回调，看空",
+          "startLine": 10,
+          "endLine": 10,
+          "reason": "双模型一致：全文多个操作感悟反复围绕葛兰碧买卖点展开，是核心主题；复核：葛兰碧是多次操作记录反复使用的分析框架。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文零散，以葛兰碧天数经验为主，兼有五日线与位置分析，故按证据选取核心标签。\nCodex · gpt-6.1-sol：以个股操作复盘为主，葛兰碧反复贯穿；位置表和五日线属于辅助内容。",
+        "disagreements": [
+          {
+            "tagId": "kind.experience",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.ma5",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.trend",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "timeframe.daily",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.case",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "purpose.explain",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:小锤20到大锤80.md",
+      "sourceHash": "3b796ba26aa7df80cb31b04d23a2d31b29d3fbb4fdc1787256651ac2461dcee9",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：仅有标题，没有交易分析或指标说明，无法提取核心标签。\nCodex · gpt-6.1-sol：正文仅一句，未解释“小锤”“大锤”的含义，内容不足以稳定提取核心标签。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:开口笑.md",
+      "sourceHash": "c1900e55658d62e8536c17bd7a79df4ecf413ce9900deca68b4d0db1283a5d49",
+      "tags": [
+        "kind.experience"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "quote": "1、第二天出高点的概率50%，第三天第四天出高点概率各占25%",
+          "startLine": 12,
+          "endLine": 12,
+          "reason": "双模型一致：内容是个人对开口笑四天走势的经验性统计总结；复核：全文记录形态走势及高点出现概率的经验规律。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：篇幅很短，未涉及均线、量价等；主要围绕开口笑形态的日线概率推演。\nCodex · gpt-6.1-sol：记录“开口笑”形态的高点出现概率及走法；布林线仅用于说明起点，未单独提取为全文主题。",
+        "disagreements": [
+          {
+            "tagId": "topic.boll",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.forecast",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "timeframe.daily",
+            "model": "DeepSeek · deepseek-chat"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:开年第一天.md",
+      "sourceHash": "c2e52a8d2ec969cd3bbfc531c5119acdb948022434d27549b10fd067457d5059",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：内容极短，仅一句关于开年首日与全年走势关系的表述，无具体方法或数据支撑，标签仅取主题维度。\nCodex · gpt-6.1-sol：仅有一条走势经验，未提供具体方法或案例。",
+        "disagreements": [
+          {
+            "tagId": "topic.market",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.trend",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:开盘五分钟十分钟半小时.md",
+      "sourceHash": "ed2d525b7f5e0d594b3514e95ba0e022e05a3837cfb5658f6617795fd6a5858c",
+      "tags": [
+        "topic.ma5",
+        "purpose.trend",
+        "timeframe.intraday"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.ma5",
+          "quote": "不突破五日线的反弹都是耍流氓",
+          "startLine": 9,
+          "endLine": 9,
+          "reason": "双模型一致：全文核心围绕五日线反弹突破判断；复核：五日线是全文判断反抽成功与失败的核心依据。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.trend",
+          "quote": "一旦突破不了就是断头匝刀第一天，会跌的很猛。",
+          "startLine": 11,
+          "endLine": 11,
+          "reason": "双模型一致：主要意图是用五日线突破与否判断趋势走向；复核：主要意图是根据突破是否成功判断后续下跌走势。",
+          "method": "ai"
+        },
+        {
+          "tagId": "timeframe.intraday",
+          "quote": "开盘五分钟十分钟半小时反抽五日线成功的几率是10%",
+          "startLine": 11,
+          "endLine": 11,
+          "reason": "双模型一致：以开盘短时盘中周期作为判断场景；复核：明确关注开盘后的分钟级盘中时段。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文极短，仅一段盘中观察经验，按五日线与盘中趋势判断提取。\nCodex · gpt-6.1-sol：核心是开盘阶段反抽五日线失败所对应的下跌判断。",
+        "disagreements": [
+          {
+            "tagId": "kind.experience",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:开盘十分钟.md",
+      "sourceHash": "aee46ce2c7faa367836f8aa4735e26918926cba7ed659318ef374b14396cfa46",
+      "tags": [
+        "topic.granville",
+        "timeframe.intraday"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.granville",
+          "quote": "早上开盘10分钟和半小时之内是空仓者买入格兰币第一天的最佳时机！",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：全文围绕葛兰碧（格兰币）第一天买入与第二天卖出的操作展开，是核心主题。；复核：全文反复围绕葛兰碧第一天买入、第二天卖出的形态交易展开。",
+          "method": "ai"
+        },
+        {
+          "tagId": "timeframe.intraday",
+          "quote": "早上开盘10分钟和半小时之内",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：全文操作时机集中在开盘10分钟和半小时的盘中时段。；复核：开盘十分钟及半小时是全文反复强调的交易观察时段。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文较短，主题集中于葛兰碧首日买入与次日冲高出局，周期为盘中开盘时段。\nCodex · gpt-6.1-sol：围绕葛兰碧形态的早盘买卖时机展开，五日线只是形态描述的一部分。",
+        "disagreements": [
+          {
+            "tagId": "topic.ma5",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.levels",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:感悟.md",
+      "sourceHash": "26d2fea6bac7c270536aad16d7f1b20f0c1ee71a299d54ce13fbf22bf99f0d98",
+      "tags": [
+        "kind.experience"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "quote": "做不好，节奏不能把握，买的比较着急。",
+          "startLine": 20,
+          "endLine": 20,
+          "reason": "双模型一致：全文以个人交易感悟和操盘经验为主；复核：全文以零散交易心得和个人操作反思为主要内容，属于经验笔记。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：内容为零散交易感悟与经验记录，提及看涨看跌买卖、五日线、板块加仓等，无成体系的方法论；主题标签仅取有明确原文支撑的MA5，内容类型为经验。\nCodex · gpt-6.1-sol：混合操作心得与个股反思，主题分散，未将其中单条涉及的均线、板块或支撑位扩展为全文标签。",
+        "disagreements": [
+          {
+            "tagId": "topic.ma5",
+            "model": "DeepSeek · deepseek-chat"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:拆分K线.md",
+      "sourceHash": "7b3d51fcc51c6b963bfa3f9939ac4fc997db32d558b6392743ceab78874e7263",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：内容简短，侧重K线四要素及60分钟线拆分方法，未明确涉及均线、量价等主题\nCodex · gpt-6.1-sol：内容简短，主要讨论K线拆合，词典无对应主题；60分钟线仅为拆分示例，不据此选择周期标签。",
+        "disagreements": [
+          {
+            "tagId": "topic.phase",
+            "model": "DeepSeek · deepseek-chat"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:摸线-一期.md",
+      "sourceHash": "19ecdf513053efa7076f53f8d8065a687571b77f5ac47d2bbd976a39a902c2db",
+      "tags": [
+        "topic.phase"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.phase",
+          "quote": "十八天摸线 ，摸线基本结束了；",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：全文围绕摸线阶段展开，是核心主题；复核：全文围绕摸线阶段及其时间、涨幅条件展开。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为摸线阶段笔记，核心主题是摸线（三期），布林线仅作为阶段转换的辅助判断；均线、海龟为提及细节，未上升为核心主题。\nCodex · gpt-6.1-sol：海龟、布林线及不同均线均为局部说明，不单独扩展为全文主题。",
+        "disagreements": [
+          {
+            "tagId": "topic.boll",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:摸线-三期.md",
+      "sourceHash": "dcd749b838302e115092274c53d398d95a963cb8029d988ba84b9f1930bcd567",
+      "tags": [
+        "topic.phase"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.phase",
+          "quote": "三期变化多端",
+          "startLine": 14,
+          "endLine": 14,
+          "reason": "双模型一致：全文围绕摸线三期的走势、节奏与出局展开，是核心主题；复核：全文集中说明摸线三期的走势特性、持续条件与结束信号。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：按原文提取摸线三期主题、均线判断、出局时机解释及日线周期，未扩展其他维度。\nCodex · gpt-6.1-sol：各均线、双高和布林线服务于三期操作说明，未单独选为核心主题；未由日均线推断全文周期。",
+        "disagreements": [
+          {
+            "tagId": "topic.ma",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.explain",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "timeframe.daily",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.risk",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:摸线-三期结束.md",
+      "sourceHash": "5b3978a2f1a4bed562a024aa15466e93238fada5f16f0187e53f78507afd2b87",
+      "tags": [
+        "topic.ma5",
+        "topic.phase",
+        "purpose.trend",
+        "kind.experience"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.ma5",
+          "quote": "三期沿着5日线下跌，突破5日线的可以判定三期震荡开启",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：全文以5日线为判断依据，是核心均线主题；复核：5日线是全文唯一且关键的走势判别依据。",
+          "method": "ai"
+        },
+        {
+          "tagId": "topic.phase",
+          "quote": "三期沿着5日线下跌，突破5日线的可以判定三期震荡开启，震荡的低位确立",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：全文围绕摸线三期阶段展开判断，是核心主题；复核：全文讨论三期下跌向震荡的阶段转换。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.trend",
+          "quote": "突破5日线的可以判定三期震荡开启",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：主要意图是依据5日线突破判断趋势阶段转换；复核：主要意图是判断行情走势发生转换。",
+          "method": "ai"
+        },
+        {
+          "tagId": "kind.experience",
+          "quote": "震荡的低位确立，随后等待高位区间到来",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：属于阶段判断的经验性描述，非公式或案例；复核：内容是对阶段走势及后续节奏的经验性判断。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文仅一段，主题为摸线三期与5日线突破判断，属经验性趋势判断。\nCodex · gpt-6.1-sol：全文仅一句，核心为借助5日线判断三期走势转换；未将等待高位区间另标为支撑压力。",
+        "disagreements": [
+          {
+            "tagId": "timeframe.daily",
+            "model": "DeepSeek · deepseek-chat"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:摸线-二期.md",
+      "sourceHash": "a636fc8804140dfcffd5389feb2ac5a2d35e3d63e96099d47e730553b74f13d8",
+      "tags": [
+        "topic.boll",
+        "topic.phase"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.boll",
+          "quote": "布林线中轨开始，从地到天，从天到地，周而复始，守住布林线上轨的时候，开始摸线第三期。",
+          "startLine": 10,
+          "endLine": 10,
+          "reason": "双模型一致：全文核心围绕布林线中轨与上轨的循环形态展开；复核：布林线中轨与上轨构成阶段运行描述的主要框架。",
+          "method": "ai"
+        },
+        {
+          "tagId": "topic.phase",
+          "quote": "守住布林线上轨的时候，开始摸线第三期。",
+          "startLine": 10,
+          "endLine": 10,
+          "reason": "双模型一致：明确以摸线三期作为全文阶段判断的核心内容；复核：全文描述摸线二期的运行及转入三期的条件。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文简短，主题集中于布林线与摸线三期判断，未给出明确周期或主要用途，故不选其他维度标签。\nCodex · gpt-6.1-sol：不同日均线用于列示震荡区间，不据此拆选MA20或推断日线周期。",
+        "disagreements": [
+          {
+            "tagId": "purpose.trend",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:摸线.md",
+      "sourceHash": "835f69d57c5e0b837f2a67a7135fed306b2a0f9d8068a7c7d89b4be7507fa0bb",
+      "tags": [
+        "topic.phase"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.phase",
+          "quote": "摸线开始是突破布林线中轨（20日线）开始18天的上升行情",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：全文围绕摸线行情的定义、启动、强弱与止盈展开，摸线／三期是核心主题。；复核：全文汇总摸线行情的起点、强弱、止盈与反弹特征。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：全文为摸线经验要点，涉及布林线中轨、周线、5/10/20日线及止盈规则；按保守原则选主题、用途与周期标签，均线只作引用不单列。\nCodex · gpt-6.1-sol：全文同时涉及行情识别、止盈和利润点，未指定单一主要用途；均线体系贯穿多条笔记，选择泛化均线主题。",
+        "disagreements": [
+          {
+            "tagId": "topic.boll",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.trend",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "timeframe.weekly",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.ma",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:摸线实战.md",
+      "sourceHash": "d9dcb9587e02f6ffee3b1b74e76c6097450be92b404c33cbfd082ea935d9070c",
+      "tags": [
+        "topic.phase",
+        "topic.ma5",
+        "kind.experience"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.phase",
+          "quote": "摸线三期数好1234的节奏，四天内出高点，四天内卖出。",
+          "startLine": 9,
+          "endLine": 9,
+          "reason": "双模型一致：全文围绕摸线三期1234节奏展开，是核心主题。；复核：全文围绕摸线三期的上涨节奏、买卖时机与结束方式展开。",
+          "method": "ai"
+        },
+        {
+          "tagId": "topic.ma5",
+          "quote": "走好第一次的1234是后面每一次博弈五日线的基础。",
+          "startLine": 11,
+          "endLine": 11,
+          "reason": "双模型一致：五日线是全文反复提及的关键均线与操作依据。；复核：五日线是文中反复讨论的买入与博弈依据。",
+          "method": "ai"
+        },
+        {
+          "tagId": "kind.experience",
+          "quote": "四天内的节奏是12上涨，3调整，4大涨大跌。也有不同的变体，但是都不会超过4天。",
+          "startLine": 17,
+          "endLine": 17,
+          "reason": "双模型一致：全文为个人摸线节奏与操作的实战经验总结。；复核：正文归纳实战节奏及其变体，属于交易经验。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为摸线三期1234节奏的个人经验笔记，围绕五日线与四天节奏操作，故按日线周期归类。\nCodex · gpt-6.1-sol：核心是摸线三期节奏与五日线博弈；风险提示属于配套说明，未单列用途。",
+        "disagreements": [
+          {
+            "tagId": "purpose.risk",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "timeframe.daily",
+            "model": "DeepSeek · deepseek-chat"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:摸线示意图.md",
+      "sourceHash": "7e8c6fafe857e8c99ee02d75b51f70588263b54a36709ef27babef4d2aaff2af",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅含元数据与图片附件，没有可提取的实质内容。\nCodex · gpt-6.1-sol：仅有图片附件，无可用于提取标签的正文。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:操盘风格短期相似性.md",
+      "sourceHash": "0d556fa5feea5d5c188c01a74d76688a503615fc9a2568d3d561e22167d89bad",
+      "tags": [
+        "kind.experience"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.experience",
+          "quote": "操盘风格短期具有相似性",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：全文仅一句话，属于操盘经验总结；元数据标签不作为正文证据，内容过少无法确定其他维度；复核：正文直接概括对短期操盘风格的经验性观察。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅一句经验性陈述，除经验类型外无足够证据支持主题、用途或周期标签。\nCodex · gpt-6.1-sol：正文仅有一条经验判断，不足以确定具体主题或用途。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:攀升过程是否照镜子.md",
+      "sourceHash": "7e198a33bc607b594e4e048facd8d5864c5872f66a24c7a69e97faf421e8aebc",
+      "tags": [
+        "topic.mirror",
+        "topic.granville",
+        "kind.experience"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.mirror",
+          "quote": "还要看下照镜子",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：原文将照镜子列为攀升过程中需要关注的核心要点之一；复核：照镜子是正文明确提出的攀升过程观察重点。",
+          "method": "ai"
+        },
+        {
+          "tagId": "topic.granville",
+          "quote": "和葛兰碧的节奏",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：原文将葛兰碧节奏与照镜子并列为攀升过程的核心关注点；复核：葛兰碧节奏与照镜子并列，是正文明确提出的观察重点。",
+          "method": "ai"
+        },
+        {
+          "tagId": "kind.experience",
+          "quote": "攀升过程注意上涨趋势线的过程",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：全文为操盘经验型提醒，而非公式或案例；复核：全文是一条关于攀升过程观察要点的经验提醒。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：短笔记，仅一句经验性提醒，故标签集中在照镜子、葛兰碧与经验类型，未涉及周期或用途细节。\nCodex · gpt-6.1-sol：正文简短，明确要求关注照镜子与葛兰碧节奏；未展开具体判断方法或周期。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:断头铡刀.md",
+      "sourceHash": "d9137c1559d8c5df6e93627a5ee0af2f1fadc4ff18253db7e91921a7dbe00608",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅有元数据和一张图片链接，没有可引用的文字内容，内容不足，因此返回空数组。\nCodex · gpt-6.1-sol：仅有图片附件，无可用于提取标签的正文。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:朗科科技.md",
+      "sourceHash": "f21c7f41980cc73e71971a27f6effbecf2d7fe710c92a9522818118d744d4a4a",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅一句操作感悟，并附有截图，缺乏可提取的核心主题、主要用途或周期证据，无法选出符合词典的标签。\nCodex · gpt-6.1-sol：正文核心是判断错误后撤退，未提供足够证据确定具体技术主题或周期。",
+        "disagreements": [
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "purpose.risk",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:杭州电热.md",
+      "sourceHash": "1442fd846825b4d395f0470ae2b8ec90c53ba4fcda12ac5939034988a88ae8db",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文仅有一句简短交易提示，缺乏足够上下文确定主题或用途，无法提取核心标签。\nCodex · gpt-6.1-sol：仅有孤立卖出价位，缺少判断依据与上下文，暂不提取标签。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:格兰碧.md",
+      "sourceHash": "17869e49700a6e20cb4fc292167693c6fbb178722cc37bc4ee1ef0b894f96ed8",
+      "tags": [
+        "topic.granville"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.granville",
+          "quote": "破五是格兰碧第一天",
+          "startLine": 10,
+          "endLine": 10,
+          "reason": "双模型一致：全文围绕格兰碧（葛兰碧）法则展开，这是核心主题词；复核：全文围绕葛兰碧的阶段识别、操作时机和强弱特征。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：全文短文，核心为格兰碧法则与均线使用经验，另含暴涨暴跌描述；图片附件未作为证据。\nCodex · gpt-6.1-sol：核心为葛兰碧操作经验；均线是使用条件，不另列主题。",
+        "disagreements": [
+          {
+            "tagId": "topic.ma",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:格兰碧_1.md",
+      "sourceHash": "1414013d98256d205747f0a33c0934b0ce064589daa249438f67240bb3cb20cf",
+      "tags": [
+        "topic.granville",
+        "kind.experience"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.granville",
+          "quote": "摸线过程从五日线起步的大阳线是葛兰碧第一天",
+          "startLine": 11,
+          "endLine": 11,
+          "reason": "双模型一致：全文以葛兰碧法则为核心，说明其第一天的形态定义；复核：两条正文均在描述葛兰碧第一天或第二天的特征。",
+          "method": "ai"
+        },
+        {
+          "tagId": "kind.experience",
+          "quote": "格兰碧第二天会有震荡",
+          "startLine": 9,
+          "endLine": 9,
+          "reason": "双模型一致：属于对葛兰碧法则后续走势的经验性观察总结；复核：记录特定阶段的走势经验。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：短文仅两条观察，围绕葛兰碧法则的日线形态与后续震荡经验，未涉及具体计算或筛选用途。\nCodex · gpt-6.1-sol：内容简短但主题明确；摸线和五日线用于说明第一天的识别，不另列主题。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:次新股.md",
+      "sourceHash": "e17c86dda729408ed6b879b9d8ed5cffee2bdd696983864f0a3bd7f5a386807a",
+      "tags": [
+        "topic.market"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.market",
+          "quote": "板块上涨找次新股",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：全文唯一内容指向板块与个股选择的关系，属于大盘与板块主题；复核：板块走势是全文选股思路的核心依据。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：全文仅一句话，主题为板块上涨情境下的选股方向，但未展开具体方法，不足以判定为选股过滤用途。\nCodex · gpt-6.1-sol：正文仅一句，但清楚表达依据板块上涨寻找次新股的选股经验。",
+        "disagreements": [
+          {
+            "tagId": "purpose.screen",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:毕业课.md",
+      "sourceHash": "12ef1cd5f99d1cac496d1d98b94c696a603e06a9d36bf151e7ae476432f3bed7",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅含元数据与音频附件链接，无实质文字内容可提取核心标签。\nCodex · gpt-6.1-sol：仅有音频附件链接，没有可用于标签提取的正文。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:海看股份.md",
+      "sourceHash": "b93cb0b24a0abfd5d846b40cdbff5d4df48019de8e113d9e95772f7eddec15a9",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅一句，无明确主题标签；内容类型仅够判定为经验。\nCodex · gpt-6.1-sol：记录观察缺口时忽略日线的具体失误；涉及两个周期且无单一主周期，不选周期标签。",
+        "disagreements": [
+          {
+            "tagId": "kind.experience",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.case",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "purpose.explain",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:海龟.md",
+      "sourceHash": "df12920fa15f3ee2aef9cbf153995b366fcad452a799d92ed7ed6b3e99375e82",
+      "tags": [
+        "topic.turtle",
+        "purpose.screen"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.turtle",
+          "quote": "筑底海龟最好",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：两处提及海龟，作为核心选股方法；复核：直接给出海龟形态的买入规则，是笔记核心。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.screen",
+          "quote": "大盘暴跌时，上涨的个股 还是五日线起步第一天",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：全文意图是在大盘暴跌背景下筛选符合条件的个股；复核：主要用于筛选大盘暴跌时符合特定形态的个股。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文简短，聚焦大盘暴跌背景下的选股条件，海龟与格兰碧信号并列出现；按维度限制仅保留最核心的海龟主题与选股用途。\nCodex · gpt-6.1-sol：以海龟形态和买入时机为核心；五日线、葛兰碧仅作为并列条件，不另设主题标签。",
+        "disagreements": [
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:海龟_1.md",
+      "sourceHash": "d01faa5b3730eed1741916ffe1e732a5b7cd4adb3ee3cff2184f65362aad01fd",
+      "tags": [
+        "topic.turtle",
+        "purpose.screen"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.turtle",
+          "quote": "筑底海龟最好",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：海龟形态是原文筛选个股的关键依据，属于核心主题；复核：海龟形态及其持续时间构成独立核心内容。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.screen",
+          "quote": "大盘暴跌时，上涨的个股 还是五日线起步第一天，格兰碧第一天，筑底海龟最好",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：全文核心意图是在大盘暴跌情境下筛选符合条件的个股；复核：主要表达大盘暴跌时对特定个股形态的筛选偏好。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为简短交易经验记录，核心是暴跌环境下按五日线、格兰碧法则、海龟形态筛选个股，并提及持有约两天半。\nCodex · gpt-6.1-sol：内容简短，以海龟形态的筛选及持续时间经验为核心，未明确图表周期。",
+        "disagreements": [
+          {
+            "tagId": "topic.granville",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "timeframe.daily",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:滑滑梯.md",
+      "sourceHash": "326fa8e32ae17826b83fd5e71ffd0d1bb6e46c9eb52ae65fc5dc115417d0b776",
+      "tags": [
+        "topic.phase",
+        "topic.ma",
+        "purpose.levels",
+        "kind.experience"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.phase",
+          "quote": "滑滑梯理论源于摸线会出现调整，配合摸线行情使用，还有照镜子理论",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：全文围绕摸线体系中的滑滑梯现象展开；复核：正文明确将滑滑梯的来源及使用条件关联到摸线行情。",
+          "method": "ai"
+        },
+        {
+          "tagId": "topic.ma",
+          "quote": "30、60、120 日线 作为滑滑梯的支撑位和压力位，内滑是支撑位，外滑是压力位。5、10 日线不会出现滑滑梯。20 日线有时也会出现滑滑梯",
+          "startLine": 12,
+          "endLine": 12,
+          "reason": "双模型一致：核心机制依托均线界定滑滑梯的支撑压力；复核：比较多条均线在滑滑梯走势中的作用，是正文主要技术内容。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.levels",
+          "quote": "30、60、120 日线 作为滑滑梯的支撑位和压力位，内滑是支撑位，外滑是压力位。",
+          "startLine": 12,
+          "endLine": 12,
+          "reason": "双模型一致：全文主要意图是用均线识别支撑位与压力位；复核：主要操作性内容是辨认滑滑梯走势中的支撑与压力。",
+          "method": "ai"
+        },
+        {
+          "tagId": "kind.experience",
+          "quote": "滑滑梯后的第一天，会拉一根大阳线",
+          "startLine": 9,
+          "endLine": 9,
+          "reason": "双模型一致：属于对滑滑梯后续走势的经验性总结；复核：通过形态后的走势规律表达经验判断。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文很短，且含多张附件图片；已按正文明确内容提取核心标签。\nCodex · gpt-6.1-sol：核心是摸线配合下的均线支撑压力经验；照镜子仅被提及，不另设主题标签。均线天数不单独作为图表周期证据。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:照镜子.md",
+      "sourceHash": "e7d3275b1c4f76a02bb901b06cb055bf2a43111e1b3c832b3813c5701c5c9e35",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅有一句标题和一张截图附件，缺少可提取核心主题的实质内容，因此标签为空。\nCodex · gpt-6.1-sol：正文仅一句，可确认支撑压力互换；不足以独立确认照镜子理论主题或适用周期。",
+        "disagreements": [
+          {
+            "tagId": "purpose.levels",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:牛十条.md",
+      "sourceHash": "3b5cfb8499b94b896123fb6bc1828941454c41f83315ca0f7ef278554dbf32d7",
+      "tags": [
+        "kind.principle"
+      ],
+      "evidence": [
+        {
+          "tagId": "kind.principle",
+          "quote": "按以下9条操作",
+          "startLine": 10,
+          "endLine": 10,
+          "reason": "双模型一致：牛十条属于交易原则性条规，而非公式或案例；复核：正文明确将后续条目作为牛市操作准则。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为牛市操作十条，核心围绕布林线、摸线三期与20日线底线展开；20日线仅作为底线解释出现，未单独列为主题标签。\nCodex · gpt-6.1-sol：全文是牛市操作原则，核心围绕牛市环境与20日线持股底线；摸线、BOLL作为解释依据，不另扩展主题。",
+        "disagreements": [
+          {
+            "tagId": "topic.boll",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.phase",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.trend",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.market",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "topic.ma20",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "purpose.risk",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:牛市.md",
+      "sourceHash": "df0ac54f85fa2692fd4acef7cb18006063f4e1f0afb98ea07ed63eb0f5c35897",
+      "tags": [
+        "topic.market"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.market",
+          "quote": "牛市标准不同，牛市次数不同",
+          "startLine": 9,
+          "endLine": 9,
+          "reason": "双模型一致：全文围绕牛市标准与历次牛市划分展开，属于大盘与板块范畴；复核：全文围绕市场牛市的定义及历史次数展开。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为个人对牛市次数与标准的经验性回顾，仅涉及大盘层面，无具体个股或技术指标。\nCodex · gpt-6.1-sol：主要解释牛市定义差异如何影响历史次数统计；腾讯仅为例子，不扩展个股主题。",
+        "disagreements": [
+          {
+            "tagId": "purpose.explain",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.context",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:牛市指南.md",
+      "sourceHash": "a7a709c52a31e1f1e025776b26f7ed99bd43abb29ab26e4adc8688e5b68d223c",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅为附件图片链接与元数据，无可提取的正文内容，故标签为空。\nCodex · gpt-6.1-sol：仅有图片附件，无可用于标注的正文。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:牛市选股策略.md",
+      "sourceHash": "09335b96dbcb22cf4b322047ded1d2398c6ed57a31d8a00f95813d31cc4b1d4c",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文仅两条简短记录，内容不足，未体现明确的公式、用途或周期。\nCodex · gpt-6.1-sol：正文简短，仅提取明确的选股用途。",
+        "disagreements": [
+          {
+            "tagId": "topic.market",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.screen",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:画趋势图.md",
+      "sourceHash": "5b64a8a7324ba62a654a63ae8b23f212f803a37d51d0b1f67951634b8f088cb2",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅有图片附件，无可提取的文本内容，因此标签为空。\nCodex · gpt-6.1-sol：仅有图片附件，无可用于标注的正文。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:盈利模式.md",
+      "sourceHash": "181b8fb7def5f8c9f4b9adaca8bde4969b1a91c0fd651d034819b8d8df69f1eb",
+      "tags": [
+        "topic.ma5"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.ma5",
+          "quote": "照镜子是等待5日线的过程。",
+          "startLine": 15,
+          "endLine": 15,
+          "reason": "双模型一致：5日线在妖股、攀升、照镜子、反弹止损多条规则中均作为核心判断依据；复核：五日线反复用于持有底线、调整观察和反弹止损，是多项模式共同的核心依据。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文为多策略清单，主题偏杂；按维度上限选取公式规则、5日线、BOLL与趋势判断，其余条目未展开。\nCodex · gpt-6.1-sol：汇集多种交易模式；五日线贯穿多项规则，其余具体方法不足以单独概括全文，未指定统一用途或周期。",
+        "disagreements": [
+          {
+            "tagId": "kind.formula",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "topic.boll",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.trend",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:石油的影响.md",
+      "sourceHash": "af65cb55c1a0e0fd9dbdc19a773610ca3bb1eb9bcdf3c3061a39c71a620dddc0",
+      "tags": [
+        "topic.market"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.market",
+          "quote": "石油带动钢铁，煤炭，有色的上涨",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：全文仅讨论石油对钢铁、煤炭、有色等板块的带动，核心是大盘与板块联动；复核：全文讨论石油对钢铁、煤炭和有色板块走势的带动关系。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：内容极短，仅一句板块联动描述，无其他维度证据，故仅选一个主题标签。\nCodex · gpt-6.1-sol：正文仅一句，核心是行业板块之间的上涨联动。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:罗平锌电002114.md",
+      "sourceHash": "7be5025802cb6717b056d5196bfebc247297250ffe4d2767ec0e7db368dd7f16",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅为元数据、附件链接和标题，无可提取的股票内容，故返回空数组。\nCodex · gpt-6.1-sol：仅有图片、音频附件及日期来源说明，缺少可用于标注的实质正文。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:美股.md",
+      "sourceHash": "498fdf8d27f1fb8931f845d63c95ed654de558c9491203afd14e878574e179ff",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅两句口号式判断，无足够内容支撑词典中的主题、用途或周期标签。\nCodex · gpt-6.1-sol：仅有股灾周期断言与年份猜测，内容不足以确定词典中的核心标签。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:老鸭头.md",
+      "sourceHash": "6c5733bf1c4bce733cee963fddc7b9c1d534284c9f552589a3f1aafc8e7cdbc3",
+      "tags": [
+        "topic.phase"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.phase",
+          "quote": "摸线三期震荡过程中",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：明确以摸线三期作为全文的行情阶段背景；复核：全文围绕摸线三期中的形态展开。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文仅一句，未提及选股、支撑压力或周期等，故不添加相关标签。\nCodex · gpt-6.1-sol：以摸线三期中的形态确认描述上涨信号。",
+        "disagreements": [
+          {
+            "tagId": "kind.principle",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.trend",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:联特科技.md",
+      "sourceHash": "344cf649e45f9925871267b2378d06cde4408b14c47a49c9ce28af0604cacbd9",
+      "tags": [
+        "topic.granville"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.granville",
+          "quote": "葛兰碧第二天下跌会比第一天猛",
+          "startLine": 34,
+          "endLine": 34,
+          "reason": "双模型一致：葛兰碧原则被明确引用并作为操作依据，是全文涉及的核心概念；复核：葛兰碧在多次操作反思中被作为交易依据，是贯穿笔记的核心方法。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：内容偏零散，含位置表和操作感想；周期与用途证据较少，仅按主要意图选支撑压力。\nCodex · gpt-6.1-sol：个股位置分析与多日操作复盘；均线仅用于表内定位，不单列主题或周期。",
+        "disagreements": [
+          {
+            "tagId": "purpose.levels",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.principle",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.explain",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.case",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:股市周期0123456789.md",
+      "sourceHash": "76be8802eef0d0c1a3dfeb7dab9512041ec1db8641bf804f4b393113a40cf583",
+      "tags": [
+        "topic.ma"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.ma",
+          "quote": "讲的均线",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：全文开篇即点明主题为均线；复核：正文明确说明讨论对象为均线，后续数字模式用于描述其运行。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：内容为简短笔记配图，主要围绕均线与摸线三期模式，属原则性经验表述，未给明确周期与选股用途。\nCodex · gpt-6.1-sol：核心是均线运行模式的循环与转移；摸线三期和具体均线仅作例子。",
+        "disagreements": [
+          {
+            "tagId": "topic.phase",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "kind.principle",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.trend",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.experience",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:股票价格.md",
+      "sourceHash": "ff10042707d8aa493db85c27c014853737cb68bffc3cffc339194f9cddbaee38",
+      "tags": [
+        "topic.valuation",
+        "purpose.valuation",
+        "kind.formula"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.valuation",
+          "quote": "市盈率分布来看，市盈率百倍以上（注：滚动市盈率=每股股价/过去四个季度每股收益，若每股收益为负值，则将滚动市盈率视为超百倍）的公司占比最高，达到32.87%。",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：全文围绕市盈率分布展开，是核心主题；复核：全文围绕市盈率及其与股价的关系展开。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.valuation",
+          "quote": "股价=业绩\\*30倍市盈率",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：全文意图是给出基于市盈率的估值定价方式；复核：提供不同类别股票的估值倍数参照，主要用于估算价格区间。",
+          "method": "ai"
+        },
+        {
+          "tagId": "kind.formula",
+          "quote": "股价=业绩\\*30倍市盈率",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：提供了股价与业绩、市盈率关系的计算公式；复核：核心内容包含直接计算股价的公式。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：全文较短，主要为市盈率分布与估值倍数参考，未涉及周期维度。\nCodex · gpt-6.1-sol：以市盈率倍数估算股价，行业倍数为估值参照。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:股票对称性-海龟和下跌.md",
+      "sourceHash": "54d0c4ec566f31a4840c62292434d884c75b6af243518b2cce0a38aae46c67a5",
+      "tags": [
+        "topic.market",
+        "kind.experience"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.market",
+          "quote": "大盘第二天的走势都会对其起到加强作用",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：全文围绕大盘走势对个股的影响展开；复核：全句核心是大盘走势对节奏不同个股的影响。",
+          "method": "ai"
+        },
+        {
+          "tagId": "kind.experience",
+          "quote": "大盘第二天的走势都会对其起到加强作用",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：属于作者总结的交易经验性判断；复核：属于对市场与个股联动关系的经验归纳。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文仅一句，主题为海龟股票与大盘走势关系，内容简短，未涉及具体公式或周期。\nCodex · gpt-6.1-sol：仅依据单句归纳个股节奏与大盘次日走势的关系；海龟缺乏展开，不单列主题。",
+        "disagreements": [
+          {
+            "tagId": "topic.turtle",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.trend",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:葛兰碧.md",
+      "sourceHash": "136e276683db01a0faa96c60909b3bafae2afd0e2640cf9be204fe8028e067f2",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅为元数据与图片附件，无可提取的正文内容，因此无法给出核心检索标签。\nCodex · gpt-6.1-sol：原文仅含元数据和图片附件，无可用于提取标签的正文。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:蓝筹见底的判断.md",
+      "sourceHash": "5afe1f0d4ca832ce8924d099e5a5138c69f64fe3758c71cce37cd51a2e19d3f8",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅有标题“一半再一半”，无实质内容，无法识别主题、用途或周期。\nCodex · gpt-6.1-sol：正文仅有“一半再一半”，缺少语境，无法确定是否涉及仓位或交易规则，不提取标签。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:见底信号.md",
+      "sourceHash": "8996d33c0eaceac959c1cd666497116d5dfd5bc3b3ed266150bf36a9382fcbed",
+      "tags": [
+        "topic.ma5",
+        "kind.experience"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.ma5",
+          "quote": "反弹不过五日线耍流氓",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：以五日线作为反弹强弱的核心判断依据；复核：五日线是全文判断反弹及短线进场的核心依据。",
+          "method": "ai"
+        },
+        {
+          "tagId": "kind.experience",
+          "quote": "暴跌2、4、6、8、10天后会出现反弹",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：属于基于经验的暴跌后反弹规律总结；复核：全文归纳暴跌后反弹时点、形态和进场条件，属于操作经验。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：全文核心为暴跌后反弹的均线判断与进场经验，未涉及选股、估值或仓位。\nCodex · gpt-6.1-sol：原文是暴跌后反弹的操作经验，以五日线作为短线进场依据；20线仅为中长线补充条件，不另列主题。",
+        "disagreements": [
+          {
+            "tagId": "topic.ma20",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.trend",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "timeframe.daily",
+            "model": "DeepSeek · deepseek-chat"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:赛力斯.md",
+      "sourceHash": "c49e32421c252e383f185e895a9cb2ef70e218950075565526ba04f5bf054f94",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅为空白表格和日期，没有实质内容可提取核心标签。\nCodex · gpt-6.1-sol：正文仅有日期及未填写的行情、均线表格，内容不足，无法确定核心标签。",
+        "disagreements": []
+      }
+    },
+    {
+      "id": "note:选股总结.md",
+      "sourceHash": "6da1624dd3780f2e5384063f021624621aaf4a7b239abc8c46729c621da89c04",
+      "tags": [
+        "topic.ma5",
+        "purpose.screen"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.ma5",
+          "quote": "沿着5日线攀升",
+          "startLine": 8,
+          "endLine": 8,
+          "reason": "双模型一致：全文核心买入条件围绕5日线展开；复核：多项筛选条件围绕5日线的位置、攀升与破位展开。",
+          "method": "ai"
+        },
+        {
+          "tagId": "purpose.screen",
+          "quote": "20日线和5日线以上的个股",
+          "startLine": 6,
+          "endLine": 6,
+          "reason": "双模型一致：全文为逐条打勾的选股过滤清单；复核：全文以清单列出个股纳入和排除条件，主要用于选股过滤。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：内容为简短的选股条件清单，主要围绕5日线与20日线过滤，另含葛兰碧回调条件但未展开。\nCodex · gpt-6.1-sol：正文是简短选股清单，核心围绕5日线筛选，20日线与葛兰碧仅为局部条件。",
+        "disagreements": [
+          {
+            "tagId": "topic.ma20",
+            "model": "DeepSeek · deepseek-chat"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:震荡筑底-摸线一期.md",
+      "sourceHash": "1303754bc7e4cc2071356d6802ecd2055f09fc6d7421f25c1aad5900a0c4b3f8",
+      "tags": [
+        "topic.phase"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.phase",
+          "quote": "属于一期行情，需要等到20日线",
+          "startLine": 10,
+          "endLine": 10,
+          "reason": "双模型一致：明确以“一期行情”分期框架组织观点；复核：明确以一期行情定位当前阶段，是全文风险判断的框架。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：短文为经验性阶段判断，仅3句，证据有限。\nCodex · gpt-6.1-sol：原文简短，核心是一期行情初期的风险及等待原则；20日线仅为等待条件，不单列主题。",
+        "disagreements": [
+          {
+            "tagId": "topic.ma20",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.trend",
+            "model": "DeepSeek · deepseek-chat"
+          },
+          {
+            "tagId": "purpose.risk",
+            "model": "Codex · gpt-6.1-sol"
+          },
+          {
+            "tagId": "kind.principle",
+            "model": "Codex · gpt-6.1-sol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:非典型摸线.md",
+      "sourceHash": "7cf140ae2387cbc72c4f13bc36378f8ca2d7efbca07f82655e009782dc5713a8",
+      "tags": [
+        "topic.boll"
+      ],
+      "evidence": [
+        {
+          "tagId": "topic.boll",
+          "quote": "在所有均线以下，这时看布林线",
+          "startLine": 9,
+          "endLine": 9,
+          "reason": "双模型一致：全文唯一实质内容，说明均线下方时改用BOLL观察，核心主题为BOLL；复核：全文唯一正文明确以布林线为观察重点。",
+          "method": "ai"
+        }
+      ],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：原文仅一行正文，标签依据有限；未选周期与用途，因无明确证据。\nCodex · gpt-6.1-sol：正文仅一句，核心为均线下方时参考布林线，其他维度证据不足。",
+        "disagreements": [
+          {
+            "tagId": "topic.ma",
+            "model": "DeepSeek · deepseek-chat"
+          }
+        ]
+      }
+    },
+    {
+      "id": "note:非典摸线.md",
+      "sourceHash": "16ee68470563753a192c3810956f304d099fa466e740df273a72d837b0408e66",
+      "tags": [],
+      "evidence": [],
+      "extraction": {
+        "models": [
+          "DeepSeek · deepseek-chat",
+          "Codex · gpt-6.1-sol"
+        ],
+        "note": "DeepSeek · deepseek-chat：正文仅有图片链接，无可引用的文字内容，无法提取有效标签。\nCodex · gpt-6.1-sol：仅含图片附件，无可用正文证据。",
+        "disagreements": []
+      }
+    }
+  ]
+}

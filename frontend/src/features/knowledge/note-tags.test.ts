@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { currentTagRecords, filterTagRecords, parseTagLedger, reviseTags, reviewTags, type NoteTagRecord } from './note-tags'
+import { applyAIOriginalTags, currentTagRecords, filterTagRecords, parseTagLedger, reviseTags, reviewTags, type NoteCatalog, type NoteTagRecord } from './note-tags'
 
 export const taggedNote: NoteTagRecord = {
   id: 'note:选股总结.md', level: 'document', file: '选股总结.md', title: '选股总结',
@@ -15,6 +15,32 @@ export const taggedNote: NoteTagRecord = {
 }
 
 describe('note tag revisions', () => {
+  it('replaces machine baselines without replacing manual revisions or accepting changed source bindings', () => {
+    const catalog = { documents: [taggedNote], fragments: [] } as unknown as NoteCatalog
+    const result = { id: taggedNote.id, sourceHash: taggedNote.sourceHash, tags: ['topic.ma5'], evidence: [{ ...taggedNote.evidence[0], method: 'ai' as const }], extraction: { models: ['DeepSeek', 'Codex'], note: '双模型一致', disagreements: [] } }
+    const updated = applyAIOriginalTags(catalog, [result])
+    expect(updated.documents[0].tags).toEqual(['topic.ma5'])
+    expect(taggedNote.tags.length).toBeGreaterThan(1)
+    const manual = reviewTags(taggedNote, '2026-10-20T01:00:00Z')
+    expect(currentTagRecords(updated.documents, [manual])[0].tags).toEqual(taggedNote.tags)
+    expect(applyAIOriginalTags(catalog, [{ ...result, sourceHash: 'b'.repeat(64) }]).documents[0]).toBe(taggedNote)
+    expect(parseTagLedger(JSON.stringify({ schemaVersion: 1, records: updated.documents }))).toHaveLength(1)
+  })
+  it('keeps insufficient-text candidates empty and editable without manufacturing placeholder tags', () => {
+    const empty = { ...taggedNote, tags: [], evidence: [], sourceReferences: [taggedNote.evidence[0]] }
+    expect(parseTagLedger(JSON.stringify({ schemaVersion: 1, records: [empty] }))).toHaveLength(1)
+    expect(() => reviewTags(empty, '2026-10-20T01:00:00Z')).toThrow('尚无可确认标签')
+    const next = reviseTags(empty, { tags: ['purpose.risk'], evidence: empty.sourceReferences[0], reason: '人工核对用途' }, '2026-10-20T01:00:00Z')
+    expect(next.evidence[0].tagId).toBe('purpose.risk')
+  })
+  it('persists supplementary evidence separately and refuses changed quotes', () => {
+    const draft = { tags: [...taggedNote.tags, 'purpose.risk'], reason: '补充用途', evidence: taggedNote.evidence[0], supplement: '只用于风险控制', supplementEvidence: [{ tagId: 'purpose.risk', quote: '风险控制', reason: '用户说明用途' }] }
+    const next = reviseTags(taggedNote, draft, '2026-10-20T01:00:00Z')
+    expect(next.evidence.some((item) => item.tagId === 'purpose.risk')).toBe(false)
+    expect(parseTagLedger(JSON.stringify({ schemaVersion: 1, records: [next] }))[0].supplement).toBe(draft.supplement)
+    expect(taggedNote).not.toHaveProperty('supplement')
+    expect(() => reviseTags(next, { ...draft, supplement: '另有用途' }, '2026-10-20T02:00:00Z')).toThrow('依据已变化')
+  })
   it('combines facet filters and searches tag labels without matching another stock by implication', () => {
     const other = { ...taggedNote, id: 'note:估值.md', title: '估值', tags: ['topic.valuation'] }
     expect(filterTagRecords([taggedNote, other], { query: 'MA5', facets: { purpose: 'purpose.screen' } })).toEqual([taggedNote])

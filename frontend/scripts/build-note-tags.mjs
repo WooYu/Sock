@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url'
 
 const scriptDir = dirname(fileURLToPath(import.meta.url))
 const taxonomy = JSON.parse(readFileSync(resolve(scriptDir, '../src/features/knowledge/note-tag-taxonomy.json'), 'utf8'))
+const noteTitles = JSON.parse(readFileSync(resolve(scriptDir, '../src/features/knowledge/note-titles.json'), 'utf8'))
 const knownTags = new Set(taxonomy.flatMap((dimension) => dimension.options.map((tag) => tag.id)))
 // These matches produce reviewable topic candidates, never executable trading conditions.
 const patterns = [
@@ -88,7 +89,7 @@ export function buildNoteCatalog({ root, commit, generatedAt }) {
     if (!first.quote) throw new Error(`Completely empty file requires source evidence before labeling: ${file}`)
     const common = { file, sourceHash, sourceUrl, tags: [], evidence: [], gaps: [], status: 'candidate', version: 1, createdAt: generatedAt, revisionReason: '自动候选标签，尚待人工核对。' }
     const oldDoc = oldDocs.get(file)
-    const document = { ...common, id: `note:${file}`, level: 'document', title: file.replace(/\.md$/, ''), sourceExcerpt: first.quote,
+    const document = { ...common, id: `note:${file}`, level: 'document', title: noteTitles[file] ?? file.replace(/\.md$/, ''), sourceExcerpt: first.quote,
       summary: oldDoc?.summary ?? '旧研究尚未覆盖；本次从原文生成候选标签。', tags: [], evidence: [], gaps: [] }
     if (!sources.length) document.gaps.push('只有标题／元数据，缺少可解析正文；本篇标签仅为目录候选。')
     dictionaryTags(document, sources)
