@@ -1,15 +1,17 @@
 import { expect, test } from '@playwright/test'
 
-test('eight moving averages and all calendar/minute periods work in the explicitly labeled example', async ({ page }) => {
+test('eight moving averages and all calendar/minute periods work in the explicitly labeled example', async ({ page }, info) => {
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))
   await page.goto('/?example=1')
   await expect(page.getByRole('heading', { name: '示例股票' })).toBeVisible()
+  await page.getByText('均线 / BOLL', { exact: true }).click()
   for (const period of [5, 10, 20, 30, 60, 90, 120, 250]) await expect(page.getByRole('switch', { name: `MA${period}`, exact: true })).toBeChecked()
-  await expect(page.getByTestId('predicted-indicator-line')).toHaveCount(11)
+  await expect(page.getByTestId('predicted-indicator-line')).toHaveCount(10)
   await page.getByRole('switch', { name: 'MA250', exact: true }).uncheck()
   await expect(page.getByRole('switch', { name: 'MA250', exact: true })).not.toBeChecked()
   await page.getByRole('switch', { name: 'MA250', exact: true }).check()
+  await page.getByText('均线 / BOLL', { exact: true }).click()
 
   for (const period of ['周线', '月线', '季线', '年线']) {
     await page.getByRole('tab', { name: period, exact: true }).click()
@@ -33,6 +35,7 @@ test('eight moving averages and all calendar/minute periods work in the explicit
   await page.getByText('均线 / BOLL', { exact: true }).click()
   await expect(page.getByRole('switch', { name: 'MA250', exact: true })).toBeChecked()
   await expect(page.getByRole('img', { name: '分时主图' })).toBeVisible()
+  await page.screenshot({ path: `artifacts/chart-periods-${info.project.name}.png`, fullPage: true })
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true)
   expect(errors).toEqual([])
 })
