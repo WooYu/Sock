@@ -1,6 +1,10 @@
 import { expect, test } from '@playwright/test'
 import catalog from '../src/features/knowledge/note-tag-catalog.json'
 
+test.beforeEach(async ({ page }) => {
+  await page.route('**/api/sync/**', route => route.fulfill({ json: { nextCursor: 0, changes: [], applied: true, cursor: 0 } }))
+})
+
 test('previews independent model results and saves only after explicit adoption', async ({ page }) => {
   await page.route('**/api/note-tag-extraction', async route => {
     const input = route.request().postDataJSON()
@@ -29,4 +33,22 @@ test('previews independent model results and saves only after explicit adoption'
   await expect(page.getByRole('region', { name: '标签详情' })).toContainText('本次双模型提取')
   await page.reload()
   await expect(page.getByRole('region', { name: '标签详情' })).toContainText('本次双模型提取')
+})
+
+test('labels a DeepSeek-only result as a single-model candidate', async ({ page }) => {
+  await page.route('**/api/note-tag-extraction', async route => {
+    const input = route.request().postDataJSON()
+    const record = catalog.documents.find(item => item.id === input.id)!
+    const evidence = [{ ...record.evidence[0], tagId: 'topic.ma', method: 'ai', reason: '原文核心主题' }]
+    await route.fulfill({ json: { ...input, models: [{ name: 'DeepSeek', tags: ['topic.ma'], evidence }], candidate: { ...input, tags: ['topic.ma'], evidence, extraction: { models: ['DeepSeek'], note: 'DeepSeek 单模型提取', disagreements: [] } } } })
+  })
+  await page.goto('/knowledge?view=notes')
+  await page.getByRole('button', { name: 'AI 重新提取标签', exact: true }).click()
+  const preview = page.getByRole('region', { name: 'AI 重新提取', exact: true })
+  await expect(preview).toContainText('单模型候选：')
+  await expect(preview).not.toContainText('双模型一致')
+  await preview.getByRole('button', { name: '采用本次结果并编辑' }).click()
+  const editor = page.getByRole('dialog')
+  await expect(editor.getByLabel('修订原因')).toHaveValue('采用 DeepSeek 从完整原文重新提取的核心标签。')
+  await editor.getByRole('button', { name: '取消标签编辑' }).click()
 })
