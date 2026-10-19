@@ -389,14 +389,15 @@ describe('ChartCanvas', () => {
   })
 
   test('intraday crosshair shows timestamp, price and supplied average without invented OHLC or VWAP', () => {
-    const { container } = render(<ChartCanvas {...baseProps} kind="intraday" period="intraday" prediction={null} candles={intraday.map((candle) => ({ ...candle, averagePrice: undefined }))} transform={intradayTransform} crosshair />)
+    const { container } = render(<ChartCanvas {...baseProps} kind="intraday" period="intraday" prediction={null} indicators={{ ma5: true, boll: true }} candles={intraday.map((candle) => ({ ...candle, averagePrice: undefined }))} transform={intradayTransform} crosshair />)
     const chart = screen.getByRole('img', { name: '分时主图' })
     fireEvent.pointerMove(chart, { pointerId: 3, clientX: intradayTransform.xForTime(intraday[1].day), clientY: 172 })
     const tooltip = screen.getByTestId('crosshair-tooltip')
     expect(tooltip).toHaveTextContent('2026-09-16 09:32 +08:00')
     expect(tooltip).toHaveTextContent('价格 10.20')
     expect(tooltip).toHaveTextContent('均价 --')
-    expect(tooltip).not.toHaveTextContent(/开 |高 |低 |收 |MA5/)
+    expect(tooltip).not.toHaveTextContent(/开 |高 |低 |收 /)
+    expect(tooltip).toHaveTextContent('MA5 --')
     expect(screen.queryByTestId('intraday-average-line')).not.toBeInTheDocument()
     expect(screen.queryByTestId('previous-close-line')).not.toBeInTheDocument()
     expect(within(container.querySelector('[aria-label="交易时间"]') as HTMLElement).getByText('09:31')).toBeInTheDocument()
@@ -424,5 +425,29 @@ describe('ChartCanvas', () => {
     expect(container.querySelector('[aria-label="交易日期"]')).toHaveTextContent(label)
     fireEvent.pointerMove(screen.getByRole('img', { name: 'K线主图' }), { pointerId: 3, clientX: calendarTransform.xForTime(time), clientY: 172 })
     expect(screen.getByTestId('crosshair-tooltip')).toHaveTextContent(label)
+  })
+})
+
+
+describe('历史信息与预测涨跌范围', () => {
+  test('指针模式在十字光标关闭时仍显示历史价格和指标', () => {
+    render(<ChartCanvas {...baseProps} indicators={{ ma5: true, boll: true }} indicatorValues={{ ...baseProps.indicatorValues, ma5: [99, 100], boll: { upper: [105, 106], middle: [100, 101], lower: [95, 96] } }} />)
+    fireEvent.pointerMove(screen.getByRole('img', { name: 'K线主图' }), { clientX: transform.xForTime(candles[0].day), clientY: 150 })
+    const tooltip = screen.getByTestId('crosshair-tooltip')
+    expect(within(tooltip).getByText('收 100.00')).toBeInTheDocument()
+    expect(within(tooltip).getByText('MA5 99.00')).toBeInTheDocument()
+    expect(within(tooltip).getByText('BOLL上 105.00')).toBeInTheDocument()
+    fireEvent.pointerLeave(screen.getByRole('img', { name: 'K线主图' }))
+    expect(screen.queryByTestId('crosshair-tooltip')).not.toBeInTheDocument()
+  })
+
+  test('预测每日竖线常显，仅标记累计涨跌限制内的值并备注百分比', () => {
+    const times = ['2026-09-08', '2026-09-09', '2026-09-10', '2026-09-11']
+    const forecastTransform = createChartTransform({ times: [...candles.map(c => c.day), ...times], minPrice: 80, maxPrice: 150, rect: { left: 58, top: 22, width: 850, height: 300 } })
+    render(<ChartCanvas {...baseProps} prediction={null} transform={forecastTransform} projectedTimes={times} limitRatio={0.1} selectedProjectionTime={times[0]} indicators={{ ma5: true }} indicatorValues={{ ...baseProps.indicatorValues, ma5: [99, 100, 110, 140, null, 120] }} />)
+    expect(screen.getAllByTestId('projection-day-line')).toHaveLength(4)
+    expect(screen.getAllByTestId('projection-within-limit')).toHaveLength(2)
+    expect(screen.getByTestId('projection-tooltip')).toHaveTextContent('+8.91%')
+    expect(screen.getByTestId('projection-tooltip')).toHaveTextContent('每日 ±10.00%')
   })
 })

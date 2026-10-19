@@ -8,7 +8,8 @@ export type IndicatorProjection = { day: string; estimated: boolean; horizon: nu
 
 /** Keep unknown holiday dates explicit. Minute slots skip lunch and overnight closures. */
 export function projectionTimes(origin: string, period: ChartPeriod, calendar: TradingCalendar | null, count = 4): Array<{ day: string; estimated: boolean }> {
-  if (period === 'intraday' || !origin) return []
+  if (!origin) return []
+  if (period === 'intraday') return projectionTimes(origin, '1m', calendar, count)
   if (!Number.isSafeInteger(count) || count < 1 || count > 240) throw new RangeError('Projection count must be 1–240')
   const known = calendar?.tradingDays ?? []
   const originDay = origin.slice(0, 10)
@@ -41,7 +42,7 @@ export function projectionTimes(origin: string, period: ChartPeriod, calendar: T
 
 /** Same average increment as the scenario table: the last three observations give two increments. */
 export function projectIndicators(candles: Candle[], period: ChartPeriod, calendar: TradingCalendar | null, count = 4): IndicatorProjection[] {
-  if (!candles.length || period === 'intraday') return []
+  if (!candles.length) return []
   const bands = bollinger(candles, 20, 2)
   const series = { ...Object.fromEntries(MA_PERIODS.map(n => [`ma${n}`, movingAverage(candles, n)])), bollUpper: bands.upper, bollMiddle: bands.middle, bollLower: bands.lower }
   return projectionTimes(candles.at(-1)!.day, period, calendar, count).map((target, index) => {
@@ -80,4 +81,27 @@ export function projectSessionIndicators(candles: Candle[], period: ChartPeriod,
     if (candidates.length && end.values[key] !== null) ranges[key] = [Math.min(...candidates), Math.max(...candidates)]
   }
   return { ...end, ranges }
+}
+
+/** Count daily limit applications through the target bucket's end, never per minute bar. */
+export function projectionLimitDays(origin: string, target: string, period: ChartPeriod, calendar: TradingCalendar | null): { days: number; estimated: boolean } | null {
+  if (origin.startsWith('forecast:') || target.startsWith('forecast:')) return null
+  const bucketEnd = (time: string) => {
+    const d = new Date(time.slice(0, 10) + 'T00:00:00Z')
+    if (period === 'week') d.setUTCDate(d.getUTCDate() + 6)
+    if (period === 'month') { d.setUTCMonth(d.getUTCMonth() + 1, 0) }
+    if (period === 'quarter') { d.setUTCMonth(d.getUTCMonth() + 3, 0) }
+    if (period === 'year') { d.setUTCFullYear(d.getUTCFullYear() + 1, 0, 0) }
+    return d
+  }
+  const start = bucketEnd(origin), end = bucketEnd(target)
+  if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime()) || end < start) return null
+  let days = 0, estimated = false
+  for (start.setUTCDate(start.getUTCDate() + 1); start <= end; start.setUTCDate(start.getUTCDate() + 1)) {
+    const day = start.toISOString().slice(0, 10)
+    if (calendar && day >= calendar.fromDay && day <= calendar.throughDay) {
+      if (calendar.tradingDays.includes(day)) days++
+    } else { estimated = true; if (![0, 6].includes(start.getUTCDay())) days++ }
+  }
+  return { days, estimated }
 }

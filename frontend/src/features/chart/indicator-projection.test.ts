@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { projectIndicators, projectionTimes, projectSessionIndicators } from './indicator-projection'
+import { projectIndicators, projectionTimes, projectSessionIndicators, projectionLimitDays } from './indicator-projection'
 import { MA_PERIODS } from './chart-periods'
 import { movingAverage } from './chart-math'
 import type { Candle } from '../workspace/stock-workspace-types'
@@ -21,7 +21,7 @@ test('does not invent long MA values when observations are insufficient', () => 
   const points = projectIndicators(candles.slice(0, 21), 'day', null)
   expect(points.every(p => p.values.ma250 === null && p.values.ma20 === null && p.ranges.ma250 === undefined)).toBe(true)
   expect(projectIndicators([], 'day', null)).toEqual([])
-  expect(projectIndicators(candles, 'intraday', null)).toEqual([])
+  expect(projectIndicators(candles.map(c => ({ ...c, day: '2026-10-16T10:00:00+08:00' })), 'intraday', null)).toHaveLength(4)
 })
 test('marks unverified dates estimated, skips weekends and minute lunch/overnight closures', () => {
   expect(projectionTimes('2026-10-16', 'day', null)[0]).toEqual({ day: '2026-10-19', estimated: true })
@@ -41,4 +41,13 @@ test('minute daily reach includes every remaining session bar, rather than only 
   expect(reach.horizon).toBe(210)
   expect(reach.ranges.ma250).toBeDefined()
   expect(projectSessionIndicators(candles, 'day', null)).toBeNull()
+})
+
+test('all periods count daily limits rather than applying a daily limit per bar', () => {
+  expect(projectionLimitDays('2026-10-16T10:00:00+08:00', '2026-10-16T10:04:00+08:00', '1m', null)?.days).toBe(0)
+  expect(projectionLimitDays('2026-10-16T15:00:00+08:00', '2026-10-19T09:31:00+08:00', 'intraday', null)?.days).toBe(1)
+  expect(projectionLimitDays('2026-10-12', '2026-10-19', 'week', null)?.days).toBe(5)
+  expect(projectionLimitDays('2026-10-01', '2026-11-01', 'month', null)?.days).toBe(21)
+  expect(projectionLimitDays('2026-10-01', '2027-01-01', 'quarter', null)?.days).toBe(64)
+  expect(projectionLimitDays('2026-01-01', '2027-01-01', 'year', null)?.days).toBe(261)
 })

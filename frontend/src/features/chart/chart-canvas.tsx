@@ -15,6 +15,7 @@ import type { IndicatorProjection } from './indicator-projection'
 type ChartCanvasProps = {
   candles: Candle[]
   kind?: 'candles' | 'intraday'
+  limitRatio?: number
   previousClose?: number
   prediction: PredictionSnapshot | null
   transform: ChartTransform
@@ -209,7 +210,8 @@ function CrosshairTooltip({ candle, price, index, kind, period, transform, indic
   cells.push({ label: '光标', value: priceText(price) })
   if (kind === 'intraday') {
     if ('volume' in candle && Number.isFinite(candle.volume)) cells.push({ label: '成交量', value: candle.volume.toLocaleString('zh-CN') })
-  } else {
+  }
+  {
     for (const key of maKeys) if (indicators[key]) cells.push({ label: key.toUpperCase(), value: optionalPriceText(indicatorValues[key]?.[index]), color: MA_COLORS[key] })
     if (indicators.boll) {
       cells.push({ label: 'BOLL上', value: optionalPriceText(indicatorValues.boll.upper[index]), color: '#bcc9ff' })
@@ -264,7 +266,7 @@ export function ChartCanvas(props: ChartCanvasProps) {
   const createPointDrawing = (event: ReactMouseEvent<SVGSVGElement>) => {
     if (consumeGestureClick.current) { consumeGestureClick.current = false; return }
     if (props.activeTool === 'pointer' || props.activeTool === 'pan' || props.activeTool === 'trend-line' || props.activeTool === 'rectangle') {
-      if (props.activeTool === 'pointer') props.onSelectDrawing(null)
+      if (props.activeTool === 'pointer') { props.onSelectDrawing(null); setCrosshairPoint(svgPoint(event)) }
       return
     }
     if (!dataPoint(event).time.startsWith('forecast:')) props.onCreateDrawing(drawing(props.activeTool, [dataPoint(event)]))
@@ -380,7 +382,7 @@ export function ChartCanvas(props: ChartCanvasProps) {
       if (delta) { props.onPan?.(delta); active.moved = true }
       active.lastClientX = event.clientX
     }
-    if (props.crosshair) setCrosshairPoint(svgPoint(event))
+    if (props.crosshair || props.activeTool === 'pointer') setCrosshairPoint(svgPoint(event))
   }
   const handleKeyDown = (event: ReactKeyboardEvent<SVGSVGElement>) => {
     const modifier = event.ctrlKey || event.metaKey
@@ -429,13 +431,13 @@ export function ChartCanvas(props: ChartCanvasProps) {
   const crosshairPrice = crosshairPoint ? props.transform.priceForY(crosshairPoint.y) : null
 
   return (
-    <svg aria-keyshortcuts="Delete Escape Control+Z Meta+Z Control+Y Meta+Y" aria-label={kind === 'intraday' ? '分时主图' : 'K线主图'} className={`sc-kline-svg ${props.panOnPointer ? 'sc-kline-svg-interactive' : ''}`} onDoubleClick={() => { if (props.activeTool === 'pointer' || props.activeTool === 'pan') props.onViewportReset?.() }} onClick={createPointDrawing} onKeyDown={handleKeyDown} onLostPointerCapture={clearLostPointerGesture} onPointerCancel={cancelPointerGesture} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} preserveAspectRatio={props.panOnPointer ? 'none' : 'xMidYMid meet'} ref={svgRef} role="img" tabIndex={0} viewBox={`0 0 ${viewBox.width} ${viewBox.height}`}>
+    <svg aria-keyshortcuts="Delete Escape Control+Z Meta+Z Control+Y Meta+Y" aria-label={kind === 'intraday' ? '分时主图' : 'K线主图'} className={`sc-kline-svg ${props.panOnPointer ? 'sc-kline-svg-interactive' : ''}`} onPointerLeave={() => setCrosshairPoint(null)} onDoubleClick={() => { if (props.activeTool === 'pointer' || props.activeTool === 'pan') props.onViewportReset?.() }} onClick={createPointDrawing} onKeyDown={handleKeyDown} onLostPointerCapture={clearLostPointerGesture} onPointerCancel={cancelPointerGesture} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} preserveAspectRatio={props.panOnPointer ? 'none' : 'xMidYMid meet'} ref={svgRef} role="img" tabIndex={0} viewBox={`0 0 ${viewBox.width} ${viewBox.height}`}>
       <HistoricalLayer candles={props.candles} keyLevels={props.keyLevels} showKeyLevels={props.showKeyLevels} transform={props.transform} kind={kind} previousClose={props.previousClose} period={props.period} />
-      {kind === 'candles' ? <IndicatorLayer candles={props.candles} indicatorValues={props.indicatorValues} indicators={props.indicators} transform={props.transform} /> : <g data-chart-layer="indicator" />}
+      <IndicatorLayer candles={props.candles} indicatorValues={props.indicatorValues} indicators={props.indicators} transform={props.transform} />
       <g data-chart-layer="prediction">{prediction ? <PredictionLayer hoveredDay={props.hoveredDay} onHoverDay={props.onHoverDay} onSelectDay={props.onSelectPredictionDay} prediction={prediction} selectedDay={props.selectedPredictionDay} transform={props.transform} /> : null}</g>
-      {props.projectedTimes?.length ? <IndicatorProjectionLayer selectedTime={props.selectedProjectionTime} onSelect={props.onSelectProjectionTime} times={props.projectedTimes} estimated={props.projectedEstimated} ranges={props.projectedRanges} historicalCount={props.candles.length} transform={props.transform} period={props.period} indicators={props.indicators} values={props.indicatorValues} interactive={props.activeTool === 'pointer'} /> : null}
+      {props.projectedTimes?.length ? <IndicatorProjectionLayer previousClose={props.previousClose} baseClose={props.candles.at(-1)?.close} limitRatio={props.limitRatio} selectedTime={props.selectedProjectionTime} onSelect={props.onSelectProjectionTime} times={props.projectedTimes} estimated={props.projectedEstimated} ranges={props.projectedRanges} historicalCount={props.candles.length} transform={props.transform} period={props.period} indicators={props.indicators} values={props.indicatorValues} interactive={props.activeTool === 'pointer'} /> : null}
       <g data-chart-layer="drawing">{props.showDrawings ? <DrawingLayer drawings={props.drawings} interactionsDisabled={props.activeTool === 'pan'} onFocusEditor={() => svgRef.current?.focus()} onMoveDrawing={beginDrawingMove} onMovePoint={beginPointMove} onSelect={props.onSelectDrawing} selectedId={props.selectedId} transform={props.transform} /> : null}</g>
-      <g data-chart-layer="crosshair">{props.crosshair && crosshairPoint && crosshairCandle && crosshairPrice !== null ? <g data-testid="crosshair-layer"><line className="sc-crosshair" x1={props.transform.xForTime(crosshairCandle.day)} x2={props.transform.xForTime(crosshairCandle.day)} y1={props.transform.rect.top} y2={volumeTop + volumeHeight} /><line className="sc-crosshair" x1={props.transform.rect.left} x2={props.transform.rect.left + props.transform.rect.width} y1={props.transform.yForPrice(crosshairPrice)} y2={props.transform.yForPrice(crosshairPrice)} /><CrosshairTooltip candle={crosshairCandle} price={crosshairPrice} index={crosshairIndex} kind={kind} period={props.period} transform={props.transform} indicators={props.indicators} indicatorValues={props.indicatorValues} /></g> : null}</g>
+      <g data-chart-layer="crosshair">{(props.crosshair || props.activeTool === 'pointer') && crosshairPoint && crosshairCandle && crosshairPrice !== null ? <g data-testid="crosshair-layer"><line className="sc-crosshair" x1={props.transform.xForTime(crosshairCandle.day)} x2={props.transform.xForTime(crosshairCandle.day)} y1={props.transform.rect.top} y2={volumeTop + volumeHeight} /><line className="sc-crosshair" x1={props.transform.rect.left} x2={props.transform.rect.left + props.transform.rect.width} y1={props.transform.yForPrice(crosshairPrice)} y2={props.transform.yForPrice(crosshairPrice)} /><CrosshairTooltip candle={crosshairCandle} price={crosshairPrice} index={crosshairIndex} kind={kind} period={props.period} transform={props.transform} indicators={props.indicators} indicatorValues={props.indicatorValues} /></g> : null}</g>
     </svg>
   )
 }
