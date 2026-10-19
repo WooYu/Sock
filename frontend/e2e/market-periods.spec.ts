@@ -16,6 +16,7 @@ test('eight moving averages and all calendar/minute periods work in the explicit
     await expect(page.getByText(`当前周期：${period}`, { exact: true })).toBeVisible()
     await expect(page.getByTestId('candlestick-layer')).toBeVisible()
     await expect(page.getByTestId('prediction-candle')).toHaveCount(0)
+    await expect(page.getByTestId('projection-day-line')).toHaveCount(4)
   }
   await expect(page.getByText(/MA250 历史不足|MA.*历史不足/)).toBeVisible()
   for (const [value, name] of [['1m', '1分钟'], ['5m', '5分钟'], ['15m', '15分钟'], ['30m', '30分钟'], ['60m', '1小时'], ['120m', '2小时']]) {
@@ -23,11 +24,14 @@ test('eight moving averages and all calendar/minute periods work in the explicit
     await expect(page.getByText(`当前周期：${name}`, { exact: true })).toBeVisible()
     await expect(page.getByTestId('candlestick-layer')).toBeVisible()
     await expect(page.getByText(/正在加载.*行情/)).toHaveCount(0)
+    await expect(page.getByTestId('projection-day-line')).toHaveCount(4)
   }
   await page.getByRole('tab', { name: '分时', exact: true }).click()
   await expect(page.getByText('当前周期：分时', { exact: true })).toBeVisible()
   await expect(page.getByTestId('candlestick-layer')).toHaveCount(0)
-  await expect(page.getByRole('switch', { name: 'MA250', exact: true })).toHaveCount(0)
+  await expect(page.getByTestId('projection-day-line')).toHaveCount(4)
+  await page.getByText('均线 / BOLL', { exact: true }).click()
+  await expect(page.getByRole('switch', { name: 'MA250', exact: true })).toBeChecked()
   await expect(page.getByRole('img', { name: '分时主图' })).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true)
   expect(errors).toEqual([])
