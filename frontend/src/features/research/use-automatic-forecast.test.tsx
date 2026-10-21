@@ -12,11 +12,13 @@ beforeEach(() => localStorage.clear())
 const series = (symbol: string, period: ChartPeriod) => seriesFixture({ symbol, period: period as AnalysisPeriod,
   closes: Array.from({ length: 30 }, (_, i) => 10 + i * .1), fetchedAt: '2026-10-15T16:00:00+08:00' })
 
-test('automatically descends day then hour then 30m and calculates all four horizons without saving confirmations', async () => {
+test('automatically descends through 15m and calculates all four horizons without saving confirmations', async () => {
   const client = { series: vi.fn(async (symbol: string, period: ChartPeriod) => series(symbol, period)) }
   const { result } = renderHook(() => useAutomaticForecast({ symbol: '603533', sourceMode: 'real', client }))
-  await waitFor(() => expect(result.current.periods).toEqual(['day', '60m', '30m']), { timeout: 15000 })
+  await waitFor(() => expect(result.current.periods).toEqual(['day', '60m', '30m', '15m']), { timeout: 15000 })
   expect(client.series.mock.calls.findIndex(c => c[1] === '60m')).toBeLessThan(client.series.mock.calls.findIndex(c => c[1] === '30m'))
+  expect(client.series.mock.calls.findIndex(c => c[1] === '30m')).toBeLessThan(client.series.mock.calls.findIndex(c => c[1] === '15m'))
+  expect(result.current.analysis!.references.some(r => r.period === '15m' && r.valid)).toBe(true)
   expect(new Set(result.current.analysis!.references.map(r => r.target.horizon))).toEqual(new Set([1, 2, 3, 4]))
   expect(result.current.clearPeriod).toBeNull()
   expect(result.current.analysis!.annotations).toEqual({})
@@ -25,15 +27,15 @@ test('automatically descends day then hour then 30m and calculates all four hori
 
 test('failed smaller period keeps valid daily and hour forecasts without retrying indefinitely', async () => {
   const client = { series: vi.fn(async (symbol: string, period: ChartPeriod) => {
-    if (period === '30m') throw new Error('30分钟行情缺失')
+    if (period === '15m') throw new Error('15分钟行情缺失')
     return series(symbol, period)
   }) }
   const { result } = renderHook(() => useAutomaticForecast({ symbol: '603533', sourceMode: 'real', client }))
-  await waitFor(() => expect(result.current.analysis?.input.loadIssues['30m']).toContain('30分钟行情缺失'), { timeout: 15000 })
+  await waitFor(() => expect(result.current.analysis?.input.loadIssues['15m']).toContain('15分钟行情缺失'), { timeout: 15000 })
   await waitFor(() => expect(result.current.loading).toBe(false))
-  expect(result.current.periods).toEqual(['day', '60m'])
+  expect(result.current.periods).toEqual(['day', '60m', '30m'])
   expect(result.current.analysis!.mergedLevels.length).toBeGreaterThan(0)
-  expect(client.series.mock.calls.filter(c => c[1] === '30m')).toHaveLength(1)
+  expect(client.series.mock.calls.filter(c => c[1] === '15m')).toHaveLength(1)
 })
 
 test('a saved valid daily trend and mode stop automatic drilling at daily', async () => {

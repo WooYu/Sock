@@ -1,5 +1,5 @@
 import type { AnalysisPeriod, Indicator, ScenarioMode } from './scenario-types'
-export const PERIOD_NAMES: Record<AnalysisPeriod, string> = { day: '日线', '60m': '1小时', '30m': '30分钟' }
+export const PERIOD_NAMES: Record<AnalysisPeriod, string> = { day: '日线', '60m': '1小时', '30m': '30分钟', '15m': '15分钟' }
 export const INDICATOR_NAMES: Record<Indicator, string> = { ma5: 'MA5', ma10: 'MA10', ma20: 'MA20', ma30: 'MA30', ma60: 'MA60', ma90: 'MA90', ma120: 'MA120', ma250: 'MA250', bollUpper: 'BOLL上轨', bollMiddle: 'BOLL中轨', bollLower: 'BOLL下轨' }
 export const MODE_NAMES: Record<ScenarioMode, string> = { trend_climb: '上涨趋势', mirror_retest: '照镜子回抽', down_rebound: '下跌反抽', range: '箱体震荡' }
 export const DIRECTION_NAMES = { rising: '上涨', falling: '下跌', sideways: '震荡', unknown: '待确认' }
@@ -35,7 +35,7 @@ export function issueLabel(issue: string): string {
   if (issue.startsWith('invalid_ohlc:')) return 'K线价格数据无效：' + issue.slice(13)
   if (issue.startsWith('missing_bar:')) return '交易时段缺柱：' + issue.slice(12)
   if (issue.startsWith('conflicting_duplicate:')) return '同一K线存在冲突数据'
-  return issues[issue] ?? issue.replace(/^day：/, '日线：').replace(/^60m：/, '1小时：').replace(/^30m：/, '30分钟：')
+  return issues[issue] ?? issue.replace(/^day：/, '日线：').replace(/^60m：/, '1小时：').replace(/^30m：/, '30分钟：').replace(/^15m：/, '15分钟：')
 }
 export function displayTime(value: string | null): string {
   if (!value) return '待核实'

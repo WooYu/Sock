@@ -39,7 +39,7 @@ export function normalizeScenarioSeries(series: ChartSeries, asOf: string): Peri
     const end = Date.parse(barEndAt(period, key))
     if (end > cutoff && period !== 'day') {
       const endMinute = Number(key.slice(11, 13)) * 60 + Number(key.slice(14, 16))
-      const length = period === '60m' ? 60 : 30
+      const length = Number(period.slice(0, -1))
       const startMinute = endMinute - length
       const start = Date.parse(key.slice(0, 10) + 'T' + String(Math.floor(startMinute / 60)).padStart(2, '0') + ':' + String(startMinute % 60).padStart(2, '0') + ':00+08:00')
       if (start >= cutoff) continue

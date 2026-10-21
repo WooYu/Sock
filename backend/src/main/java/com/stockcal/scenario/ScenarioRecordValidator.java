@@ -11,7 +11,7 @@ import tools.jackson.databind.JsonNode;
 
 /** Checks frozen provenance and price consolidation; it does not certify chart-pattern predictions. */
 public final class ScenarioRecordValidator {
-    private static final Set<String> PERIODS=Set.of("day","60m","30m");
+    private static final Set<String> PERIODS=Set.of("day","60m","30m","15m");
     private static final Set<String> METHODS=Set.of("average_delta","last_delta","rolling_close");
     public record ValidatedForecast(SaveForecastRequest request, String clientRecordId, int clientVersion,
         String symbol, String kind, Instant clientCreatedAt, Instant inputAsOf, LocalDate anchorDay,
@@ -110,7 +110,7 @@ public final class ScenarioRecordValidator {
         boolean stale=false;
         var calendar=snapshot.path("input").path("calendar");
         for(var d:calendar.path("tradingDays")) if(d.asText().compareTo(day.toString())>0 && !endAt("day",d.asText()).isAfter(asOf))stale=true;
-        for(String period:List.of("60m","30m"))for(var b:snapshot.path("input").path("periods").path(period).path("closed")) {
+        for(String period:List.of("60m","30m","15m"))for(var b:snapshot.path("input").path("periods").path(period).path("closed")) {
             String key=text(b,"day");if(key.substring(0,10).compareTo(day.toString())>0 && key.substring(11,16).equals("15:00"))stale=true;
         }
         boolean noBand=ratio==null || stale;
@@ -152,7 +152,13 @@ public final class ScenarioRecordValidator {
     static Instant endAt(String period,String key) {
         if("day".equals(period))return LocalDate.parse(key).atTime(15,0).atOffset(java.time.ZoneOffset.ofHours(8)).toInstant();
         var end=OffsetDateTime.parse(key);String slot=end.toLocalTime().toString();
-        require(end.getOffset().getTotalSeconds()==8*3600 && ("60m".equals(period)?Set.of("10:30","11:30","14:00","15:00"):Set.of("10:00","10:30","11:00","11:30","13:30","14:00","14:30","15:00")).contains(slot),"周期结束时刻无效");return end.toInstant();
+        var slots = switch (period) {
+            case "60m" -> Set.of("10:30","11:30","14:00","15:00");
+            case "30m" -> Set.of("10:00","10:30","11:00","11:30","13:30","14:00","14:30","15:00");
+            case "15m" -> Set.of("09:45","10:00","10:15","10:30","10:45","11:00","11:15","11:30","13:15","13:30","13:45","14:00","14:15","14:30","14:45","15:00");
+            default -> Set.<String>of();
+        };
+        require(end.getOffset().getTotalSeconds()==8*3600 && slots.contains(slot),"周期结束时刻无效");return end.toInstant();
     }
     private static void validateCandle(JsonNode b) {
         double o=number(b,"open"),h=number(b,"high"),l=number(b,"low"),c=number(b,"close");

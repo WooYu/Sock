@@ -3,6 +3,13 @@ import { normalizeScenarioSeries } from './scenario-inputs'
 import { seriesFixture } from './scenario-test-fixtures'
 
 describe('scenario candle boundaries', () => {
+  test('15m_keeps_only_current_unfinished_bucket_as_observed', () => {
+    const asOf = '2026-10-12T10:05:00+08:00'
+    const series = seriesFixture({ period: '15m', closes: [10, 11, 12], dates: ['2026-10-12T10:00:00+08:00', '2026-10-12T10:15:00+08:00', '2026-10-12T10:30:00+08:00'], fetchedAt: asOf })
+    const result = normalizeScenarioSeries(series, asOf)
+    expect(result.closed.map(b => b.day)).toEqual(['2026-10-12T10:00:00+08:00'])
+    expect(result.observed.map(b => b.day)).toEqual(['2026-10-12T10:15:00+08:00'])
+  })
   test('daily_bar_stays_observed_before_1500', () => {
     const asOf = '2026-10-12T14:15:00+08:00'
     const result = normalizeScenarioSeries(seriesFixture({ dates: ['2026-10-09', '2026-10-12'], fetchedAt: asOf }), asOf)

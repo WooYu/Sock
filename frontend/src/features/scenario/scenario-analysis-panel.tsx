@@ -34,7 +34,7 @@ export function ScenarioAnalysisPanel(props: ScenarioAnalysisPanelProps) {
   return <ScenarioPanel key={props.symbol + ':' + props.sourceMode} {...props} />
 }
 function ScenarioPanel({ symbol, sourceMode, activePeriod, onPeriodChange, client = browserMarketClient, security }: ScenarioAnalysisPanelProps) {
-  const requestedPeriod: AnalysisPeriod = activePeriod === '60m' || activePeriod === '30m' ? activePeriod : 'day'
+  const requestedPeriod: AnalysisPeriod = activePeriod === '60m' || activePeriod === '30m' || activePeriod === '15m' ? activePeriod : 'day'
   const loader = useScenarioInputs({ symbol, sourceMode, calendar: scenarioCalendar, client })
   const [annotations, setAnnotations] = useState<AnalysisAnnotations>({})
   const [paths, setPaths] = useState<CloseScenario[]>([])
@@ -93,7 +93,7 @@ function ScenarioPanel({ symbol, sourceMode, activePeriod, onPeriodChange, clien
   const horizons = useMemo(() => horizonChoice.split(',').map(Number) as Horizon[], [horizonChoice])
   const scopedInput = useMemo(() => loader.input ? scopedPeriodInput(loader.input, annotations) : null, [loader.input, annotations])
   const plan = useMemo(() => scopedInput ? adaptivePeriodPlan(scopedInput, annotations) : null, [scopedInput, annotations])
-  const maximumPeriod = plan?.maxPeriod ?? '30m'
+  const maximumPeriod = plan?.maxPeriod ?? '15m'
   const retainThrough = loader.retainThrough
   useEffect(() => {
     let active = true
@@ -136,7 +136,8 @@ function ScenarioPanel({ symbol, sourceMode, activePeriod, onPeriodChange, clien
   async function choosePeriod(target: AnalysisPeriod) {
     if (history) { onPeriodChange(target); return }
     if (ANALYSIS_PERIODS.indexOf(target) > ANALYSIS_PERIODS.indexOf(maximumPeriod)) return
-    if (target === '30m' && !loader.input?.periods['60m'] && !loader.input?.loadIssues['60m']) return
+    const previous = ANALYSIS_PERIODS[ANALYSIS_PERIODS.indexOf(target) - 1]
+    if (previous && !loader.input?.periods[previous] && !loader.input?.loadIssues[previous]) return
     onPeriodChange(target)
     if (!loader.input?.periods[target]?.closed.length || loader.input?.loadIssues[target]) {
       setActionError(null)
@@ -198,8 +199,10 @@ function ScenarioPanel({ symbol, sourceMode, activePeriod, onPeriodChange, clien
     <nav className="sa-drill" aria-label="分析周期下钻">
       <button type="button" disabled={busy || loader.status === 'loading'} aria-pressed={period === 'day'} onClick={() => { void choosePeriod('day') }}>日线分析</button><span aria-hidden="true">→</span>
       <button type="button" disabled={busy || loader.status === 'loading' || !!history && !history.input.periods['60m']} aria-pressed={period === '60m'} onClick={() => { void choosePeriod('60m') }}>看1小时</button><span aria-hidden="true">→</span>
-      <button type="button" disabled={busy || loader.status === 'loading' || (history ? !history.input.periods['30m'] : maximumPeriod !== '30m' || !loader.input?.periods['60m'] && !loader.input?.loadIssues['60m'])}
+      <button type="button" disabled={busy || loader.status === 'loading' || (history ? !history.input.periods['30m'] : ANALYSIS_PERIODS.indexOf(maximumPeriod) < ANALYSIS_PERIODS.indexOf('30m') || !loader.input?.periods['60m'] && !loader.input?.loadIssues['60m'])}
         aria-pressed={period === '30m'} onClick={() => { void choosePeriod('30m') }}>继续看30分钟</button>
+      <span aria-hidden="true">→</span><button type="button" disabled={busy || loader.status === 'loading' || (history ? !history.input.periods['15m'] : maximumPeriod !== '15m' || !loader.input?.periods['30m'] && !loader.input?.loadIssues['30m'])}
+        aria-pressed={period === '15m'} onClick={() => { void choosePeriod('15m') }}>继续看15分钟</button>
     </nav>
     <div className="sa-state-grid">{ANALYSIS_PERIODS.filter(p => analysis?.input.periods[p] || analysis?.input.loadIssues[p] || !analysis && p === 'day').map(p => {
       const state = analysis?.states[p], input = analysis?.input.periods[p]

@@ -8,6 +8,12 @@ import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ObjectNode;
 
 class ScenarioRecordValidatorTest {
+    @Test void fifteenMinuteEndsRespectSessions() {
+        assertThat(ScenarioRecordValidator.endAt("15m","2026-10-12T09:45:00+08:00")).isEqualTo(java.time.Instant.parse("2026-10-12T01:45:00Z"));
+        assertThat(ScenarioRecordValidator.endAt("15m","2026-10-12T13:15:00+08:00")).isEqualTo(java.time.Instant.parse("2026-10-12T05:15:00Z"));
+        assertThatThrownBy(() -> ScenarioRecordValidator.endAt("15m","2026-10-12T12:15:00+08:00")).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> ScenarioRecordValidator.endAt("30m","2026-10-12T13:15:00+08:00")).isInstanceOf(IllegalArgumentException.class);
+    }
     private final JsonMapper json = JsonMapper.builder().build();
     ObjectNode fixture() {
         return (ObjectNode)json.readTree(getClass().getResourceAsStream("/scenario/valid-day-forecast.json"));

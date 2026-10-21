@@ -11,7 +11,8 @@ export function adaptivePeriodPlan(input: AnalysisInput, annotations: AnalysisAn
     return state && state.confirmed && state.direction !== 'unknown' && state.bars.length >= 22 && input.periods[period]?.source.online
       && selected?.barKey === state.bars.at(-1)?.day && modes.some(mode => mode.period === period && mode.status === 'confirmed')
   }) ?? null
-  const maxIndex = clearPeriod ? Math.min(ANALYSIS_PERIODS.indexOf(clearPeriod) + 1, 2) : 2
+  const lastIndex = ANALYSIS_PERIODS.length - 1
+  const maxIndex = clearPeriod ? Math.min(ANALYSIS_PERIODS.indexOf(clearPeriod) + 1, lastIndex) : lastIndex
   const attempted = ANALYSIS_PERIODS.filter(period => input.periods[period] || input.loadIssues[period])
   const includedPeriods = ANALYSIS_PERIODS.filter((period, index) => index <= maxIndex && input.periods[period])
   const deepestIndex = Math.max(0, ...attempted.map(period => ANALYSIS_PERIODS.indexOf(period)).filter(index => index <= maxIndex))

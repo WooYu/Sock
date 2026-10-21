@@ -1,6 +1,6 @@
 import { isIsoTimestamp } from '../chart/chart-periods'
 import { indicatorSeries } from './scenario-calculator'
-import { barEndAt } from './scenario-calendar'
+import { ANALYSIS_PERIODS, barEndAt } from './scenario-calendar'
 import type { AnalysisAnnotations, AnalysisKind, AnalysisPeriod, Confirmation, GranvilleStage, ModeCandidate, PeriodFacts, PeriodInput, PeriodState, ScenarioMode } from './scenario-types'
 
 export function confirmationIsKnown(c: Confirmation | undefined, input: Pick<PeriodInput, 'period' | 'closed' | 'asOf'>, kind: AnalysisKind): boolean {
@@ -84,13 +84,12 @@ export function annotationsForPeriod(annotations: AnalysisAnnotations, period: A
 }
 export function selectionPeriods(annotations: AnalysisAnnotations): AnalysisPeriod[] {
   const primary = annotations.mode?.period ?? annotations.mirror?.period ?? annotations.range?.period ?? 'day'
-  return [primary, ...(['day', '60m', '30m'] as const).filter(p => p !== primary && annotations.periodSelections?.[p]?.mode.period === p)]
+  return [primary, ...ANALYSIS_PERIODS.filter(p => p !== primary && annotations.periodSelections?.[p]?.mode.period === p)]
 }
 export function matchModeCandidates(states: Partial<Record<AnalysisPeriod, PeriodState>>, annotations: AnalysisAnnotations): ModeCandidate[] {
   return selectionPeriods(annotations).flatMap(period => matchSelectedModeCandidates(states, annotationsForPeriod(annotations, period)))
 }
-function matchSelectedModeCandidates(states: Partial<Record<AnalysisPeriod, PeriodState>>, annotations: AnalysisAnnotations): ModeCandidate[] {
-  const period = annotations.mode?.period ?? annotations.mirror?.period ?? annotations.range?.period ?? 'day'
+export function matchSelectedModeCandidates(states: Partial<Record<AnalysisPeriod, PeriodState>>, annotations: AnalysisAnnotations, period: AnalysisPeriod = annotations.mode?.period ?? annotations.mirror?.period ?? annotations.range?.period ?? 'day'): ModeCandidate[] {
   const state = states[period]
   const kinds: ScenarioMode[] = ['trend_climb', 'mirror_retest', 'down_rebound', 'range']
   return kinds.map(id => {

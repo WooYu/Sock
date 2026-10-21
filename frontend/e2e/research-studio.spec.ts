@@ -27,6 +27,45 @@ async function marketApi(page: Page, failPrediction = false) {
 }
 
 test.describe('K-line research studio', () => {
+  test('shows per-period trend and mode context and supports 15 minute forecasts', async ({ page }, info) => {
+    await page.goto('/?example=1')
+    const panel = page.getByRole('region', { name: '自动 MA/BOLL 预测', exact: true })
+    const periods = panel.getByRole('navigation', { name: '预测计算周期' })
+    await expect(periods.getByRole('button', { name: '15分钟', exact: true })).toBeEnabled({ timeout: 20000 })
+    for (const name of ['日线', '1小时', '30分钟', '15分钟']) {
+      const card = panel.getByRole('region', { name: name + '趋势与模式', exact: true })
+      await expect(card).toContainText('K线趋势')
+      await expect(card).toContainText('优先核对模式')
+      await card.getByText('核对全部盈利模式条件').click()
+      await expect(card.getByRole('listitem')).toHaveCount(4)
+    }
+    await periods.getByRole('button', { name: '15分钟', exact: true }).click()
+    const table = panel.getByRole('table', { name: '15分钟 MA/BOLL参考位', exact: true })
+    await expect(table).toBeVisible()
+    await expect(table.getByRole('columnheader', { name: /未来第/ })).toHaveCount(4)
+    await expect(table.locator('tbody tr').first()).not.toContainText('历史不足')
+    await panel.locator('.rs-period-context').screenshot({ path: `artifacts/forecast-context-${info.project.name}.png` })
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  })
+
+  test('shows indicator movement and sorts forecast rows', async ({ page }) => {
+    await page.goto('/?example=1')
+    const panel = page.getByRole('region', { name: '自动 MA/BOLL 预测', exact: true })
+    const table = panel.getByRole('table', { name: /日线 MA\/BOLL参考位/ })
+    await expect(panel.getByLabel('指标排序')).toBeVisible({ timeout: 20000 })
+    const sorting = panel.getByLabel('指标排序')
+    await sorting.selectOption('rise')
+    const changes = await table.locator('tbody th small').allTextContents()
+    const percentages = changes.map(text => Number(text.match(/([+-]?\d+\.\d+)%/)![1]))
+    expect(percentages).toEqual([...percentages].sort((a, b) => b - a))
+    const coloredValues = table.locator('td strong.sa-tone-rise, td strong.sa-tone-fall')
+    expect(await coloredValues.count()).toBeGreaterThan(0)
+    await expect(table.locator('td.sa-forecast-start').first()).toBeVisible()
+    await sorting.selectOption('indicator')
+    await expect(table.locator('tbody th').first()).toContainText('MA5')
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  })
+
   test('opens search with a shortcut, clears without closing, and restores focus after selection', async ({ page }, info) => {
     await marketApi(page)
     await page.goto('/?example=1')

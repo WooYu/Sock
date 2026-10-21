@@ -9,6 +9,8 @@ import { INDICATOR_NAMES, PERIOD_NAMES } from '../scenario/scenario-labels'
 import type { AnalysisPeriod } from '../scenario/scenario-types'
 import { findHistoricalMatches } from './research-context'
 import { levelEvidence } from './forecast-evidence'
+import { ANALYSIS_PERIODS } from '../scenario/scenario-calendar'
+import { ForecastPeriodContext } from './forecast-period-context'
 
 export function AutomaticForecastPanel({ forecast, selected, onSelect, rules = [], stockAnalysis, compact = false }: {
   forecast: AutomaticForecast; selected: MergedLevel | null; onSelect: (level: MergedLevel) => void;
@@ -23,11 +25,11 @@ export function AutomaticForecastPanel({ forecast, selected, onSelect, rules = [
   const evidence = selected ? levelEvidence(selected, close, rules, stockAnalysis, history) : null
   return <section className={`rs-auto-forecast ${compact ? 'is-compact' : ''}`} id={compact ? undefined : 'automatic-forecast-results'} aria-label={compact ? '预测候选价位' : '自动 MA/BOLL 预测'}>
     <header><div><h2>{compact ? '合并候选价位' : 'MA / BOLL 预测'}</h2><p>{compact ? '选择价位，核对下方依据' : '历史 3 根 → 未来 4 根 → 合并价位 → 选择依据'}</p></div>{!compact ? <button type="button" className="rs-button" onClick={() => void forecast.refresh()} disabled={forecast.loading}>重新计算</button> : null}</header>
-    {!compact ? <p className="rs-auto-status" role="status">{forecast.loading ? '正在自动核对日线 → 1小时 → 30分钟…' : forecast.clearPeriod ? `${PERIOD_NAMES[forecast.clearPeriod]}趋势与盈利模式已有有效确认，停止自动下钻。` : '日线趋势／盈利模式尚未明确，已自动核对至30分钟；候选价位不代表模式已确认。'}</p> : null}
+    {!compact ? <p className="rs-auto-status" role="status">{forecast.loading ? '正在按需核对日线 → 1小时 → 30分钟 → 15分钟…' : forecast.clearPeriod ? `${PERIOD_NAMES[forecast.clearPeriod]}趋势与盈利模式已有有效确认，停止自动下钻。` : `趋势／盈利模式尚未明确，已核对至${PERIOD_NAMES[forecast.periods.at(-1) ?? 'day']}；候选适配仍需核对条件。`}</p> : null}
     {forecast.error ? <p role="alert">{forecast.error}</p> : null}
     {!analysis ? <p role="status">{forecast.loading ? '正在计算指标预测…' : '暂无有效预测数据，可重新计算。'}</p> : null}
-    {!compact && analysis ? <><nav aria-label="预测计算周期" className="rs-auto-periods">{(['day', '60m', '30m'] as const).map(p => <button type="button" key={p} aria-pressed={period === p} disabled={!analysis.input.periods[p]} onClick={() => setPeriod(p)}>{PERIOD_NAMES[p]}{analysis.input.loadIssues[p] ? ' · 数据缺项' : ''}</button>)}</nav>
-      <p className="rs-auto-table-hint">{analysis.input.periods[period]?.adjustment === 'qfq' ? '前复权' : '不复权'} · 表格可左右滑动，查看历史3根与未来4根的全部指标值。</p>
+    {!compact && analysis ? <><ForecastPeriodContext analysis={analysis} selected={period} onSelect={setPeriod} /><nav aria-label="预测计算周期" className="rs-auto-periods">{ANALYSIS_PERIODS.map(p => <button type="button" key={p} aria-pressed={period === p} disabled={!analysis.input.periods[p]} onClick={() => setPeriod(p)}>{PERIOD_NAMES[p]}{analysis.input.loadIssues[p] ? ' · 数据缺项' : ''}</button>)}</nav>
+      <p className="rs-auto-table-hint">{analysis.input.periods[period]?.adjustment === 'qfq' ? '前复权' : '不复权'} · 从左到右查看历史3根 → 未来4根；每格依次显示指标值、较上一根变化、距原点收盘。表格可左右滑动。</p>
       {analysis.input.periods[period] ? <ScenarioReferenceTable analysis={analysis} period={period} method="average_delta" scenarioId={null} horizons={FORECAST_HORIZONS} historyCount={3} /> : <p>该周期暂无有效数据。</p>}
       <p className="rs-auto-method">按最近3根指标的平均增量外推4根；未来值为条件参考；日期未核实时按第1～4根展示，不推定具体交易日。各周期分别按本周期的4根计算。</p>
       {forecast.issues.map(issue => <p className="rs-auto-method" role="status" key={issue}>{issue}</p>)}</> : null}

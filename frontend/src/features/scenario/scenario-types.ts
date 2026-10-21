@@ -1,6 +1,6 @@
 import type { Candle, MarketSnapshot } from '../workspace/stock-workspace-types'
 
-export type AnalysisPeriod = 'day' | '60m' | '30m'
+export type AnalysisPeriod = 'day' | '60m' | '30m' | '15m'
 export type Horizon = 1 | 2 | 3 | 4
 export type Indicator = 'ma5' | 'ma10' | 'ma20' | 'ma30' | 'ma60' | 'ma90' | 'ma120' | 'ma250' | 'bollUpper' | 'bollMiddle' | 'bollLower'
 export type TradingCalendar = { fromDay: string; throughDay: string; tradingDays: string[]; sourceUrl: string; verifiedAt: string }

@@ -1,10 +1,11 @@
 import { isCalendarDate, isChartTime, isIsoTimestamp } from '../chart/chart-periods'
 import type { AnalysisPeriod, BarTarget, Horizon, TradingCalendar } from './scenario-types'
 
-export const ANALYSIS_PERIODS: AnalysisPeriod[] = ['day', '60m', '30m']
+export const ANALYSIS_PERIODS: AnalysisPeriod[] = ['day', '60m', '30m', '15m']
 export function sessionEnds(period: AnalysisPeriod): string[] {
   return period === '60m' ? ['10:30', '11:30', '14:00', '15:00']
-    : period === '30m' ? ['10:00', '10:30', '11:00', '11:30', '13:30', '14:00', '14:30', '15:00'] : ['15:00']
+    : period === '30m' ? ['10:00', '10:30', '11:00', '11:30', '13:30', '14:00', '14:30', '15:00']
+    : period === '15m' ? ['09:45', '10:00', '10:15', '10:30', '10:45', '11:00', '11:15', '11:30', '13:15', '13:30', '13:45', '14:00', '14:15', '14:30', '14:45', '15:00'] : ['15:00']
 }
 export function barEndAt(period: AnalysisPeriod, barKey: string): string {
   if (!ANALYSIS_PERIODS.includes(period) || !isChartTime(barKey, period)) throw new Error('K线原点时间无效')

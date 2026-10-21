@@ -227,6 +227,24 @@
 .rs-auto-forecast header p, .rs-auto-method { color: #626d80; font-size: 12px; line-height: 1.8; margin: 4px 0 12px; }
 .rs-auto-status { padding: 10px 12px; background: #f4f6fa; border-radius: 8px; color: #45516b; font-size: 12px; line-height: 1.8; }
 .rs-auto-periods { display: flex; gap: 8px; margin: 14px 0; }
+.rs-period-context { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 16px; }
+.rs-period-card { min-width: 0; padding: 12px; border: 1px solid #e2e7ef; border-radius: 8px; background: #fafbfe; font-size: 12px; color: #526079; }
+.rs-period-card.is-selected { border-color: #8073cd; background: #f8f7ff; }
+.rs-period-card > button { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; width: 100%; min-height: 44px; text-align: left; cursor: pointer; }
+.rs-period-card > button:disabled { cursor: default; }
+.rs-period-card > button:focus-visible { outline: 2px solid #7064d5; outline-offset: 2px; }
+.rs-period-card strong { font-size: 14px; }
+.rs-period-card p { margin: 8px 0; line-height: 1.8; overflow-wrap: anywhere; }
+.rs-period-card .rs-period-origin { color: #626d80; font-size: 11px; }
+.rs-period-card .rs-trend-rising { color: #b42336; }
+.rs-period-card .rs-trend-falling { color: #08734f; }
+.rs-period-card .rs-period-missing { color: #785524; }
+.rs-period-card summary { cursor: pointer; padding: 12px 0; line-height: 1.6; }
+.rs-period-card ul { padding-left: 16px; margin: 0; }
+.rs-period-card li { margin: 8px 0; line-height: 1.7; }
+.rs-period-card li span { display: block; color: #626d80; }
+@media (max-width: 1100px) { .rs-period-context { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .rs-period-context { grid-template-columns: minmax(0, 1fr); }.rs-auto-periods { flex-wrap: wrap; } }
 .rs-auto-periods button { min-height: 44px; padding: 0 14px; background: #f5f6fa; border-radius: 6px; color: #526079; }
 .rs-auto-periods button[aria-pressed=true] { background: #eeecfb; color: #5146b8; }
 .rs-auto-periods button:disabled { opacity: .45; }
@@ -256,6 +274,27 @@
 
 .rs-auto-table-hint { color: #626d80; font-size: 12px; margin: 8px 0; }
 .rs-auto-forecast .sa-reference-table tr > th:first-child { position: sticky; left: 0; background: #fff; z-index: 1; }
+.sa-trend-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin: 12px 0; font-size: 12px; color: #626d80; }
+.sa-trend-legend { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.sa-trend-toolbar label { display: flex; gap: 8px; align-items: center; }
+.sa-trend-toolbar select { min-height: 44px; max-width: 100%; border: 1px solid #dce1eb; border-radius: 6px; padding: 0 10px; color: #384d78; background: #fff; font: inherit; cursor: pointer; }
+.sa-trend-toolbar select:focus-visible { outline: 2px solid #7064d5; outline-offset: 2px; }
+.sa-trend-toolbar p { flex-basis: 100%; margin: 0; line-height: 1.7; }
+.rs-auto-forecast .sa-trend-table-scroll .sa-reference-table { min-width: 1000px; }
+.rs-auto-forecast .sa-trend-table-scroll caption { text-align: left; padding: 12px; background: #f7f8fc; color: #526079; font-size: 12px; }
+.rs-auto-forecast .sa-trend-table-scroll thead th { background: #f7f8fc; }
+.rs-auto-forecast .sa-trend-table-scroll th:first-child { min-width: 130px; }
+.rs-auto-forecast .sa-trend-table-scroll td { vertical-align: top; }
+.rs-auto-forecast .sa-trend-table-scroll td strong { font-size: 14px; }
+.rs-auto-forecast .sa-trend-table-scroll small { font-size: 11px; white-space: nowrap; }
+.rs-auto-forecast .sa-trend-table-scroll .sa-forecast-start { border-left: 2px solid #cbc8ee; }
+.rs-auto-forecast .sa-trend-table-scroll .sa-cell-rise { background: #fff7f7; }
+.rs-auto-forecast .sa-trend-table-scroll .sa-cell-fall { background: #f1faf6; }
+.rs-auto-forecast .sa-trend-table-scroll tbody tr:hover td { box-shadow: inset 0 1px #dce1eb, inset 0 -1px #dce1eb; }
+.sa-trend-toolbar .sa-tone-rise, .rs-auto-forecast .sa-reference-table .sa-tone-rise { color: #b42336; }
+.sa-trend-toolbar .sa-tone-fall, .rs-auto-forecast .sa-reference-table .sa-tone-fall { color: #08734f; }
+.rs-auto-forecast .sa-reference-table .sa-tone-flat { color: #626d80; }
+.rs-auto-forecast .sa-reference-table .sa-step-change { font-weight: 600; }
 
 .rs-indicator-forecast { padding: 12px; border-top: 1px solid #edf0f5; font-size: 12px; }
 .rs-forecast-date-buttons { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 6px; }

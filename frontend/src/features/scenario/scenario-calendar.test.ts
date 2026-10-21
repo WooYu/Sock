@@ -3,6 +3,12 @@ import { futureBarTargets } from './scenario-calendar'
 import { testCalendar } from './scenario-test-fixtures'
 
 describe('scenario trading targets', () => {
+  test('15m_targets_skip_lunch_and_overnight', () => {
+    expect(futureBarTargets('15m', '2026-10-12T11:30:00+08:00', [1, 2, 3, 4], testCalendar).map(t => t.barKey)).toEqual([
+      '2026-10-12T13:15:00+08:00', '2026-10-12T13:30:00+08:00', '2026-10-12T13:45:00+08:00', '2026-10-12T14:00:00+08:00',
+    ])
+    expect(futureBarTargets('15m', '2026-10-09T15:00:00+08:00', [1], testCalendar)[0].barKey).toBe('2026-10-12T09:45:00+08:00')
+  })
   test('daily_targets_skip_weekend', () => {
     expect(futureBarTargets('day', '2026-10-09', [1, 2, 3], testCalendar).map(t => t.barKey)).toEqual(['2026-10-12', '2026-10-13', '2026-10-14'])
   })

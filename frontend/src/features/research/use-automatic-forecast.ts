@@ -5,9 +5,10 @@ import type { BrowserMarketClient } from '@/lib/api/browser-client'
 import { useScenarioInputs } from '../scenario/use-scenario-inputs'
 import { scenarioCalendar } from '../scenario/scenario-calendar-data'
 import { adaptivePeriodPlan } from '../scenario/scenario-period-policy'
+import { ANALYSIS_PERIODS } from '../scenario/scenario-calendar'
 import { buildScenarioAnalysis } from '../scenario/scenario-engine'
 import { parseScenarioLedger, SCENARIO_STORAGE_KEY } from '../scenario/scenario-ledger'
-import type { AnalysisAnnotations, AnalysisPeriod, Horizon } from '../scenario/scenario-types'
+import type { AnalysisAnnotations, Horizon } from '../scenario/scenario-types'
 import { resolveDailyPriceLimit } from '../scenario/scenario-price-ladder'
 
 export const FORECAST_HORIZONS: Horizon[] = [1, 2, 3, 4]
@@ -53,7 +54,7 @@ export function useAutomaticForecast({ symbol, sourceMode, client, name }: {
         priceSelection: { limit: resolveDailyPriceLimit(symbol, name) } }), error: null }
     } catch (error) { return { analysis: null, error: error instanceof Error ? error.message : '预测计算失败' } }
   }, [loader.input, annotations, owner, symbol, name])
-  const periods = (['day', '60m', '30m'] as AnalysisPeriod[]).filter(p => result.analysis?.input.periods[p])
+  const periods = ANALYSIS_PERIODS.filter(p => result.analysis?.input.periods[p])
   return { ...result, periods, loading: loader.status === 'loading' || !!next, issues: loader.issues,
     clearPeriod: plan?.clearPeriod ?? null, refresh: loader.refresh }
 }

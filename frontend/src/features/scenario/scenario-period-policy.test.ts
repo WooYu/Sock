@@ -41,5 +41,11 @@ test('unconfirmed_or_stale_or_short_history_does_not_claim_a_clear_pattern', () 
   expect(adaptivePeriodPlan(i, unknown).clearPeriod).toBeNull()
 })
 test('when_all_periods_remain_unclear_the_smallest_period_does_not_trigger_more_work', () => {
-  expect(adaptivePeriodPlan(input(['day', '60m', '30m']), {})).toMatchObject({ clearPeriod: null, primaryPeriod: '30m', nextPeriod: null })
+  expect(adaptivePeriodPlan(input(['day', '60m', '30m']), {})).toMatchObject({ clearPeriod: null, primaryPeriod: '30m', nextPeriod: '15m' })
+  expect(adaptivePeriodPlan(input(['day', '60m', '30m', '15m']), {})).toMatchObject({ clearPeriod: null, primaryPeriod: '15m', nextPeriod: null })
+})
+
+test('clear_30m_allows_only_one_optional_15m_check', () => {
+  const i = input(['day', '60m', '30m'])
+  expect(adaptivePeriodPlan(i, clear(i, '30m'))).toMatchObject({ clearPeriod: '30m', primaryPeriod: '30m', nextPeriod: '15m', nextKind: 'verify' })
 })
