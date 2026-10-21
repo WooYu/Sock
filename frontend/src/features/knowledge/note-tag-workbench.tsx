@@ -168,10 +168,8 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
   if (view === 'study') return <section className="nt-workbench" aria-label="笔记标签工作台"><nav className="nt-study-tabs" aria-label="笔记工作视图"><button type="button" onClick={() => setView('tags')}>标签与版本</button><button type="button" aria-pressed="true">逐篇学习建议</button></nav><NoteStudyWorkbench currentTags={current} /></section>
 
   return <section className="nt-workbench" aria-label="笔记标签工作台">
-    <nav className="nt-study-tabs" aria-label="笔记工作视图"><button type="button" aria-pressed="true">标签与版本</button><button type="button" onClick={() => setView('study')}>逐篇学习建议</button></nav>
-    <div className="nt-heading"><div><h2>笔记标签目录</h2><p>{catalog.documents.length} 篇笔记 · {catalog.fragments.length} 个原文片段 · {catalog.audit.addedFiles.length} 篇补充资料</p></div><button type="button" className="kw-button" disabled={!ready || Boolean(error)} onClick={exportTags}>导出标签与历史</button></div>
-    <p className="nt-context">后续研究对象：<Link href="/?symbol=603533">掌阅科技 · 603533</Link>。通用笔记保留通用范围，股票案例按原文处理。</p>
-    <p className="nt-disclaimer">自动标签为待核对候选；标签核对不代表计算定义或预测效果已验证。</p>
+    <div className="nt-top-toolbar"><nav className="nt-study-tabs" aria-label="笔记工作视图"><button type="button" aria-pressed="true">标签与版本</button><button type="button" onClick={() => setView('study')}>逐篇学习建议</button></nav><button type="button" className="kw-button" disabled={!ready || Boolean(error)} onClick={exportTags}>导出标签与历史</button></div>
+    <div className="nt-catalog-overview"><h2>笔记标签目录</h2><div className="nt-catalog-stats" aria-label="目录概况"><span><strong>{catalog.documents.length}</strong> 篇笔记</span><span><strong>{catalog.fragments.length}</strong> 个原文片段</span><span><strong>{catalog.audit.addedFiles.length}</strong> 篇补充资料</span></div><details className="nt-catalog-help"><summary>研究范围与标签说明</summary><p className="nt-context">后续研究对象：<Link href="/?symbol=603533">掌阅科技 · 603533</Link>。通用笔记保留通用范围，股票案例按原文处理。</p><p className="nt-disclaimer">自动标签为待核对候选；标签核对不代表计算定义或预测效果已验证。</p></details></div>
     {error ? <div className="kw-alert" role="alert">{error}<button type="button" onClick={store.refresh}>重新读取标签</button></div> : null}
     {writeError && !editor ? <div className="kw-alert" role="alert">{writeError}</div> : null}
     {message ? <div className="kw-notice" role="status">{message}</div> : null}

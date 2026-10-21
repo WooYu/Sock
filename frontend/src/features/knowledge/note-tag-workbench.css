@@ -172,3 +172,42 @@
   .nt-reading-detail .nt-note-prose { font-size: 16px; line-height: 1.9; }
   .nt-note-title { gap: 10px; }
 }
+/* Compact notes header and catalog controls. */
+.kw-notes-page .kw-breadcrumb { height: 40px; }
+.kw-notes-page .kw-page-heading { align-items: center; gap: 12px; padding: 0 0 18px; }
+.kw-notes-page .kw-page-heading h1 { margin-top: 0; }
+.kw-notes-page .kw-page-heading p { line-height: 1.7; }
+.nt-updated { flex-shrink: 0; color: #69758a; font-size: 12px; }
+.nt-top-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 14px; border-bottom: 1px solid #dfe4ee; }
+.nt-top-toolbar .nt-study-tabs { margin: 0; gap: 4px; padding: 4px; background: #e9edf5; border-radius: 10px; }
+.nt-top-toolbar .nt-study-tabs button { border: 0; background: transparent; color: #59667c; border-radius: 7px; }
+.nt-top-toolbar .nt-study-tabs button[aria-pressed=true] { background: #fff; color: #4740aa; box-shadow: 0 1px 4px #25344d12; }
+.nt-top-toolbar > .kw-button { min-height: 44px; }
+.nt-catalog-overview { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 24px; padding: 18px 0 4px; }
+.nt-catalog-overview h2 { margin: 0; color: #283247; font-size: 18px; font-weight: 600; }
+.nt-catalog-stats { display: flex; flex-wrap: wrap; gap: 8px 18px; color: #69758a; font-size: 12px; }
+.nt-catalog-stats strong { color: #394760; font-size: 14px; font-variant-numeric: tabular-nums; }
+.nt-catalog-help { margin-left: auto; max-width: 100%; font-size: 12px; color: #63718b; }
+.nt-catalog-help summary { cursor: pointer; min-height: 44px; align-content: center; }
+.nt-catalog-help[open] { flex-basis: 100%; margin-left: 0; }
+.nt-catalog-help .nt-context { line-height: 1.8; }
+.nt-catalog-help .nt-disclaimer { margin-bottom: 0 !important; }
+.kw-notes-page .nt-filters { margin-top: 12px; grid-template-columns: minmax(220px, 1.6fr) repeat(4, minmax(120px, 1fr)) auto; gap: 12px; padding: 16px; }
+.kw-notes-page .nt-filters input, .kw-notes-page .nt-filters select { min-height: 44px; }
+.nt-top-toolbar button:focus-visible, .nt-catalog-help summary:focus-visible { outline: 2px solid #5952cf; outline-offset: 3px; }
+@media (max-width: 1200px) { .kw-notes-page .nt-filters { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 760px) {
+.kw-notes-page .kw-page-heading { gap: 6px; padding-bottom: 14px; }
+.nt-updated { width: 100%; font-size: 11px; }
+.nt-top-toolbar { flex-wrap: wrap; gap: 10px; }
+.nt-top-toolbar .nt-study-tabs { flex: 1; flex-wrap: nowrap; }
+.nt-top-toolbar .nt-study-tabs button { flex: 1; padding-inline: 10px; white-space: nowrap; }
+.nt-top-toolbar > .kw-button { font-size: 12px; }
+.nt-catalog-overview { gap: 8px; padding-top: 16px; }
+.nt-catalog-overview h2 { width: 100%; }
+.nt-catalog-stats { gap: 12px; }
+.nt-catalog-help { margin-left: 0; width: 100%; }
+.kw-notes-page .nt-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 14px; }
+.kw-notes-page .nt-filters > label:first-child { grid-column: 1 / -1; }
+.kw-notes-page .nt-filters > button { min-height: 44px; }
+}

@@ -178,10 +178,11 @@ export function ExperienceWorkbench({ data = researchPackage as KnowledgePackage
   return <div className="kw-workbench">
     <ResearchHeader active={tab} onKnowledgeNavigate={switchTab} />
 
-    <main className="kw-main">
+    <main className={`kw-main${tab === 'notes' ? ' kw-notes-page' : ''}`}>
       <div className="kw-breadcrumb"><StudioIcon name="book" size={15} /><span>研究工作区</span><span>/</span><strong>{tab === 'library' ? '经验与原则' : tab === 'notes' ? '笔记标签' : tab === 'samples' ? '学习样本' : '回测证据'}</strong></div>
       <div className="kw-page-heading">
-        <div><h1>{tab === 'notes' ? '笔记标签' : tab === 'samples' ? '学习样本' : tab === 'backtest' ? '回测证据' : '经验与原则'}</h1><p>{tab === 'notes' ? '按主题、用途与计算条件整理笔记，保留每次分类的原文依据。' : tab === 'samples' ? '把保存时的计算、所用笔记与实际行情连在一起，保留每次核对结果。' : tab === 'backtest' ? '对照历史数据与基线方法，检验经验规则是否改善预测。' : '保留原话，核对解释，让每条经验在被使用前先经得起检查。'}</p></div>
+        <div><h1>{tab === 'notes' ? '笔记标签' : tab === 'samples' ? '学习样本' : tab === 'backtest' ? '回测证据' : '经验与原则'}</h1><p>{tab === 'notes' ? '按内容分类与分析主题整理笔记，保留原文依据与修订历史。' : tab === 'samples' ? '把保存时的计算、所用笔记与实际行情连在一起，保留每次核对结果。' : tab === 'backtest' ? '对照历史数据与基线方法，检验经验规则是否改善预测。' : '保留原话，核对解释，让每条经验在被使用前先经得起检查。'}</p></div>
+        {tab === 'notes' ? <span className="nt-updated">目录更新 <time dateTime={noteSummary.generatedAt}>{shanghaiToday(new Date(noteSummary.generatedAt))}</time></span> : null}
         {tab === 'library' ? <div className="kw-actions"><button className="kw-button" onClick={exportRecords} type="button"><StudioIcon name="layers" size={16} />导出记录</button><button className="kw-button kw-primary" disabled={!ready} onClick={() => { setEditor('new'); setWriteError('') }} type="button"><StudioIcon name="plus" size={16} />新增记录</button></div> : null}
       </div>
 
@@ -196,7 +197,7 @@ export function ExperienceWorkbench({ data = researchPackage as KnowledgePackage
         <div className="kw-summary-note"><StudioIcon name="layers" size={24} /><p><strong>经验 ≠ 可执行规则</strong><span>定义缺失时保持参考；确认解释不代表启用交易。</span></p></div>
       </div> : null}
 
-      <p className="kw-view-caption">{tab === 'samples' ? '保存版本与实际核对' : (tab === 'notes' ? '标签目录更新 ' + shanghaiToday(new Date(noteSummary.generatedAt)) : '原研究更新 ' + data.generatedAt.slice(0, 10))}</p>
+      {tab !== 'notes' ? <p className="kw-view-caption">{tab === 'samples' ? '保存版本与实际核对' : '原研究更新 ' + data.generatedAt.slice(0, 10)}</p> : null}
 
       {tab === 'library' ? <div id="kw-panel-library" role="region" aria-labelledby="research-nav-library" className="kw-library">
         <aside className="kw-sidebar" aria-label="记录筛选">
