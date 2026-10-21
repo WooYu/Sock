@@ -24,6 +24,8 @@ function save(value: SavedList) { try { const raw = JSON.stringify(value); if (r
 export function StockPicker({ selectedSymbol, market, onSelect, onClose }: { selectedSymbol: string | null; market?: MarketSnapshot | null; onSelect: (security: Security) => void; onClose: () => void }) {
   const stored = useSyncExternalStore(subscribe, read, () => emptyList)
   const saved = useMemo(() => parse(stored), [stored])
+  const [quotes, setQuotes] = useState<Record<string, MarketSnapshot>>({})
+  const [quoteErrors, setQuoteErrors] = useState<Record<string, boolean>>({})
   const [researchStages, setResearchStages] = useState<Record<string, string>>({})
   const [tab, setTab] = useState<'recent' | 'favorites'>('recent')
   const [query, setQuery] = useState('')
@@ -74,6 +76,38 @@ export function StockPicker({ selectedSymbol, market, onSelect, onClose }: { sel
   const clearSearch = () => { setQuery(''); setResults([]); setSearchState('idle'); setActiveIndex(0); input.current?.focus() }
 
   const visible = query.trim() ? results : tab === 'favorites' ? saved.favorites : saved.recent.length ? saved.recent : initialSecurities
+  // A stable symbol key prevents unrelated renders from restarting quote requests.
+  const visibleSymbols = [...new Set(visible.map(security => security.code))].sort().join(',')
+  useEffect(() => {
+    const controller = new AbortController()
+    let running = false
+    const refresh = async () => {
+      if (running || document.visibilityState === 'hidden') return
+      running = true
+      const pending = visibleSymbols.split(',').filter(Boolean)
+      // Bound concurrency so a long watchlist does not flood the market service.
+      await Promise.all(Array.from({ length: Math.min(4, pending.length) }, async () => {
+        while (pending.length && !controller.signal.aborted) {
+          const symbol = pending.shift()!
+          try {
+            const snapshot = await browserMarketClient.snapshot(symbol, controller.signal)
+            if (controller.signal.aborted) return
+            setQuotes(previous => ({ ...previous, [symbol]: snapshot }))
+            setQuoteErrors(previous => ({ ...previous, [symbol]: false }))
+          } catch {
+            if (!controller.signal.aborted) setQuoteErrors(previous => ({ ...previous, [symbol]: true }))
+          }
+        }
+      }))
+      running = false
+    }
+    void refresh()
+    const timer = window.setInterval(() => { void refresh() }, 60_000)
+    const resume = () => { void refresh() }
+    window.addEventListener('focus', resume)
+    document.addEventListener('visibilitychange', resume)
+    return () => { controller.abort(); clearInterval(timer); window.removeEventListener('focus', resume); document.removeEventListener('visibilitychange', resume) }
+  }, [visibleSymbols])
   return <aside aria-label="股票选择" className="rs-stock-picker">
     <div className="rs-picker-heading"><strong>A 股市场</strong><button aria-label="关闭选股" className="rs-mobile-only rs-icon-button" onClick={onClose} type="button"><StudioIcon name="close" /></button><span className="rs-desktop-only">沪 · 深 · 北</span></div>
     <form className="rs-search" onSubmit={(event) => { event.preventDefault(); if (results[activeIndex] && query.trim()) choose(results[activeIndex]); else if (validMarketSymbol.test(query.trim())) choose({ code: query.trim(), name: query.trim() }) }}>
@@ -85,10 +119,15 @@ export function StockPicker({ selectedSymbol, market, onSelect, onClose }: { sel
     <div className="rs-stock-results" id="rs-stock-results" role={query.trim() ? 'listbox' : undefined} aria-label="股票列表">
       {visible.map((security, index) => {
         const favorite = saved.favorites.some((item) => item.code === security.code)
-        const quote = market?.quote.security.code === security.code ? market.quote : null
-        const change = quote?.previousClose ? (quote.price / quote.previousClose - 1) * 100 : null
+        const fetched = quotes[security.code]
+        const selected = market?.quote.security.code === security.code ? market : null
+        const snapshot = fetched && (!selected || Date.parse(fetched.source.fetchedAt) >= Date.parse(selected.source.fetchedAt)) ? fetched : selected
+        const quote = snapshot?.quote
+        const price = quote && Number.isFinite(quote.price) && quote.price > 0 ? quote.price : null
+        const change = price !== null && quote?.previousClose && Number.isFinite(quote.previousClose) && quote.previousClose > 0 ? (price / quote.previousClose - 1) * 100 : null
+        const quoteTitle = snapshot ? `${snapshot.source.name} · ${snapshot.source.fetchedAt}${quoteErrors[security.code] ? ' · 刷新失败，显示上次行情' : ''}` : quoteErrors[security.code] ? '行情暂不可用' : '行情加载中'
         return <div className={`rs-security-row ${selectedSymbol === security.code ? 'is-selected' : ''} ${query.trim() && activeIndex === index ? 'is-focused' : ''}`} key={security.code}>
-          <button id={`rs-result-${index}`} type="button" role={query.trim() ? 'option' : undefined} aria-selected={query.trim() ? activeIndex === index : undefined} aria-current={!query.trim() && selectedSymbol === security.code ? 'true' : undefined} className="rs-security-select" onClick={() => choose(security)}><span><strong>{security.name}</strong><small>{security.exchange ?? ''} {security.code}{researchStages[security.code] ? ` · ${researchStages[security.code]}` : ''}</small></span>{quote ? <span className={`rs-security-quote ${change !== null && change < 0 ? 'rs-down' : 'rs-up'}`}><strong>{quote.price.toFixed(2)}</strong><small>{change === null ? '—' : `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`}</small></span> : null}</button>
+          <button id={`rs-result-${index}`} type="button" role={query.trim() ? 'option' : undefined} aria-selected={query.trim() ? activeIndex === index : undefined} aria-current={!query.trim() && selectedSymbol === security.code ? 'true' : undefined} className="rs-security-select" onClick={() => choose(security)}><span><strong>{security.name}</strong><small>{security.exchange ?? ''} {security.code}{researchStages[security.code] ? ` · ${researchStages[security.code]}` : ''}</small></span><span title={quoteTitle} aria-label={`当前价格与当日涨跌幅，${quoteTitle}`} className={`rs-security-quote ${change === null || change === 0 ? '' : change < 0 ? 'rs-down' : 'rs-up'}`}><strong>{price === null ? '—' : price.toFixed(2)}</strong><small>{price === null ? quoteErrors[security.code] ? '暂无行情' : '加载中' : change === null ? '—' : `${change > 0 ? '+' : ''}${change.toFixed(2)}%`}</small></span></button>
           {!query.trim() ? <button className={`rs-star ${favorite ? 'is-starred' : ''}`} aria-label={`${favorite ? '取消自选' : '加入自选'} ${security.name}`} aria-pressed={favorite} onClick={() => { if (!save({ ...saved, favorites: favorite ? saved.favorites.filter((item) => item.code !== security.code) : [...saved.favorites, security] })) setNotice('自选保存失败，请检查浏览器存储设置') }} type="button"><StudioIcon name="star" size={15} /></button> : null}
         </div>
       })}

@@ -1,5 +1,7 @@
 # StockCal
 
+本地开发统一使用 `E:/Code_Tool/StockCal`，日常开发与发布使用 `agent/local-first-watchlist` 分支。旧的 `StockCal-deploy-tags`、`StockCal-deploy-kline`、`StockCal-taxonomy` 为临时 Git worktree，已整合；对应分支提交历史保留。后续仅在确需并行隔离时临时创建 worktree，完成后用 `git worktree remove` 清理。环境配置、验证截图与规划记录只在本地保存，不纳入源码发布。
+
 部署拓扑（用户于2026-09-16确认）：**前端部署在Vercel，后端部署在阿里云**。生产前端项目为Vercel的`frontend`，关联`WooYu/Sock`，入口为`https://frontend-xi-nine-18.vercel.app`。排查线上问题应检查Vercel生产配置、实际部署提交和阿里云服务，不应以本机缺少环境变量或8080端口未启动推断线上后端不可用。
 
 2026-09-16只读检查：Vercel生产版本为`f68c014`（9月9日部署）；线上行情和规则接口返回200，预测接口返回上游404，路径`/api/v1/market/stocks/300502/prediction`。仓库代码已有该路由，需核对阿里云运行版本及反向代理；这不是已经验证的“线上未配置后端地址”。本轮新工作台、经验研究库和多周期行情修改仍需独立发布才会出现在生产版本。

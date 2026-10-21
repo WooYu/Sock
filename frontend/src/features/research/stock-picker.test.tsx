@@ -1,13 +1,14 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, expect, test, vi } from 'vitest'
 import { browserMarketClient } from '@/lib/api/browser-client'
 import { StockPicker } from './stock-picker'
 
-vi.mock('@/lib/api/browser-client', () => ({ browserMarketClient: { search: vi.fn() } }))
+vi.mock('@/lib/api/browser-client', () => ({ browserMarketClient: { search: vi.fn(), snapshot: vi.fn() } }))
 
 beforeEach(() => {
   localStorage.clear()
+  vi.mocked(browserMarketClient.snapshot).mockReset().mockRejectedValue(new Error('unavailable'))
   vi.mocked(browserMarketClient.search).mockReset()
 })
 
@@ -49,4 +50,27 @@ test('restores a saved index and selects it with its qualified symbol', async ()
   render(<StockPicker selectedSymbol={null} onSelect={onSelect} onClose={vi.fn()} />)
   await userEvent.click(screen.getByRole('button', { name: /上证指数.*SH sh000001/ }))
   expect(onSelect).toHaveBeenCalledWith(index)
+})
+
+
+test('loads price and daily change for every saved stock including the Shanghai index', async () => {
+  const securities = [{ code: '600519', name: '贵州茅台' }, { code: 'sh000001', name: '上证指数' }, { code: '300502', name: '新易盛' }]
+  localStorage.setItem('stockcal:research-list:v1', JSON.stringify({ recent: securities, favorites: securities }))
+  vi.mocked(browserMarketClient.snapshot).mockImplementation(async code => ({
+    quote: { security: securities.find(item => item.code === code)!, price: code === 'sh000001' ? 3300 : 110, previousClose: code === 'sh000001' ? 3000 : 100 },
+    dailyCandles: [], source: { name: '测试行情', fetchedAt: '2026-10-20T06:00:00Z', state: 'ready', online: true },
+  }))
+  render(<StockPicker selectedSymbol="600519" onSelect={vi.fn()} onClose={vi.fn()} />)
+  const index = screen.getByRole('button', { name: /上证指数.*sh000001/ })
+  await within(index).findByText('3300.00')
+  expect(within(index).getByText('+10.00%')).toBeInTheDocument()
+  expect(within(screen.getByRole('button', { name: /新易盛.*300502/ })).getByText('110.00')).toBeInTheDocument()
+  await userEvent.click(screen.getByRole('tab', { name: /我的自选/ }))
+  expect(screen.getAllByText('+10.00%')).toHaveLength(3)
+})
+
+test('shows unavailable placeholders when quotes fail without hiding stock selection', async () => {
+  render(<StockPicker selectedSymbol={null} onSelect={vi.fn()} onClose={vi.fn()} />)
+  expect(await screen.findAllByText('暂无行情')).toHaveLength(5)
+  expect(screen.getByRole('button', { name: /贵州茅台.*600519/ })).toBeEnabled()
 })

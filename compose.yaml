@@ -68,6 +68,9 @@ services:
       dockerfile: Dockerfile
     environment:
       STOCKCAL_API_BASE_URL: http://app:8080
+      STOCKCAL_AI_BASE_URL: ${STOCKCAL_AI_BASE_URL:-https://api.deepseek.com}
+      STOCKCAL_AI_MODEL: ${STOCKCAL_AI_MODEL:-deepseek-chat}
+      AI_API_KEY: ${AI_API_KEY:-}
       PORT: "3000"
     ports:
       - "3000:3000"
