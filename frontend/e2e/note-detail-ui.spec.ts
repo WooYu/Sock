@@ -1,0 +1,46 @@
+import { expect, test } from '@playwright/test'
+import catalog from '../src/features/knowledge/note-tag-catalog.json'
+
+test('note detail reading, keyboard navigation and AI previews stay coherent', async ({ page }) => {
+  await page.route('**/api/sync/**', route => route.fulfill({ json: { nextCursor: 0, changes: [], applied: true, cursor: 0 } }))
+  await page.route('**/api/note-tag-extraction', route => {
+    const input = route.request().postDataJSON()
+    const record = catalog.documents.find(item => item.id === input.id)!
+    return route.fulfill({ json: { ...input, models: [{ name: 'DeepSeek', tags: ['topic.ma'], note: '阅读测试候选' }], candidate: { ...input, tags: ['topic.ma'], evidence: [{ ...record.evidence[0], tagId: 'topic.ma', method: 'ai' }], extraction: { models: ['DeepSeek'], note: '阅读测试候选', disagreements: [] } } } })
+  })
+  await page.goto('/knowledge?view=notes')
+  const detail = page.getByRole('region', { name: '标签详情', exact: true })
+  await expect(detail.getByRole('tab', { name: '概览', exact: true })).toHaveAttribute('aria-selected', 'true', { timeout: 60_000 })
+  await detail.scrollIntoViewIfNeeded()
+  await expect(detail.getByRole('button', { name: '编辑标签', exact: true })).toBeVisible()
+  await expect(detail.getByRole('tabpanel', { name: '概览', exact: true })).toBeVisible()
+  await detail.screenshot({ path: test.info().outputPath('overview.png') })
+
+  await detail.getByRole('button', { name: 'AI 重新提取标签', exact: true }).click()
+  await expect(detail.getByRole('button', { name: '采用本次结果并编辑' })).toBeVisible()
+  const source = detail.getByRole('tab', { name: '原文与依据', exact: true })
+  await source.click()
+  const sourcePanel = detail.getByRole('tabpanel', { name: '原文与依据', exact: true })
+  await expect(sourcePanel).toBeVisible()
+  await expect(sourcePanel.getByRole('heading', { name: '原文片段' })).toBeVisible()
+  await sourcePanel.screenshot({ path: test.info().outputPath('source.png') })
+  await source.focus()
+  await page.keyboard.press('End')
+  await expect(detail.getByRole('tab', { name: '版本历史' })).toBeFocused()
+  await expect(detail.getByRole('tabpanel', { name: '版本历史' })).toBeVisible()
+  await page.keyboard.press('Home')
+  await expect(detail.getByRole('button', { name: '采用本次结果并编辑' })).toBeVisible()
+
+  await detail.getByRole('button', { name: '编辑标签', exact: true }).click()
+  const editor = page.getByRole('dialog', { name: '修订笔记标签' })
+  await editor.getByLabel('修订原因', { exact: true }).fill('检查新的阅读与历史交互')
+  await editor.getByRole('button', { name: '保存标签新版本' }).click()
+  await expect(editor).toHaveCount(0)
+  await detail.getByRole('tab', { name: '版本历史' }).click()
+  await detail.getByRole('button', { name: '查看标签 v1' }).click()
+  await expect(detail).toContainText('历史标签版本，只读')
+  await expect(detail.getByRole('button', { name: '编辑标签', exact: true })).toHaveCount(0)
+  await detail.getByRole('button', { name: '返回当前标签' }).click()
+  await expect(detail.getByRole('button', { name: '编辑标签', exact: true })).toBeVisible()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true)
+})

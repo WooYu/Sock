@@ -9,6 +9,7 @@ import { NOTE_TAG_STORAGE_KEY, TAG_DIMENSIONS, LEGACY_TAG_DIMENSIONS, TAG_LABELS
   applyAIOriginalTags, parseTagLedger, reviseTags, reviewTags, tagVersionKey, type AIOriginalTags, type NoteCatalog, type NoteTagRecord, type TagDimension, type TagRevisionDraft, type TagSuggestion } from './note-tags'
 import './note-tag-workbench.css'
 import { NoteTagReextract } from './note-tag-reextract'
+import { NoteDetailNavigation, NoteExcerpt, type NoteDetailTab } from './note-detail-navigation'
 
 const defaultCatalog = applyAIOriginalTags(catalogData as NoteCatalog, aiTagResults.records as AIOriginalTags[])
 const PAGE_SIZE = 10
@@ -26,7 +27,7 @@ function EvidenceGroups({ items, supplemental = false }: { items: Array<{ tagId:
   return <details className="nt-evidence"><summary>{supplemental ? '补充说明依据' : '标签依据'} · {groups.size} 段引用 · {new Set(items.map((item) => item.tagId)).size} 个标签</summary>{[...groups.entries()].map(([key, group]) => {
     const reasons = new Map<string, { method: string; reason: string; tags: Set<string> }>()
     for (const item of group) {
-      const method = supplemental ? '用户补充' : item.method === 'ai' ? '双模型原文提取' : item.method === 'manual' ? '人工引用' : item.method === 'catalog' ? '旧解析／目录候选' : '术语匹配候选'
+      const method = supplemental ? '用户补充' : item.method === 'ai' ? 'AI 原文提取' : item.method === 'manual' ? '人工引用' : item.method === 'catalog' ? '旧解析／目录候选' : '术语匹配候选'
       const reasonKey = JSON.stringify([method, item.reason])
       const existing = reasons.get(reasonKey)
       if (existing) existing.tags.add(item.tagId)
@@ -80,6 +81,7 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
   const [status, setStatus] = useState('all')
   const [selectedId, setSelectedId] = useState(catalog.documents[0]?.id ?? '')
   const [viewedKey, setViewedKey] = useState<string | null>(null)
+  const [detailNavigation, setDetailNavigation] = useState<{ id: string; tab: NoteDetailTab }>({ id: '', tab: 'overview' })
   const [page, setPage] = useState(0)
   const [editor, setEditor] = useState<NoteTagRecord | null>(null)
   const [supplementEntry, setSupplementEntry] = useState(false)
@@ -106,12 +108,15 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
   const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const currentPage = Math.min(page, pages - 1)
   const selected = filtered.find((record) => record.id === selectedId) ?? filtered[0]
+  const detailTab = detailNavigation.id === selected?.id ? detailNavigation.tab : 'overview'
+  const changeDetailTab = (tab: NoteDetailTab) => setDetailNavigation({ id: selected?.id ?? '', tab })
   const history = allVersions.filter((record) => record.id === selected?.id).sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.version - a.version)
   const viewed = (viewedKey ? history.find((record) => tagVersionKey(record) === viewedKey && viewedKey !== (selected && tagVersionKey(selected))) : null) ?? selected
   const historical = Boolean(viewed && selected && tagVersionKey(viewed) !== tagVersionKey(selected))
   const aiOriginal = base.find(record => record.id === viewed?.id && record.sourceHash === viewed.sourceHash && record.extraction)
   const aiCandidate = aiOriginal ? activeTagRecord(aiOriginal) : undefined
-  const modelDisagreements = viewed?.extraction?.disagreements.filter(item => !viewed.tags.includes(item.tagId)) ?? []
+  const extraction = viewed?.extraction ?? aiCandidate?.extraction
+  const modelDisagreements = extraction?.disagreements.filter(item => !viewed?.tags.includes(item.tagId)) ?? []
 
   function persist(next: NoteTagRecord, previous: NoteTagRecord) {
     if (!ready || error) throw new Error('标签存储尚未就绪。')
@@ -121,7 +126,7 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
     const records = mergeTagVersions(stored, [seed, ...allVersions.filter((record) => record.id === previous.id), next])
     localStorage.setItem(NOTE_TAG_STORAGE_KEY, JSON.stringify({ schemaVersion: 1, records }))
     store.refresh()
-    setSelectedId(next.id); setViewedKey(null); setWriteError('')
+    setSelectedId(next.id); setViewedKey(null); setWriteError(''); setDetailNavigation({ id: next.id, tab: 'overview' })
     setMessage(`已保存标签 v${next.version}，原文与历史版本保持完整。`)
   }
 
@@ -154,7 +159,7 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
   }
 
   function choose(record: NoteTagRecord) {
-    setSelectedId(record.id); setViewedKey(null)
+    setSelectedId(record.id); setViewedKey(null); setDetailNavigation({ id: record.id, tab: 'overview' })
     if (window.matchMedia?.('(max-width: 760px)').matches) detailRef.current?.scrollIntoView({ block: 'start', behavior: 'instant' })
   }
 
@@ -184,22 +189,38 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
         {!filtered.length ? <div className="kw-empty"><h3>没有符合条件的笔记</h3><p>调整内容分类、分析主题或关键词后再试。</p></div> : null}
         <div className="nt-pagination"><button type="button" className="kw-button" disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}>上一页</button><span>{currentPage + 1} / {pages}</span><button type="button" className="kw-button" disabled={currentPage + 1 >= pages} onClick={() => setPage(currentPage + 1)}>下一页</button></div>
       </section>
-      <section className="nt-detail" aria-label="标签详情" ref={detailRef}>
+      <section className="nt-detail nt-reading-detail" aria-label="标签详情" ref={detailRef}>
         {viewed ? <>
-          <div className="nt-detail-heading"><span>{viewed.level === 'document' ? '整篇笔记' : '规则片段'} · v{viewed.version}</span><h3>{viewed.title}</h3><p>{viewed.summary}</p><a className="nt-source-link" href={viewed.sourceUrl} target="_blank" rel="noopener noreferrer">查看原文 ↗</a></div>
-          {historical ? <div className="kw-history-banner"><span>历史标签版本，只读{viewed.sourceHash !== selected?.sourceHash ? ' · 原文版本已更新' : ''}</span><button type="button" onClick={() => setViewedKey(null)}>返回当前标签</button></div> : null}
-          <p className="nt-revision">{viewed.version === 1 ? '自动候选' : '人工修订'} · {formatTime(viewed.createdAt)}<br />{viewed.revisionReason}</p>
-          <section className="nt-supplement-summary"><h4>补充说明</h4>{viewed.supplement ? <p>{viewed.supplement}</p> : <p>补充用途或背景，帮助重新提取标签。</p>}{!historical ? <button type="button" className="kw-button" disabled={!ready || Boolean(error)} onClick={() => openEditor(viewed, true)}>{viewed.supplement ? '修改补充说明' : '补充说明'}</button> : null}</section>
-          {viewed.supplementEvidence?.length ? <EvidenceGroups items={viewed.supplementEvidence} supplemental /> : null}
-          {!historical && viewed.level === 'document' ? <NoteTagReextract key={tagVersionKey(viewed)} record={viewed} disabled={!ready || Boolean(error)} onAdopt={candidate => openEditor({ ...viewed, tags: [...candidate.tags], evidence: candidate.evidence, sourceReferences: [...(viewed.sourceReferences ?? []), ...viewed.evidence], extraction: candidate.extraction }, false, true)} /> : null}
-          {viewed.extraction ? <section className="nt-extraction"><p>原始标签由 {viewed.extraction.models.join('、')} 提取；人工调整按当前版本记录。</p>{!viewed.tags.length ? <p>暂无可确认的核心标签，请核对原文或补充说明。</p> : null}{modelDisagreements.length ? <details><summary>模型分歧 · {modelDisagreements.length} 个候选</summary><p>以下仅供核对，尚未作为标签采用。</p><ul>{modelDisagreements.map(item => <li key={`${item.model}-${item.tagId}`}>{TAG_LABELS[item.tagId]} · {item.model}</li>)}</ul></details> : null}<details><summary>查看提取说明</summary><p>{viewed.extraction.note}</p></details></section> : null}
-          <div className="nt-facets">{(historical ? [...TAG_DIMENSIONS, ...LEGACY_TAG_DIMENSIONS.filter(dimension => !TAG_DIMENSIONS.some(active => active.id === dimension.id))] : TAG_DIMENSIONS).filter(dimension => viewed.tags.some(tag => tag.startsWith(`${dimension.id}.`))).map((dimension) => <div key={dimension.id}><strong>{dimension.label}</strong><span className="nt-chips">{viewed.tags.filter((tag) => tag.startsWith(`${dimension.id}.`)).map((tag) => <span key={tag}>{TAG_LABELS[tag]}</span>)}</span></div>)}</div>
-          <section className="kw-detail-section"><h4>原文片段</h4><blockquote className="nt-source">{viewed.sourceExcerpt}</blockquote><a className="nt-source-link" href={viewed.sourceUrl} target="_blank" rel="noopener noreferrer">查看 {viewed.file} 原文</a></section>
-          {viewed.gaps.length ? <section className="kw-detail-section"><h4>待补定义与边界</h4><ul>{viewed.gaps.map((gap, index) => <li key={index}>{gap}</li>)}</ul></section> : null}
-          <EvidenceGroups items={viewed.evidence} />
-          <details className="kw-history"><summary>标签历史 · {history.length} 个版本</summary><ol>{history.map((record) => <li key={tagVersionKey(record)}><div><strong>v{record.version}{record.sourceHash !== selected?.sourceHash ? ' · 旧原文' : ''}</strong><span>{formatTime(record.createdAt)}</span><small>{record.revisionReason}</small></div><button type="button" aria-label={`查看标签 v${record.version}`} aria-pressed={tagVersionKey(record) === tagVersionKey(viewed)} onClick={() => setViewedKey(tagVersionKey(record))}>查看 v{record.version}</button></li>)}</ol></details>
-          {!historical ? <div className="nt-detail-actions"><button type="button" className="kw-button" disabled={!ready || Boolean(error)} onClick={() => openEditor(viewed)}>编辑标签</button>{aiCandidate && viewed.version > 1 ? <button type="button" className="kw-button" disabled={!ready || Boolean(error)} onClick={() => openEditor({ ...viewed, tags: [...aiCandidate.tags], evidence: aiCandidate.evidence.map(item => ({ ...item })), sourceReferences: [...(aiCandidate.sourceReferences ?? []), ...viewed.evidence], extraction: aiCandidate.extraction }, false, true)}>采用 AI 精简标签</button> : null}<button type="button" className="kw-button kw-primary" disabled={!ready || Boolean(error) || !viewed.tags.length || viewed.status === 'reviewed'} onClick={confirmTags}>{viewed.status === 'reviewed' ? '标签已核对' : '确认标签'}</button></div> : null}
-          <p className="nt-source-hash">原文 SHA-256：{viewed.sourceHash}<br />标签保存在当前浏览器；导出可保留修订历史。</p>
+          <header className="nt-note-header">
+            <div className="nt-note-kicker"><span>{viewed.level === 'document' ? '整篇笔记' : '规则片段'}</span><span>v{viewed.version}</span><span className={`nt-review-badge${viewed.status === 'reviewed' ? ' is-reviewed' : ''}`}>{viewed.status === 'reviewed' ? '标签已核对' : '标签待核对'}</span></div>
+            <div className="nt-note-title"><h3>{viewed.title}</h3><a className="nt-source-link" href={viewed.sourceUrl} target="_blank" rel="noopener noreferrer">查看原文 ↗</a></div>
+            <p className="nt-note-file">{viewed.file}</p>
+          </header>
+          {historical ? <div className="kw-history-banner"><span>历史标签版本，只读{viewed.sourceHash !== selected?.sourceHash ? ' · 原文版本已更新' : ''}</span><button type="button" onClick={() => { setViewedKey(null); changeDetailTab('overview') }}>返回当前标签</button></div> : <div className="nt-detail-actions" aria-label="笔记操作">
+            <button type="button" className="kw-button kw-primary" disabled={!ready || Boolean(error)} onClick={() => openEditor(viewed)}>编辑标签</button>
+            <button type="button" className="kw-button" disabled={!ready || Boolean(error) || !viewed.tags.length || viewed.status === 'reviewed'} onClick={confirmTags}>{viewed.status === 'reviewed' ? '标签已核对' : '确认标签'}</button>
+          </div>}
+          <section className="nt-current-tags" aria-label="当前标签">
+            <div className="nt-facets">{(historical ? [...TAG_DIMENSIONS, ...LEGACY_TAG_DIMENSIONS.filter(dimension => !TAG_DIMENSIONS.some(active => active.id === dimension.id))] : TAG_DIMENSIONS).map((dimension) => <div key={dimension.id}><strong>{dimension.label}</strong><span className="nt-chips">{viewed.tags.filter(tag => tag.startsWith(`${dimension.id}.`)).map(tag => <span key={tag}>{TAG_LABELS[tag]}</span>)}{!viewed.tags.some(tag => tag.startsWith(`${dimension.id}.`)) ? <small className="nt-muted">待补充</small> : null}</span></div>)}</div>
+          </section>
+          <NoteDetailNavigation active={detailTab} onChange={changeDetailTab} />
+          <div role="tabpanel" id="nt-panel-overview" aria-labelledby="nt-tab-overview" hidden={detailTab !== 'overview'} tabIndex={0} className="nt-detail-panel">
+            <section className="nt-detail-card"><h4>笔记摘要</h4><NoteExcerpt text={viewed.summary} /></section>
+            <section className="nt-detail-card nt-supplement-summary"><div className="nt-card-heading"><h4>补充说明</h4>{!historical ? <button type="button" className="kw-button" disabled={!ready || Boolean(error)} onClick={() => openEditor(viewed, true)}>{viewed.supplement ? '修改补充说明' : '补充说明'}</button> : null}</div>{viewed.supplement ? <NoteExcerpt text={viewed.supplement} /> : <p className="nt-empty-copy">还没有补充说明。可补充使用场景、理解或需要纠正的内容。</p>}</section>
+            {!historical && viewed.level === 'document' ? <NoteTagReextract key={tagVersionKey(viewed)} record={viewed} disabled={!ready || Boolean(error)} onAdopt={candidate => openEditor({ ...viewed, tags: [...candidate.tags], evidence: candidate.evidence, sourceReferences: [...(viewed.sourceReferences ?? []), ...viewed.evidence], extraction: candidate.extraction }, false, true)} /> : null}
+            <details className="nt-detail-card nt-version-note"><summary>本次修订信息 <span>{formatTime(viewed.createdAt)}</span></summary><p className="nt-revision">{viewed.version === 1 ? '自动候选' : '人工修订'} · {viewed.revisionReason}</p></details>
+          </div>
+          <div role="tabpanel" id="nt-panel-source" aria-labelledby="nt-tab-source" hidden={detailTab !== 'source'} tabIndex={0} className="nt-detail-panel">
+            <section className="nt-detail-card"><div className="nt-card-heading"><h4>原文片段</h4><span className="nt-muted">完整内容可从顶部查看原文</span></div><NoteExcerpt text={viewed.sourceExcerpt} /></section>
+            <EvidenceGroups items={viewed.evidence} />
+            {viewed.supplementEvidence?.length ? <EvidenceGroups items={viewed.supplementEvidence} supplemental /> : null}
+            {extraction ? <details className="nt-detail-card nt-extraction"><summary>AI 提取说明{modelDisagreements.length ? ` · ${modelDisagreements.length} 个分歧待核对` : ''}</summary><p>原始标签由 {extraction.models.join('、')} 提取；人工调整按当前版本记录。</p><p>{extraction.note}</p>{modelDisagreements.length ? <div><strong>模型分歧（未采用）</strong><ul>{modelDisagreements.map(item => <li key={`${item.model}-${item.tagId}`}>{TAG_LABELS[item.tagId]} · {item.model}</li>)}</ul></div> : null}{aiCandidate && viewed.version > 1 && !historical ? <button type="button" className="kw-button" disabled={!ready || Boolean(error)} onClick={() => openEditor({ ...viewed, tags: [...aiCandidate.tags], evidence: aiCandidate.evidence.map(item => ({ ...item })), sourceReferences: [...(aiCandidate.sourceReferences ?? []), ...viewed.evidence], extraction: aiCandidate.extraction }, false, true)}>采用 AI 精简标签</button> : null}</details> : null}
+            {viewed.gaps.length ? <details className="nt-detail-card nt-boundaries"><summary>待补定义与边界 · {viewed.gaps.length} 项</summary><ul>{viewed.gaps.map((gap, index) => <li key={index}>{gap}</li>)}</ul></details> : null}
+          </div>
+          <div role="tabpanel" id="nt-panel-history" aria-labelledby="nt-tab-history" hidden={detailTab !== 'history'} tabIndex={0} className="nt-detail-panel">
+            <section className="nt-detail-card nt-history-card"><div className="nt-card-heading"><h4>标签历史 · {history.length} 个版本</h4></div><p className="nt-muted">查看旧版本不会覆盖当前标签。</p><ol className="nt-version-list">{history.map(record => <li key={tagVersionKey(record)}><div><div className="nt-version-heading"><strong>v{record.version}{record.sourceHash !== selected?.sourceHash ? ' · 旧原文' : ''}</strong>{tagVersionKey(record) === tagVersionKey(selected) ? <span>当前版本</span> : null}</div><time dateTime={record.createdAt}>{formatTime(record.createdAt)}</time><p>{record.revisionReason}</p></div><button type="button" className="kw-button" aria-label={`查看标签 v${record.version}`} onClick={() => { setViewedKey(tagVersionKey(record)); changeDetailTab('overview') }}>查看 v{record.version}</button></li>)}</ol></section>
+            <details className="nt-detail-card"><summary>来源与保存信息</summary><p className="nt-source-hash">原文 SHA-256：{viewed.sourceHash}</p><p className="nt-muted">标签保存在当前浏览器，可通过“导出标签与历史”备份。</p></details>
+          </div>
         </> : <div className="kw-empty"><h3>选择一篇笔记查看标签依据</h3></div>}
       </section>
     </div>

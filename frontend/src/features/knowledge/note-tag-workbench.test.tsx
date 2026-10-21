@@ -12,6 +12,22 @@ beforeEach(() => localStorage.clear())
 afterEach(() => vi.unstubAllGlobals())
 
 describe('note tagging workbench', () => {
+  it('separates reading views with keyboard navigation and resets when choosing another note', () => {
+    render(<NoteTagWorkbench catalog={fixture} />)
+    const overview = screen.getByRole('tab', { name: '概览' })
+    expect(overview).toHaveAttribute('aria-selected', 'true')
+    fireEvent.keyDown(overview, { key: 'ArrowRight' })
+    const source = screen.getByRole('tab', { name: '原文与依据' })
+    expect(source).toHaveFocus()
+    expect(screen.getByRole('tabpanel', { name: '原文与依据' })).toBeVisible()
+    expect(screen.queryByRole('tabpanel', { name: '概览' })).not.toBeInTheDocument()
+    fireEvent.keyDown(source, { key: 'End' })
+    expect(screen.getByRole('tabpanel', { name: '版本历史' })).toBeVisible()
+    fireEvent.click(screen.getByRole('button', { name: '查看标签：选股总结' }))
+    expect(overview).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('button', { name: '编辑标签' })).toBeVisible()
+  })
+
   it('previews fresh dual-model results and appends a version only after editor save', async () => {
     const original = currentTagRecords(fixture.documents, [])[0]
     const candidate = { id: original.id, sourceHash: original.sourceHash, tags: ['topic.ma'], evidence: [{ ...original.evidence[0], tagId: 'topic.ma', method: 'ai', reason: '本次双模型提取' }], extraction: { models: ['DeepSeek', 'Codex'], note: '本次全文提取', disagreements: [{ tagId: 'topic.climb', model: 'DeepSeek' }] } }
@@ -52,6 +68,8 @@ describe('note tagging workbench', () => {
     localStorage.setItem(NOTE_TAG_STORAGE_KEY, JSON.stringify({ schemaVersion: 1, records: [original, reviewed] }))
     const aiCatalog = applyAIOriginalTags(fixture, [{ id: original.id, sourceHash: original.sourceHash, tags: ['topic.ma'], evidence: [{ ...original.evidence[0], tagId: 'topic.ma', method: 'ai' }], extraction: { models: ['DeepSeek', 'Codex'], note: '仅保留核心主题', disagreements: [] } }])
     render(<NoteTagWorkbench catalog={aiCatalog} />)
+    fireEvent.click(screen.getByRole('tab', { name: '原文与依据' }))
+    fireEvent.click(screen.getByText('AI 提取说明'))
     fireEvent.click(screen.getByRole('button', { name: '采用 AI 精简标签' }))
     const editor = screen.getByRole('dialog')
     expect(within(editor).getByRole('checkbox', { name: 'MA均线' })).toBeChecked()
@@ -130,7 +148,7 @@ describe('note tagging workbench', () => {
     render(<NoteTagWorkbench catalog={fixture} />)
     await user.click(screen.getByRole('button', { name: '查看标签：选股总结' }))
     expect(screen.getByRole('region', { name: '标签详情' })).toHaveTextContent('人工修订')
-    await user.click(screen.getByText('标签历史 · 2 个版本'))
+    await user.click(screen.getByRole('tab', { name: '版本历史' }))
     await user.click(screen.getByRole('button', { name: '查看标签 v1' }))
     expect(screen.getByText('历史标签版本，只读')).toBeInTheDocument()
     expect(within(screen.getByRole('region', { name: '标签详情' })).queryByRole('button', { name: '编辑标签' })).not.toBeInTheDocument()
