@@ -1,4 +1,4 @@
-import { TAG_LABELS } from '@/features/knowledge/note-tags'
+import { ACTIVE_TAG_LABELS as TAG_LABELS } from '@/features/knowledge/note-tags'
 import { getAIConfiguration } from '@/lib/ai-config'
 import { suggestSupplement } from '../../../scripts/note-tag-suggestions.mjs'
 

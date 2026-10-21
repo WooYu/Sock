@@ -1,9 +1,122 @@
 [
-  {"id":"kind","label":"内容类型","options":[{"id":"kind.formula","label":"计算公式"},{"id":"kind.experience","label":"经验"},{"id":"kind.principle","label":"交易原则"},{"id":"kind.case","label":"案例"},{"id":"kind.context","label":"背景资料"}]},
-  {"id":"topic","label":"分析主题","options":[{"id":"topic.ma5","label":"MA5"},{"id":"topic.ma10","label":"MA10"},{"id":"topic.ma20","label":"MA20"},{"id":"topic.ma","label":"均线"},{"id":"topic.boll","label":"BOLL"},{"id":"topic.volume","label":"量价"},{"id":"topic.double-high","label":"双高"},{"id":"topic.granville","label":"葛兰碧"},{"id":"topic.turtle","label":"海龟"},{"id":"topic.mirror","label":"照镜子"},{"id":"topic.phase","label":"摸线／三期"},{"id":"topic.valuation","label":"估值"},{"id":"topic.position","label":"仓位"},{"id":"topic.market","label":"大盘与板块"},{"id":"topic.unknown","label":"主题待补充"}]},
-  {"id":"purpose","label":"使用目的","options":[{"id":"purpose.screen","label":"选股过滤"},{"id":"purpose.trend","label":"趋势判断"},{"id":"purpose.levels","label":"支撑压力"},{"id":"purpose.forecast","label":"参数推演"},{"id":"purpose.valuation","label":"估值区间"},{"id":"purpose.risk","label":"风险控制"},{"id":"purpose.explain","label":"解释与复盘"},{"id":"purpose.unknown","label":"用途待补充"}]},
-  {"id":"timeframe","label":"周期","options":[{"id":"timeframe.daily","label":"日线"},{"id":"timeframe.weekly","label":"周线"},{"id":"timeframe.monthly","label":"月线"},{"id":"timeframe.intraday","label":"分钟／盘中"},{"id":"timeframe.unknown","label":"周期未明确"}]},
-  {"id":"scope","label":"适用范围","options":[{"id":"scope.stock","label":"A股"},{"id":"scope.etf","label":"ETF"},{"id":"scope.bond","label":"可转债"},{"id":"scope.rising","label":"上涨情境"},{"id":"scope.sideways","label":"震荡情境"},{"id":"scope.falling","label":"下跌情境"},{"id":"scope.unknown","label":"适用范围未明确"}]},
-  {"id":"data","label":"数据依赖","options":[{"id":"data.daily","label":"日线行情"},{"id":"data.intraday","label":"分钟行情"},{"id":"data.financial","label":"财报"},{"id":"data.sector","label":"板块／指数"},{"id":"data.portfolio","label":"账户与持仓"},{"id":"data.attachment","label":"图片／音视频"},{"id":"data.unknown","label":"数据需求待补充"}]},
-  {"id":"computability","label":"可计算性","options":[{"id":"computability.direct","label":"可直接计算"},{"id":"computability.definition","label":"需补定义"},{"id":"computability.data","label":"缺数据"},{"id":"computability.reference","label":"仅供解释"}]}
+  {
+    "id": "kind",
+    "label": "内容分类",
+    "options": [
+      {
+        "id": "kind.parameter",
+        "label": "参数"
+      },
+      {
+        "id": "kind.experience",
+        "label": "经验"
+      },
+      {
+        "id": "kind.principle",
+        "label": "交易原则"
+      },
+      {
+        "id": "kind.case",
+        "label": "案例"
+      },
+      {
+        "id": "kind.screen",
+        "label": "选股"
+      },
+      {
+        "id": "kind.profit",
+        "label": "盈利模式"
+      },
+      {
+        "id": "kind.review",
+        "label": "解释与复盘"
+      },
+      {
+        "id": "kind.unknown",
+        "label": "类型待补充"
+      }
+    ]
+  },
+  {
+    "id": "topic",
+    "label": "分析主题",
+    "options": [
+      {
+        "id": "topic.formula",
+        "label": "计算公式"
+      },
+      {
+        "id": "topic.parameter-thinking",
+        "label": "参数计算思想"
+      },
+      {
+        "id": "topic.risk",
+        "label": "风险控制"
+      },
+      {
+        "id": "topic.buy",
+        "label": "买入"
+      },
+      {
+        "id": "topic.sell",
+        "label": "卖出"
+      },
+      {
+        "id": "topic.ma",
+        "label": "MA均线"
+      },
+      {
+        "id": "topic.boll",
+        "label": "Boll线"
+      },
+      {
+        "id": "topic.volume",
+        "label": "量价"
+      },
+      {
+        "id": "topic.phase1",
+        "label": "摸线一期"
+      },
+      {
+        "id": "topic.phase2",
+        "label": "摸线二期"
+      },
+      {
+        "id": "topic.phase3",
+        "label": "摸线三期"
+      },
+      {
+        "id": "topic.climb",
+        "label": "攀升"
+      },
+      {
+        "id": "topic.surge",
+        "label": "飙升"
+      },
+      {
+        "id": "topic.double-high",
+        "label": "双高"
+      },
+      {
+        "id": "topic.granville",
+        "label": "葛兰碧"
+      },
+      {
+        "id": "topic.turtle",
+        "label": "海龟"
+      },
+      {
+        "id": "topic.mirror",
+        "label": "照镜子"
+      },
+      {
+        "id": "topic.position",
+        "label": "仓位"
+      },
+      {
+        "id": "topic.unknown",
+        "label": "主题待补充"
+      }
+    ]
+  }
 ]

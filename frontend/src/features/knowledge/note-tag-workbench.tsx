@@ -5,7 +5,7 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import catalogData from './note-tag-catalog.json'
 import aiTagResults from './note-tag-ai-results.json'
-import { NOTE_TAG_STORAGE_KEY, TAG_DIMENSIONS, TAG_LABELS, currentTagRecords, filterTagRecords, mergeTagVersions,
+import { NOTE_TAG_STORAGE_KEY, TAG_DIMENSIONS, LEGACY_TAG_DIMENSIONS, TAG_LABELS, activeTagRecord, currentTagRecords, filterTagRecords, mergeTagVersions,
   applyAIOriginalTags, parseTagLedger, reviseTags, reviewTags, tagVersionKey, type AIOriginalTags, type NoteCatalog, type NoteTagRecord, type TagDimension, type TagRevisionDraft, type TagSuggestion } from './note-tags'
 import './note-tag-workbench.css'
 import { NoteTagReextract } from './note-tag-reextract'
@@ -70,7 +70,7 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
   const store = useMemo(() => createTagStore(), [])
   const { records: local, ready, error } = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getServerSnapshot)
   const base = useMemo(() => [...catalog.documents, ...catalog.fragments], [catalog])
-  const current = useMemo(() => currentTagRecords(base, local), [base, local])
+  const current = useMemo(() => currentTagRecords(base, local).map(activeTagRecord), [base, local])
   const allVersions = useMemo(() => mergeTagVersions(base, local), [base, local])
   const [level, setLevel] = useState<'document' | 'fragment'>('document')
   const [view, setView] = useState<'tags' | 'study'>('tags')
@@ -107,9 +107,10 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
   const currentPage = Math.min(page, pages - 1)
   const selected = filtered.find((record) => record.id === selectedId) ?? filtered[0]
   const history = allVersions.filter((record) => record.id === selected?.id).sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.version - a.version)
-  const viewed = history.find((record) => tagVersionKey(record) === viewedKey) ?? selected
+  const viewed = (viewedKey ? history.find((record) => tagVersionKey(record) === viewedKey && viewedKey !== (selected && tagVersionKey(selected))) : null) ?? selected
   const historical = Boolean(viewed && selected && tagVersionKey(viewed) !== tagVersionKey(selected))
-  const aiCandidate = base.find(record => record.id === viewed?.id && record.sourceHash === viewed.sourceHash && record.extraction)
+  const aiOriginal = base.find(record => record.id === viewed?.id && record.sourceHash === viewed.sourceHash && record.extraction)
+  const aiCandidate = aiOriginal ? activeTagRecord(aiOriginal) : undefined
   const modelDisagreements = viewed?.extraction?.disagreements.filter(item => !viewed.tags.includes(item.tagId)) ?? []
 
   function persist(next: NoteTagRecord, previous: NoteTagRecord) {
@@ -143,7 +144,7 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
     try {
       if (!ready || error) throw new Error('请先解决本地标签读取问题。')
       const blob = new Blob([JSON.stringify({ schemaVersion: 1, exportedAt: new Date().toISOString(), sourceCommit: catalog.sourceCommit,
-        sourceRepository: catalog.sourceRepository, taxonomy: TAG_DIMENSIONS, records: allVersions }, null, 2)], { type: 'application/json;charset=utf-8' })
+        sourceRepository: catalog.sourceRepository, taxonomy: TAG_DIMENSIONS, legacyTaxonomy: LEGACY_TAG_DIMENSIONS, records: allVersions }, null, 2)], { type: 'application/json;charset=utf-8' })
       const url = URL.createObjectURL(blob)
       const anchor = document.createElement('a')
       anchor.href = url; anchor.download = 'stockcal-note-tags.json'; document.body.appendChild(anchor); anchor.click(); anchor.remove()
@@ -165,12 +166,12 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
     <nav className="nt-study-tabs" aria-label="笔记工作视图"><button type="button" aria-pressed="true">标签与版本</button><button type="button" onClick={() => setView('study')}>逐篇学习建议</button></nav>
     <div className="nt-heading"><div><h2>笔记标签目录</h2><p>{catalog.documents.length} 篇笔记 · {catalog.fragments.length} 个原文片段 · {catalog.audit.addedFiles.length} 篇补充资料</p></div><button type="button" className="kw-button" disabled={!ready || Boolean(error)} onClick={exportTags}>导出标签与历史</button></div>
     <p className="nt-context">后续研究对象：<Link href="/?symbol=603533">掌阅科技 · 603533</Link>。通用笔记保留通用范围，股票案例按原文处理。</p>
-    <p className="nt-disclaimer">自动标签为待核对候选；可直接计算只表示定义分类。标签核对不代表计算定义或预测效果已验证。</p>
+    <p className="nt-disclaimer">自动标签为待核对候选；标签核对不代表计算定义或预测效果已验证。</p>
     {error ? <div className="kw-alert" role="alert">{error}<button type="button" onClick={store.refresh}>重新读取标签</button></div> : null}
     {writeError && !editor ? <div className="kw-alert" role="alert">{writeError}</div> : null}
     {message ? <div className="kw-notice" role="status">{message}</div> : null}
     <div className="nt-filters" aria-label="标签筛选">
-      <label>搜索笔记与标签<input aria-label="搜索笔记与标签" value={query} placeholder="标题、原文片段、MA5…" onChange={(event) => { setQuery(event.target.value); setPage(0); setViewedKey(null) }} /></label>
+      <label>搜索笔记与标签<input aria-label="搜索笔记与标签" value={query} placeholder="标题、原文片段、MA均线…" onChange={(event) => { setQuery(event.target.value); setPage(0); setViewedKey(null) }} /></label>
       <label>标注层级<select value={level} onChange={(event) => { setLevel(event.target.value as typeof level); setPage(0); setViewedKey(null) }}><option value="document">整篇笔记</option><option value="fragment">规则片段</option></select></label>
       {TAG_DIMENSIONS.map((dimension) => <label key={dimension.id}>{dimension.label}<select value={facets[dimension.id] ?? ''} onChange={(event) => { setFacets((previous) => ({ ...previous, [dimension.id]: event.target.value })); setPage(0); setViewedKey(null) }}><option value="">全部</option>{dimension.options.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}</select></label>)}
       <label>标签核对状态<select value={status} onChange={(event) => { setStatus(event.target.value); setPage(0); setViewedKey(null) }}><option value="all">全部</option><option value="candidate">待核对</option><option value="reviewed">已核对标签</option></select></label>
@@ -180,7 +181,7 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
       <section className="nt-list" aria-label="笔记目录">
         <div className="nt-list-heading"><strong>{level === 'document' ? '整篇笔记' : '规则片段'}</strong><span>{filtered.length} 条结果</span></div>
         {filtered.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE).map((record) => <div key={record.id} className="nt-record-row"><button type="button" className="nt-record" aria-label={`查看标签：${record.title}`} aria-pressed={record.id === selected?.id} onClick={() => choose(record)}><strong>{record.title}</strong><small>{record.file}</small><span className="nt-chips">{(record.extraction ? record.tags.slice(0, 5) : record.tags.filter((tag) => tag.startsWith('topic.')).slice(0, 4)).map((tag) => <span key={tag}>{TAG_LABELS[tag]}</span>)}</span><span className="nt-record-status">{record.status === 'reviewed' ? '标签已核对' : '候选 · 待核对'} · v{record.version}</span></button><a className="nt-source-link" href={record.sourceUrl} target="_blank" rel="noopener noreferrer" aria-label={`查看原文：${record.title}`}>查看原文 ↗</a></div>)}
-        {!filtered.length ? <div className="kw-empty"><h3>没有符合条件的笔记</h3><p>调整主题、用途或关键词后再试。</p></div> : null}
+        {!filtered.length ? <div className="kw-empty"><h3>没有符合条件的笔记</h3><p>调整内容分类、分析主题或关键词后再试。</p></div> : null}
         <div className="nt-pagination"><button type="button" className="kw-button" disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}>上一页</button><span>{currentPage + 1} / {pages}</span><button type="button" className="kw-button" disabled={currentPage + 1 >= pages} onClick={() => setPage(currentPage + 1)}>下一页</button></div>
       </section>
       <section className="nt-detail" aria-label="标签详情" ref={detailRef}>
@@ -192,7 +193,7 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
           {viewed.supplementEvidence?.length ? <EvidenceGroups items={viewed.supplementEvidence} supplemental /> : null}
           {!historical && viewed.level === 'document' ? <NoteTagReextract key={tagVersionKey(viewed)} record={viewed} disabled={!ready || Boolean(error)} onAdopt={candidate => openEditor({ ...viewed, tags: [...candidate.tags], evidence: candidate.evidence, sourceReferences: [...(viewed.sourceReferences ?? []), ...viewed.evidence], extraction: candidate.extraction }, false, true)} /> : null}
           {viewed.extraction ? <section className="nt-extraction"><p>原始标签由 {viewed.extraction.models.join('、')} 提取；人工调整按当前版本记录。</p>{!viewed.tags.length ? <p>暂无可确认的核心标签，请核对原文或补充说明。</p> : null}{modelDisagreements.length ? <details><summary>模型分歧 · {modelDisagreements.length} 个候选</summary><p>以下仅供核对，尚未作为标签采用。</p><ul>{modelDisagreements.map(item => <li key={`${item.model}-${item.tagId}`}>{TAG_LABELS[item.tagId]} · {item.model}</li>)}</ul></details> : null}<details><summary>查看提取说明</summary><p>{viewed.extraction.note}</p></details></section> : null}
-          <div className="nt-facets">{TAG_DIMENSIONS.filter(dimension => viewed.tags.some(tag => tag.startsWith(`${dimension.id}.`))).map((dimension) => <div key={dimension.id}><strong>{dimension.label}</strong><span className="nt-chips">{viewed.tags.filter((tag) => tag.startsWith(`${dimension.id}.`)).map((tag) => <span key={tag}>{TAG_LABELS[tag]}</span>)}</span></div>)}</div>
+          <div className="nt-facets">{(historical ? [...TAG_DIMENSIONS, ...LEGACY_TAG_DIMENSIONS.filter(dimension => !TAG_DIMENSIONS.some(active => active.id === dimension.id))] : TAG_DIMENSIONS).filter(dimension => viewed.tags.some(tag => tag.startsWith(`${dimension.id}.`))).map((dimension) => <div key={dimension.id}><strong>{dimension.label}</strong><span className="nt-chips">{viewed.tags.filter((tag) => tag.startsWith(`${dimension.id}.`)).map((tag) => <span key={tag}>{TAG_LABELS[tag]}</span>)}</span></div>)}</div>
           <section className="kw-detail-section"><h4>原文片段</h4><blockquote className="nt-source">{viewed.sourceExcerpt}</blockquote><a className="nt-source-link" href={viewed.sourceUrl} target="_blank" rel="noopener noreferrer">查看 {viewed.file} 原文</a></section>
           {viewed.gaps.length ? <section className="kw-detail-section"><h4>待补定义与边界</h4><ul>{viewed.gaps.map((gap, index) => <li key={index}>{gap}</li>)}</ul></section> : null}
           <EvidenceGroups items={viewed.evidence} />

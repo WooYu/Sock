@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { expect, test } from 'vitest'
 import { IndicatorProjectionLayer } from './indicator-projection-layer'
-import { CHART_PERIODS, type IndicatorValues, isIntradayPeriod } from './chart-periods'
+import { CHART_PERIODS, MA_COLORS, type IndicatorValues, isIntradayPeriod } from './chart-periods'
 import { projectionTimes } from './indicator-projection'
 import { createChartTransform } from './chart-coordinates'
 
@@ -16,4 +16,7 @@ test.each(CHART_PERIODS)('%s displays four guides, all selected indicators, limi
   expect(screen.getByTestId('projection-tooltip')).toHaveTextContent('+1.00%')
   expect(screen.getByTestId('projection-tooltip')).toHaveTextContent('BOLL上')
   expect(screen.getByTestId('projection-tooltip')).toHaveTextContent('每日 ±10.00%')
+  expect(screen.getByTestId('projection-tooltip').querySelector('[data-indicator="ma5"]')).toHaveAttribute('fill', MA_COLORS.ma5)
+  expect(screen.getByTestId('projection-tooltip').querySelector('[data-indicator="bollUpper"]')).toHaveAttribute('fill', '#6f7fd8')
+  expect(screen.getByTestId('projection-tooltip').querySelector('[data-indicator="bollMiddle"]')).toHaveAttribute('fill', '#94a3b8')
 })

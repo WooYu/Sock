@@ -8,6 +8,9 @@ export type IndicatorKey = MaKey | 'boll'
 export type IndicatorValue = number | null
 export type IndicatorValues = Partial<Record<MaKey, IndicatorValue[]>> & { boll: { upper: IndicatorValue[]; middle: IndicatorValue[]; lower: IndicatorValue[] } }
 export const MA_COLORS: Record<MaKey, string> = { ma5: '#c47a08', ma10: '#167a9b', ma20: '#8753b5', ma30: '#27949e', ma60: '#c67c38', ma90: '#bd688f', ma120: '#738196', ma250: '#78613f' }
+export function indicatorColor(key: MaKey | 'bollUpper' | 'bollMiddle' | 'bollLower', ma20Visible = false): string {
+  return key.startsWith('ma') ? MA_COLORS[key as MaKey] : key === 'bollMiddle' ? ma20Visible ? MA_COLORS.ma20 : '#94a3b8' : '#6f7fd8'
+}
 export const DEFAULT_INDICATORS: Record<IndicatorKey, boolean> = { ma5: true, ma10: true, ma20: true, ma30: true, ma60: true, ma90: true, ma120: true, ma250: true, boll: true }
 export function isChartPeriod(value: unknown): value is ChartPeriod { return typeof value === 'string' && (CHART_PERIODS as readonly string[]).includes(value) }
 export function isMinutePeriod(period: ChartPeriod) { return /^\d+m$/.test(period) }

@@ -1,7 +1,7 @@
 import { scenarioCalendar } from '../scenario/scenario-calendar-data'
 import { useState } from 'react'
 import type { ChartTransform } from './chart-coordinates'
-import { formatChartTime, MA_COLORS, MA_PERIODS, type ChartPeriod, type IndicatorKey, type IndicatorValues, type MaKey } from './chart-periods'
+import { formatChartTime, indicatorColor, MA_PERIODS, type ChartPeriod, type IndicatorKey, type IndicatorValues, type MaKey } from './chart-periods'
 import { projectionLimitDays, type ProjectionKey, type IndicatorProjection } from './indicator-projection'
 
 type Props = { baseClose?: number; previousClose?: number; limitRatio?: number; times: string[]; estimated?: boolean; ranges?: IndicatorProjection['ranges'][]; historicalCount: number; transform: ChartTransform; period: ChartPeriod; indicators: Partial<Record<IndicatorKey, boolean>>; values: IndicatorValues; interactive: boolean; selectedTime?: string | null; onSelect?: (time: string | null) => void }
@@ -30,7 +30,7 @@ export function IndicatorProjectionLayer({ baseClose, previousClose, limitRatio,
     return value >= limitBase * (1 - limitRatio!) ** days - .005 && value <= limitBase * (1 + limitRatio!) ** days + .005
   }
   const percent = (value: number) => { const change = (value / baseClose! - 1) * 100; return `${change >= 0 ? '+' : ''}${change.toFixed(2)}%` }
-  const color = (key: ProjectionKey) => key.startsWith('ma') ? MA_COLORS[key as MaKey] : '#6f7fd8'
+  const color = (key: ProjectionKey) => indicatorColor(key, indicators.ma20)
   const x = transform.xForTime(times[0]) - transform.widthForTime(times[0]) / 2
   const textTime = (time: string) => time.startsWith('forecast:') ? `第${times.indexOf(time) + 1}根 · 日期待核实` : formatChartTime(time, period)
   return <g data-testid="indicator-projection" onKeyDown={e => { if (e.key === 'Escape') { selectTime(null); setHoveredTime(null) } }}>
@@ -56,7 +56,7 @@ export function IndicatorProjectionLayer({ baseClose, previousClose, limitRatio,
       <text x={transform.rect.left + 16} y={transform.rect.top + 43} fill="white" fontSize="11">{estimated ? '预计 ' : ''}{textTime(times[selected])} · 预测 / 情景区间</text>
       {keys.map((key, i) => {
         const value = valueAt(key, selected), range = ranges?.[selected]?.[key]
-        return <text key={key} x={transform.rect.left + 16} y={transform.rect.top + 63 + i * 18} fill="white" fontSize="11">{value != null && withinLimit(value, selected) ? '◆ ' : ''}{labels[key] ?? key.toUpperCase()}　{value?.toFixed(2) ?? '—'} {value != null && hasBase ? `(${percent(value)})` : ''}　{value == null ? '历史不足' : range ? `${range[0].toFixed(2)}～${range[1].toFixed(2)}` : '区间暂无'}</text>
+        return <text key={key} data-indicator={key} x={transform.rect.left + 16} y={transform.rect.top + 63 + i * 18} fill={color(key)} fontSize="11">{value != null && withinLimit(value, selected) ? '◆ ' : ''}{labels[key] ?? key.toUpperCase()}　{value?.toFixed(2) ?? '—'} {value != null && hasBase ? `(${percent(value)})` : ''}　{value == null ? '历史不足' : range ? `${range[0].toFixed(2)}～${range[1].toFixed(2)}` : '区间暂无'}</text>
       })}
       <text x={transform.rect.left + 16} y={transform.rect.top + 68 + keys.length * 18} fill="#dbe4ff" fontSize="10">{hasBase ? `百分比相对历史末根收盘 ${baseClose!.toFixed(2)}` : '缺少收盘基准，无法计算涨跌幅'}</text>
       <text x={transform.rect.left + 16} y={transform.rect.top + 83 + keys.length * 18} fill="#dbe4ff" fontSize="10">{hasLimit && reach(selected) && (!minute || (previousClose != null && previousClose > 0)) ? `◆ 限制内：每日 ±${(limitRatio! * 100).toFixed(2)}%，累计 ${reach(selected)!.days + (minute ? 1 : 0)} 个交易日${reach(selected)!.estimated ? '（日历待核实）' : ''}${minute ? '，基准为昨收' : ''}` : '未标记限制范围：缺少有效基准或涨跌幅限制'}</text>

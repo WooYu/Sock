@@ -12,11 +12,11 @@ const record = { id: 'note:test.md', sourceHash: createHash('sha256').update(sou
 const tag = (tagId: string) => ({ tagId, quote: source, startLine: 1, endLine: 1, reason: '全文核心意图' })
 beforeEach(() => vi.clearAllMocks())
 it('adopts only consensus and preserves both models evidence, disagreements and provenance', async () => {
-  vi.mocked(extract).mockResolvedValueOnce({ tags: [tag('topic.ma'), tag('purpose.trend')], note: '一' }).mockResolvedValueOnce({ tags: [tag('topic.ma')], note: '二' })
+  vi.mocked(extract).mockResolvedValueOnce({ tags: [tag('topic.ma'), tag('topic.climb')], note: '一' }).mockResolvedValueOnce({ tags: [tag('topic.ma')], note: '二' })
   const result = await extractNoteTags(record, source)
   expect(result.candidate?.tags).toEqual(['topic.ma'])
   expect(result.candidate?.evidence).toHaveLength(2)
-  expect(result.candidate?.extraction.disagreements).toEqual([{ tagId: 'purpose.trend', model: 'DeepSeek · deepseek-chat' }])
+  expect(result.candidate?.extraction.disagreements).toEqual([{ tagId: 'topic.climb', model: 'DeepSeek · deepseek-chat' }])
   expect(result.candidate?.extraction.promptHash).toMatch(/^[a-f0-9]{64}$/)
   expect(extract).toHaveBeenCalledWith(expect.objectContaining({ provider: 'codex' }), source)
 })

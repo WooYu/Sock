@@ -4,6 +4,10 @@ import { POST } from './route'
 afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals() })
 beforeEach(() => { vi.stubEnv('VERCEL', ''); vi.stubEnv('STOCKCAL_TAG_REMOTE', '') })
 const request = () => new Request('http://test/api/note-tag-suggestions', { method: 'POST', body: JSON.stringify({ source: '均线', tags: ['topic.ma'], supplement: '用于风险控制' }) })
+it('rejects retired taxonomy tags before contacting the model or worker', async () => {
+  const response = await POST(new Request('http://test/api/note-tag-suggestions', { method: 'POST', body: JSON.stringify({ source: '均线', tags: ['timeframe.daily'], supplement: '用于风险控制' }) }))
+  expect(response.status).toBe(400)
+})
 it('uses the server worker for production supplementary suggestions', async () => {
   vi.stubEnv('VERCEL', '1')
   vi.stubEnv('STOCKCAL_RECORDS_API_BASE_URL', 'https://backend.test')
@@ -18,7 +22,7 @@ it('returns an explicit unavailable response without model credentials', async (
 })
 it('accepts grounded suggestions and rejects fabricated quotes', async () => {
   vi.stubEnv('AI_API_KEY', 'test')
-  const suggestion = { tagId: 'purpose.risk', action: 'add', quote: '风险控制', reason: '用户说明用途', conflict: '' }
+  const suggestion = { tagId: 'topic.risk', action: 'add', quote: '风险控制', reason: '用户说明用途', conflict: '' }
   const fetchMock = vi.fn().mockImplementation(() => Promise.resolve(Response.json({ choices: [{ message: { content: JSON.stringify({ suggestions: [suggestion] }) } }] })))
   vi.stubGlobal('fetch', fetchMock)
   expect((await POST(request())).status).toBe(200)

@@ -11,9 +11,9 @@ test('previews independent model results and saves only after explicit adoption'
     const record = catalog.documents.find(item => item.id === input.id)!
     const evidence = [{ ...record.evidence[0], tagId: 'topic.ma', method: 'ai', reason: '本次双模型共识' }]
     await route.fulfill({ json: { ...input, models: [
-      { name: 'DeepSeek', tags: ['topic.ma', 'purpose.trend'], evidence, note: '主要研究均线' },
+      { name: 'DeepSeek', tags: ['topic.ma', 'topic.climb'], evidence, note: '主要研究均线' },
       { name: 'Codex', tags: ['topic.ma'], evidence, note: '只保留核心主题' },
-    ], candidate: { ...input, tags: ['topic.ma'], evidence, extraction: { models: ['DeepSeek', 'Codex'], note: '本次双模型提取', disagreements: [{ tagId: 'purpose.trend', model: 'DeepSeek' }] } } } })
+    ], candidate: { ...input, tags: ['topic.ma'], evidence, extraction: { models: ['DeepSeek', 'Codex'], note: '本次双模型提取', disagreements: [{ tagId: 'topic.climb', model: 'DeepSeek' }] } } } })
   })
   await page.goto('/knowledge?view=notes')
   await page.getByRole('button', { name: 'AI 重新提取标签', exact: true }).click()
@@ -23,7 +23,7 @@ test('previews independent model results and saves only after explicit adoption'
   await page.screenshot({ path: test.info().outputPath('dual-ai-preview.png') })
   await preview.getByRole('button', { name: '采用本次结果并编辑' }).click()
   const editor = page.getByRole('dialog', { name: '修订笔记标签' })
-  await expect(editor.getByRole('checkbox', { name: '均线', exact: true })).toBeChecked()
+  await expect(editor.getByRole('checkbox', { name: 'MA均线', exact: true })).toBeChecked()
   await editor.locator('.nt-editor-body').evaluate(body => { body.scrollTop = body.scrollHeight })
   await expect(editor.getByRole('button', { name: '取消标签编辑' })).toBeInViewport({ ratio: 1 })
   await expect(editor.getByRole('button', { name: '保存标签新版本' })).toBeInViewport({ ratio: 1 })

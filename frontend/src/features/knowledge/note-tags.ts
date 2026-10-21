@@ -25,6 +25,7 @@ export type SupplementEvidence = { tagId: string; quote: string; reason: string 
 export type TagSuggestion = SupplementEvidence & { action: 'add' | 'remove'; conflict: string }
 export type TagRevisionDraft = { tags: string[]; reason: string; evidence: Pick<TagEvidence, 'startLine' | 'endLine' | 'quote'>; supplement?: string; supplementEvidence?: SupplementEvidence[] }
 import taxonomy from './note-tag-taxonomy.json'
+import legacyTaxonomy from './note-tag-taxonomy-legacy.json'
 import noteTitles from './note-titles.json'
 
 function localizedTitle(record: NoteTagRecord): NoteTagRecord {
@@ -33,9 +34,29 @@ function localizedTitle(record: NoteTagRecord): NoteTagRecord {
 }
 
 // Retain retired labels for historical records, but exclude them from active controls.
-export const TAG_DIMENSIONS = (taxonomy as Array<{ id: TagDimension; label: string; options: Array<{ id: string; label: string }> }>).filter(dimension => dimension.id !== 'data')
-export const TAG_LABELS = Object.fromEntries(taxonomy.flatMap((dimension) => dimension.options.map((tag) => [tag.id, tag.label]))) as Record<string, string>
+export const TAG_DIMENSIONS = taxonomy as Array<{ id: TagDimension; label: string; options: Array<{ id: string; label: string }> }>
+export const LEGACY_TAG_DIMENSIONS = legacyTaxonomy as typeof TAG_DIMENSIONS
+export const TAG_LABELS = Object.fromEntries([...legacyTaxonomy, ...taxonomy].flatMap((dimension) => dimension.options.map((tag) => [tag.id, tag.label]))) as Record<string, string>
 export const ACTIVE_TAG_LABELS = Object.fromEntries(TAG_DIMENSIONS.flatMap(dimension => dimension.options.map(tag => [tag.id, tag.label]))) as Record<string, string>
+const TAG_ALIASES: Record<string, string> = {
+  'kind.formula': 'topic.formula', 'purpose.screen': 'kind.screen', 'purpose.explain': 'kind.review',
+  'purpose.risk': 'topic.risk', 'topic.ma5': 'topic.ma', 'topic.ma10': 'topic.ma', 'topic.ma20': 'topic.ma',
+}
+const activeTagId = (id: string): string | null => Object.hasOwn(ACTIVE_TAG_LABELS, id) ? id : TAG_ALIASES[id] ?? null
+
+/** Project old IDs into the current vocabulary without rewriting stored versions or source evidence. */
+export function activeTagRecord(record: NoteTagRecord): NoteTagRecord {
+  const tags = [...new Set(record.tags.flatMap(id => activeTagId(id) ?? []))]
+  const convertEvidence = <T extends { tagId: string }>(items: T[]) => items.flatMap(item => {
+    const tagId = activeTagId(item.tagId)
+    return tagId ? [{ ...item, tagId }] : []
+  })
+  return { ...record, tags, evidence: convertEvidence(record.evidence),
+    sourceReferences: [...new Map([...(record.sourceReferences ?? []), ...record.evidence].map(({ startLine, endLine, quote }) => [JSON.stringify([startLine, endLine, quote]), { startLine, endLine, quote }])).values()],
+    supplementEvidence: record.supplementEvidence ? convertEvidence(record.supplementEvidence) : undefined,
+    extraction: record.extraction ? { ...record.extraction, disagreements: [...new Map(convertEvidence(record.extraction.disagreements).map(item => [JSON.stringify([item.tagId, item.model]), item])).values()] } : undefined,
+    status: record.tags.join('|') === tags.join('|') ? record.status : 'candidate' }
+}
 export const NOTE_TAG_STORAGE_KEY = 'stockcal.note-tags.v1'
 export const tagVersionKey = (record: NoteTagRecord) => `${record.id}@${record.sourceHash}@${record.version}`
 
@@ -105,7 +126,7 @@ export function parseTagLedger(raw: string | null): NoteTagRecord[] {
 export function reviseTags(previous: NoteTagRecord, draft: TagRevisionDraft, createdAt: string): NoteTagRecord {
   if (!draft.reason.trim()) throw new Error('请填写修订原因。')
   const tags = [...new Set(draft.tags)]
-  if (!tags.every((tag) => Object.hasOwn(TAG_LABELS, tag))) throw new Error('请选择有效标签。')
+  if (!tags.every((tag) => Object.hasOwn(ACTIVE_TAG_LABELS, tag))) throw new Error('请选择有效标签。')
   const added = tags.filter((tag) => !previous.tags.includes(tag))
   const supplement = (draft.supplement ?? previous.supplement ?? '').trim()
   const supplementEvidence = (draft.supplementEvidence ?? previous.supplementEvidence ?? []).filter((e) => tags.includes(e.tagId)).map((e) => ({ ...e }))

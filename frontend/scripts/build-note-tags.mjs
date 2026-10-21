@@ -5,7 +5,8 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const scriptDir = dirname(fileURLToPath(import.meta.url))
-const taxonomy = JSON.parse(readFileSync(resolve(scriptDir, '../src/features/knowledge/note-tag-taxonomy.json'), 'utf8'))
+// Rebuild the frozen source catalog with its original vocabulary; the UI projects current tags separately.
+const taxonomy = JSON.parse(readFileSync(resolve(scriptDir, '../src/features/knowledge/note-tag-taxonomy-legacy.json'), 'utf8'))
 const noteTitles = JSON.parse(readFileSync(resolve(scriptDir, '../src/features/knowledge/note-titles.json'), 'utf8'))
 const knownTags = new Set(taxonomy.flatMap((dimension) => dimension.options.map((tag) => tag.id)))
 // These matches produce reviewable topic candidates, never executable trading conditions.

@@ -226,9 +226,9 @@ function CrosshairTooltip({ candle, price, index, kind, period, transform, indic
   {
     for (const key of maKeys) if (indicators[key]) cells.push({ label: key.toUpperCase(), value: optionalPriceText(indicatorValues[key]?.[index]), color: MA_COLORS[key] })
     if (indicators.boll) {
-      cells.push({ label: 'BOLL上', value: optionalPriceText(indicatorValues.boll.upper[index]), color: '#bcc9ff' })
-      cells.push({ label: 'BOLL中', value: optionalPriceText(indicatorValues.boll.middle[index]), color: '#bcc9ff' })
-      cells.push({ label: 'BOLL下', value: optionalPriceText(indicatorValues.boll.lower[index]), color: '#bcc9ff' })
+      cells.push({ label: 'BOLL上', value: optionalPriceText(indicatorValues.boll.upper[index]), color: '#6f7fd8' })
+      cells.push({ label: 'BOLL中', value: optionalPriceText(indicatorValues.boll.middle[index]), color: indicators.ma20 ? MA_COLORS.ma20 : '#94a3b8' })
+      cells.push({ label: 'BOLL下', value: optionalPriceText(indicatorValues.boll.lower[index]), color: '#6f7fd8' })
     }
   }
   const longest = Math.max(...cells.map((cell) => `${cell.label} ${cell.value}`.length), 1)
