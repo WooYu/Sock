@@ -10,7 +10,8 @@ const manifestBytes = await readFile(resolve(research, 'manifest.json')), studyB
 const manifest = JSON.parse(manifestBytes), catalog = JSON.parse(studyBytes)
 const sourceCatalogBytes = await readFile(resolve(frontend, 'src/features/knowledge/note-tag-catalog.json'))
 if (hash(sourceCatalogBytes) !== catalog.sourceCatalogSha256 || catalog.sourceCatalogSha256 !== manifest.sourceCatalogSha256) throw new Error('原标签目录已变化，请先核对逐篇研究来源')
-const taxonomy = JSON.parse(await readFile(resolve(frontend, 'src/features/knowledge/note-tag-taxonomy.json'), 'utf8'))
+// Frozen research uses the vocabulary recorded when it was created, not current UI options.
+const taxonomy = JSON.parse(await readFile(resolve(frontend, 'src/features/knowledge/note-tag-taxonomy-legacy.json'), 'utf8'))
 const allowed = new Set(taxonomy.flatMap(d => d.options.map(t => t.id)))
 const originals = new Map(manifest.documents.map(d => [d.file, d]))
 if (catalog.records.length !== originals.size || new Set(catalog.records.map(r => r.file)).size !== originals.size) throw new Error('逐篇研究覆盖清单不完整')
