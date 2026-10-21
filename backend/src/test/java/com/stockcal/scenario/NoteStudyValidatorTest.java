@@ -26,8 +26,8 @@ class NoteStudyValidatorTest {
         var fake=s.payload().deepCopy();((tools.jackson.databind.node.ObjectNode)fake.path("claims").get(0)).put("evaluationStatus","proven");
         assertThatThrownBy(()->new NoteStudyValidator().validate(new StudyImport(s.sourceFile(),s.sourceHash(),s.sourceText(),s.sourceUrl(),s.channel(),null,null,fake))).isInstanceOf(IllegalArgumentException.class);
     }
-    @Test void vocabularyResourceMatchesProductTaxonomy() throws Exception {
-        var taxonomy=ResearchJson.JSON.readTree(java.nio.file.Files.readString(java.nio.file.Path.of("../frontend/src/features/knowledge/note-tag-taxonomy.json")));
+    @Test void vocabularyResourceMatchesFrozenResearchTaxonomy() throws Exception {
+        var taxonomy=ResearchJson.JSON.readTree(java.nio.file.Files.readString(java.nio.file.Path.of("../frontend/src/features/knowledge/note-tag-taxonomy-legacy.json")));
         var expected=new java.util.TreeSet<String>();for(var dim:taxonomy)for(var tag:dim.path("options"))expected.add(tag.path("id").asText());
         assertThat(new NoteStudyValidator().allowedTags()).containsExactlyElementsOf(expected);
     }
