@@ -13,6 +13,7 @@ import { ResearchJournal } from './research-journal'
 import { StockPicker } from './stock-picker'
 import { useAutomaticForecast } from './use-automatic-forecast'
 import { AutomaticForecastPanel } from './automatic-forecast-panel'
+import { dailyCandidates } from './daily-candidates'
 import type { MergedLevel } from '../scenario/scenario-types'
 import { ResearchEvidence } from './research-evidence'
 import { StudioIcon } from './studio-icon'
@@ -60,7 +61,8 @@ function Studio({ initialPreview, initialSymbol }: { initialPreview: boolean; in
   const current = cached?.symbol === selectedSymbol ? cached : null
   const market = demo ? preview.market : current?.market
   const automatic = useAutomaticForecast({ symbol: selectedSymbol, sourceMode: demo ? 'demo' : 'real', client: demo ? previewScenarioClient : browserMarketClient, name: market?.quote.security.name })
-  const selectedLevel = levelSelection?.owner === selectedSymbol ? automatic.analysis?.mergedLevels.find(level => level.id === levelSelection.id) ?? null : null
+  const candidates = useMemo(() => automatic.analysis ? dailyCandidates(automatic.analysis) : null, [automatic.analysis])
+  const selectedLevel = levelSelection?.owner === selectedSymbol ? [...(candidates?.levels ?? []), ...(candidates?.extended ?? [])].find(level => level.id === levelSelection.id) ?? null : null
   const selectLevel = (level: MergedLevel) => setLevelSelection({ owner: selectedSymbol, id: level.id })
   const forecastPanel = <AutomaticForecastPanel compact forecast={automatic} selected={selectedLevel} onSelect={selectLevel} rules={demo ? [] : current?.publishedRules} stockAnalysis={current?.analysis} />
   const security = market?.quote.security ?? workspace.selectedSecurity

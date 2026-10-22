@@ -268,6 +268,8 @@
 .rs-auto-levels button { min-height: 90px; display: grid; grid-template-columns: 1fr auto; gap: 5px; text-align: left; padding: 12px; background: #fafbfe; border: 1px solid #e5e9ef; border-radius: 8px; color: #526079; }
 .rs-auto-levels button[aria-pressed=true] { background: #f0effd; border-color: #7064d5; }
 .rs-auto-levels strong { font-size: 18px; color: #243b53; }
+.rs-extended-levels { margin-top: 16px; }
+.rs-extended-levels summary { min-height: 44px; padding: 12px 0; cursor: pointer; font-size: 13px; color: #526079; }
 .rs-auto-levels span { font-size: 12px; }
 .rs-auto-levels small { grid-column: 1 / -1; line-height: 1.6; font-size: 11px; }
 .rs-selected-basis { margin-top: 16px; padding: 4px 14px 14px; background: #f6f7fc; border-radius: 8px; font-size: 12px; line-height: 1.8; overflow-wrap: anywhere; }

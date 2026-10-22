@@ -11,6 +11,7 @@ import { findHistoricalMatches } from './research-context'
 import { levelEvidence } from './forecast-evidence'
 import { ANALYSIS_PERIODS } from '../scenario/scenario-calendar'
 import { ForecastPeriodContext } from './forecast-period-context'
+import { dailyCandidates } from './daily-candidates'
 
 export function AutomaticForecastPanel({ forecast, selected, onSelect, rules = [], stockAnalysis, compact = false }: {
   forecast: AutomaticForecast; selected: MergedLevel | null; onSelect: (level: MergedLevel) => void;
@@ -21,8 +22,17 @@ export function AutomaticForecastPanel({ forecast, selected, onSelect, rules = [
   const daily = analysis?.input.periods.day?.closed ?? []
   const close = daily.at(-1)?.close ?? 0
   const history = findHistoricalMatches(daily)
-  const levels = analysis?.mergedLevels ?? []
+  const candidates = analysis ? dailyCandidates(analysis) : null
+  const levels = candidates?.levels ?? []
   const evidence = selected ? levelEvidence(selected, close, rules, stockAnalysis, history) : null
+  const renderLevel = (level: MergedLevel) => {
+    const basis = levelEvidence(level, close, rules, stockAnalysis, history)
+    return <button type="button" key={level.id} aria-pressed={selected?.id === level.id} onClick={() => onSelect(level)}>
+      <strong>{level.value.toFixed(2)}</strong><span>{basis.change === null ? '—' : `${basis.change >= 0 ? '+' : ''}${basis.change.toFixed(2)}%`}</span>
+      <small>{[...new Set(level.references.map(r => PERIOD_NAMES[r.period]))].join(' / ')}</small>
+      <small>{basis.matchingRules.length ? `${basis.matchingRules.length} 条规则可核对` : '待核对规则依据'}{basis.comparableHistory.length ? ` · ${basis.comparableHistory.length} 个历史结果接近` : ''}</small>
+    </button>
+  }
   return <section className={`rs-auto-forecast ${compact ? 'is-compact' : ''}`} id={compact ? undefined : 'automatic-forecast-results'} aria-label={compact ? '预测候选价位' : '自动 MA/BOLL 预测'}>
     <header><div><h2>{compact ? '合并候选价位' : 'MA / BOLL 预测'}</h2><p>{compact ? '选择价位，核对下方依据' : '历史 3 根 → 未来 4 根 → 合并价位 → 选择依据'}</p></div>{!compact ? <button type="button" className="rs-button" onClick={() => void forecast.refresh()} disabled={forecast.loading}>重新计算</button> : null}</header>
     {!compact ? <p className="rs-auto-status" role="status">{forecast.loading ? '正在按需核对日线 → 1小时 → 30分钟 → 15分钟…' : forecast.clearPeriod ? `${PERIOD_NAMES[forecast.clearPeriod]}趋势与盈利模式已有有效确认，停止自动下钻。` : `趋势／盈利模式尚未明确，已核对至${PERIOD_NAMES[forecast.periods.at(-1) ?? 'day']}；候选适配仍需核对条件。`}</p> : null}
@@ -35,15 +45,10 @@ export function AutomaticForecastPanel({ forecast, selected, onSelect, rules = [
       {forecast.issues.map(issue => <p className="rs-auto-method" role="status" key={issue}>{issue}</p>)}</> : null}
     {analysis ? <><h3>{compact ? '最近的3个候选价位' : `合并候选价位 · ${levels.length} 个`}</h3>
       {!compact ? <p className="rs-auto-method">仅合并与日线价格口径一致的有效平均增量预测（日线前复权时，分钟不复权参考值单独展示）：组内任意两值偏差不超过1%，取算术平均；保留各周期与目标根数。不同周期不视为同一到达时间。</p> : null}
-      <div className="rs-auto-levels">{[...levels].sort((a, b) => compact ? Math.abs(a.value - close) - Math.abs(b.value - close) : a.value - b.value).slice(0, compact ? 3 : undefined).map(level => {
-        const basis = levelEvidence(level, close, rules, stockAnalysis, history)
-        return <button type="button" key={level.id} aria-pressed={selected?.id === level.id} onClick={() => onSelect(level)}>
-          <strong>{level.value.toFixed(2)}</strong><span>{basis.change === null ? '—' : `${basis.change >= 0 ? '+' : ''}${basis.change.toFixed(2)}%`}</span>
-          <small>{[...new Set(level.references.map(r => PERIOD_NAMES[r.period]))].join(' / ')}</small>
-          <small>{basis.matchingRules.length ? `${basis.matchingRules.length} 条规则可核对` : '待核对规则依据'}{basis.comparableHistory.length ? ` · ${basis.comparableHistory.length} 个历史结果接近` : ''}</small>
-        </button>
-      })}</div>{compact ? <a className="rs-auto-all-link" href="#automatic-forecast-results">查看全部 {levels.length} 个价位与依据 ↓</a> : null}{!levels.length ? <p>有效参考值不足，暂不合并价位。</p> : null}</> : null}
-    {!compact && selected && evidence ? <section className="rs-selected-basis" aria-label="所选价位依据"><h3>所选价位 {selected.value.toFixed(2)} · 依据</h3>
+      <p className="rs-auto-method" data-testid="daily-candidate-scope">{candidates?.band && candidates.anchor ? `单日筛选：以 ${candidates.anchor.day} 收盘 ${candidates.anchor.close.toFixed(2)} 为基准，${candidates.targetDay ?? '下一交易日（日期待核实）'}参考范围 ${candidates.band.lower.toFixed(2)}～${candidates.band.upper.toFixed(2)}（${candidates.limitLabel}）。` : candidates?.index ? '指数无个股涨跌停限制，仅保留下一交易日内的指标参考。' : '缺少已核实的单日价格范围，暂不列为单日候选。'}仅采用该交易日内的预测；范围内不代表当日必达。</p>
+      <div className="rs-auto-levels">{[...levels].sort((a, b) => compact ? Math.abs(a.value - close) - Math.abs(b.value - close) : a.value - b.value).slice(0, compact ? 3 : undefined).map(renderLevel)}</div>{compact ? <a className="rs-auto-all-link" href="#automatic-forecast-results">查看全部 {levels.length} 个价位与依据 ↓</a> : null}{!levels.length ? <p>{candidates?.verified ? '单日范围内暂无有效候选，不补造目标价。' : '单日范围尚未核实，暂不列为单日候选。'}</p> : null}
+      {!compact && candidates?.extended.length ? <details className="rs-extended-levels"><summary>跨日／超出单日范围的指标参考 · {candidates.extended.length} 个</summary><p className="rs-auto-method">以下保留原始计算依据，不作为单日候选；MA/BOLL 指标外推值不等于股价会到达该位置。</p><div className="rs-auto-levels">{candidates.extended.map(renderLevel)}</div></details> : null}</> : null}
+    {!compact && selected && evidence ? <section className="rs-selected-basis" aria-label="所选价位依据"><h3>所选价位 {selected.value.toFixed(2)} · 依据</h3>{!levels.some(level => level.id === selected.id) ? <p>跨日／超出单日范围的指标参考，不作为单日候选。</p> : null}
       <p>计算来源：{selected.references.map(r => `${PERIOD_NAMES[r.period]} ${INDICATOR_NAMES[r.indicator]} 第${r.target.horizon}根 ${r.value?.toFixed(2)}`).join('；')}</p>
       <p>笔记规则：{evidence.matchingRules.length ? evidence.matchingRules.map(r => r.name).join('；') : '暂无已命中且直接关联该指标的笔记规则，不能视为已获规则支持。'}</p>
       {evidence.matchingRules.map(rule => <p key={rule.ruleId}>{rule.evidence.map(e => `${e.detail ?? e.label}（${e.id}）`).join('；')}</p>)}
