@@ -18,14 +18,16 @@ function fixture() {
   return { snapshot, ref, set }
 }
 
-describe('single-session candidate scope', () => {
+describe('origin-relative candidate scope across all horizons', () => {
   test('keeps inclusive board bounds and defers a ninety percent extrapolation without changing source evidence', () => {
     const { snapshot, ref, set } = fixture()
-    set(ref('low', 8.8), ref('high', 13.2), ref('far', 21.09))
+    set(ref('low', 8.8), ref('high', 13.2), ref('far', 21.09), ref('far-72pct', 18.92, {
+      target: { horizon: 4, barKey: '2026-10-15', endAt: null, issues: [] },
+    }))
     const original = JSON.stringify(snapshot)
     const result = dailyCandidates(snapshot)
     expect(result.levels.map(l => l.value)).toEqual([8.8, 13.2])
-    expect(result.extended.map(l => l.value)).toEqual([21.09])
+    expect(result.extended.map(l => l.value)).toEqual([18.92, 21.09])
     expect(JSON.stringify(snapshot)).toBe(original)
   })
   test('filters constituents before remerging rather than accepting their in-band mean', () => {
@@ -34,19 +36,17 @@ describe('single-session candidate scope', () => {
     expect(result.levels.map(l => l.value)).toEqual([13.15])
     expect(result.extended.map(l => l.value)).toEqual([13.25])
   })
-  test('excludes later daily horizons and minute targets outside the next session', () => {
+  test('retains today and cross-day targets inside the same origin band', () => {
     const { ref, set } = fixture()
     const result = dailyCandidates(set(ref('day', 10), ref('later', 11, { target: { horizon: 2, barKey: '2026-10-13', endAt: null, issues: [] } }),
       ref('minute', 12, { period: '60m' }), ref('old-minute', 9, { period: '15m', target: { horizon: 1, barKey: null, endAt: '2026-10-09T15:00:00+08:00', issues: [] } })))
-    expect(result.levels.flatMap(l => l.references.map(r => r.id))).toEqual(['day', 'minute'])
-    expect(result.targetDay).toBe('2026-10-12')
+    expect(result.levels.flatMap(l => l.references.map(r => r.id))).toEqual(['old-minute', 'day', 'later', 'minute'])
   })
-  test('without a calendar only daily horizon one can be assigned to the next session', () => {
+  test('a missing calendar does not discard valid minute or later daily targets', () => {
     const { snapshot, ref, set } = fixture()
-    set(ref('day', 10), ref('minute', 12, { period: '60m' }))
+    set(ref('day', 10), ref('minute', 12, { period: '60m' }), ref('later', 11, { target: { horizon: 4, barKey: null, endAt: null, issues: ['calendar_missing'] } }))
     snapshot.input.calendar = null
-    expect(dailyCandidates(snapshot).levels.map(l => l.id)).toEqual(['day'])
-    expect(dailyCandidates(snapshot).targetDay).toBeNull()
+    expect(dailyCandidates(snapshot).levels.map(l => l.id)).toEqual(['day', 'later', 'minute'])
   })
   test('does not manufacture candidates when the daily band is unverified', () => {
     const { snapshot, ref, set } = fixture()
