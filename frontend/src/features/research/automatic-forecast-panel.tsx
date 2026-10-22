@@ -35,7 +35,7 @@ export function AutomaticForecastPanel({ forecast, selected, onSelect, rules = [
       {forecast.issues.map(issue => <p className="rs-auto-method" role="status" key={issue}>{issue}</p>)}</> : null}
     {analysis ? <><h3>{compact ? '最近的3个候选价位' : `合并候选价位 · ${levels.length} 个`}</h3>
       {!compact ? <p className="rs-auto-method">仅合并与日线价格口径一致的有效平均增量预测（日线前复权时，分钟不复权参考值单独展示）：组内任意两值偏差不超过1%，取算术平均；保留各周期与目标根数。不同周期不视为同一到达时间。</p> : null}
-      <div className="rs-auto-levels">{[...levels].sort((a, b) => Math.abs(a.value - close) - Math.abs(b.value - close)).slice(0, compact ? 3 : undefined).map(level => {
+      <div className="rs-auto-levels">{[...levels].sort((a, b) => compact ? Math.abs(a.value - close) - Math.abs(b.value - close) : a.value - b.value).slice(0, compact ? 3 : undefined).map(level => {
         const basis = levelEvidence(level, close, rules, stockAnalysis, history)
         return <button type="button" key={level.id} aria-pressed={selected?.id === level.id} onClick={() => onSelect(level)}>
           <strong>{level.value.toFixed(2)}</strong><span>{basis.change === null ? '—' : `${basis.change >= 0 ? '+' : ''}${basis.change.toFixed(2)}%`}</span>

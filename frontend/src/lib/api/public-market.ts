@@ -190,12 +190,13 @@ function intradaySeries(symbol: string): Promise<ChartSeries> {
     let previousVolume = 0, previousAmount = 0
     for (const [time, sample] of [...samples].sort(([a], [b]) => a.localeCompare(b))) {
       if (!Number.isFinite(sample.volume) || sample.volume < previousVolume || sample.amount < previousAmount || (sample.volume === 0 && sample.amount > 0)) throw invalidData()
-      bars.push({ day: time, endTime: time, open: sample.price, high: sample.price, low: sample.price, close: sample.price, volume: sample.volume - previousVolume, turnover: sample.amount - previousAmount, ...(sample.volume > 0 ? { averagePrice: sample.amount / sample.volume } : {}) })
+      // Index turnover / aggregate constituent volume is not an index-point VWAP.
+      bars.push({ day: time, endTime: time, open: sample.price, high: sample.price, low: sample.price, close: sample.price, volume: sample.volume - previousVolume, turnover: sample.amount - previousAmount, ...(!isShanghaiComposite(symbol) && sample.volume > 0 ? { averagePrice: sample.amount / sample.volume } : {}) })
       previousVolume = sample.volume
       previousAmount = sample.amount
     }
     if (!bars.length) throw noData()
-    return { symbol, period: 'intraday', adjustment: 'none', kind: 'intraday', bars, previousClose: optionalPositive(quoteFields(entry, code)?.[4]), source: source(new Date().toISOString()), limitedHistory: true, note: '当日正常交易时段的价格采样，不含盘后定价；均价为累计成交额/累计成交量，柱形为每分钟成交量。' }
+    return { symbol, period: 'intraday', adjustment: 'none', kind: 'intraday', bars, previousClose: optionalPositive(quoteFields(entry, code)?.[4]), source: source(new Date().toISOString()), limitedHistory: true, note: isShanghaiComposite(symbol) ? '当日指数点位采样，不含盘后定价；总成交额/总成交量不代表指数均价，不绘制该均价线；柱形为每分钟成交量。' : '当日正常交易时段的价格采样，不含盘后定价；均价为累计成交额/累计成交量，柱形为每分钟成交量。' }
   })
 }
 

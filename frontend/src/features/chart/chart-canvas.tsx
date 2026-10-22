@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent } from 'react'
+import { useId, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent } from 'react'
 import type { Candle } from '../workspace/stock-workspace-types'
 import type { ChartTransform } from './chart-coordinates'
 import type { ChartTool } from './chart-annotation-store'
@@ -46,6 +46,10 @@ type ChartCanvasProps = {
   onPan?: (deltaX: number) => void
   onPanEnd?: () => void
   panOnPointer?: boolean
+  navigationMode?: 'inspect' | 'pan'
+  onPricePan?: (fraction: number) => void
+  onPriceScale?: (factor: number) => void
+  onPriceReset?: () => void
   onViewportZoom?: (factor: number, anchor?: number) => void
   onViewportPan?: (bars: number) => void
   onViewportReset?: () => void
@@ -57,11 +61,16 @@ type ChartCanvasProps = {
 }
 
 type PointerGesture = {
-  kind: 'create' | 'move-drawing' | 'move-point' | 'pan'
+  kind: 'create' | 'move-drawing' | 'move-point' | 'pan' | 'price-axis'
   pointerId: number
   captureTarget: SVGElement
   start: TimePricePoint
   lastClientX?: number
+  startClientX?: number
+  startClientY?: number
+  lastClientY?: number
+  direction?: 'horizontal' | 'vertical'
+  scalePrice?: boolean
   moved?: boolean
   drawingId?: string
   pointIndex?: number
@@ -146,7 +155,7 @@ function IntradayPrices({ candles, transform, previousClose }: Pick<ChartCanvasP
   </g>
 }
 
-function HistoricalLayer({ candles, transform, keyLevels, showKeyLevels, kind = 'candles', previousClose, period }: Pick<ChartCanvasProps, 'candles' | 'transform' | 'keyLevels' | 'showKeyLevels' | 'kind' | 'previousClose' | 'period'>) {
+function HistoricalLayer({ candles, transform, keyLevels, showKeyLevels, kind = 'candles', previousClose, period, priceClipId }: Pick<ChartCanvasProps, 'candles' | 'transform' | 'keyLevels' | 'showKeyLevels' | 'kind' | 'previousClose' | 'period'> & { priceClipId: string }) {
   const maxVolume = Math.max(...candles.map((candle) => Number.isFinite(candle.volume) ? candle.volume : 0), 1)
   const candleWidth = Math.max(1, Math.min(14, transform.widthForTime(candles[0]?.day ?? '') * 0.56))
   return (
@@ -162,7 +171,7 @@ function HistoricalLayer({ candles, transform, keyLevels, showKeyLevels, kind = 
           return <text key={line} x={viewBox.width - 10} textAnchor="end" y={y + 4}>{priceText(transform.priceForY(y))}</text>
         })}
       </g>
-      {kind === 'intraday' ? <IntradayPrices candles={candles} transform={transform} previousClose={previousClose} /> : <g data-testid="candlestick-layer">
+      <g clipPath={`url(#${priceClipId})`}>{kind === 'intraday' ? <IntradayPrices candles={candles} transform={transform} previousClose={previousClose} /> : <g data-testid="candlestick-layer">
         {candles.map((candle) => {
           const x = transform.xForTime(candle.day)
           const openY = transform.yForPrice(candle.open)
@@ -172,6 +181,7 @@ function HistoricalLayer({ candles, transform, keyLevels, showKeyLevels, kind = 
         })}
       </g>}
       {showKeyLevels && kind === 'candles' ? <g data-testid="key-level-layer">{keyLevels.filter(Number.isFinite).map((price, index) => <g key={price}><line className="sc-key-level-line" x1={transform.rect.left} x2={transform.rect.left + transform.rect.width} y1={transform.yForPrice(price)} y2={transform.yForPrice(price)} /><text className="sc-key-level-label" x={transform.rect.left + transform.rect.width - 78} y={transform.yForPrice(price) - 5}>{index === 0 ? '近20根高点' : '近20根低点'} {priceText(price)}</text></g>)}</g> : null}
+      </g>
       <g className="sc-volume-bars">{candles.map((candle) => {
         if (!Number.isFinite(candle.volume) || candle.volume <= 0) return null
         const height = Number(((candle.volume / maxVolume) * volumeHeight).toFixed(4))
@@ -245,9 +255,11 @@ function CrosshairTooltip({ candle, price, index, kind, period, transform, indic
 }
 
 export function ChartCanvas(props: ChartCanvasProps) {
+  const priceClipId = useId()
   const svgRef = useRef<SVGSVGElement>(null)
   const gesture = useRef<PointerGesture | null>(null)
   const consumeGestureClick = useRef(false)
+  const pinnedCrosshair = useRef(false)
   const [crosshairPoint, setCrosshairPoint] = useState<{ x: number; y: number } | null>(null)
   const kind = props.kind ?? 'candles'
   const touchPoints = useRef(new Map<number, { x: number; y: number }>())
@@ -284,9 +296,19 @@ export function ChartCanvas(props: ChartCanvasProps) {
     if (!dataPoint(event).time.startsWith('forecast:')) props.onCreateDrawing(drawing(props.activeTool, [dataPoint(event)]))
   }
   const handlePointerDown = (event: ReactPointerEvent<SVGSVGElement>) => {
+    if (event.button !== 0) return
     consumeGestureClick.current = false
     if (props.activeTool === 'pointer' && (event.target as Element).closest('[data-testid="prediction-candle"]')) return
     event.currentTarget.focus({ preventScroll: true })
+    const point = svgPoint(event)
+    if ((event.target as Element).closest('[data-price-axis]') && props.onPricePan) {
+      event.currentTarget.setPointerCapture?.(event.pointerId)
+      gesture.current = { kind: 'price-axis', pointerId: event.pointerId, captureTarget: event.currentTarget, start: dataPoint(event), lastClientY: event.clientY, scalePrice: event.shiftKey }
+      consumeGestureClick.current = true
+      return
+    }
+    pinnedCrosshair.current = event.pointerType === 'touch' && props.navigationMode === 'inspect' && props.activeTool === 'pointer'
+    if (pinnedCrosshair.current) setCrosshairPoint(point)
     if (event.pointerType === 'touch' && props.onViewportZoom) {
       touchPoints.current.set(event.pointerId, { x: event.clientX, y: event.clientY })
       if (touchPoints.current.size > 1) {
@@ -298,9 +320,9 @@ export function ChartCanvas(props: ChartCanvasProps) {
         return
       }
     }
-    if (props.activeTool === 'pan' || (props.panOnPointer && props.activeTool === 'pointer')) {
+    if (props.activeTool === 'pan' || (props.panOnPointer && props.navigationMode !== 'inspect' && props.activeTool === 'pointer')) {
       event.currentTarget.setPointerCapture?.(event.pointerId)
-      gesture.current = { kind: 'pan', pointerId: event.pointerId, captureTarget: event.currentTarget, start: dataPoint(event), lastClientX: event.clientX }
+      gesture.current = { kind: 'pan', pointerId: event.pointerId, captureTarget: event.currentTarget, start: dataPoint(event), lastClientX: event.clientX, startClientX: event.clientX, startClientY: event.clientY }
       return
     }
     if (props.activeTool !== 'trend-line' && props.activeTool !== 'rectangle') return
@@ -339,12 +361,14 @@ export function ChartCanvas(props: ChartCanvasProps) {
     if (!active || active.pointerId !== event.pointerId) return
     gesture.current = null
     const end = dataPoint(event)
-    if (active.kind !== 'pan' && end.time.startsWith('forecast:')) { releaseGestureCapture(active); consumeGestureClick.current = true; return }
+    if (active.kind !== 'pan' && active.kind !== 'price-axis' && end.time.startsWith('forecast:')) { releaseGestureCapture(active); consumeGestureClick.current = true; return }
     if (active.kind === 'pan') {
       if (active.moved) consumeGestureClick.current = true
       const finalDelta = (active.lastClientX ?? event.clientX) - event.clientX
-      if (finalDelta) props.onPan?.(finalDelta)
-      props.onPanEnd?.()
+      if (active.moved && finalDelta) props.onPan?.(finalDelta)
+      if (active.moved) props.onPanEnd?.()
+    } else if (active.kind === 'price-axis') {
+      consumeGestureClick.current = true
     } else if (active.kind === 'move-point' && active.drawingId !== undefined && active.pointIndex !== undefined) {
       if (!samePoint(active.start, end)) props.onMovePoint(active.drawingId, active.pointIndex, end)
     } else if (active.kind === 'move-drawing' && active.drawingId !== undefined) {
@@ -389,7 +413,25 @@ export function ChartCanvas(props: ChartCanvasProps) {
       }
     }
     const active = gesture.current
+    if (active?.kind === 'price-axis' && active.pointerId === event.pointerId) {
+      const bounds = event.currentTarget.getBoundingClientRect()
+      const plotHeight = (bounds.height || viewBox.height) * props.transform.rect.height / viewBox.height
+      const delta = event.clientY - (active.lastClientY ?? event.clientY)
+      if (active.scalePrice) props.onPriceScale?.(Math.exp(Math.max(-0.3, Math.min(0.3, delta * 0.01))))
+      else props.onPricePan?.(delta / Math.max(1, plotHeight))
+      active.lastClientY = event.clientY
+      return
+    }
     if (active?.kind === 'pan' && active.pointerId === event.pointerId) {
+      if (props.panOnPointer && !active.direction) {
+        const dx = event.clientX - (active.startClientX ?? event.clientX)
+        const dy = event.clientY - (active.startClientY ?? event.clientY)
+        if (Math.hypot(dx, dy) < 10) return
+        if (Math.abs(dx) > Math.abs(dy) * 1.4) active.direction = 'horizontal'
+        else if (Math.abs(dy) > Math.abs(dx) * 1.4) active.direction = 'vertical'
+        else return
+      }
+      if (active.direction === 'vertical') { setCrosshairPoint(svgPoint(event)); return }
       const delta = (active.lastClientX ?? event.clientX) - event.clientX
       if (delta) { props.onPan?.(delta); active.moved = true }
       active.lastClientX = event.clientX
@@ -430,6 +472,8 @@ export function ChartCanvas(props: ChartCanvasProps) {
         releaseGestureCapture(active)
       }
       props.onSelectDrawing(null)
+      pinnedCrosshair.current = false
+      setCrosshairPoint(null)
       return
     }
     if ((event.key === 'Delete' || event.key === 'Backspace') && props.selectedId) {
@@ -446,13 +490,15 @@ export function ChartCanvas(props: ChartCanvasProps) {
   const crosshairPrice = crosshairPoint ? props.transform.priceForY(crosshairPoint.y) : null
 
   return (
-    <svg aria-keyshortcuts="Delete Escape Control+Z Meta+Z Control+Y Meta+Y" aria-label={kind === 'intraday' ? '分时主图' : 'K线主图'} className={`sc-kline-svg ${props.panOnPointer ? 'sc-kline-svg-interactive' : ''}`} onPointerLeave={() => setCrosshairPoint(null)} onDoubleClick={() => { if (props.activeTool === 'pointer' || props.activeTool === 'pan') props.onViewportReset?.() }} onClick={createPointDrawing} onKeyDown={handleKeyDown} onLostPointerCapture={clearLostPointerGesture} onPointerCancel={cancelPointerGesture} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} preserveAspectRatio={props.panOnPointer ? 'none' : 'xMidYMid meet'} ref={svgRef} role="img" tabIndex={0} viewBox={`0 0 ${viewBox.width} ${viewBox.height}`}>
-      <HistoricalLayer candles={props.candles} keyLevels={props.keyLevels} showKeyLevels={props.showKeyLevels} transform={props.transform} kind={kind} previousClose={props.previousClose} period={props.period} />
-      <IndicatorLayer candles={props.candles} indicatorValues={props.indicatorValues} indicators={props.indicators} transform={props.transform} />
-      <g data-chart-layer="prediction">{prediction ? <PredictionLayer hoveredDay={props.hoveredDay} onHoverDay={props.onHoverDay} onSelectDay={props.onSelectPredictionDay} prediction={prediction} selectedDay={props.selectedPredictionDay} transform={props.transform} /> : null}</g>
+    <svg aria-keyshortcuts="Delete Escape Control+Z Meta+Z Control+Y Meta+Y" data-navigation-mode={props.navigationMode} aria-label={kind === 'intraday' ? '分时主图' : 'K线主图'} className={`sc-kline-svg ${props.panOnPointer ? 'sc-kline-svg-interactive' : ''}`} onPointerLeave={() => { if (!pinnedCrosshair.current) setCrosshairPoint(null) }} onDoubleClick={event => { if ((event.target as Element).closest('[data-price-axis]')) { props.onPriceReset?.(); return } if (props.activeTool === 'pointer' || props.activeTool === 'pan') props.onViewportReset?.() }} onClick={createPointDrawing} onKeyDown={handleKeyDown} onLostPointerCapture={clearLostPointerGesture} onPointerCancel={cancelPointerGesture} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} preserveAspectRatio={props.panOnPointer ? 'none' : 'xMidYMid meet'} ref={svgRef} role="img" tabIndex={0} viewBox={`0 0 ${viewBox.width} ${viewBox.height}`}>
+      <defs><clipPath id={priceClipId}><rect x={props.transform.rect.left} y={props.transform.rect.top} width={props.transform.rect.width} height={props.transform.rect.height} /></clipPath></defs>
+      <HistoricalLayer priceClipId={priceClipId} candles={props.candles} keyLevels={props.keyLevels} showKeyLevels={props.showKeyLevels} transform={props.transform} kind={kind} previousClose={props.previousClose} period={props.period} />
+      <g clipPath={`url(#${priceClipId})`}><IndicatorLayer candles={props.candles} indicatorValues={props.indicatorValues} indicators={props.indicators} transform={props.transform} /></g>
+      <g data-chart-layer="prediction" clipPath={`url(#${priceClipId})`}>{prediction ? <PredictionLayer hoveredDay={props.hoveredDay} onHoverDay={props.onHoverDay} onSelectDay={props.onSelectPredictionDay} prediction={prediction} selectedDay={props.selectedPredictionDay} transform={props.transform} /> : null}</g>
       {props.projectedTimes?.length ? <IndicatorProjectionLayer previousClose={props.previousClose} baseClose={props.candles.at(-1)?.close} limitRatio={props.limitRatio} selectedTime={props.selectedProjectionTime} onSelect={props.onSelectProjectionTime} times={props.projectedTimes} estimated={props.projectedEstimated} ranges={props.projectedRanges} historicalCount={props.candles.length} transform={props.transform} period={props.period} indicators={props.indicators} values={props.indicatorValues} interactive={props.activeTool === 'pointer'} /> : null}
       <g data-chart-layer="drawing">{props.showDrawings ? <DrawingLayer drawings={props.drawings} interactionsDisabled={props.activeTool === 'pan'} onFocusEditor={() => svgRef.current?.focus()} onMoveDrawing={beginDrawingMove} onMovePoint={beginPointMove} onSelect={props.onSelectDrawing} selectedId={props.selectedId} transform={props.transform} /> : null}</g>
-      <g data-chart-layer="crosshair">{(props.crosshair || props.activeTool === 'pointer') && crosshairPoint && crosshairCandle && crosshairPrice !== null ? <g data-testid="crosshair-layer"><line className="sc-crosshair" x1={props.transform.xForTime(crosshairCandle.day)} x2={props.transform.xForTime(crosshairCandle.day)} y1={props.transform.rect.top} y2={volumeTop + volumeHeight} /><line className="sc-crosshair" x1={props.transform.rect.left} x2={props.transform.rect.left + props.transform.rect.width} y1={props.transform.yForPrice(crosshairPrice)} y2={props.transform.yForPrice(crosshairPrice)} /><g data-testid="crosshair-axis-labels" pointerEvents="none">
+      {props.onPricePan ? <rect data-price-axis="true" data-testid="price-axis-hit-area" x={props.transform.rect.left + props.transform.rect.width} y={props.transform.rect.top} width={viewBox.width - props.transform.rect.left - props.transform.rect.width} height={props.transform.rect.height} fill="transparent" className="sc-price-axis-hit"><title>上下拖动移动价格 · Shift+拖动缩放 · 双击自动适配</title></rect> : null}
+      <g data-chart-layer="crosshair" pointerEvents="none">{(props.crosshair || props.activeTool === 'pointer') && crosshairPoint && crosshairCandle && crosshairPrice !== null ? <g data-testid="crosshair-layer"><line className="sc-crosshair" x1={props.transform.xForTime(crosshairCandle.day)} x2={props.transform.xForTime(crosshairCandle.day)} y1={props.transform.rect.top} y2={volumeTop + volumeHeight} /><line className="sc-crosshair" x1={props.transform.rect.left} x2={props.transform.rect.left + props.transform.rect.width} y1={props.transform.yForPrice(crosshairPrice)} y2={props.transform.yForPrice(crosshairPrice)} /><g data-testid="crosshair-axis-labels" pointerEvents="none">
         <rect x={viewBox.width - 58} y={Math.max(0, Math.min(volumeTop + volumeHeight - 20, crosshairPoint.y - 10))} width={58} height={20} rx={3} fill="#17213c" />
         <text x={viewBox.width - 4} y={Math.max(0, Math.min(volumeTop + volumeHeight - 20, crosshairPoint.y - 10)) + 14} textAnchor="end" fill="#fff" fontSize={10}>{priceText(crosshairPrice)}</text>
         <rect x={Math.max(0, Math.min(viewBox.width - 160, props.transform.xForTime(crosshairCandle.day) - 80))} y={volumeTop + volumeHeight + 5} width={160} height={22} rx={3} fill="#17213c" />

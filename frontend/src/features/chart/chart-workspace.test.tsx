@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { ChartWorkspace, aggregateCandles } from './chart-workspace'
@@ -26,6 +26,73 @@ const prediction: PredictionSnapshot = {
 const renderChart = () => render(<ChartWorkspace prediction={prediction} snapshot={snapshot} />)
 
 describe('ChartWorkspace', () => {
+  test('ordinary wheel preserves the viewport while Ctrl+wheel zooms around the pointer', () => {
+    const { container } = render(<ChartWorkspace variant="studio" snapshot={snapshot} />)
+    const scroll = container.querySelector('.sc-kline-chart-scroll')!
+    const surface = container.querySelector('.sc-kline-chart-surface')!
+    const initial = surface.getAttribute('data-zoom')
+    const wheel = new WheelEvent('wheel', { deltaY: -100, bubbles: true, cancelable: true })
+    fireEvent(scroll, wheel)
+    expect(wheel.defaultPrevented).toBe(false)
+    expect(surface).toHaveAttribute('data-zoom', initial)
+    fireEvent.wheel(scroll, { deltaY: -100, clientX: 400, ctrlKey: true })
+    expect(surface.getAttribute('data-zoom')).not.toBe(initial)
+  })
+
+  test('manual price navigation leaves time bounds intact and auto restores the price domain', () => {
+    const { container } = render(<ChartWorkspace variant="studio" snapshot={snapshot} />)
+    const surface = container.querySelector('.sc-kline-chart-surface')!
+    const initialMin = surface.getAttribute('data-price-min')
+    const initialEnd = surface.getAttribute('data-visible-end')
+    const axis = screen.getByTestId('price-axis-hit-area')
+    const chart = screen.getByRole('img', { name: 'K线主图' })
+    fireEvent.pointerDown(axis, { pointerId: 11, clientX: 930, clientY: 120 })
+    fireEvent.pointerMove(chart, { pointerId: 11, clientX: 930, clientY: 150 })
+    fireEvent.pointerUp(chart, { pointerId: 11, clientX: 930, clientY: 150 })
+    expect(surface).toHaveAttribute('data-price-auto', 'false')
+    expect(surface.getAttribute('data-price-min')).not.toBe(initialMin)
+    expect(surface).toHaveAttribute('data-visible-end', initialEnd)
+    fireEvent.click(screen.getByRole('button', { name: '自动价格' }))
+    expect(surface).toHaveAttribute('data-price-auto', 'true')
+    expect(surface).toHaveAttribute('data-price-min', initialMin)
+  })
+
+  test('retains the stock adjustment preference across minute and calendar periods', async () => {
+    const loadSeries = vi.fn<import('./use-chart-series').ChartSeriesLoader>(async (symbol, period, _signal, adjustment) => ({
+      symbol, period, adjustment: adjustment!, kind: period === 'intraday' ? 'intraday' : 'candles',
+      bars: period === 'intraday' ? snapshot.dailyCandles.slice(0, 2).map((bar, i) => ({ ...bar, day: `2026-09-01T09:3${i}:00+08:00` })) : aggregateCandles(snapshot.dailyCandles, period),
+      source: snapshot.source, limitedHistory: true,
+    }))
+    render(<ChartWorkspace variant="studio" snapshot={snapshot} loadSeries={loadSeries} />)
+    const basis = screen.getByLabelText('价格复权方式')
+    expect(basis).toHaveValue('qfq')
+    await waitFor(() => expect(screen.getByRole('img', { name: 'K线主图' })).toBeInTheDocument())
+    await userEvent.selectOptions(basis, 'hfq')
+    await userEvent.click(screen.getByRole('tab', { name: '分时' }))
+    expect(basis).toHaveValue('none')
+    expect(basis).toBeDisabled()
+    await waitFor(() => expect(screen.getByTestId('intraday-price-line')).toBeInTheDocument())
+    await userEvent.click(screen.getByRole('tab', { name: '季线' }))
+    expect(basis).toHaveValue('hfq')
+    expect(basis).toBeEnabled()
+    await waitFor(() => expect(screen.getByRole('img', { name: 'K线主图' })).toBeInTheDocument())
+    expect(screen.queryByText('返回的股票或周期与请求不一致')).not.toBeInTheDocument()
+  })
+
+  test('ignores legacy cached index averages so intraday prices retain a useful vertical scale', async () => {
+    const index = { ...snapshot, quote: { ...snapshot.quote, security: { code: 'sh000001', name: '上证指数' } } }
+    const loadSeries: import('./use-chart-series').ChartSeriesLoader = async (symbol, period) => ({
+      symbol, period, adjustment: 'none', kind: 'intraday',
+      bars: [3710, 3658].map((price, i) => ({ day: `2026-09-01T09:3${i}:00+08:00`, open: price, high: price, low: price, close: price, volume: 100, averagePrice: 14 })),
+      previousClose: 3713, source: snapshot.source, limitedHistory: true,
+    })
+    render(<ChartWorkspace variant="studio" snapshot={index} period="intraday" loadSeries={loadSeries} />)
+    await waitFor(() => expect(screen.getByTestId('intraday-price-line')).toBeInTheDocument())
+    expect(screen.queryByTestId('intraday-average-line')).not.toBeInTheDocument()
+    expect(screen.getByLabelText('价格复权方式')).toBeDisabled()
+    expect(screen.getByText('指数无需复权，各周期统一使用原始点位')).toBeInTheDocument()
+  })
+
   test('accepts_external_period_and_reports_toolbar_changes', async () => {
     const onPeriodChange = vi.fn()
     const loadSeries = async (symbol: string, period: import('./chart-periods').ChartPeriod) => ({

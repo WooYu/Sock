@@ -54,6 +54,62 @@ const baseProps = {
 }
 
 describe('ChartCanvas', () => {
+  test('inspect mode moves the crosshair without moving the time viewport', () => {
+    const onPan = vi.fn()
+    render(<ChartCanvas {...baseProps} panOnPointer navigationMode="inspect" onPan={onPan} />)
+    const chart = screen.getByRole('img', { name: 'K线主图' })
+    fireEvent.pointerDown(chart, { pointerId: 1, clientX: 240, clientY: 120 })
+    fireEvent.pointerMove(chart, { pointerId: 1, clientX: 190, clientY: 220 })
+    fireEvent.pointerUp(chart, { pointerId: 1, clientX: 170, clientY: 220 })
+    expect(onPan).not.toHaveBeenCalled()
+    expect(screen.getByTestId('crosshair-tooltip')).toBeInTheDocument()
+  })
+
+  test('pan mode ignores jitter and locks a vertical drag against subsequent horizontal drift', () => {
+    const onPan = vi.fn()
+    render(<ChartCanvas {...baseProps} panOnPointer navigationMode="pan" onPan={onPan} />)
+    const chart = screen.getByRole('img', { name: 'K线主图' })
+    fireEvent.pointerDown(chart, { pointerId: 2, clientX: 240, clientY: 120 })
+    fireEvent.pointerMove(chart, { pointerId: 2, clientX: 243, clientY: 123 })
+    fireEvent.pointerMove(chart, { pointerId: 2, clientX: 245, clientY: 160 })
+    fireEvent.pointerMove(chart, { pointerId: 2, clientX: 170, clientY: 180 })
+    fireEvent.pointerUp(chart, { pointerId: 2, clientX: 150, clientY: 180 })
+    expect(onPan).not.toHaveBeenCalled()
+    fireEvent.pointerDown(chart, { pointerId: 3, clientX: 240, clientY: 120 })
+    fireEvent.pointerMove(chart, { pointerId: 3, clientX: 190, clientY: 122 })
+    expect(onPan).toHaveBeenCalledWith(50)
+  })
+
+  test('price-axis drag and double click affect only the price range', () => {
+    const onPan = vi.fn(), onPricePan = vi.fn(), onPriceScale = vi.fn(), onPriceReset = vi.fn(), onViewportReset = vi.fn()
+    render(<ChartCanvas {...baseProps} panOnPointer onPan={onPan} onPricePan={onPricePan} onPriceScale={onPriceScale} onPriceReset={onPriceReset} onViewportReset={onViewportReset} />)
+    const chart = screen.getByRole('img', { name: 'K线主图' })
+    const axis = screen.getByTestId('price-axis-hit-area')
+    fireEvent.pointerDown(axis, { pointerId: 4, clientX: 930, clientY: 120 })
+    fireEvent.pointerMove(chart, { pointerId: 4, clientX: 935, clientY: 150 })
+    fireEvent.pointerUp(chart, { pointerId: 4, clientX: 935, clientY: 150 })
+    expect(onPricePan).toHaveBeenCalledWith(0.1)
+    expect(onPan).not.toHaveBeenCalled()
+    fireEvent.pointerDown(axis, { pointerId: 5, clientX: 930, clientY: 120, shiftKey: true })
+    fireEvent.pointerMove(chart, { pointerId: 5, clientX: 930, clientY: 150 })
+    expect(onPriceScale).toHaveBeenCalled()
+    fireEvent.doubleClick(axis)
+    expect(onPriceReset).toHaveBeenCalledOnce()
+    expect(onViewportReset).not.toHaveBeenCalled()
+  })
+
+  test('touch inspection retains readout after lifting the finger and Escape dismisses it', () => {
+    render(<ChartCanvas {...baseProps} panOnPointer navigationMode="inspect" />)
+    const chart = screen.getByRole('img', { name: 'K线主图' })
+    fireEvent.pointerDown(chart, { pointerId: 6, pointerType: 'touch', clientX: 240, clientY: 120 })
+    fireEvent.pointerMove(chart, { pointerId: 6, pointerType: 'touch', clientX: 260, clientY: 180 })
+    fireEvent.pointerUp(chart, { pointerId: 6, pointerType: 'touch', clientX: 260, clientY: 180 })
+    fireEvent.pointerLeave(chart, { pointerId: 6, pointerType: 'touch' })
+    expect(screen.getByTestId('crosshair-tooltip')).toBeInTheDocument()
+    fireEvent.keyDown(chart, { key: 'Escape' })
+    expect(screen.queryByTestId('crosshair-tooltip')).not.toBeInTheDocument()
+  })
+
   test('historical change uses previous close and amplitude uses the high-low range', () => {
     render(<ChartCanvas {...baseProps} prediction={null} />)
     fireEvent.pointerMove(screen.getByRole('img', { name: 'K线主图' }), { pointerId: 3, clientX: transform.xForTime(candles[1].day), clientY: 172 })

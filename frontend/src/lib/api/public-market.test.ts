@@ -86,6 +86,15 @@ describe('Tencent public market adapter', () => {
     expect(result.bars.map((bar) => [bar.day, bar.close, bar.volume])).toEqual([['2026-09-15', 11, 10000], ['2026-09-16', 12.5, 17000]])
   })
 
+  test('does not treat aggregate constituent turnover per share as an index-point average', async () => {
+    const data = { date: '20260916', data: ['0930 3710 2000 2800000', '0931 3658 3000 4200000'] }
+    vi.stubGlobal('fetch', vi.fn(async () => Response.json(payload('data', data, 'sh000001'))))
+    const result = await (await load()).getPublicChartSeries('sh000001', 'intraday')
+    expect(result.bars.map(bar => bar.close)).toEqual([3710, 3658])
+    expect(result.bars.every(bar => bar.averagePrice === undefined)).toBe(true)
+    expect(result.note).toContain('不代表指数均价')
+  })
+
   test.each([
     { rows: [['2026-02-30', '10', '11', '12', '9', '100']] },
     { rows: [['2026-09-16', '10', '11', '10.5', '9', '100']] },

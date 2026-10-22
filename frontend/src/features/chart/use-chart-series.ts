@@ -7,12 +7,14 @@ import { isIntradayPeriod, type ChartPeriod } from './chart-periods'
 import type { ChartSeries, PriceAdjustment } from './chart-market-types'
 import { browserMarketClient } from '@/lib/api/browser-client'
 import { cachedChartSeries } from '@/lib/api/market-history-cache'
+import { isShanghaiComposite } from '@/lib/api/market-symbol'
 
 export type ChartSeriesLoader = (symbol: string, period: ChartPeriod, signal?: AbortSignal, adjustment?: PriceAdjustment) => Promise<ChartSeries>
 type SeriesState = { key: string; data: ChartSeries | null; loading: boolean; error: string | null }
 
-export function useChartSeries(snapshot: MarketSnapshot | null | undefined, period: ChartPeriod, loader?: ChartSeriesLoader, adjustment: PriceAdjustment = snapshot?.adjustment ?? 'none') {
+export function useChartSeries(snapshot: MarketSnapshot | null | undefined, period: ChartPeriod, loader?: ChartSeriesLoader, requestedAdjustment: PriceAdjustment = snapshot?.adjustment ?? 'none') {
   const symbol = snapshot?.quote.security.code ?? ''
+  const adjustment = isShanghaiComposite(symbol) || isIntradayPeriod(period) ? 'none' : requestedAdjustment
   const [attempt, setAttempt] = useState(0)
   const key = `${symbol}:${period}:${adjustment}:${attempt}`
   const [remote, setRemote] = useState<SeriesState>({ key: '', data: null, loading: false, error: null })

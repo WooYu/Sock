@@ -187,8 +187,16 @@
 .rs-chart-workspace .sc-kline-chart-scroll { overflow: hidden; min-height: 0; }
 .rs-chart-workspace .sc-kline-chart-surface svg.sc-kline-svg-interactive { width: 100%; height: clamp(340px, 34vw, 480px); touch-action: none; cursor: grab; }
 .rs-chart-workspace .sc-kline-svg-interactive:active { cursor: grabbing; }
+.rs-chart-workspace .sc-kline-svg { user-select: none; -webkit-user-select: none; }
+.rs-chart-workspace .sc-kline-svg:focus { outline: none; }
+.rs-chart-workspace .sc-kline-svg:focus-visible { outline: 2px solid #6860cc; outline-offset: -2px; }
+.rs-chart-workspace svg.sc-kline-svg-interactive[data-navigation-mode="inspect"] { cursor: crosshair; touch-action: none; }
+.rs-chart-workspace svg.sc-kline-svg-interactive[data-navigation-mode="pan"] { touch-action: pan-y; }
+.rs-chart-workspace .sc-price-axis-hit { cursor: ns-resize; touch-action: none; }
+.rs-chart-navigation-actions button[aria-pressed="true"] { background: #eeecfb; color: #5146b8; border-color: #d6d1ef; }
+.rs-chart-navigation-actions button:focus-visible { outline: 2px solid #6860cc; outline-offset: 2px; }
 .rs-chart-navigator { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; padding: 6px 14px 10px; border-top: 1px solid #edf0f5; background: #fafbfe; }
-.rs-chart-navigation-actions { display: flex; align-items: center; gap: 4px; }
+.rs-chart-navigation-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
 .rs-chart-navigation-actions button { min-width: 44px; min-height: 44px; padding: 0 10px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: #45516a; font-size: 12px; }
 .rs-chart-navigation-actions button:hover:not(:disabled) { background: #eeecfb; color: #5146b8; }
 .rs-chart-navigation-actions button:disabled { opacity: .4; cursor: default; }
@@ -199,6 +207,7 @@
 .rs-forecast-basis { display: grid; gap: 5px; padding: 12px; background: #f5f6fc; border-radius: 8px; color: #626d80; font-size: 12px; line-height: 1.7; }
 .rs-forecast-basis strong { color: #37435d; }
 @media (max-width: 720px) {
+  .rs-chart-workspace .sc-price-axis-hit { x: 850px; width: 110px; }
   .rs-chart-workspace .sc-kline-chart-surface { min-width: 0; }
   .rs-chart-workspace .sc-kline-chart-surface svg.sc-kline-svg-interactive { height: 320px; }
   .rs-chart-workspace .rs-chart-controls { padding: 6px 10px; }

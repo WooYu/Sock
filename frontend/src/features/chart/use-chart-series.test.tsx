@@ -41,3 +41,16 @@ test('refreshing the market snapshot also refreshes an active minute series', as
   rerender({ snapshot: { ...market, source: { ...market.source, fetchedAt: '2026-09-16T08:01:00Z' } } })
   await waitFor(() => expect(loader).toHaveBeenCalledTimes(2))
 })
+
+test('index period round trips request original points even when qfq is the stock preference', async () => {
+  const index = { ...market, quote: { ...market.quote, security: { code: 'sh000001', name: '上证指数' } } }
+  const loader = vi.fn(async (symbol: string, period: ChartPeriod, _signal?: AbortSignal, adjustment?: string) => ({ ...response(period), symbol, adjustment } as ChartSeries))
+  const { result, rerender } = renderHook(({ period }: { period: ChartPeriod }) => useChartSeries(index, period, loader, 'qfq'), { initialProps: { period: 'quarter' as ChartPeriod } })
+  await waitFor(() => expect(result.current.data?.period).toBe('quarter'))
+  rerender({ period: 'intraday' })
+  await waitFor(() => expect(result.current.data?.period).toBe('intraday'))
+  rerender({ period: 'quarter' })
+  await waitFor(() => expect(result.current.data?.period).toBe('quarter'))
+  expect(result.current.error).toBeNull()
+  expect(loader.mock.calls.every(call => call[3] === 'none')).toBe(true)
+})
