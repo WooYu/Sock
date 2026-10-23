@@ -26,6 +26,22 @@ const prediction: PredictionSnapshot = {
 const renderChart = () => render(<ChartWorkspace prediction={prediction} snapshot={snapshot} />)
 
 describe('ChartWorkspace', () => {
+  test.each(['qfq', 'hfq'] as const)('persists %s drawings across remounts and isolates price bases', async (adjustment) => {
+    const adjusted = { ...snapshot, adjustment }
+    const view = render(<ChartWorkspace variant="studio" snapshot={adjusted} />)
+    await userEvent.click(within(screen.getByLabelText('桌面绘图工具')).getByRole('button', { name: /^水平线$/ }))
+    fireEvent.click(screen.getByRole('img', { name: 'K线主图' }), { clientX: 300, clientY: 160 })
+    expect(screen.getByTestId('annotation-horizontal-line')).toBeInTheDocument()
+    const saved = loadChartWorkspace(`600519-${adjustment}`, 'day')!
+    expect(saved.drawings).toHaveLength(1)
+    expect(saved.drawings[0].symbol).toBe(`600519-${adjustment}`)
+    await userEvent.selectOptions(screen.getByLabelText('价格复权方式'), 'none')
+    expect(screen.queryByTestId('annotation-horizontal-line')).not.toBeInTheDocument()
+    view.unmount()
+    render(<ChartWorkspace variant="studio" snapshot={adjusted} />)
+    expect(screen.getByTestId('annotation-horizontal-line')).toBeInTheDocument()
+  }, 15000)
+
   test('ordinary wheel preserves the viewport while Ctrl+wheel zooms around the pointer', () => {
     const { container } = render(<ChartWorkspace variant="studio" snapshot={snapshot} />)
     const scroll = container.querySelector('.sc-kline-chart-scroll')!

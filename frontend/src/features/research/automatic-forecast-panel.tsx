@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { DecisionRule, StockAnalysis } from '../workspace/stock-workspace-types'
 import type { MergedLevel } from '../scenario/scenario-types'
 import { ScenarioReferenceTable } from '../scenario/scenario-reference-table'
@@ -18,6 +18,29 @@ export function AutomaticForecastPanel({ forecast, selected, onSelect, rules = [
   rules?: DecisionRule[]; stockAnalysis?: StockAnalysis | null; compact?: boolean
 }) {
   const [period, setPeriod] = useState<AnalysisPeriod>('day')
+  const sectionRef = useRef<HTMLElement>(null)
+  const initialAnchorHandled = useRef(false)
+  const anchorReady = !forecast.loading && !!(forecast.analysis || forecast.error)
+  useEffect(() => {
+    if (compact || !anchorReady) return
+    let frame = 0
+    const scrollToAnchor = () => {
+      if (window.location.hash !== '#automatic-forecast-results') return
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(() => {
+        initialAnchorHandled.current = true
+        sectionRef.current?.scrollIntoView({ block: 'start' })
+      })
+    }
+    if (!initialAnchorHandled.current) {
+      scrollToAnchor()
+    }
+    window.addEventListener('hashchange', scrollToAnchor)
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener('hashchange', scrollToAnchor)
+    }
+  }, [compact, anchorReady])
   const analysis = forecast.analysis
   const daily = analysis?.input.periods.day?.closed ?? []
   const close = daily.at(-1)?.close ?? 0
@@ -33,7 +56,7 @@ export function AutomaticForecastPanel({ forecast, selected, onSelect, rules = [
       <small>{basis.matchingRules.length ? `${basis.matchingRules.length} 条规则可核对` : '待核对规则依据'}{basis.comparableHistory.length ? ` · ${basis.comparableHistory.length} 个历史结果接近` : ''}</small>
     </button>
   }
-  return <section className={`rs-auto-forecast ${compact ? 'is-compact' : ''}`} id={compact ? undefined : 'automatic-forecast-results'} aria-label={compact ? '预测候选价位' : '自动 MA/BOLL 预测'}>
+  return <section ref={sectionRef} className={`rs-auto-forecast ${compact ? 'is-compact' : ''}`} id={compact ? undefined : 'automatic-forecast-results'} aria-label={compact ? '预测候选价位' : '自动 MA/BOLL 预测'}>
     <header><div><h2>{compact ? '合并候选价位' : 'MA / BOLL 预测'}</h2><p>{compact ? '选择价位，核对下方依据' : '历史 3 根 → 未来 4 根 → 合并价位 → 选择依据'}</p></div>{!compact ? <button type="button" className="rs-button" onClick={() => void forecast.refresh()} disabled={forecast.loading}>重新计算</button> : null}</header>
     {!compact ? <p className="rs-auto-status" role="status">{forecast.loading ? '正在按需核对日线 → 1小时 → 30分钟 → 15分钟…' : forecast.clearPeriod ? `${PERIOD_NAMES[forecast.clearPeriod]}趋势与盈利模式已有有效确认，停止自动下钻。` : `趋势／盈利模式尚未明确，已核对至${PERIOD_NAMES[forecast.periods.at(-1) ?? 'day']}；候选适配仍需核对条件。`}</p> : null}
     {forecast.error ? <p role="alert">{forecast.error}</p> : null}

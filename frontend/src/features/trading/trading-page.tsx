@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useState, useSyncExternalStore, type FormEvent } from 'react'
 import { addRecord, createRecordId, loadRecords } from '../records/record-store'
 import type { PredictionRecord, TradeRecord } from '../records/record-types'
 import { getAuthorizationHeader, getClientId, syncRecord } from '../records/record-sync'
@@ -12,7 +12,12 @@ export type TradingTab = 'positions' | 'ledger' | 'predictions' | 'statistics'
 
 const tabs: Array<[TradingTab, string]> = [['positions', '持仓'], ['ledger', '交易流水'], ['predictions', '预测记录'], ['statistics', '统计图表']]
 
+const subscribeHydration = () => () => {}
+const clientHydrated = () => true
+const serverHydrated = () => false
+
 export function TradingPage({ symbol, initialTab = 'positions' }: { symbol?: string | null; initialTab?: TradingTab }) {
+  const hydrated = useSyncExternalStore(subscribeHydration, clientHydrated, serverHydrated)
   const [tab, setTab] = useState<TradingTab>(initialTab)
   const [trades, setTrades] = useState<TradeRecord[]>(() => loadRecords<TradeRecord>('trades'))
   const [predictions, setPredictions] = useState<PredictionRecord[]>(() => loadRecords<PredictionRecord>('predictions'))
@@ -26,8 +31,8 @@ export function TradingPage({ symbol, initialTab = 'positions' }: { symbol?: str
     return () => window.removeEventListener('storage', reload)
   }, [])
   const label = tabs.find(([key]) => key === tab)?.[1] ?? '持仓'
-  const visibleTrades = symbol ? trades.filter((trade) => trade.symbol === symbol) : trades
-  const visiblePredictions = symbol ? predictions.filter((prediction) => prediction.symbol === symbol) : predictions
+  const visibleTrades = !hydrated ? [] : symbol ? trades.filter((trade) => trade.symbol === symbol) : trades
+  const visiblePredictions = !hydrated ? [] : symbol ? predictions.filter((prediction) => prediction.symbol === symbol) : predictions
   return <section className="sc-trading-page"><div className="sc-trading-header"><div><p className="text-sm text-[var(--sc-muted)]">{symbol ? `当前股票：${symbol}` : '账户与组合'}</p><h1 className="mt-1 text-2xl font-semibold">{label}</h1></div><RecordSyncButton onSynced={() => { setTrades(loadRecords<TradeRecord>('trades')); setPredictions(loadRecords<PredictionRecord>('predictions')) }} /></div><div className="sc-workspace-tabs" role="tablist" aria-label="交易内容">{tabs.map(([key, name]) => <Link className={tab === key ? 'is-active' : ''} data-active={tab === key} href={`/trading/${key}${symbol ? `?symbol=${symbol}` : ''}`} key={key} onClick={() => setTab(key)} role="tab" aria-selected={tab === key}>{name}</Link>)}</div><div className="sc-trading-content"><TradingContent tab={tab} symbol={symbol} trades={visibleTrades} predictions={visiblePredictions} onTradeSaved={(trade) => setTrades((items) => [...items, trade])} /></div></section>
 }
 

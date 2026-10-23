@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { expect, test, vi } from 'vitest'
 import { AutomaticForecastPanel } from './automatic-forecast-panel'
 import { forecastFixture } from '../scenario/scenario-test-fixtures'
@@ -22,3 +22,29 @@ test('merges nearby cross-day targets in ascending order and filters remote extr
   expect(onSelect).toHaveBeenCalledWith(expect.objectContaining({ value: 10, references: [expect.objectContaining({ target: expect.objectContaining({ horizon: 4 }) })] }))
 })
 
+
+test('waits for delayed forecast layout before following the initial hash, without stealing later scroll', async () => {
+  const { snapshot } = forecastFixture()
+  const forecast: AutomaticForecast = { analysis: null, error: null, periods: ['day'], loading: true, issues: [], clearPeriod: null, refresh: vi.fn() }
+  window.history.replaceState(null, '', '/#automatic-forecast-results')
+  const scroll = vi.fn()
+  const original = HTMLElement.prototype.scrollIntoView
+  HTMLElement.prototype.scrollIntoView = scroll
+  vi.useFakeTimers()
+  try {
+    const view = render(<AutomaticForecastPanel forecast={forecast} selected={null} onSelect={vi.fn()} />)
+    await act(() => vi.advanceTimersByTimeAsync(40))
+    expect(scroll).not.toHaveBeenCalled()
+    view.rerender(<AutomaticForecastPanel forecast={{ ...forecast, analysis: snapshot, loading: false }} selected={null} onSelect={vi.fn()} />)
+    await act(() => vi.advanceTimersByTimeAsync(40))
+    expect(scroll).toHaveBeenCalledTimes(1)
+    view.rerender(<AutomaticForecastPanel forecast={forecast} selected={null} onSelect={vi.fn()} />)
+    view.rerender(<AutomaticForecastPanel forecast={{ ...forecast, analysis: snapshot, loading: false }} selected={null} onSelect={vi.fn()} />)
+    await act(() => vi.advanceTimersByTimeAsync(40))
+    expect(scroll).toHaveBeenCalledTimes(1)
+  } finally {
+    vi.useRealTimers()
+    HTMLElement.prototype.scrollIntoView = original
+    window.history.replaceState(null, '', '/')
+  }
+})
