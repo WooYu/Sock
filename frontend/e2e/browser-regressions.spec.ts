@@ -88,9 +88,16 @@ test('forecast tooltip text keeps its proportions when the chart stretches', asy
   await page.getByRole('button', { name: /^查看预测 / }).first().click()
   const tooltip = page.getByTestId('projection-tooltip')
   if (info.project.name === 'mobile') {
-    // Small screens already use the forecast detail panel instead of the floating tooltip.
+    const sheet = page.getByRole('dialog', { name: '指标预测详情' })
+    await expect(sheet).toBeVisible()
+    await expect(sheet).toBeInViewport()
+    await expect(sheet.locator('.rs-forecast-value-grid')).toContainText('MA5')
+    await sheet.screenshot({ path: 'artifacts/mobile-indicator-details.png' })
+    await page.getByRole('button', { name: '关闭指标预测详情', exact: true }).click()
+    await expect(sheet).toHaveCount(0)
     await expect(tooltip).toBeHidden()
     await page.setViewportSize({ width: 1000, height: 850 })
+    await page.getByRole('button', { name: /^查看预测 / }).first().click()
   }
   await expect(tooltip).toBeVisible()
   await tooltip.screenshot({ path: `artifacts/tooltip-fixed-${info.project.name}.png` })

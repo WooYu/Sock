@@ -8,6 +8,7 @@ import type { DrawingKind, DrawingObject, PredictionSnapshot, TimePricePoint } f
 import { MA_COLORS, MA_PERIODS, formatChartTime, isIntradayPeriod, type ChartPeriod, type IndicatorKey, type IndicatorValue, type IndicatorValues, type MaKey } from './chart-periods'
 import type { DrawingMove } from './drawing-engine'
 import { DrawingLayer } from './drawing-layer'
+import { ChartTooltipFrame } from './chart-tooltip-frame'
 import { PredictionLayer } from './prediction-layer'
 import { IndicatorProjectionLayer } from './indicator-projection-layer'
 import type { IndicatorProjection } from './indicator-projection'
@@ -196,7 +197,7 @@ function HistoricalLayer({ candles, transform, keyLevels, showKeyLevels, kind = 
         {index ? <line x1={transform.xForTime(session.first)} x2={transform.xForTime(session.first)} y1={transform.rect.top} y2={volumeTop + volumeHeight} stroke="var(--sc-border)" strokeDasharray="3 4" /> : null}
         <text x={(transform.xForTime(session.first) + transform.xForTime(session.last)) / 2} y={volumeTop + volumeHeight + 22} textAnchor="middle" fill="var(--sc-muted)" fontSize="11">{session.day.slice(5)}</text>
       </g>)}</g> : null}
-      <g className="sc-kline-axis-labels" aria-label={isIntradayPeriod(period) ? '交易时间' : '交易日期'}>{(sessions.length ? [] : candles).filter((_, index) => index % Math.max(1, Math.ceil(candles.length / 5)) === 0).map((candle) => <text key={candle.day} x={transform.xForTime(candle.day)} y={volumeTop + volumeHeight + 22} textAnchor="middle" fontSize="11">{axisTime(candle.day, period)}</text>)}</g>
+      <g className="sc-kline-axis-labels" aria-label={isIntradayPeriod(period) ? '交易时间' : '交易日期'}>{(sessions.length ? [] : candles).filter((_, index) => index % Math.max(1, Math.ceil(candles.length / 5)) === 0).map((candle) => <ChartTooltipFrame key={candle.day} x={transform.xForTime(candle.day)} y={volumeTop + volumeHeight + 22} maxWidth={100} testId="chart-date-label">{() => <text x={0} y={0} textAnchor="middle" fontSize="11">{axisTime(candle.day, period)}</text>}</ChartTooltipFrame>)}</g>
     </g>
   )
 }
