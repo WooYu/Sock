@@ -9,7 +9,7 @@ export type IndicatorProjection = { day: string; estimated: boolean; horizon: nu
 /** Keep unknown holiday dates explicit. Minute slots skip lunch and overnight closures. */
 export function projectionTimes(origin: string, period: ChartPeriod, calendar: TradingCalendar | null, count = 4): Array<{ day: string; estimated: boolean }> {
   if (!origin) return []
-  if (period === 'intraday') return projectionTimes(origin, '1m', calendar, count)
+  if (period === 'intraday' || period === '5day') return projectionTimes(origin, '1m', calendar, count)
   if (!Number.isSafeInteger(count) || count < 1 || count > 240) throw new RangeError('Projection count must be 1–240')
   const known = calendar?.tradingDays ?? []
   const originDay = origin.slice(0, 10)

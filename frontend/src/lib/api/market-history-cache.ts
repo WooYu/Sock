@@ -22,7 +22,7 @@ function entries(): Entry[] {
 }
 export function cachedMarketRead<T>(url: string, freshOnly = false): T | null {
   const entry = entries().find(e => e.url === url)
-  const ttl = url.includes('period=') && /period=(intraday|\d+m)/.test(url) ? 60_000 : 5 * 60_000
+  const ttl = url.includes('period=') && /period=(intraday|5day|\d+m)/.test(url) ? 60_000 : 5 * 60_000
   return entry && (!freshOnly || entry.savedAt > invalidatedAt && Date.now() - entry.savedAt < ttl) ? entry.value as T : null
 }
 export function storeMarketRead(url: string, value: MarketSnapshot | ChartSeries) {

@@ -1,6 +1,6 @@
-export const CHART_PERIODS = ['intraday', '1m', '5m', '15m', '30m', '60m', '120m', 'day', 'week', 'month', 'quarter', 'year'] as const
+export const CHART_PERIODS = ['intraday', '5day', '1m', '5m', '15m', '30m', '60m', '120m', 'day', 'week', 'month', 'quarter', 'year'] as const
 export type ChartPeriod = typeof CHART_PERIODS[number]
-export const PERIOD_LABELS: Record<ChartPeriod, string> = { intraday: '分时', '1m': '1分钟', '5m': '5分钟', '15m': '15分钟', '30m': '30分钟', '60m': '1小时', '120m': '2小时', day: '日线', week: '周线', month: '月线', quarter: '季线', year: '年线' }
+export const PERIOD_LABELS: Record<ChartPeriod, string> = { intraday: '分时', '5day': '5日', '1m': '1分钟', '5m': '5分钟', '15m': '15分钟', '30m': '30分钟', '60m': '1小时', '120m': '2小时', day: '日线', week: '周线', month: '月线', quarter: '季线', year: '年线' }
 export const MA_PERIODS = [5, 10, 20, 30, 60, 90, 120, 250] as const
 export type MaPeriod = typeof MA_PERIODS[number]
 export type MaKey = `ma${MaPeriod}`
@@ -14,7 +14,8 @@ export function indicatorColor(key: MaKey | 'bollUpper' | 'bollMiddle' | 'bollLo
 export const DEFAULT_INDICATORS: Record<IndicatorKey, boolean> = { ma5: true, ma10: true, ma20: true, ma30: true, ma60: true, ma90: true, ma120: true, ma250: true, boll: true }
 export function isChartPeriod(value: unknown): value is ChartPeriod { return typeof value === 'string' && (CHART_PERIODS as readonly string[]).includes(value) }
 export function isMinutePeriod(period: ChartPeriod) { return /^\d+m$/.test(period) }
-export function isIntradayPeriod(period: ChartPeriod) { return period === 'intraday' || isMinutePeriod(period) }
+export function isPriceLinePeriod(period: ChartPeriod) { return period === 'intraday' || period === '5day' }
+export function isIntradayPeriod(period: ChartPeriod) { return isPriceLinePeriod(period) || isMinutePeriod(period) }
 
 /** Date.parse alone silently normalizes invalid dates such as February 30. */
 export function isCalendarDate(value: unknown): value is string {
@@ -48,7 +49,7 @@ export function canonicalPeriodTime(time: string, period: ChartPeriod): string {
   if (isIntradayPeriod(period)) {
     const session = shanghaiSession(time)
     if (!session) throw new RangeError('Chart minute time must be a Shanghai trading-session timestamp')
-    if (period === 'intraday') return time
+    if (isPriceLinePeriod(period)) return time
     const size = Number.parseInt(period, 10)
     const end = Math.min(session.end, session.start + Math.ceil(Math.max(1, session.minute - session.start) / size) * size)
     return `${time.slice(0, 10)}T${String(Math.floor(end / 60)).padStart(2, '0')}:${String(end % 60).padStart(2, '0')}:00+08:00`
@@ -70,7 +71,7 @@ export function isChartTime(value: unknown, period: ChartPeriod): value is strin
   if (typeof value !== 'string' || !isChartPeriod(period)) return false
   if (!isIntradayPeriod(period)) return isCalendarDate(value)
   if (!shanghaiSession(value)) return false
-  return period === 'intraday' || canonicalPeriodTime(value, period) === value
+  return isPriceLinePeriod(period) || canonicalPeriodTime(value, period) === value
 }
 
 export function formatChartTime(time: string, period: ChartPeriod): string {

@@ -177,3 +177,22 @@ describe('Tencent public market adapter', () => {
     await expect((await load()).searchPublicSecurities('xys')).rejects.toMatchObject({ status: 502 })
   })
 })
+
+test('five-day samples are chronological and reset volume and VWAP each trading day', async () => {
+  const days = ['20261023', '20261022', '20261021', '20261020', '20261019'].map(date => ({ date, data: ['0930 10.00 2 2000.00', '0931 11.00 5 5200.00'] }))
+  vi.resetModules()
+  vi.stubGlobal('fetch', vi.fn(async () => Response.json(payload('data', days))))
+  try {
+    const result = await (await load()).getPublicChartSeries('300502', '5day')
+    expect(result).toMatchObject({ period: '5day', kind: 'intraday', adjustment: 'none' })
+    expect(result.bars).toHaveLength(10)
+    expect(result.bars[0].day).toContain('2026-10-19')
+    expect(result.bars.at(-1)!.day).toContain('2026-10-23')
+    for (let i = 0; i < 10; i += 2) {
+      expect(result.bars[i]).toMatchObject({ volume: 200, averagePrice: 10 })
+      expect(result.bars[i + 1]).toMatchObject({ volume: 300, averagePrice: 10.4 })
+    }
+    expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/appstock/app/day/query?code=sz300502'), expect.anything())
+    expect(result.previousClose).toBeUndefined()
+  } finally { vi.unstubAllGlobals() }
+})

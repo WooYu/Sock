@@ -156,6 +156,10 @@ function IntradayPrices({ candles, transform, previousClose }: Pick<ChartCanvasP
 }
 
 function HistoricalLayer({ candles, transform, keyLevels, showKeyLevels, kind = 'candles', previousClose, period, priceClipId }: Pick<ChartCanvasProps, 'candles' | 'transform' | 'keyLevels' | 'showKeyLevels' | 'kind' | 'previousClose' | 'period'> & { priceClipId: string }) {
+  const sessions = period === '5day' ? [...new Set(candles.map(candle => candle.day.slice(0, 10)))].map(day => {
+    const samples = candles.filter(candle => candle.day.startsWith(day))
+    return { day, first: samples[0].day, last: samples.at(-1)!.day }
+  }) : []
   const maxVolume = Math.max(...candles.map((candle) => Number.isFinite(candle.volume) ? candle.volume : 0), 1)
   const candleWidth = Math.max(1, Math.min(14, transform.widthForTime(candles[0]?.day ?? '') * 0.56))
   return (
@@ -188,7 +192,11 @@ function HistoricalLayer({ candles, transform, keyLevels, showKeyLevels, kind = 
         return <rect height={height} key={candle.day} width={candleWidth} x={transform.xForTime(candle.day) - candleWidth / 2} y={volumeTop + volumeHeight - height} />
       })}</g>
       <text className="sc-volume-label" x={transform.rect.left} y={volumeTop - 7}>成交量</text>
-      <g className="sc-kline-axis-labels" aria-label={isIntradayPeriod(period) ? '交易时间' : '交易日期'}>{candles.filter((_, index) => index % Math.max(1, Math.ceil(candles.length / 5)) === 0).map((candle) => <text key={candle.day} x={transform.xForTime(candle.day)} y={volumeTop + volumeHeight + 22} textAnchor="middle" fontSize="11">{axisTime(candle.day, period)}</text>)}</g>
+      {sessions.length ? <g data-testid="five-day-sessions">{sessions.map((session, index) => <g key={session.day}>
+        {index ? <line x1={transform.xForTime(session.first)} x2={transform.xForTime(session.first)} y1={transform.rect.top} y2={volumeTop + volumeHeight} stroke="#cbd5e1" strokeDasharray="3 4" /> : null}
+        <text x={(transform.xForTime(session.first) + transform.xForTime(session.last)) / 2} y={volumeTop + volumeHeight + 22} textAnchor="middle" fill="#526079" fontSize="11">{session.day.slice(5)}</text>
+      </g>)}</g> : null}
+      <g className="sc-kline-axis-labels" aria-label={isIntradayPeriod(period) ? '交易时间' : '交易日期'}>{(sessions.length ? [] : candles).filter((_, index) => index % Math.max(1, Math.ceil(candles.length / 5)) === 0).map((candle) => <text key={candle.day} x={transform.xForTime(candle.day)} y={volumeTop + volumeHeight + 22} textAnchor="middle" fontSize="11">{axisTime(candle.day, period)}</text>)}</g>
     </g>
   )
 }

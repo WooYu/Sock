@@ -79,7 +79,7 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
   const revealedDrawingLocation = useRef('')
 
   const series = useChartSeries(snapshot, activePeriod, loadSeries, priceBasis)
-  const intraday = activePeriod === 'intraday'
+  const intraday = activePeriod === 'intraday' || activePeriod === '5day'
   const sourceCandles = useMemo(() => [...(series.data?.bars ?? [])].map(bar => index ? { ...bar, averagePrice: undefined } : bar).sort((a, b) => a.day.localeCompare(b.day)), [series.data?.bars, index])
   const allCandles = sourceCandles
   const viewport = useChartViewport(`${symbol}:${activePeriod}`, allCandles.length)

@@ -1,3 +1,4 @@
+import { ChartTooltipFrame } from './chart-tooltip-frame'
 import { scenarioCalendar } from '../scenario/scenario-calendar-data'
 import { useState } from 'react'
 import type { ChartTransform } from './chart-coordinates'
@@ -21,7 +22,7 @@ export function IndicatorProjectionLayer({ baseClose, previousClose, limitRatio,
   const origin = transform.times[historicalCount - 1]
   const spans = times.map(time => origin ? projectionLimitDays(origin, time, period, scenarioCalendar) : null)
   const reach = (i: number) => spans[i]
-  const minute = period === 'intraday' || /^\d+m$/.test(period)
+  const minute = period === 'intraday' || period === '5day' || /^\d+m$/.test(period)
   const limitBase = minute ? previousClose : baseClose
   const withinLimit = (value: number, i: number) => {
     const span = reach(i)
@@ -51,15 +52,15 @@ export function IndicatorProjectionLayer({ baseClose, previousClose, limitRatio,
       const px = transform.xForTime(times[selected])
       return <g key={key} pointerEvents="none">{range ? <line x1={px} x2={px} y1={transform.yForPrice(range[0])} y2={transform.yForPrice(range[1])} stroke={color(key)} strokeWidth="3" opacity=".4" /> : null}<circle cx={px} cy={transform.yForPrice(value)} r="3" fill={color(key)} stroke="white" /></g>
     }) : null}
-    {selected >= 0 ? <g data-testid="projection-tooltip" pointerEvents="none">
-      <rect x={transform.rect.left + 6} y={transform.rect.top + 24} width={Math.min(530, transform.rect.width - 12)} height={86 + keys.length * 18} rx="5" fill="#17213c" opacity=".94" />
-      <text x={transform.rect.left + 16} y={transform.rect.top + 43} fill="white" fontSize="11">{estimated ? '预计 ' : ''}{textTime(times[selected])} · 预测 / 情景区间</text>
+    {selected >= 0 ? <ChartTooltipFrame x={transform.rect.left + 6} y={transform.rect.top + 24} maxWidth={transform.rect.width - 12} testId="projection-tooltip">{availableWidth => <>
+      <rect x={0} y={0} width={Math.min(530, availableWidth)} height={86 + keys.length * 18} rx="5" fill="#17213c" opacity=".94" />
+      <text x={10} y={19} fill="white" fontSize="11">{estimated ? '预计 ' : ''}{textTime(times[selected])} · 预测 / 情景区间</text>
       {keys.map((key, i) => {
         const value = valueAt(key, selected), range = ranges?.[selected]?.[key]
-        return <text key={key} data-indicator={key} x={transform.rect.left + 16} y={transform.rect.top + 63 + i * 18} fill={color(key)} fontSize="11">{value != null && withinLimit(value, selected) ? '◆ ' : ''}{labels[key] ?? key.toUpperCase()}　{value?.toFixed(2) ?? '—'} {value != null && hasBase ? `(${percent(value)})` : ''}　{value == null ? '历史不足' : range ? `${range[0].toFixed(2)}～${range[1].toFixed(2)}` : '区间暂无'}</text>
+        return <text key={key} data-indicator={key} x={10} y={39 + i * 18} fill={color(key)} fontSize={availableWidth < 380 ? 10 : 11}>{value != null && withinLimit(value, selected) ? '◆ ' : ''}{labels[key] ?? key.toUpperCase()}　{value?.toFixed(2) ?? '—'} {value != null && hasBase ? `(${percent(value)})` : ''}　{value == null ? '历史不足' : range ? `${range[0].toFixed(2)}～${range[1].toFixed(2)}` : '区间暂无'}</text>
       })}
-      <text x={transform.rect.left + 16} y={transform.rect.top + 68 + keys.length * 18} fill="#dbe4ff" fontSize="10">{hasBase ? `百分比相对历史末根收盘 ${baseClose!.toFixed(2)}` : '缺少收盘基准，无法计算涨跌幅'}</text>
-      <text x={transform.rect.left + 16} y={transform.rect.top + 83 + keys.length * 18} fill="#dbe4ff" fontSize="10">{hasLimit && reach(selected) && (!minute || (previousClose != null && previousClose > 0)) ? `◆ 限制内：每日 ±${(limitRatio! * 100).toFixed(2)}%，累计 ${reach(selected)!.days + (minute ? 1 : 0)} 个交易日${reach(selected)!.estimated ? '（日历待核实）' : ''}${minute ? '，基准为昨收' : ''}` : '未标记限制范围：缺少有效基准或涨跌幅限制'}</text>
-    </g> : null}
+      <text x={10} y={44 + keys.length * 18} fill="#dbe4ff" fontSize="10">{hasBase ? `百分比相对历史末根收盘 ${baseClose!.toFixed(2)}` : '缺少收盘基准，无法计算涨跌幅'}</text>
+      <text x={10} y={59 + keys.length * 18} fill="#dbe4ff" fontSize="10">{hasLimit && reach(selected) && (!minute || (previousClose != null && previousClose > 0)) ? `◆ 限制内：每日 ±${(limitRatio! * 100).toFixed(2)}%，累计 ${reach(selected)!.days + (minute ? 1 : 0)} 个交易日${reach(selected)!.estimated ? '（日历待核实）' : ''}${minute ? '，基准为昨收' : ''}` : '未标记限制范围：缺少有效基准或涨跌幅限制'}</text>
+    </>}</ChartTooltipFrame> : null}
   </g>
 }

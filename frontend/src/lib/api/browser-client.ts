@@ -46,7 +46,7 @@ export const browserMarketClient: BrowserMarketClient = {
   search: (query, signal) => browserRequest(`/api/market/search?q=${encodeURIComponent(query)}`, signal),
   snapshot: (symbol, signal) => marketRead(`/api/market/stocks/${encodeURIComponent(symbol)}/snapshot`, signal),
   cachedSnapshot: symbol => cachedMarketRead<MarketSnapshot>(snapshotUrl(symbol)),
-  series: (symbol, period, signal, adjustment = ['intraday', '1m', '5m', '15m', '30m', '60m', '120m'].includes(period) ? 'none' : 'qfq') => period === 'day' && adjustment === 'qfq'
+  series: (symbol, period, signal, adjustment = ['intraday', '5day', '1m', '5m', '15m', '30m', '60m', '120m'].includes(period) ? 'none' : 'qfq') => period === 'day' && adjustment === 'qfq'
     ? browserMarketClient.snapshot(symbol, signal).then(market => ({ symbol, period, adjustment: market.adjustment ?? 'none', kind: 'candles', bars: market.dailyCandles, source: market.source, limitedHistory: market.dailyCandles.length < 250 }))
     : marketRead(`/api/market/stocks/${encodeURIComponent(symbol)}/candles?period=${encodeURIComponent(period)}&adjustment=${adjustment}`, signal),
   prediction: async (symbol, signal) => {

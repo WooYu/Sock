@@ -82,3 +82,43 @@ test('initial forecast hash scrolls after delayed market and forecast rendering'
     return rect.top >= -1 && rect.top < innerHeight / 2 && scrollY > 0
   }), { timeout: 45000 }).toBe(true)
 })
+
+test('forecast tooltip text keeps its proportions when the chart stretches', async ({ page }, info) => {
+  await page.goto('/?symbol=300502')
+  await page.getByRole('button', { name: /^查看预测 / }).first().click()
+  const tooltip = page.getByTestId('projection-tooltip')
+  if (info.project.name === 'mobile') {
+    // Small screens already use the forecast detail panel instead of the floating tooltip.
+    await expect(tooltip).toBeHidden()
+    await page.setViewportSize({ width: 1000, height: 850 })
+  }
+  await expect(tooltip).toBeVisible()
+  await tooltip.screenshot({ path: `artifacts/tooltip-fixed-${info.project.name}.png` })
+  const distortion = () => tooltip.evaluate(element => {
+    const matrix = (element as SVGGraphicsElement).getScreenCTM()!
+    return Math.abs(Math.hypot(matrix.a, matrix.b) - Math.hypot(matrix.c, matrix.d))
+  })
+  await expect.poll(distortion).toBeLessThan(.001)
+  await page.setViewportSize({ width: 1200, height: 850 })
+  await expect.poll(distortion).toBeLessThan(.001)
+})
+
+test('five-day tab displays five sessions and preserves the daily adjustment preference', async ({ page }) => {
+  await page.route('**/api/market/stocks/*/candles?*', async route => {
+    const url = new URL(route.request().url())
+    const period = url.searchParams.get('period') as ChartPeriod
+    const series = await loadPreviewSeries('DEMO', period)
+    return route.fulfill({ json: { ...series, symbol: '300502', adjustment: url.searchParams.get('adjustment') } })
+  })
+  await page.goto('/?symbol=300502')
+  await expect(page.getByTestId('candlestick-layer')).toBeVisible()
+  await page.getByRole('tab', { name: '5日', exact: true }).click()
+  await expect(page.getByRole('tab', { name: '5日', exact: true })).toHaveAttribute('aria-selected', 'true')
+  await expect(page.getByTestId('intraday-price-line')).toBeVisible()
+  await expect(page.getByTestId('five-day-sessions').locator('text')).toHaveCount(5)
+  await expect(page.getByLabel('价格复权方式')).toBeDisabled()
+  await expect(page.getByLabel('价格复权方式')).toHaveValue('none')
+  await page.getByRole('tab', { name: '日线', exact: true }).click()
+  await expect(page.getByLabel('价格复权方式')).toHaveValue('qfq')
+  await expect(page.getByTestId('candlestick-layer')).toBeVisible()
+})

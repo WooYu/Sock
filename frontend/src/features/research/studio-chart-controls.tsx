@@ -2,7 +2,7 @@ import type { ChartPeriod } from '../chart/chart-types'
 import { MA_COLORS, MA_PERIODS, PERIOD_LABELS, isMinutePeriod, type IndicatorKey } from '../chart/chart-periods'
 import { StudioIcon } from './studio-icon'
 
-const mainPeriods: ChartPeriod[] = ['intraday', 'day', 'week', 'month', 'quarter', 'year']
+const mainPeriods: ChartPeriod[] = ['intraday', '5day', 'day', 'week', 'month', 'quarter', 'year']
 const minutePeriods: ChartPeriod[] = ['1m', '5m', '15m', '30m', '60m', '120m']
 
 export function StudioChartControls({ period, onPeriod, indicators, onIndicator, onMaVisibility, maVisible, predictionVisible, onPrediction, onReset, onUndo, onRedo, crosshair, onCrosshair }: { period: ChartPeriod; onPeriod: (period: ChartPeriod) => void; indicators: Record<IndicatorKey, boolean>; onIndicator: (key: IndicatorKey, visible: boolean) => void; maVisible: boolean; onMaVisibility: () => void; predictionVisible: boolean; onPrediction: (visible: boolean) => void; zoom: number; onZoom: (zoom: number) => void; onReset: () => void; onUndo: () => void; onRedo: () => void; crosshair: boolean; onCrosshair: () => void }) {

@@ -21,6 +21,7 @@ const allowedEndpoints = new Set([
   'https://web.ifzq.gtimg.cn/appstock/app/fqkline/get',
   'https://ifzq.gtimg.cn/appstock/app/kline/mkline',
   'https://web.ifzq.gtimg.cn/appstock/app/minute/query',
+  'https://web.ifzq.gtimg.cn/appstock/app/day/query',
   'https://smartbox.gtimg.cn/s3/',
 ])
 
@@ -165,38 +166,49 @@ function nativeSeries(symbol: string, period: ChartPeriod, adjustment: PriceAdju
   })
 }
 
-function intradaySeries(symbol: string): Promise<ChartSeries> {
+function intradaySeries(symbol: string, period: 'intraday' | '5day' = 'intraday'): Promise<ChartSeries> {
   const code = marketCode(symbol)
-  return cached(`intraday:${code}`, 15_000, async () => {
-    const url = new URL('https://web.ifzq.gtimg.cn/appstock/app/minute/query')
+  return cached(`${period}:${code}`, 15_000, async () => {
+    const url = new URL(`https://web.ifzq.gtimg.cn/appstock/app/${period === '5day' ? 'day' : 'minute'}/query`)
     url.searchParams.set('code', code)
     const entry = await providerEntry(url, code)
-    const data = object(entry.data)
-    const day = calendarDate(data.date)
-    if (!Array.isArray(data.data)) throw invalidData()
-    if (!data.data.length) throw noData()
-    if (data.data.length > 1500) throw invalidData()
-    const samples = new Map<string, { price: number; volume: number; amount: number }>()
-    for (const sample of data.data) {
-      if (typeof sample !== 'string') throw invalidData()
-      const values = sample.trim().split(/\s+/)
-      if (values.length < 4 || !/^\d{4}$/.test(values[0])) throw invalidData()
-      const time = minuteTime(`${day.replaceAll('-', '')}${values[0]}`)
-      const clock = Number(values[0])
-      if (!((clock >= 930 && clock <= 1130) || (clock >= 1300 && clock <= 1500))) continue
-      samples.set(canonical(time, 'intraday'), { price: positive(values[1]), volume: number(values[2]) * 100, amount: number(values[3]) })
+    const datasets = period === '5day' ? entry.data : [entry.data]
+    if (!Array.isArray(datasets) || datasets.length > 10) throw invalidData()
+    const sessions = new Map<string, Record<string, unknown>>()
+    for (const item of datasets) {
+      const data = object(item)
+      sessions.set(calendarDate(data.date), data)
     }
-    const bars: Candle[] = []
-    let previousVolume = 0, previousAmount = 0
-    for (const [time, sample] of [...samples].sort(([a], [b]) => a.localeCompare(b))) {
-      if (!Number.isFinite(sample.volume) || sample.volume < previousVolume || sample.amount < previousAmount || (sample.volume === 0 && sample.amount > 0)) throw invalidData()
-      // Index turnover / aggregate constituent volume is not an index-point VWAP.
-      bars.push({ day: time, endTime: time, open: sample.price, high: sample.price, low: sample.price, close: sample.price, volume: sample.volume - previousVolume, turnover: sample.amount - previousAmount, ...(!isShanghaiComposite(symbol) && sample.volume > 0 ? { averagePrice: sample.amount / sample.volume } : {}) })
-      previousVolume = sample.volume
-      previousAmount = sample.amount
+    const allBars: Candle[] = []
+    for (const [, data] of [...sessions].sort(([a], [b]) => a.localeCompare(b)).slice(-5)) {
+      const day = calendarDate(data.date)
+      if (!Array.isArray(data.data)) throw invalidData()
+      if (!data.data.length) throw noData()
+      if (data.data.length > 1500) throw invalidData()
+      const samples = new Map<string, { price: number; volume: number; amount: number }>()
+      for (const sample of data.data) {
+        if (typeof sample !== 'string') throw invalidData()
+        const values = sample.trim().split(/\s+/)
+        if (values.length < 4 || !/^\d{4}$/.test(values[0])) throw invalidData()
+        const time = minuteTime(`${day.replaceAll('-', '')}${values[0]}`)
+        const clock = Number(values[0])
+        if (!((clock >= 930 && clock <= 1130) || (clock >= 1300 && clock <= 1500))) continue
+        samples.set(canonical(time, 'intraday'), { price: positive(values[1]), volume: number(values[2]) * 100, amount: number(values[3]) })
+      }
+      const bars: Candle[] = []
+      let previousVolume = 0, previousAmount = 0
+      for (const [time, sample] of [...samples].sort(([a], [b]) => a.localeCompare(b))) {
+        if (!Number.isFinite(sample.volume) || sample.volume < previousVolume || sample.amount < previousAmount || (sample.volume === 0 && sample.amount > 0)) throw invalidData()
+        // Index turnover / aggregate constituent volume is not an index-point VWAP.
+        bars.push({ day: time, endTime: time, open: sample.price, high: sample.price, low: sample.price, close: sample.price, volume: sample.volume - previousVolume, turnover: sample.amount - previousAmount, ...(!isShanghaiComposite(symbol) && sample.volume > 0 ? { averagePrice: sample.amount / sample.volume } : {}) })
+        previousVolume = sample.volume
+        previousAmount = sample.amount
+      }
+      if (!bars.length) throw noData()
+      allBars.push(...bars)
     }
-    if (!bars.length) throw noData()
-    return { symbol, period: 'intraday', adjustment: 'none', kind: 'intraday', bars, previousClose: optionalPositive(quoteFields(entry, code)?.[4]), source: source(new Date().toISOString()), limitedHistory: true, note: isShanghaiComposite(symbol) ? '当日指数点位采样，不含盘后定价；总成交额/总成交量不代表指数均价，不绘制该均价线；柱形为每分钟成交量。' : '当日正常交易时段的价格采样，不含盘后定价；均价为累计成交额/累计成交量，柱形为每分钟成交量。' }
+    if (!allBars.length) throw noData()
+    return { symbol, period, adjustment: 'none', kind: 'intraday', bars: allBars, ...(period === 'intraday' ? { previousClose: optionalPositive(quoteFields(entry, code)?.[4]) } : {}), source: source(new Date().toISOString()), limitedHistory: true, note: period === '5day' ? `最近 ${Math.min(5, sessions.size)} 个交易日分时走势；按交易日分别计算成交量与均价，不补造缺失交易日。` : isShanghaiComposite(symbol) ? '当日指数点位采样，不含盘后定价；总成交额/总成交量不代表指数均价，不绘制该均价线；柱形为每分钟成交量。' : '当日正常交易时段的价格采样，不含盘后定价；均价为累计成交额/累计成交量，柱形为每分钟成交量。' }
   })
 }
 
@@ -206,8 +218,8 @@ export async function getPublicChartSeries(symbol: string, period: ChartPeriod =
   if (!['none', 'qfq', 'hfq'].includes(adjustment)) throw new PublicMarketError('MARKET_ADJUSTMENT_INVALID', '不支持的复权方式', 400)
   if (isIntradayPeriod(period) && adjustment !== 'none') throw new PublicMarketError('MARKET_ADJUSTMENT_UNSUPPORTED', '分时与分钟行情仅支持不复权', 400)
   if (isShanghaiComposite(symbol)) adjustment = 'none'
-  if (period === 'intraday') {
-    const result = await intradaySeries(symbol)
+  if (period === 'intraday' || period === '5day') {
+    const result = await intradaySeries(symbol, period)
     return { ...result, bars: result.bars.map((bar) => ({ ...bar })) }
   }
   const nativePeriod = period === 'quarter' || period === 'year' ? 'month' : period === '120m' ? '60m' : period
