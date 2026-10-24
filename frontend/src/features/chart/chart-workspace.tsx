@@ -59,6 +59,7 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
   const [internalPeriod, setInternalPeriod] = useState<ChartPeriod>('day')
   const activePeriod = controlledPeriod ?? internalPeriod
   const setActivePeriod = (period: ChartPeriod) => { if (controlledPeriod === undefined) setInternalPeriod(period); onPeriodChange?.(period) }
+  const fiveDay = activePeriod === '5day'
   const symbol = snapshot?.quote.security.code ?? ''
   const [adjustment, setAdjustment] = useState<'none' | 'qfq' | 'hfq'>((isStudio && loadSeries) || !snapshot ? 'qfq' : snapshot.adjustment ?? 'none')
   const index = isShanghaiComposite(symbol)
@@ -66,7 +67,7 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
   const { workspace, drawings, selectedId, syncStatus, commands } = useChartWorkspace({ symbol: priceBasis === 'none' ? symbol : `${symbol}-${priceBasis}`, period: activePeriod, localOnly: symbol === 'DEMO' })
   const [maVisible, setMaVisible] = useState(true)
   const configuredIndicators = { ...DEFAULT_INDICATORS, ...workspace.indicators }
-  const indicators = { ...configuredIndicators, ...(maVisible ? {} : Object.fromEntries(MA_PERIODS.map(period => [`ma${period}`, false]))) }
+  const indicators = { ...configuredIndicators, ...(fiveDay ? Object.fromEntries(indicatorOptions.map(([key]) => [key, false])) : maVisible ? {} : Object.fromEntries(MA_PERIODS.map(period => [`ma${period}`, false]))) }
   const layers: ChartLayerState = { keyLevels: true, annotations: true, prediction: true, ...workspace.layers }
   const zoom = workspace.view.zoom
   const crosshair = workspace.crosshair
@@ -94,7 +95,7 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
   const fullBoll = useMemo(() => bollinger(allCandles, 20, 2), [allCandles])
   const boll = useMemo(() => ({ upper: fullBoll.upper.slice(visibleStart, visibleEnd), middle: fullBoll.middle.slice(visibleStart, visibleEnd), lower: fullBoll.lower.slice(visibleStart, visibleEnd) }), [fullBoll, visibleStart, visibleEnd])
   const projection = useMemo(() => {
-    if (!isStudio || activePrediction) return []
+    if (!isStudio || activePrediction || fiveDay) return []
     return projectIndicators(allCandles, activePeriod, scenarioCalendar).map(point => {
       const refs = forecastReferences?.filter(ref => (ref.adjustment ?? 'none') === priceBasis && ref.period === activePeriod && ref.target.horizon === point.horizon && ref.originBarKey === allCandles.at(-1)?.day) ?? []
       const target = refs.find(ref => ref.target.barKey)?.target.barKey
@@ -102,8 +103,8 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
       for (const ref of refs) if (!ref.valid) delete ranges[ref.indicator]
       return { ...point, ranges, ...(target ? { day: target, estimated: false } : {}), values: { ...point.values, ...Object.fromEntries(refs.map(ref => [ref.indicator, ref.valid ? ref.value : null])) } }
     })
-  }, [activePeriod, activePrediction, allCandles, isStudio, forecastReferences, priceBasis])
-  const sessionProjection = useMemo(() => isStudio && layers.prediction ? projectSessionIndicators(allCandles, activePeriod, scenarioCalendar) : null, [activePeriod, allCandles, isStudio, layers.prediction])
+  }, [activePeriod, activePrediction, allCandles, isStudio, forecastReferences, priceBasis, fiveDay])
+  const sessionProjection = useMemo(() => isStudio && !fiveDay && layers.prediction ? projectSessionIndicators(allCandles, activePeriod, scenarioCalendar) : null, [activePeriod, allCandles, isStudio, layers.prediction, fiveDay])
   const visibleProjection = useMemo(() => layers.prediction && (intraday || viewport.atLatest) ? projection : [], [layers.prediction, intraday, viewport.atLatest, projection])
   const visiblePrediction = layers.prediction && (!isStudio || viewport.atLatest) ? activePrediction : null
   const indicatorValues = useMemo(() => ({
@@ -306,7 +307,7 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
             <div className="sc-kline-control-row" aria-label="视图控制"><span className="sc-kline-group-label">视图</span><button className="sc-kline-control-button" aria-label="缩小" onClick={() => setZoom((value) => Math.max(80, value - 10))} type="button">−</button><span className="sc-kline-zoom" role="status">{zoom}%</span><button className="sc-kline-control-button" aria-label="放大" onClick={() => setZoom((value) => Math.min(150, value + 10))} type="button">＋</button><button className="sc-kline-control-button" onClick={resetView} type="button">复位视图</button><button aria-pressed={crosshair} className={`sc-kline-control-button ${crosshair ? 'is-active' : ''}`} onClick={() => setCrosshair((value) => !value)} type="button">十字光标</button><button className="sc-kline-control-button" onClick={commands.undo} type="button">撤销</button><button className="sc-kline-control-button" onClick={commands.redo} type="button">重做</button></div>
           </div>}
 
-          <div className="sc-chart-mobile-context"><button disabled={!isStudio && (!activePrediction || !layers.prediction)} onClick={() => setMobileSheet('prediction')} type="button">预测详情</button><button onClick={() => setMobileSheet('properties')} type="button">对象属性</button></div>
+          <div className="sc-chart-mobile-context"><button disabled={fiveDay || !isStudio && (!activePrediction || !layers.prediction)} onClick={() => setMobileSheet('prediction')} type="button">预测详情</button><button onClick={() => setMobileSheet('properties')} type="button">对象属性</button></div>
 
           <div className="sc-kline-chart-panel">
             <div className="sc-kline-chart-heading"><div className="sc-kline-legend">{intraday ? <><span style={{ color: '#5651da' }}>分时价格</span>{index ? <span>指数不展示成交均价</span> : <span style={{ color: '#c79b28' }}>成交均价</span>}<span>不含午间休市</span></> : <><span><i className="sc-candle-rise" />历史行情</span>{visiblePrediction || visibleProjection.length ? <span><i className="rs-forecast-swatch" />MA/BOLL 后4根 · 点选查看</span> : null}{MA_PERIODS.map((period) => { const key = `ma${period}` as MaKey; return indicators[key] ? <span key={key} style={{ color: indicatorColors[key] }}>{`MA${period}`} {movingAverages[key].at(-1)?.toFixed(2) ?? '—'}</span> : null })}</>}</div></div>
@@ -330,8 +331,8 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
           <nav aria-label="移动绘图工具" className="sc-chart-mobile-toolbar" data-testid="chart-mobile-toolbar"><button aria-pressed={activeTool === 'pointer'} onClick={() => setActiveTool('pointer')} type="button"><span aria-hidden="true">↖</span>选择</button><button aria-pressed={activeTool === 'trend-line'} onClick={() => setActiveTool('trend-line')} type="button"><span aria-hidden="true">╱</span>趋势线</button><button aria-pressed={activeTool === 'horizontal-line'} onClick={() => setActiveTool('horizontal-line')} type="button"><span aria-hidden="true">─</span>水平线</button><button aria-haspopup="dialog" aria-pressed={markerTools.some(([tool]) => tool === activeTool)} onClick={() => setMobileSheet('markers')} type="button"><span aria-hidden="true">◆</span>标记</button><button aria-haspopup="dialog" onClick={() => setMobileSheet('more')} type="button"><span aria-hidden="true">•••</span>更多</button></nav>
         </div>
 
-        <aside aria-label="图层与对象属性" className="sc-kline-side-column sc-chart-right-rail">{isStudio ? <><div className="rs-rail-tabs" role="tablist" aria-label="侧栏内容"><button role="tab" aria-selected={rightTab === 'prediction'} onClick={() => setRightTab('prediction')} type="button">预测</button><button role="tab" aria-selected={rightTab === 'drawings'} onClick={() => setRightTab('drawings')} type="button">绘图与图层 <span>{drawings.length}</span></button></div>{rightTab === 'prediction' ? forecastPanel ?? <ForecastPanel prediction={activePrediction} selectedDay={detailPredictionDay} onSelectDay={selectPredictionDay} currentPrice={currentPrice} status={forecastStatus} error={forecastError} onRetry={onRetry} hidden={!layers.prediction} onShow={() => setLayers((old) => ({ ...old, prediction: true }))} period={activePeriod} /> : <>{inspector}{drawingList}<ChartLayerPanel layers={layers} onChange={(key, value) => setLayers((old) => ({ ...old, [key]: value }))} />{workspace.recovery?.length ? recovery : null}</>}</> : <><ChartLayerPanel layers={layers} onChange={(key, value) => setLayers((old) => ({ ...old, [key]: value }))} />{inspector}{recovery}<section className="sc-kline-side-card"><p className="sc-eyebrow">当前观察</p><h2>{snapshot.quote.security.name}</h2><dl><div><dt>现价</dt><dd>{priceText(currentPrice)}</dd></div><div><dt>数据源</dt><dd>{snapshot.source.name}</dd></div><div><dt>更新时间</dt><dd>{new Date(snapshot.source.fetchedAt).toLocaleString('zh-CN')}</dd></div></dl></section></>}</aside>
-        {footer ? <div className="sc-chart-results">{footer}</div> : null}
+        <aside aria-label="图层与对象属性" className="sc-kline-side-column sc-chart-right-rail">{isStudio ? <><div className="rs-rail-tabs" role="tablist" aria-label="侧栏内容"><button role="tab" aria-selected={rightTab === 'prediction'} onClick={() => setRightTab('prediction')} type="button">预测</button><button role="tab" aria-selected={rightTab === 'drawings'} onClick={() => setRightTab('drawings')} type="button">绘图与图层 <span>{drawings.length}</span></button></div>{rightTab === 'prediction' ? fiveDay ? <p className="rs-panel-empty">最近五个交易日的分时价格与成交均价，不进行预测。</p> : forecastPanel ?? <ForecastPanel prediction={activePrediction} selectedDay={detailPredictionDay} onSelectDay={selectPredictionDay} currentPrice={currentPrice} status={forecastStatus} error={forecastError} onRetry={onRetry} hidden={!layers.prediction} onShow={() => setLayers((old) => ({ ...old, prediction: true }))} period={activePeriod} /> : <>{inspector}{drawingList}<ChartLayerPanel layers={layers} onChange={(key, value) => setLayers((old) => ({ ...old, [key]: value }))} />{workspace.recovery?.length ? recovery : null}</>}</> : <><ChartLayerPanel layers={layers} onChange={(key, value) => setLayers((old) => ({ ...old, [key]: value }))} />{inspector}{recovery}<section className="sc-kline-side-card"><p className="sc-eyebrow">当前观察</p><h2>{snapshot.quote.security.name}</h2><dl><div><dt>现价</dt><dd>{priceText(currentPrice)}</dd></div><div><dt>数据源</dt><dd>{snapshot.source.name}</dd></div><div><dt>更新时间</dt><dd>{new Date(snapshot.source.fetchedAt).toLocaleString('zh-CN')}</dd></div></dl></section></>}</aside>
+        {footer && !fiveDay ? <div className="sc-chart-results">{footer}</div> : null}
       </div>
 
 
