@@ -200,7 +200,7 @@ export function ExperienceWorkbench({ data = researchPackage as KnowledgePackage
 
       {tab !== 'notes' ? <p className="kw-view-caption">{tab === 'samples' ? '保存版本与实际核对' : '原研究更新 ' + data.generatedAt.slice(0, 10)}</p> : null}
 
-      {tab === 'library' ? <div id="kw-panel-library" role="region" aria-labelledby="research-nav-library" className="kw-library">
+      {tab === 'library' ? <div id="kw-panel-library" role="region" aria-label="历史经验记录" className="kw-library">
         <aside className="kw-sidebar" aria-label="记录筛选">
           <h2>我的知识库</h2>
           <div className="kw-type-filters" aria-label="按类型筛选">

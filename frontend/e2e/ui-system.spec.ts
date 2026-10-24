@@ -43,6 +43,13 @@ for (const [name, path] of routes) test(`UI ${name}: readable layout and bounded
   await page.goto(path)
   await expect(page.locator('main').first()).toBeVisible()
   await expect(page.locator('h1').first()).toBeVisible()
+  if (name === 'knowledge') {
+    await expect(page.getByRole('heading', { name: '笔记标签', exact: true, level: 1 })).toBeVisible()
+    const nav = page.getByRole('navigation', { name: '研究工作台导航' })
+    await expect(nav.getByRole('link', { name: '经验原则', exact: true })).toHaveCount(0)
+    await expect(nav.getByRole('link', { name: '笔记标签', exact: true })).toHaveAttribute('aria-current', 'page')
+    await expect(nav.getByRole('link')).toHaveCount(4)
+  }
   if (name === 'notes') await expect(page.getByLabel('搜索笔记与标签', { exact: true })).toBeVisible()
   if (info.project.name === 'mobile' && ['research', 'knowledge', 'notes', 'samples', 'evidence'].includes(name)) {
     const nav = page.getByRole('navigation', { name: '研究工作台导航' })

@@ -105,7 +105,7 @@ describe('experience workbench', () => {
     await user.click(screen.getByRole('link', { name: '学习样本' }))
     expect(await screen.findByRole('heading', { name: '学习样本库' }, { timeout: 20_000 })).toBeInTheDocument()
     expect(window.location.search).toContain('view=samples')
-    expect(screen.queryByRole('link', { name: '经验与原则' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /经验原则|经验与原则/ })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: '复盘' })).not.toBeInTheDocument()
     vi.unstubAllGlobals()
   })
@@ -116,7 +116,7 @@ describe('experience workbench', () => {
     // The actual lazy-loaded source catalog can take longer to import under a parallel suite.
     expect(await screen.findByRole('heading', { name: '笔记标签目录' }, { timeout: 20_000 })).toBeInTheDocument()
     expect(window.location.search).toContain('view=notes')
-    expect(screen.queryByRole('link', { name: '经验与原则' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /经验原则|经验与原则/ })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: '复盘' })).not.toBeInTheDocument()
   }, 30_000)
 
