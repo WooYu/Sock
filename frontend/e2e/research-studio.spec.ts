@@ -1,17 +1,23 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Page } from './fixtures/test'
 import { createPreviewData, loadPreviewSeries } from '../src/features/research/preview-data'
 import { aggregateCandles } from '../src/features/chart/chart-math'
 import type { ChartPeriod } from '../src/features/chart/chart-periods'
 
 const sample = createPreviewData()
+// Real-market fixtures use exchange ticks and an as-of time matching the frozen bars.
+sample.market.dailyCandles = sample.market.dailyCandles.map(bar => ({ ...bar,
+  open: Number(bar.open.toFixed(2)), high: Number(bar.high.toFixed(2)),
+  low: Number(bar.low.toFixed(2)), close: Number(bar.close.toFixed(2)),
+}))
 const names: Record<string, string> = { '600519': '贵州茅台', '002475': '立讯精密', '000001': '平安银行' }
 
 async function marketApi(page: Page, failPrediction = false) {
+  await page.clock.setFixedTime(new Date(sample.market.source.fetchedAt))
   await page.route('**/api/market/stocks/*/candles?*', async (route) => {
     const url = new URL(route.request().url())
     const symbol = url.pathname.split('/').at(-2)!
     const period = url.searchParams.get('period') as ChartPeriod
-    const bars = period === '60m' || period === '30m' ? (await loadPreviewSeries('DEMO', period)).bars : aggregateCandles(sample.market.dailyCandles, period)
+    const bars = ['day', 'week', 'month', 'quarter', 'year'].includes(period) ? aggregateCandles(sample.market.dailyCandles, period) : (await loadPreviewSeries('DEMO', period)).bars
     return route.fulfill({ json: { symbol, period, adjustment: 'none', kind: 'candles', bars, source: { ...sample.market.source, name: 'TEST', online: true }, limitedHistory: true } })
   })
   await page.route('**/api/market/search?*', (route) => route.fulfill({ json: [{ code: '002475', name: '立讯精密', exchange: 'SZ' }] }))
@@ -71,7 +77,7 @@ test.describe('K-line research studio', () => {
     await page.goto('/?example=1')
     await expect(page.getByRole('heading', { name: '示例股票', exact: true })).toBeVisible()
     // Wait for an observable client interaction before sending a global shortcut.
-    if (info.project.name === 'mobile') await page.getByRole('button', { name: '选股', exact: true }).click()
+    if (info.project.name === 'mobile') await page.getByRole('button', { name: '选择对象', exact: true }).click()
     const search = page.getByRole('combobox', { name: '搜索 A 股' })
     await search.fill('准备')
     await page.getByRole('button', { name: '清空搜索' }).click()
@@ -97,7 +103,7 @@ test.describe('K-line research studio', () => {
     await expect(page.getByRole('heading', { name: '立讯精密', exact: true })).toBeVisible()
     if (info.project.name === 'mobile') {
       await expect(page.getByRole('dialog', { name: '选择股票' })).toHaveCount(0)
-      await expect(page.getByRole('button', { name: '选股', exact: true })).toBeFocused()
+      await expect(page.getByRole('button', { name: '选择对象', exact: true })).toBeFocused()
       await expect(page.locator('body')).not.toHaveCSS('overflow', 'hidden')
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true)
@@ -120,7 +126,7 @@ test.describe('K-line research studio', () => {
     await page.getByRole('button', { name: 'MA总开关' }).click()
     await expect(page.locator('[data-chart-layer=indicator] [data-indicator]')).toHaveCount(0)
     await page.getByRole('button', { name: 'MA总开关' }).click()
-    await expect(page.locator('[data-chart-layer=indicator] [data-indicator]')).toHaveCount(3)
+    await expect(page.locator('[data-chart-layer=indicator] [data-indicator]')).toHaveCount(8)
     await panel.locator('.rs-auto-levels button').first().click()
     await expect(panel.getByRole('region', { name: '所选价位依据' })).toBeVisible()
     await page.getByRole('tab', { name: '笔记规则', exact: true }).click()
@@ -133,16 +139,16 @@ test.describe('K-line research studio', () => {
     await marketApi(page)
     await page.goto('/')
     await expect(page.getByRole('heading', { name: '贵州茅台', exact: true })).toBeVisible()
-    if (info.project.name === 'mobile') await page.getByRole('button', { name: '选股', exact: true }).click()
+    if (info.project.name === 'mobile') await page.getByRole('button', { name: '选择对象', exact: true }).click()
     await page.getByRole('combobox', { name: '搜索 A 股' }).fill('立讯')
     await page.getByRole('option', { name: /立讯精密/ }).click()
     await expect(page.getByRole('heading', { name: '立讯精密', exact: true })).toBeVisible()
     await expect(page).toHaveURL(/symbol=002475/)
-    if (info.project.name === 'mobile') await page.getByRole('button', { name: '选股', exact: true }).click()
+    if (info.project.name === 'mobile') await page.getByRole('button', { name: '选择对象', exact: true }).click()
     await page.getByRole('button', { name: '加入自选 立讯精密' }).click()
     await page.reload()
     await expect(page.getByRole('heading', { name: '立讯精密', exact: true })).toBeVisible()
-    if (info.project.name === 'mobile') await page.getByRole('button', { name: '选股', exact: true }).click()
+    if (info.project.name === 'mobile') await page.getByRole('button', { name: '选择对象', exact: true }).click()
     await page.getByRole('tab', { name: /我的自选/ }).click()
     await expect(page.getByRole('button', { name: '取消自选 立讯精密' })).toBeVisible()
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true)
@@ -156,14 +162,14 @@ test.describe('K-line research studio', () => {
     await page.getByLabel('桌面绘图工具').getByRole('button', { name: '水平线', exact: true }).click()
     await page.getByRole('img', { name: 'K线主图' }).click({ position: { x: 240, y: 150 } })
     await expect(page.getByTestId('annotation-horizontal-line')).toHaveCount(1)
-    await page.getByLabel('控制点 1 价格').fill('33.25')
-    await expect(page.getByTestId('drawing-price-label')).toHaveText('33.25')
+    await page.getByLabel('控制点 1 价格').fill('65.10')
+    await expect(page.getByTestId('drawing-price-label')).toHaveText('65.10')
     await page.getByRole('button', { name: '撤销', exact: true }).click()
-    await expect(page.getByTestId('drawing-price-label')).not.toHaveText('33.25')
+    await expect(page.getByTestId('drawing-price-label')).not.toHaveText('65.10')
     await page.getByRole('button', { name: '重做', exact: true }).click()
-    await expect(page.getByTestId('drawing-price-label')).toHaveText('33.25')
+    await expect(page.getByTestId('drawing-price-label')).toHaveText('65.10')
     await page.reload()
-    await expect(page.getByTestId('drawing-price-label')).toHaveText('33.25')
+    await expect(page.getByTestId('drawing-price-label')).toHaveText('65.10')
     await page.getByRole('button', { name: '近期复位', exact: true }).click()
     await expect(page.getByText(`共 ${sample.market.dailyCandles.length} 根 K 线`)).toBeVisible()
     await page.getByRole('tab', { name: '周线', exact: true }).click()
@@ -222,8 +228,11 @@ test('navigates continuous history without changing drawings and restores foreca
   await expect(page.getByTestId('indicator-projection')).toHaveCount(1)
   const box = await chart.boundingBox()
   await page.mouse.move(box!.x + box!.width * 0.8, box!.y + box!.height / 2)
+  await page.keyboard.down('Control')
   await page.mouse.wheel(0, -150)
+  await page.keyboard.up('Control')
   await expect.poll(async () => Number(await surface.getAttribute('data-visible-start'))).toBeGreaterThan(start)
+  await page.getByRole('button', { name: '移动图表', exact: true }).click()
   await page.mouse.move(box!.x + box!.width * 0.4, box!.y + box!.height * 0.5)
   await page.mouse.down()
   await page.mouse.move(box!.x + box!.width * 0.7, box!.y + box!.height * 0.5, { steps: 8 })

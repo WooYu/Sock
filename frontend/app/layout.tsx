@@ -6,6 +6,7 @@ import "./globals.css"
 import "./workspace-polish.css"
 import "./kline-layout.css"
 import "./interface-system.css"
+import "./themes.css"
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] })
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] })
@@ -19,8 +20,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="zh-CN"
+      data-theme="c"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head><script dangerouslySetInnerHTML={{ __html: `(function(){try{document.documentElement.dataset.theme=localStorage.getItem('stockcal-theme')==='d'?'d':'c'}catch(e){}})()` }} /></head>
       <body className="min-h-full flex flex-col"><SharedDataSyncProvider />{children}</body>
     </html>
   )

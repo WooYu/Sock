@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures/test'
 
 test.describe('source-backed note tags', () => {
   test('filters notes, revises tags, reloads history and exports source evidence', async ({ page }, info) => {
@@ -9,7 +9,9 @@ test.describe('source-backed note tags', () => {
     await expect(page).toHaveTitle(/StockCal/)
     await expect(page.getByRole('heading', { name: '笔记标签目录' })).toBeVisible()
     await expect(page.getByRole('region', { name: '笔记标签工作台' })).toContainText('146 篇笔记')
+    await page.getByText('研究范围与标签说明', { exact: true }).click()
     await expect(page.getByRole('link', { name: '掌阅科技 · 603533' })).toHaveAttribute('href', '/?symbol=603533')
+    await page.getByText('研究范围与标签说明', { exact: true }).click()
     await page.screenshot({ path: `/tmp/stockcal-tags-${info.project.name}-initial.png`, fullPage: false })
     await page.getByRole('combobox', { name: '分析主题', exact: true }).selectOption('topic.ma')
     await page.getByRole('combobox', { name: '内容分类', exact: true }).selectOption('kind.screen')

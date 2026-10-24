@@ -21,7 +21,10 @@ const subscribeIdentity = (listener: () => void) => {
   window.addEventListener('storage', listener)
   return () => { window.removeEventListener('stockcal:identity-change', listener); window.removeEventListener('storage', listener) }
 }
-const signedInSnapshot = () => Boolean(window.localStorage.getItem('stockcal.accessToken'))
+const signedInSnapshot = () => {
+  try { return Boolean(window.localStorage.getItem('stockcal.accessToken')) }
+  catch { return false }
+}
 const signedOutSnapshot = () => false
 
 export function WebAccountButton({ requestCode = requestAuthCode, verify = verifyAuth }: { requestCode?: AuthFn; verify?: VerifyFn }) {

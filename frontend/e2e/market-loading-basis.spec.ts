@@ -1,11 +1,11 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures/test'
 test('one daily read renders before optional rules and keeps adjustment explicit', async ({ page }) => {
   const bars = Array.from({ length: 400 }, (_, i) => ({ day: new Date(Date.UTC(2024,0,i+1)).toISOString().slice(0,10), open: 1200+i, close: 1201+i, high: 1202+i, low: 1199+i, volume: 100 }))
   const source = { name: '独立测试行情', fetchedAt: '2026-10-18T00:00:00Z', state: 'TEST', online: true }
   let snapshots = 0, unusedPredictions = 0, rawReads = 0
   await page.route('**/api/knowledge/rules', route => new Promise<void>(() => { void route }))
   await page.route('**/api/market/stocks/*/prediction*', route => { unusedPredictions++; return route.fulfill({ status: 503, json: {} }) })
-  await page.route('**/api/market/stocks/*/snapshot', route => { snapshots++; return route.fulfill({ json: { adjustment: 'qfq', quote: { security: { code: '600519', name: '贵州茅台' }, price: bars.at(-1)!.close }, dailyCandles: bars, source } }) })
+  await page.route('**/api/market/stocks/600519/snapshot', route => { snapshots++; return route.fulfill({ json: { adjustment: 'qfq', quote: { security: { code: '600519', name: '贵州茅台' }, price: bars.at(-1)!.close }, dailyCandles: bars, source } }) })
   await page.route('**/api/market/stocks/*/candles?*', route => {
     const params = new URL(route.request().url()).searchParams
     const adjustment = params.get('adjustment')
@@ -28,7 +28,7 @@ test('cached history survives reload and stays visible when a forced update fail
   const bars = Array.from({ length: 400 }, (_, i) => ({ day: new Date(Date.UTC(2024, 0, i + 1)).toISOString().slice(0, 10), open: 100, high: 102, low: 99, close: 101, volume: 100 }))
   const source = { name: '缓存测试行情', fetchedAt: '2026-10-18T00:00:00Z', state: 'TEST', online: true }
   let snapshots = 0, fail = false
-  await page.route('**/api/market/stocks/*/snapshot', route => {
+  await page.route('**/api/market/stocks/600519/snapshot', route => {
     snapshots++
     return fail ? route.abort('failed') : route.fulfill({ json: { adjustment: 'qfq', quote: { security: { code: '600519', name: '贵州茅台' }, price: 101 }, dailyCandles: bars, source } })
   })

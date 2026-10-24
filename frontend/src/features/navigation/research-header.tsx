@@ -31,6 +31,6 @@ export function ResearchHeader({ active, onKnowledgeNavigate }: {
           }
         }}>{item.label}</Link>)}
     </nav>
-    <div className="sc-research-actions"><span>让每一次判断，都有依据</span><WebAccountButton /></div>
+    <div className="sc-research-actions"><span>让每一次判断，都有依据</span><Link className="sc-theme-settings-link" href="/settings" aria-label="设置与外观主题">外观</Link><WebAccountButton /></div>
   </header>
 }

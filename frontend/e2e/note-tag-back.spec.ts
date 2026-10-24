@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures/test'
 
 test('Back closes tag editing before leaving the selected note', async ({ page }) => {
   await page.goto('/')

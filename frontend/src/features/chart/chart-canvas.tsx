@@ -149,8 +149,8 @@ function IntradayPrices({ candles, transform, previousClose }: Pick<ChartCanvasP
   const prices = linePath(candles.map((candle) => candle.close), times, transform)
   const average = linePath(candles.map((candle) => candle.averagePrice), times, transform)
   return <g data-testid="intraday-price-layer">
-    {typeof previousClose === 'number' && Number.isFinite(previousClose) && previousClose > 0 ? <g><line data-testid="previous-close-line" x1={transform.rect.left} x2={transform.rect.left + transform.rect.width} y1={transform.yForPrice(previousClose)} y2={transform.yForPrice(previousClose)} stroke="#9ba5b6" strokeDasharray="4 5" /><text fill="#929bad" fontSize="10" x={transform.rect.left + 6} y={transform.yForPrice(previousClose) - 5}>昨收 {priceText(previousClose)}</text></g> : null}
-    {prices ? <path data-testid="intraday-price-line" d={prices} fill="none" stroke="#5869d5" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" /> : null}
+    {typeof previousClose === 'number' && Number.isFinite(previousClose) && previousClose > 0 ? <g><line data-testid="previous-close-line" x1={transform.rect.left} x2={transform.rect.left + transform.rect.width} y1={transform.yForPrice(previousClose)} y2={transform.yForPrice(previousClose)} stroke="#9ba5b6" strokeDasharray="4 5" /><text fill="var(--sc-muted)" fontSize="10" x={transform.rect.left + 6} y={transform.yForPrice(previousClose) - 5}>昨收 {priceText(previousClose)}</text></g> : null}
+    {prices ? <path data-testid="intraday-price-line" d={prices} fill="none" stroke="var(--sc-primary)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" /> : null}
     {average ? <path data-testid="intraday-average-line" d={average} fill="none" stroke="#c79b28" strokeWidth={1.6} strokeLinejoin="round" strokeLinecap="round" /> : null}
   </g>
 }
@@ -164,7 +164,7 @@ function HistoricalLayer({ candles, transform, keyLevels, showKeyLevels, kind = 
   const candleWidth = Math.max(1, Math.min(14, transform.widthForTime(candles[0]?.day ?? '') * 0.56))
   return (
     <g data-chart-layer="historical">
-      <rect fill="#ffffff" height={viewBox.height} width={viewBox.width} x="0" y="0" />
+      <rect fill="var(--sc-surface)" height={viewBox.height} width={viewBox.width} x="0" y="0" />
       <g className="sc-kline-grid">
         {[0, 1, 2, 3, 4].map((line) => <line key={`h-${line}`} x1={transform.rect.left} x2={transform.rect.left + transform.rect.width} y1={transform.rect.top + line * (transform.rect.height / 4)} y2={transform.rect.top + line * (transform.rect.height / 4)} />)}
         {[0, 1, 2, 3, 4, 5].map((line) => <line key={`v-${line}`} x1={transform.rect.left + line * (transform.rect.width / 5)} x2={transform.rect.left + line * (transform.rect.width / 5)} y1={transform.rect.top} y2={volumeTop + volumeHeight} />)}
@@ -193,8 +193,8 @@ function HistoricalLayer({ candles, transform, keyLevels, showKeyLevels, kind = 
       })}</g>
       <text className="sc-volume-label" x={transform.rect.left} y={volumeTop - 7}>成交量</text>
       {sessions.length ? <g data-testid="five-day-sessions">{sessions.map((session, index) => <g key={session.day}>
-        {index ? <line x1={transform.xForTime(session.first)} x2={transform.xForTime(session.first)} y1={transform.rect.top} y2={volumeTop + volumeHeight} stroke="#cbd5e1" strokeDasharray="3 4" /> : null}
-        <text x={(transform.xForTime(session.first) + transform.xForTime(session.last)) / 2} y={volumeTop + volumeHeight + 22} textAnchor="middle" fill="#526079" fontSize="11">{session.day.slice(5)}</text>
+        {index ? <line x1={transform.xForTime(session.first)} x2={transform.xForTime(session.first)} y1={transform.rect.top} y2={volumeTop + volumeHeight} stroke="var(--sc-border)" strokeDasharray="3 4" /> : null}
+        <text x={(transform.xForTime(session.first) + transform.xForTime(session.last)) / 2} y={volumeTop + volumeHeight + 22} textAnchor="middle" fill="var(--sc-muted)" fontSize="11">{session.day.slice(5)}</text>
       </g>)}</g> : null}
       <g className="sc-kline-axis-labels" aria-label={isIntradayPeriod(period) ? '交易时间' : '交易日期'}>{(sessions.length ? [] : candles).filter((_, index) => index % Math.max(1, Math.ceil(candles.length / 5)) === 0).map((candle) => <text key={candle.day} x={transform.xForTime(candle.day)} y={volumeTop + volumeHeight + 22} textAnchor="middle" fontSize="11">{axisTime(candle.day, period)}</text>)}</g>
     </g>

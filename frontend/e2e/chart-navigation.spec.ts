@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures/test'
 
 test('inspect, deliberate navigation and price axis operate independently', async ({ page }, info) => {
   test.setTimeout(120_000)

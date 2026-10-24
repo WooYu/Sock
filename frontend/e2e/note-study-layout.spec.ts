@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures/test'
 
 test('study directory stays readable and opens the selected detail', async ({ page }, info) => {
   await page.goto('/knowledge?view=notes')

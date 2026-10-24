@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures/test'
 
 test('keeps research entry labels and positions stable when switching panels', async ({ page }) => {
   await page.goto('/?example=1')

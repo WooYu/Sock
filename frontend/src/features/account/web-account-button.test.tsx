@@ -5,6 +5,13 @@ import { WebAccountButton } from './web-account-button'
 
 describe('WebAccountButton', () => {
   beforeEach(() => localStorage.clear())
+  test('keeps the page and login entry usable when browser storage is blocked', () => {
+    const read = vi.spyOn(localStorage, 'getItem').mockImplementation(() => { throw new DOMException('Blocked', 'SecurityError') })
+    try {
+      render(<WebAccountButton />)
+      expect(screen.getByRole('button', { name: '登录同步' })).toBeVisible()
+    } finally { read.mockRestore() }
+  })
   test('requests a code and signs in for cross-device sync', async () => {
     const user = userEvent.setup()
     const requestCode = vi.fn(async () => undefined)

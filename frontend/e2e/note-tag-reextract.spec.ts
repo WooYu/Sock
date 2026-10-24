@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures/test'
 import catalog from '../src/features/knowledge/note-tag-catalog.json'
 
 test.beforeEach(async ({ page }) => {

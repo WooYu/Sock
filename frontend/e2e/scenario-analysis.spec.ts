@@ -1,13 +1,15 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Page } from './fixtures/test'
 import fixture from './fixtures/scenario-series.json'
+import { loadPreviewSeries } from '../src/features/research/preview-data'
 
 async function installScenarioApi(page: Page, fail30m = false) {
-  const source = { name: '合成浏览器验收行情', fetchedAt: new Date().toISOString(), online: true, state: 'TEST' }
+  await page.clock.setFixedTime(new Date('2026-09-22T08:00:00Z'))
+  const source = { name: '合成浏览器验收行情', fetchedAt: '2026-09-22T08:00:00Z', online: true, state: 'TEST' }
   await page.route('**/api/market/stocks/*/candles?*', async route => {
     const url = new URL(route.request().url()), symbol = url.pathname.split('/').at(-2)!
     const period = url.searchParams.get('period') as 'day' | '60m' | '30m'
     if (fail30m && period === '30m') return route.fulfill({ status: 503, json: { message: '30分钟暂缺' } })
-    return route.fulfill({ json: { symbol, period, adjustment: 'none', kind: 'candles', bars: fixture[period] ?? fixture.day, source, limitedHistory: false } })
+    return route.fulfill({ json: { symbol, period, adjustment: 'none', kind: 'candles', bars: fixture[period] ?? (await loadPreviewSeries('DEMO', period)).bars, source, limitedHistory: false } })
   })
   await page.route('**/api/market/stocks/*/snapshot', route => {
     const symbol = new URL(route.request().url()).pathname.split('/').at(-2)!
@@ -23,7 +25,8 @@ test.describe('multi-period scenario analysis', () => {
     page.on('pageerror', error => errors.push(error.message))
     page.on('console', message => {
       if (!['error', 'warning'].includes(message.type())) return
-      if (message.text().includes('503') && message.location().url.includes('/prediction?')) return
+      // Isolated saves retain the snapshot locally; cloud retry/export is tested separately.
+      if (message.text().includes('503') && (message.location().url.includes('/prediction?') || message.location().url.endsWith('/api/scenario-records'))) return
       errors.push(message.text())
     })
     await installScenarioApi(page)
@@ -31,9 +34,10 @@ test.describe('multi-period scenario analysis', () => {
       const url = new URL(route.request().url()), period = url.searchParams.get('period') as 'day' | '60m' | '30m'
       const close = period === 'day' ? 10 : period === '60m' ? 10.01 : 10.08
       await route.fulfill({ json: { symbol: '603533', period, adjustment: 'none', kind: 'candles', limitedHistory: false,
-        bars: fixture[period].map(bar => ({ ...bar, open: close, close, low: close - 0.1, high: close + 0.1 })),
-        source: { name: '合成1%平均价验收', fetchedAt: new Date().toISOString(), online: true, state: 'TEST' } } })
+        bars: (fixture[period] ?? (await loadPreviewSeries('DEMO', period)).bars).map(bar => ({ ...bar, open: close, close, low: close - 0.1, high: close + 0.1 })),
+        source: { name: '合成1%平均价验收', fetchedAt: '2026-09-22T08:00:00Z', online: true, state: 'TEST' } } })
     })
+    await page.route('**/api/market/stocks/*/snapshot', route => route.fulfill({ json: { quote: { security: { code: '603533', name: '掌阅科技', exchange: 'SH' }, price: 10, previousClose: 10 }, dailyCandles: fixture.day.map(bar => ({ ...bar, open: 10, close: 10, low: 9.9, high: 10.1 })), source: { name: '合成1%平均价验收', fetchedAt: '2026-09-22T08:00:00Z', online: true, state: 'TEST' } } }))
     await page.goto('/?symbol=603533', { waitUntil: 'domcontentloaded' })
     await expect(page).toHaveTitle(/StockCal/)
     await page.getByRole('tab', { name: '多周期分析', exact: true }).click()
@@ -110,15 +114,15 @@ test.describe('multi-period scenario analysis', () => {
   })
   test('requires_a_rule_for_special_status_and_keeps_out_of_band_prices_out_of_the_ladder', async ({ page }) => {
     await installScenarioApi(page)
-    const source = { name: '特殊状态合成验收', fetchedAt: new Date().toISOString(), online: true, state: 'TEST' }
+    const source = { name: '特殊状态合成验收', fetchedAt: '2026-09-22T08:00:00Z', online: true, state: 'TEST' }
     await page.route('**/api/market/stocks/*/snapshot', route => route.fulfill({ json: {
-      quote: { security: { code: '603533', name: '*ST样例', exchange: 'SH' }, price: 10, previousClose: 10 }, dailyCandles: fixture.day, source,
+      quote: { security: { code: '603533', name: '*ST样例', exchange: 'SH' }, price: 10, previousClose: 10 }, dailyCandles: fixture.day.map(bar => ({ ...bar, open: 10, close: 10, low: 9.9, high: 10.1 })), source,
     } }))
-    await page.route('**/api/market/stocks/*/candles?*', route => {
+    await page.route('**/api/market/stocks/*/candles?*', async route => {
       const period = new URL(route.request().url()).searchParams.get('period') as 'day' | '60m' | '30m'
       const close = period === 'day' ? 10 : 15
       return route.fulfill({ json: { symbol: '603533', period, adjustment: 'none', kind: 'candles', limitedHistory: false, source,
-        bars: fixture[period].map(bar => ({ ...bar, open: close, close, low: close - 0.1, high: close + 0.1 })) } })
+        bars: (fixture[period] ?? (await loadPreviewSeries('DEMO', period)).bars).map(bar => ({ ...bar, open: close, close, low: close - 0.1, high: close + 0.1 })) } })
     })
     await page.goto('/?symbol=603533', { waitUntil: 'domcontentloaded' })
     await expect(page.getByRole('heading', { name: '*ST样例', exact: true })).toBeVisible()
@@ -146,8 +150,8 @@ test.describe('multi-period scenario analysis', () => {
     page.on('pageerror', error => errors.push(error.message))
     page.on('console', message => {
       if (!['error', 'warning'].includes(message.type())) return
-      // Prediction is intentionally unavailable in this scenario-only fixture.
-      if (message.text().includes('503') && message.location().url.includes('/prediction?')) return
+      // Prediction and cloud writes are intentionally unavailable in this local-save fixture.
+      if (message.text().includes('503') && (message.location().url.includes('/prediction?') || message.location().url.endsWith('/api/scenario-records'))) return
       errors.push(message.text())
     })
     await installScenarioApi(page)
@@ -161,7 +165,7 @@ test.describe('multi-period scenario analysis', () => {
     await panel.scrollIntoViewIfNeeded()
     await expect(panel.getByText('笔记来源已加载')).toBeVisible()
     await expect(panel.getByRole('region', { name: '跨周期综合结果' })).toContainText('本次采用：日线')
-    expect(requestedPeriods).toContain('day') // Main forecast now precomputes unclear lower periods automatically.
+    expect(requestedPeriods).toContain('60m') // Main forecast now precomputes unclear lower periods automatically.
     await panel.getByRole('button', { name: '核对形态与模式' }).click()
     await panel.getByLabel('趋势方向', { exact: true }).selectOption('rising')
     await panel.getByLabel('上涨形态', { exact: true }).selectOption('climbing')
@@ -174,7 +178,7 @@ test.describe('multi-period scenario analysis', () => {
     await expect(panel.getByLabel('计算方法', { exact: true })).toHaveValue('rolling_close')
     await expect(panel.getByRole('region', { name: '周期判断与停止' })).toContainText('日线规律已确认')
     await expect(panel.getByRole('button', { name: '继续看30分钟' })).toBeDisabled()
-    expect(requestedPeriods).toContain('day') // Main forecast now precomputes unclear lower periods automatically.
+    expect(requestedPeriods).toContain('60m') // Main forecast now precomputes unclear lower periods automatically.
     await panel.getByRole('button', { name: '看1小时' }).click()
     await expect(page.getByLabel('分钟K线周期', { exact: true })).toHaveValue('60m')
     await expect(panel.getByRole('table', { name: '1小时 MA/BOLL参考位' })).toBeVisible()
@@ -247,7 +251,7 @@ test.describe('multi-period scenario analysis', () => {
     await page.route('**/api/market/stocks/603533/candles?*', async route => {
       if (new URL(route.request().url()).searchParams.get('period') !== '60m') return route.fallback()
       started(); await pending
-      try { await route.fulfill({ json: { symbol: '603533', period: '60m', adjustment: 'none', kind: 'candles', bars: fixture['60m'], source: { name: '旧股票延迟响应', fetchedAt: new Date().toISOString(), online: true, state: 'TEST' } } }) } catch { /* The old request may already be aborted. */ }
+      try { await route.fulfill({ json: { symbol: '603533', period: '60m', adjustment: 'none', kind: 'candles', bars: fixture['60m'], source: { name: '旧股票延迟响应', fetchedAt: '2026-09-22T08:00:00Z', online: true, state: 'TEST' } } }) } catch { /* The old request may already be aborted. */ }
     })
     await page.goto('/?symbol=603533', { waitUntil: 'domcontentloaded' })
     await page.getByRole('tab', { name: '多周期分析', exact: true }).click()
@@ -255,7 +259,7 @@ test.describe('multi-period scenario analysis', () => {
     await page.getByRole('button', { name: '开始多周期分析' }).click()
     await page.getByRole('button', { name: '看1小时' }).click()
     await requested
-    if (info.project.name === 'mobile') await page.getByRole('button', { name: '选股', exact: true }).click()
+    if (info.project.name === 'mobile') await page.getByRole('button', { name: '选择对象', exact: true }).click()
     await page.getByRole('combobox', { name: '搜索 A 股' }).fill('平安')
     await page.getByRole('option', { name: /平安银行/ }).click()
     const panel = page.getByRole('region', { name: '多周期情景分析', exact: true })

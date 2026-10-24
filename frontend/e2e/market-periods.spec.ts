@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures/test'
 
 test('eight moving averages and all calendar/minute periods work in the explicitly labeled example', async ({ page }, info) => {
   const errors: string[] = []

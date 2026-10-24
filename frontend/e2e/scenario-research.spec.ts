@@ -1,7 +1,9 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Page } from './fixtures/test'
 import { readFile } from 'node:fs/promises'
 import fixture from './fixtures/scenario-research.json'
 import series from './fixtures/scenario-series.json'
+import { loadPreviewSeries } from '../src/features/research/preview-data'
+import type { ChartPeriod } from '../src/features/chart/chart-periods'
 import catalog from '../src/features/knowledge/note-tag-catalog.json'
 import type { ForecastRecord, PriceEvaluation, SaveForecastRequest } from '../src/features/scenario/scenario-record-types'
 
@@ -24,9 +26,10 @@ function evaluation(forecastId = record().id): PriceEvaluation {
 }
 async function market(page: Page) {
   const source = { name: '合成页面行情', fetchedAt: new Date().toISOString(), online: true, state: 'TEST' }
-  await page.route('**/api/market/stocks/*/candles?*', route => {
-    const period = new URL(route.request().url()).searchParams.get('period') as keyof typeof series
-    return route.fulfill({ json: { symbol: '603533', period, adjustment: 'none', kind: 'candles', bars: series[period], source, limitedHistory: false } })
+  const marketBars: Partial<Record<ChartPeriod, typeof series.day>> = { day: series.day, '60m': series['60m'], '30m': series['30m'] }
+  await page.route('**/api/market/stocks/*/candles?*', async route => {
+    const period = new URL(route.request().url()).searchParams.get('period') as ChartPeriod
+    return route.fulfill({ json: { symbol: '603533', period, adjustment: 'none', kind: 'candles', bars: marketBars[period] ?? (await loadPreviewSeries('DEMO', period)).bars, source, limitedHistory: false } })
   })
   await page.route('**/api/market/stocks/*/snapshot', route => route.fulfill({ json: { quote: { security: { code: '603533', name: '掌阅科技', exchange: 'SH' }, price: 30, previousClose: 29 }, dailyCandles: series.day, source } }))
   await page.route('**/api/market/stocks/*/prediction?*', route => route.fulfill({ status: 503, json: { message: '固定页面行情不含预测' } }))
@@ -87,7 +90,7 @@ test('local-only failure retries the frozen version, reloads its receipt and exp
   expect(exported.records).toEqual([frozen.snapshot]); expect(exported.research[0].selectedEvaluationId).toBe(evaluation().id)
   expect(exported.research[0].actualEvidence[0].candleHash).toBe('b'.repeat(64))
   expect(exported.research[0].noteBindings.length).toBeGreaterThan(0)
-  expect([...new Set(periods)].sort()).toEqual(['30m', '60m', 'day']) // Automatic forecast now loads unclear lower periods too.
+  expect([...new Set(periods)].sort()).toEqual(['15m', '30m', '60m']) // Automatic forecast now loads unclear lower periods too.
   expect(uploads).toHaveLength(2); expect(errors).toEqual([])
   await page.getByRole('region', { name: '价格核对', exact: true }).screenshot({ path: info.outputPath('price-evaluation.png') })
 })

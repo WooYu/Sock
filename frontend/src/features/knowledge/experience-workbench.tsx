@@ -110,11 +110,12 @@ export function ExperienceWorkbench({ data = researchPackage as KnowledgePackage
   const historical = Boolean(viewed && selected && viewed.version !== selected.version)
 
   function switchTab(next: WorkbenchTab) {
+    if (next === tab) return
     setTab(next)
     const url = new URL(window.location.href)
     if (next !== 'library') url.searchParams.set('view', next)
     else url.searchParams.delete('view')
-    window.history.replaceState(null, '', `${url.pathname}${url.search}`)
+    window.history.pushState(null, '', `${url.pathname}${url.search}`)
   }
 
   function chooseEntry(entry: ExperienceEntry) {

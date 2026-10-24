@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures/test'
 import { createPreviewData, loadPreviewSeries } from '../src/features/research/preview-data'
 import { aggregateCandles } from '../src/features/chart/chart-math'
 import { isIntradayPeriod, type ChartPeriod } from '../src/features/chart/chart-periods'

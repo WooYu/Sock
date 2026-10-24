@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures/test'
 import { mkdir } from 'node:fs/promises'
 
 test('four forecast dates expose every MA and solid BOLL on desktop and phone', async ({ page }, info) => {

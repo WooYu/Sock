@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures/test'
 import taxonomy from '../src/features/knowledge/note-tag-taxonomy.json'
 import { MA_COLORS } from '../src/features/chart/chart-periods'
 
