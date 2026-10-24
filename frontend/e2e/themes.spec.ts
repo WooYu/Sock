@@ -34,7 +34,7 @@ test.beforeEach(async ({ page }) => {
 
 for (const theme of ['c', 'd'] as const) {
   test(`theme ${theme}: all pages, refresh and navigation`, async ({ page }, info) => {
-    test.setTimeout(240_000)
+    test.setTimeout(600_000)
     const errors: string[] = []
     page.on('pageerror', error => errors.push(error.message))
     await page.goto('/settings')
@@ -49,9 +49,9 @@ for (const theme of ['c', 'd'] as const) {
       await expect(page.locator('html')).toHaveAttribute('data-theme', theme)
       expect(await page.locator('body').evaluate(el => getComputedStyle(el).backgroundColor)).toBe(theme === 'c' ? 'rgb(241, 245, 242)' : 'rgb(16, 25, 35)')
       if (theme === 'd') {
-        const brightPanels = await page.locator('header, nav, main, section, article, aside').evaluateAll(elements => elements.filter(el => {
+        const brightPanels = await page.locator('header, nav, main, section, article, aside, button, input, select, textarea, [role=dialog]').evaluateAll(elements => elements.filter(el => {
           const rect = el.getBoundingClientRect()
-          if (rect.width < 100 || rect.height < 40 || !rect.width || !rect.height) return false
+          if (rect.width < 30 || rect.height < 20) return false
           const color = getComputedStyle(el).backgroundColor.match(/[\d.]+/g)?.map(Number) ?? []
           return color.length >= 3 && (color.length < 4 || color[3] > .7) && color.slice(0, 3).every(value => value > 220)
         }).map(el => el.className))

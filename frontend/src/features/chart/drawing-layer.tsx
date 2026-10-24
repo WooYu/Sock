@@ -85,7 +85,7 @@ export function DrawingLayer({ drawings, transform, selectedId, onSelect, onFocu
             {selected && !drawing.locked && !interactionsDisabled ? points.map((point, index) => (
               <circle
                 data-testid="drawing-handle"
-                fill="#fff"
+                fill="var(--sc-surface)"
                 key={`${drawing.id}-${index}`}
                 onClick={(event) => event.stopPropagation()}
                 onPointerDown={(event) => { event.stopPropagation(); onFocusEditor?.(); onMovePoint(drawing.id, index, event) }}

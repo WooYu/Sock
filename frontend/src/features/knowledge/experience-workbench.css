@@ -96,12 +96,12 @@
 .kw-version { margin-left: auto; font-variant-numeric: tabular-nums; color: var(--sc-muted); }
 .kw-detail > h2 { font-size: 20px; line-height: 1.6; font-weight: 600; margin-top: 11px; letter-spacing: -.35px; overflow-wrap: anywhere; }
 .kw-detail-subtitle { display: flex; gap: 18px; flex-wrap: wrap; color: var(--sc-muted); font-size: 12px; margin-top: 7px; }
-.kw-readiness { display: flex; gap: 10px; background: var(--sc-surface-muted); border: 1px solid var(--sc-border); border-radius: 6px; color: #ad9769; padding: 11px 12px; margin-top: 19px; }
+.kw-readiness { display: flex; gap: 10px; background: var(--sc-surface-muted); border: 1px solid var(--sc-border); border-radius: 6px; color: var(--sc-warning); padding: 11px 12px; margin-top: 19px; }
 .kw-readiness > svg { margin-top: 2px; }
 .kw-readiness strong { color: var(--sc-warning); font-size: 12px; font-weight: 550; }
 .kw-readiness p { color: var(--sc-muted); font-size: 12px; line-height: 1.8; margin-top: 3px; }
 .kw-expiry { display: flex; align-items: center; gap: 7px; margin-top: 14px; color: var(--sc-muted); font-size: 12px; }
-.kw-expiry.is-expired { color: #a77a62; }
+.kw-expiry.is-expired { color: var(--sc-warning); }
 .kw-detail-section { padding: 22px 0; border-bottom: 1px solid var(--sc-surface-muted); }
 .kw-detail-section h3 { display: flex; align-items: center; gap: 8px; color: var(--sc-muted); font-size: 12px; font-weight: 550; margin-bottom: 12px; }
 .kw-detail-section h3 > svg { color: var(--sc-muted); }
@@ -183,8 +183,8 @@
 .kw-source-quality p { margin-top: 16px; font-size: 12px; color: var(--sc-muted); }
 .kw-source-quality code { overflow-wrap: anywhere; }
 
-.kw-modal-backdrop { position: fixed; inset: 0; z-index: 140; background: #252b455e; display: flex; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(3px); }
-.kw-editor { width: min(620px, 100%); max-height: 90dvh; display: flex; flex-direction: column; background: var(--sc-surface); border: 1px solid #ffffff80; border-radius: 12px; box-shadow: 0 24px 90px #25284128; overflow: hidden; }
+.kw-modal-backdrop { position: fixed; inset: 0; z-index: 140; background: var(--sc-backdrop); display: flex; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(3px); }
+.kw-editor { width: min(620px, 100%); max-height: 90dvh; display: flex; flex-direction: column; background: var(--sc-surface); border: 1px solid var(--sc-border); border-radius: 12px; box-shadow: var(--sc-shadow-dialog); overflow: hidden; }
 .kw-editor > header { display: flex; align-items: flex-start; justify-content: space-between; padding: 23px 26px 20px; border-bottom: 1px solid var(--kw-border); gap: 12px; }
 .kw-editor h2 { font-size: 21px; font-weight: 600; margin-top: 3px; }
 .kw-editor header p { margin-top: 5px; color: var(--sc-text-muted); font-size: 12px; }
@@ -196,7 +196,7 @@
 .kw-editor :is(input, textarea)::placeholder { color: var(--sc-muted); }
 .kw-editor textarea { resize: vertical; }
 .kw-editor [readonly], .kw-editor select:disabled { background: var(--sc-surface-muted); color: var(--sc-muted); }
-.kw-editor [aria-invalid=true] { border-color: #d99f8c; }
+.kw-editor [aria-invalid=true] { border-color: var(--sc-danger); }
 .kw-editor small { display: block; margin-top: 5px; font-size: 12px; color: var(--sc-muted); }
 .kw-editor .kw-field-error { color: var(--sc-gain); }
 .kw-form-row { display: grid; grid-template-columns: 1fr 1.2fr; gap: 16px; }

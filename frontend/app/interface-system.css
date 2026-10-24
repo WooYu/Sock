@@ -183,7 +183,7 @@ body { background: var(--sc-background); color: var(--sc-foreground); line-heigh
 :is(.sc-shell-unified, .kw-workbench, .rs-studio) [role=alert] { line-height: 1.75; }
 
 /* Modal behavior and appearance are shared; panels retain their own fields. */
-.sc-dialog-backdrop { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 24px; background: rgb(15 29 48 / 46%); backdrop-filter: blur(3px); }
+.sc-dialog-backdrop { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 24px; background: var(--sc-backdrop); backdrop-filter: blur(3px); }
 .sc-account-dialog { width: min(100%, 440px); max-height: calc(100dvh - 48px); overflow-y: auto; border: 1px solid var(--sc-border); border-radius: 16px; background: var(--sc-surface); box-shadow: var(--sc-shadow-dialog); padding: 28px; color: var(--sc-foreground); font-size: 14px; line-height: 1.65; }
 .sc-account-dialog > header { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
 .sc-account-dialog h2 { margin: 0; font-size: 23px; font-weight: 700; letter-spacing: -.5px; }
@@ -204,7 +204,7 @@ body { background: var(--sc-background); color: var(--sc-foreground); line-heigh
 .sc-trade-dialog input, .sc-trade-dialog select { background: var(--sc-surface); }
 .sc-trade-dialog-heading { border-bottom: 1px solid var(--sc-border); padding-bottom: 18px; }
 .sc-trade-dialog-actions { border-top: 1px solid var(--sc-border); padding-top: 18px; }
-.sc-trade-dialog-layer, .kw-modal-backdrop, .sc-rule-detail-layer { background: rgb(15 29 48 / 46%); backdrop-filter: blur(3px); }
+.sc-trade-dialog-layer, .kw-modal-backdrop, .sc-rule-detail-layer { background: var(--sc-backdrop); backdrop-filter: blur(3px); }
 .kw-editor > header, .nt-editor > header { background: var(--sc-surface); border-bottom: 1px solid var(--sc-border); }
 .kw-editor form > footer, .nt-editor form > footer { background: var(--sc-surface-muted); border-top: 1px solid var(--sc-border); }
 

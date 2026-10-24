@@ -54,8 +54,8 @@
 .nt-evidence-reasons p { margin: 3px 0 0; line-height: 1.7; }
 .nt-detail-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
 .nt-source-hash { color: var(--sc-muted); overflow-wrap: anywhere; font-size: 12px; }
-.nt-modal-backdrop { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 24px; background: #1b243b70; }
-.nt-editor { width: min(850px, 100%); max-height: min(90dvh, calc(100dvh - 48px)); display: flex; flex-direction: column; overflow: hidden; background: var(--sc-surface); border-radius: 10px; padding: 24px; box-shadow: 0 20px 70px #18203830; }
+.nt-modal-backdrop { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 24px; background: var(--sc-backdrop); }
+.nt-editor { width: min(850px, 100%); max-height: min(90dvh, calc(100dvh - 48px)); display: flex; flex-direction: column; overflow: hidden; background: var(--sc-surface); border-radius: 10px; padding: 24px; box-shadow: var(--sc-shadow-dialog); }
 .nt-editor-heading, .nt-editor > p { flex-shrink: 0; }
 .nt-editor > form { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
 .nt-editor-body { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 4px; }
@@ -77,7 +77,7 @@
 .nt-suggestions h3 { font-size: 14px; }
 .nt-suggestions > label { display: flex; align-items: flex-start; gap: 10px; padding: 12px; background: var(--sc-surface); border: 1px solid var(--sc-border); border-radius: 6px; }
 .nt-suggestions > label > span { display: grid; gap: 6px; min-width: 0; overflow-wrap: anywhere; }
-.nt-suggestion-conflict { color: #98511f; }
+.nt-suggestion-conflict { color: var(--sc-warning); }
 .nt-extraction { margin: 14px 0; padding: 12px; background: var(--sc-surface); border: 1px solid var(--sc-border); border-radius: 6px; color: var(--sc-muted); font-size: 12px; line-height: 1.8; }
 .nt-extraction details { margin-top: 8px; }
 .nt-extraction summary { cursor: pointer; }

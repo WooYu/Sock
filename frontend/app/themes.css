@@ -27,6 +27,7 @@
   --sc-font-numeric: "DengXian", "PingFang SC", "Microsoft YaHei", sans-serif;
   --sc-shadow: 0 3px 14px rgb(32 60 50 / 4%);
   --sc-shadow-dialog: 0 20px 70px rgb(15 35 26 / 22%);
+  --sc-backdrop: rgb(15 35 26 / 46%);
 }
 :root[data-theme="d"] {
   color-scheme: dark;
@@ -56,6 +57,7 @@
   --sc-font-numeric: "Bahnschrift", "Microsoft YaHei", sans-serif;
   --sc-shadow: 0 3px 14px rgb(0 0 0 / 12%);
   --sc-shadow-dialog: 0 20px 70px rgb(0 0 0 / 50%);
+  --sc-backdrop: rgb(0 0 0 / 60%);
 }
 html[data-theme] {
   --font-geist-sans: var(--sc-font-body);
@@ -90,3 +92,6 @@ button, input, select, textarea { font-family: inherit; }
 .sc-theme-settings-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding-inline: 12px; border-radius: 8px; color: var(--sc-muted); font-size: 13px; }
 .sc-theme-settings-link:hover { color: var(--sc-primary); background: var(--sc-primary-soft); }
 @media (max-width: 540px) { .sc-theme-options { grid-template-columns: 1fr; } }
+
+/* SVG labels and native popovers use the same typeface as the surrounding UI. */
+svg text, dialog, [role="dialog"], [popover] { font-family: var(--sc-font-body); }

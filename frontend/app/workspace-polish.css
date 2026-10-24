@@ -271,7 +271,7 @@
 /* Mobile workspace refinements: keep controls readable, tappable, and inside the viewport. */
 .sc-daily-review-form { display: grid; gap: 14px; }
 .sc-daily-review-input { min-height: 220px; width: 100%; resize: vertical; border: 1px solid var(--sc-border); border-radius: 14px; background: var(--sc-surface); padding: 18px; color: var(--ink); font-size: 15px; line-height: 1.7; outline: none; }
-.sc-daily-review-input:focus { border-color: var(--sc-primary); box-shadow: 0 0 0 3px #eef1ff; }
+.sc-daily-review-input:focus { border-color: var(--sc-primary); box-shadow: 0 0 0 3px var(--sc-primary-soft); }
 .sc-review-primary-action { min-height: 52px; width: 100%; border: 0; border-radius: 12px; background: linear-gradient(135deg, var(--sc-primary), var(--sc-primary)); color: var(--sc-on-primary); font-size: 15px; font-weight: 750; box-shadow: 0 8px 16px rgba(72, 104, 255, 0.18); }
 .sc-review-primary-action:hover { background: linear-gradient(135deg, var(--sc-primary), var(--sc-primary)); }
 
@@ -483,7 +483,7 @@
 .sc-chart-recovery li span { color: var(--sc-muted); font-size: 12px; }
 .sc-chart-recovery li button { min-height: 36px; border: 1px solid var(--sc-primary); border-radius: 6px; background: var(--sc-surface); color: var(--sc-primary); font-size: 12px; font-weight: 700; }
 .sc-chart-mobile-context, .sc-chart-mobile-toolbar { display: none; }
-.sc-chart-sheet-layer { position: fixed; inset: 0; z-index: 80; display: grid; align-items: end; background: rgb(15 23 42 / 42%); }
+.sc-chart-sheet-layer { position: fixed; inset: 0; z-index: 80; display: grid; align-items: end; background: var(--sc-backdrop); }
 .sc-chart-mobile-sheet { display: grid; max-height: min(82dvh, 760px); overflow: hidden; border: 1px solid var(--sc-border); border-bottom: 0; border-radius: 14px 14px 0 0; background: var(--sc-surface); box-shadow: 0 -16px 42px rgb(15 23 42 / 16%); transition: transform 100ms ease-out; }
 .sc-chart-sheet-handle { display: grid; min-height: 44px; place-items: center; border: 0; background: transparent; touch-action: none; }
 .sc-chart-sheet-handle span { width: 42px; height: 4px; border-radius: 2px; background: var(--sc-border); }
@@ -600,7 +600,7 @@
 .sc-position-table td { padding: 14px; border-top: 1px solid var(--sc-border); }
 .sc-position-table a { color: var(--sc-primary); font-weight: 700; }
 .sc-table-empty { color: var(--sc-text-muted); text-align: center; }
-.sc-trade-dialog-layer { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; background: rgb(15 23 42 / 42%); padding: 20px; }
+.sc-trade-dialog-layer { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; background: var(--sc-backdrop); padding: 20px; }
 .sc-trade-dialog { display: grid; width: min(560px, 100%); gap: 18px; border: 1px solid var(--sc-border); border-radius: 10px; background: var(--sc-surface); padding: 22px; box-shadow: 0 18px 50px rgb(15 23 42 / 18%); }
 .sc-trade-dialog-heading { display: flex; align-items: center; justify-content: space-between; }
 .sc-trade-dialog-heading h2 { margin: 0; font-size: 20px; }

@@ -226,7 +226,7 @@ function IndicatorLayer({ indicators, indicatorValues, transform, candles }: Pic
 
 function CrosshairTooltip({ candle, price, index, kind, period, transform, indicators, indicatorValues, referenceClose, cursorX }: Pick<ChartCanvasProps, 'kind' | 'period' | 'transform' | 'indicators' | 'indicatorValues'> & { candle: Candle | PredictionSnapshot['days'][number]; price: number; index: number; referenceClose?: number; cursorX: number }) {
   const cells: Array<{ label: string; value: string; color?: string }> = kind === 'intraday'
-    ? [{ label: '价格', value: priceText(candle.close) }, { label: '均价', value: optionalPriceText('averagePrice' in candle ? candle.averagePrice : undefined), color: '#eed083' }]
+    ? [{ label: '价格', value: priceText(candle.close) }, { label: '均价', value: optionalPriceText('averagePrice' in candle ? candle.averagePrice : undefined), color: 'var(--sc-warning)' }]
     : [{ label: '开', value: priceText(candle.open) }, { label: '高', value: priceText(candle.high) }, { label: '低', value: priceText(candle.low) }, { label: '收', value: priceText(candle.close) }]
   if (kind !== 'intraday') {
     const reference = typeof referenceClose === 'number' && Number.isFinite(referenceClose) && referenceClose > 0 ? referenceClose : null
