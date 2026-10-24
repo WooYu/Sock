@@ -9,6 +9,7 @@ export type KnowledgeView = 'library' | 'notes' | 'samples' | 'backtest'
 
 const destinations = [
   { key: 'chart', label: '趋势工作台', href: '/' },
+  { key: 'library', label: '经验原则', href: '/knowledge?view=library' },
   { key: 'notes', label: '笔记标签', href: '/knowledge?view=notes' },
   { key: 'samples', label: '学习样本', href: '/knowledge?view=samples' },
   { key: 'backtest', label: '回测证据', href: '/knowledge?view=backtest' },

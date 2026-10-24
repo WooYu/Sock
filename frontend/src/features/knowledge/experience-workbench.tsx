@@ -178,7 +178,8 @@ export function ExperienceWorkbench({ data = researchPackage as KnowledgePackage
   return <div className="kw-workbench">
     <ResearchHeader active={tab} onKnowledgeNavigate={switchTab} />
 
-    <main className={`kw-main${tab === 'notes' ? ' kw-notes-page' : ''}`}>
+    <a className="sc-skip-link" href="#knowledge-main">跳到知识内容</a>
+    <main id="knowledge-main" tabIndex={-1} className={`kw-main${tab === 'notes' ? ' kw-notes-page' : ''}`}>
       <div className="kw-breadcrumb"><StudioIcon name="book" size={15} /><span>研究工作区</span><span>/</span><strong>{tab === 'library' ? '经验与原则' : tab === 'notes' ? '笔记标签' : tab === 'samples' ? '学习样本' : '回测证据'}</strong></div>
       <div className="kw-page-heading">
         <div><h1>{tab === 'notes' ? '笔记标签' : tab === 'samples' ? '学习样本' : tab === 'backtest' ? '回测证据' : '经验与原则'}</h1><p>{tab === 'notes' ? '按内容分类与分析主题整理笔记，保留原文依据与修订历史。' : tab === 'samples' ? '把保存时的计算、所用笔记与实际行情连在一起，保留每次核对结果。' : tab === 'backtest' ? '对照历史数据与基线方法，检验经验规则是否改善预测。' : '保留原话，核对解释，让每条经验在被使用前先经得起检查。'}</p></div>

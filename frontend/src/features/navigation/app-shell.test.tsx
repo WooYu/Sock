@@ -101,3 +101,16 @@ describe('AppShell', () => {
     expect(styles).not.toContain('.sc-tone-cyber .sc-shell-main')
   })
 })
+
+test('mobile search shortcut focuses the visible input and Escape returns focus', async () => {
+  vi.stubGlobal('innerWidth', 390)
+  try {
+    const user = userEvent.setup()
+    render(<AppShell section="overview" onSectionChange={vi.fn()} />)
+    await user.keyboard('{Control>}k{/Control}')
+    expect(screen.getByRole('textbox', { name: '股票代码或名称' })).toHaveFocus()
+    await user.keyboard('{Escape}')
+    expect(screen.queryByRole('textbox', { name: '股票代码或名称' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '搜索股票（移动端）' })).toHaveFocus()
+  } finally { vi.unstubAllGlobals() }
+})

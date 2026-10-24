@@ -57,3 +57,21 @@ test('hydrates saved trades without a server/client mismatch', async () => {
     localStorage.clear()
   }
 })
+
+test('trade dialog traps keyboard focus and supports Escape without discarding the draft', async () => {
+  localStorage.clear()
+  const user = userEvent.setup()
+  render(<TradingPage initialTab="ledger" symbol="600519" />)
+  expect(screen.getByLabelText('交易方向')).toHaveFocus()
+  await user.type(screen.getByLabelText('交易数量'), '100')
+  await user.keyboard('{Escape}')
+  expect(screen.queryByRole('dialog', { name: '新增交易' })).not.toBeInTheDocument()
+  const trigger = screen.getByRole('button', { name: '记录交易' })
+  await user.click(trigger)
+  expect(screen.getByLabelText('交易数量')).toHaveValue(100)
+  screen.getByRole('button', { name: '取消' }).focus()
+  await user.tab()
+  expect(screen.getByRole('button', { name: '关闭新增交易' })).toHaveFocus()
+  await user.keyboard('{Escape}')
+  expect(trigger).toHaveFocus()
+})

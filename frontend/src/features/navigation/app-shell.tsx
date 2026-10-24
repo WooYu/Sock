@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import type { PrimarySection, WorkspaceTone } from './navigation-config'
 import { desktopNavigation, mobileNavigation } from './navigation-config'
+import { StudioIcon } from '../research/studio-icon'
 import { WebAccountButton } from '../account/web-account-button'
 
 type AppShellProps = {
@@ -38,6 +39,9 @@ export function AppShell({
   const [query, setQuery] = useState('')
   const [notice, setNotice] = useState<string | null>(null)
   const searchRef = useRef<HTMLInputElement>(null)
+  const mobileSearchRef = useRef<HTMLInputElement>(null)
+  const mobileSearchTrigger = useRef<HTMLButtonElement>(null)
+  useEffect(() => { if (searchOpen) mobileSearchRef.current?.focus() }, [searchOpen])
   const notify = (message: string) => {
     setNotice(message)
     window.setTimeout(() => setNotice(null), 2600)
@@ -47,7 +51,8 @@ export function AppShell({
     const onShortcut = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault()
-        searchRef.current?.focus()
+        if (window.innerWidth <= 900) { setSearchOpen(true); mobileSearchRef.current?.focus() }
+        else searchRef.current?.focus()
       }
     }
     window.addEventListener('keydown', onShortcut)
@@ -87,6 +92,7 @@ export function AppShell({
 
   return (
     <div className="sc-shell sc-shell-unified" data-testid="app-shell">
+      <a className="sc-skip-link" href="#product-main">跳到主要内容</a>
       <header className="sc-shell-header">
         <div className="sc-shell-header-inner">
           <Link className="sc-brand" href="/" aria-label="回到总览">
@@ -103,19 +109,19 @@ export function AppShell({
               </span>
             ) : null}
             <form className="sc-search-box" action="/analysis/key-levels" method="get" onSubmit={(event) => { if (!query.trim()) { event.preventDefault(); notify('请输入股票代码或名称') } }}>
-              <span aria-hidden="true">⌕</span>
+              <StudioIcon name="search" size={18} />
               <input aria-label="搜索股票" name="symbol" placeholder="输入代码 / 名称" ref={searchRef} value={query} onChange={(event) => setQuery(event.target.value)} />
-              <kbd>⌘ K</kbd>
+              <kbd>Ctrl K</kbd>
             </form>
-            <button aria-expanded={searchOpen} aria-label="搜索股票（移动端）" className="sc-mobile-search-trigger" onClick={() => setSearchOpen((open) => !open)} type="button">⌕</button>
-            <button className="sc-alert-button" aria-label="提醒" onClick={() => notify('当前没有新增提醒')} type="button">●</button>
+            <button ref={mobileSearchTrigger} aria-controls="mobile-stock-search" aria-expanded={searchOpen} aria-label="搜索股票（移动端）" className="sc-mobile-search-trigger" onClick={() => setSearchOpen((open) => !open)} type="button"><StudioIcon name={searchOpen ? 'close' : 'search'} size={20} /></button>
+            <button className="sc-alert-button" aria-label="提醒" onClick={() => notify('当前没有新增提醒')} type="button"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" /></svg></button>
             <WebAccountButton />
           </div>
         </div>
-        {searchOpen ? <form className="sc-mobile-search-row" action="/analysis/key-levels" method="get"><input autoFocus name="symbol" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="输入股票代码或名称" aria-label="股票代码或名称" /><button type="submit">进入分析</button></form> : null}
+        {searchOpen ? <form id="mobile-stock-search" className="sc-mobile-search-row" action="/analysis/key-levels" method="get" onSubmit={event => { if (!query.trim()) { event.preventDefault(); notify('请输入股票代码或名称') } }} onKeyDown={event => { if (event.key === 'Escape') { event.preventDefault(); setSearchOpen(false); mobileSearchTrigger.current?.focus() } }}><input ref={mobileSearchRef} name="symbol" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="输入股票代码或名称" aria-label="股票代码或名称" /><button type="submit">进入分析</button></form> : null}
       </header>
 
-      <main className="sc-shell-main">
+      <main className="sc-shell-main" id="product-main" tabIndex={-1}>
         {children}
       </main>
 

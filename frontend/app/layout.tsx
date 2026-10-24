@@ -5,6 +5,7 @@ import { SharedDataSyncProvider } from "@/features/records/shared-data-sync-prov
 import "./globals.css"
 import "./workspace-polish.css"
 import "./kline-layout.css"
+import "./interface-system.css"
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] })
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] })
