@@ -185,7 +185,7 @@ function HistoricalLayer({ candles, transform, keyLevels, showKeyLevels, kind = 
           return <g key={candle.day}><line className={rising ? 'sc-rise-stroke' : 'sc-fall-stroke'} x1={x} x2={x} y1={transform.yForPrice(candle.high)} y2={transform.yForPrice(candle.low)} /><rect className={rising ? 'sc-rise-fill' : 'sc-fall-fill'} height={Math.max(3, Math.abs(closeY - openY))} width={candleWidth} x={x - candleWidth / 2} y={Math.min(openY, closeY)} /></g>
         })}
       </g>}
-      {showKeyLevels && kind === 'candles' ? <g data-testid="key-level-layer">{keyLevels.filter(Number.isFinite).map((price, index) => <g key={price}><line className="sc-key-level-line" x1={transform.rect.left} x2={transform.rect.left + transform.rect.width} y1={transform.yForPrice(price)} y2={transform.yForPrice(price)} /><text className="sc-key-level-label" x={transform.rect.left + transform.rect.width - 78} y={transform.yForPrice(price) - 5}>{index === 0 ? '近20根高点' : '近20根低点'} {priceText(price)}</text></g>)}</g> : null}
+      {showKeyLevels && kind === 'candles' ? <g data-testid="key-level-layer">{keyLevels.filter(Number.isFinite).map((price, index) => <g key={price}><line className="sc-key-level-line" x1={transform.rect.left} x2={transform.rect.left + transform.rect.width} y1={transform.yForPrice(price)} y2={transform.yForPrice(price)} /><ChartTooltipFrame x={transform.rect.left + transform.rect.width - 6} y={transform.yForPrice(price) - 7} maxWidth={180} testId="key-level-label">{() => <text className="sc-key-level-label" textAnchor="end">{index === 0 ? '近20根高点' : '近20根低点'} {priceText(price)}</text>}</ChartTooltipFrame></g>)}</g> : null}
       </g>
       <g className="sc-volume-bars">{candles.map((candle) => {
         if (!Number.isFinite(candle.volume) || candle.volume <= 0) return null
@@ -233,12 +233,12 @@ function CrosshairTooltip({ candle, price, index, kind, period, transform, indic
     const change = reference === null ? null : candle.close - reference
     const range = candle.high - candle.low
     const signed = (value: number) => `${value > 0 ? '+' : ''}${value.toFixed(2)}`
-    cells.push({ label: period === 'day' ? '当日涨跌' : '本根涨跌', value: change === null ? '-- / --' : `${signed(change)} / ${signed(change / reference! * 100)}%`, color: change === null || change === 0 ? undefined : change > 0 ? '#ff9eaa' : '#7fe0bd' })
+    cells.push({ label: period === 'day' ? '当日涨跌' : '本根涨跌', value: change === null ? '-- / --' : `${signed(change)} / ${signed(change / reference! * 100)}%`, color: change === null || change === 0 ? undefined : change > 0 ? 'var(--sc-gain)' : 'var(--sc-loss)' })
     cells.push({ label: '振幅', value: `${priceText(range)} / ${reference === null ? '--' : `${(range / reference * 100).toFixed(2)}%`}` })
     cells.push({ label: '前收', value: optionalPriceText(reference) })
     if ('volume' in candle && Number.isFinite(candle.volume)) cells.push({ label: '成交量', value: candle.volume.toLocaleString('zh-CN') })
   }
-  cells.push({ label: '光标', value: priceText(price) })
+  cells.push({ label: '光标', value: priceText(price), color: 'var(--sc-primary)' })
   if (kind === 'intraday') {
     if ('volume' in candle && Number.isFinite(candle.volume)) cells.push({ label: '成交量', value: candle.volume.toLocaleString('zh-CN') })
   }
@@ -250,17 +250,29 @@ function CrosshairTooltip({ candle, price, index, kind, period, transform, indic
       cells.push({ label: 'BOLL下', value: optionalPriceText(indicatorValues.boll.lower[index]), color: '#6f7fd8' })
     }
   }
-  const longest = Math.max(...cells.map((cell) => `${cell.label} ${cell.value}`.length), 1)
-  const width = Math.min(transform.rect.width - 12, Math.max(256, Math.min(410, longest * 12 + 42)))
-  const columns = width < 240 || longest * 6 + 20 > width / 2 ? 1 : 2
-  const rowHeight = 17
-  const height = 37 + Math.ceil(cells.length / columns) * rowHeight
-  const x = cursorX < transform.rect.left + transform.rect.width / 2 ? transform.rect.left + transform.rect.width - width - 6 : transform.rect.left + 6, y = transform.rect.top + 8
-  return <g data-testid="crosshair-tooltip" pointerEvents="none">
-    <rect fill="#17213c" height={height} opacity="0.94" rx="5" width={width} x={x} y={y} />
-    <text fill="#fff" fontSize="11" x={x + 10} y={y + 18}>{formatChartTime(candle.day, period)}{'volume' in candle ? '' : ' · 预测'}</text>
-    {cells.map((cell, cellIndex) => <text key={cell.label} fill={cell.color ?? '#edf0ff'} fontSize="10" x={x + 10 + cellIndex % columns * (width - 20) / columns} y={y + 35 + Math.floor(cellIndex / columns) * rowHeight}>{cell.label} {cell.value}</text>)}
-  </g>
+  const maxWidth = Math.min(transform.rect.width - 12, 360)
+  const onRight = cursorX < transform.rect.left + transform.rect.width / 2
+  const anchorX = onRight ? transform.rect.left + transform.rect.width - 6 : transform.rect.left + 6
+  return <ChartTooltipFrame x={anchorX} y={transform.rect.top + 8} maxWidth={maxWidth} testId="crosshair-tooltip">{availableWidth => {
+    const width = Math.min(430, availableWidth)
+    const columns = width < 360 ? 1 : 2
+    const rowHeight = 22
+    const height = 42 + Math.ceil(cells.length / columns) * rowHeight
+    const x = onRight ? -width : 0
+    return <g>
+      <rect className="sc-chart-tooltip-bg" height={height} rx={7} width={width} x={x} />
+      <text className="sc-chart-tooltip-title" x={x + 12} y={23}>{formatChartTime(candle.day, period)}{'volume' in candle ? '' : ' · 预测'}</text>
+      {cells.map((cell, cellIndex) => {
+        const left = x + 12 + cellIndex % columns * (width - 24) / columns
+        const y = 45 + Math.floor(cellIndex / columns) * rowHeight
+        const indicator = cell.label.startsWith('MA') || cell.label.startsWith('BOLL')
+        return <g key={cell.label}>
+          {indicator ? <circle cx={left + 3} cy={y - 4} r={3} fill={cell.color} /> : null}
+          <text x={left + (indicator ? 12 : 0)} y={y} fontSize={12}><tspan fill="var(--sc-muted)">{cell.label} </tspan><tspan fill={indicator ? 'var(--sc-foreground)' : cell.color ?? 'var(--sc-foreground)'} fontWeight={600}>{cell.value}</tspan></text>
+        </g>
+      })}
+    </g>
+  }}</ChartTooltipFrame>
 }
 
 export function ChartCanvas(props: ChartCanvasProps) {
@@ -508,10 +520,8 @@ export function ChartCanvas(props: ChartCanvasProps) {
       <g data-chart-layer="drawing">{props.showDrawings ? <DrawingLayer drawings={props.drawings} interactionsDisabled={props.activeTool === 'pan'} onFocusEditor={() => svgRef.current?.focus()} onMoveDrawing={beginDrawingMove} onMovePoint={beginPointMove} onSelect={props.onSelectDrawing} selectedId={props.selectedId} transform={props.transform} /> : null}</g>
       {props.onPricePan ? <rect data-price-axis="true" data-testid="price-axis-hit-area" x={props.transform.rect.left + props.transform.rect.width} y={props.transform.rect.top} width={viewBox.width - props.transform.rect.left - props.transform.rect.width} height={props.transform.rect.height} fill="transparent" className="sc-price-axis-hit"><title>上下拖动移动价格 · Shift+拖动缩放 · 双击自动适配</title></rect> : null}
       <g data-chart-layer="crosshair" pointerEvents="none">{(props.crosshair || props.activeTool === 'pointer') && crosshairPoint && crosshairCandle && crosshairPrice !== null ? <g data-testid="crosshair-layer"><line className="sc-crosshair" x1={props.transform.xForTime(crosshairCandle.day)} x2={props.transform.xForTime(crosshairCandle.day)} y1={props.transform.rect.top} y2={volumeTop + volumeHeight} /><line className="sc-crosshair" x1={props.transform.rect.left} x2={props.transform.rect.left + props.transform.rect.width} y1={props.transform.yForPrice(crosshairPrice)} y2={props.transform.yForPrice(crosshairPrice)} /><g data-testid="crosshair-axis-labels" pointerEvents="none">
-        <rect x={viewBox.width - 58} y={Math.max(0, Math.min(volumeTop + volumeHeight - 20, crosshairPoint.y - 10))} width={58} height={20} rx={3} fill="#17213c" />
-        <text x={viewBox.width - 4} y={Math.max(0, Math.min(volumeTop + volumeHeight - 20, crosshairPoint.y - 10)) + 14} textAnchor="end" fill="#fff" fontSize={10}>{priceText(crosshairPrice)}</text>
-        <rect x={Math.max(0, Math.min(viewBox.width - 160, props.transform.xForTime(crosshairCandle.day) - 80))} y={volumeTop + volumeHeight + 5} width={160} height={22} rx={3} fill="#17213c" />
-        <text x={Math.max(0, Math.min(viewBox.width - 160, props.transform.xForTime(crosshairCandle.day) - 80)) + 80} y={volumeTop + volumeHeight + 20} textAnchor="middle" fill="#fff" fontSize={11}>{formatChartTime(crosshairCandle.day, props.period)}</text>
+        <ChartTooltipFrame x={viewBox.width - 2} y={Math.max(12, Math.min(volumeTop + volumeHeight - 12, crosshairPoint.y))} maxWidth={90} testId="crosshair-price-label">{() => <g><rect x={-82} y={-12} width={82} height={24} rx={4} fill="var(--sc-primary)" /><text x={-7} y={4} textAnchor="end" fill="var(--sc-on-primary)" fontSize={12} fontWeight={600}>{priceText(crosshairPrice)}</text></g>}</ChartTooltipFrame>
+        <ChartTooltipFrame x={Math.max(80, Math.min(viewBox.width - 80, props.transform.xForTime(crosshairCandle.day)))} y={volumeTop + volumeHeight + 16} maxWidth={160} testId="crosshair-time-label">{() => <g><rect x={-74} y={-12} width={148} height={24} rx={4} fill="var(--sc-primary)" /><text y={4} textAnchor="middle" fill="var(--sc-on-primary)" fontSize={12} fontWeight={600}>{formatChartTime(crosshairCandle.day, props.period)}</text></g>}</ChartTooltipFrame>
       </g><CrosshairTooltip referenceClose={referenceClose} cursorX={crosshairPoint.x} candle={crosshairCandle} price={crosshairPrice} index={crosshairIndex} kind={kind} period={props.period} transform={props.transform} indicators={props.indicators} indicatorValues={props.indicatorValues} /></g> : null}</g>
     </svg>
   )

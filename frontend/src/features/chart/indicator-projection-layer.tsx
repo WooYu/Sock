@@ -36,7 +36,7 @@ export function IndicatorProjectionLayer({ baseClose, previousClose, limitRatio,
   const textTime = (time: string) => time.startsWith('forecast:') ? `第${times.indexOf(time) + 1}根 · 日期待核实` : formatChartTime(time, period)
   return <g data-testid="indicator-projection" onKeyDown={e => { if (e.key === 'Escape') { selectTime(null); setHoveredTime(null) } }}>
     <rect x={x} y={transform.rect.top} width={transform.rect.left + transform.rect.width - x} height={transform.rect.height} fill="#64748b" opacity=".035" pointerEvents="none" />
-    <text x={x + 4} y={transform.rect.top + 15} fill="#526079" fontSize="10" pointerEvents="none">后4根 · 点选查看</text>
+    <ChartTooltipFrame x={x + 4} y={transform.rect.top + 15} maxWidth={140} testId="projection-hint">{() => <text fill="var(--sc-muted)" fontSize="12">后4根 · 点选查看</text>}</ChartTooltipFrame>
     {times.map((time, i) => <g key={time}>
       <line data-testid="projection-day-line" x1={transform.xForTime(time)} x2={transform.xForTime(time)} y1={transform.rect.top + 20} y2={400} stroke="#9aa8c6" strokeDasharray="3 4" opacity=".65" pointerEvents="none" />
       {keys.map(key => { const value = valueAt(key, i); return value != null && withinLimit(value, i) ? <g key={key} pointerEvents="none"><circle data-testid="projection-within-limit" cx={transform.xForTime(time)} cy={transform.yForPrice(value)} r="4" fill={color(key)} stroke="white" strokeWidth="1.5"><title>{`${labels[key] ?? key.toUpperCase()} ${value.toFixed(2)} (${percent(value)}) · 涨跌幅限制内`}</title></circle></g> : null })}

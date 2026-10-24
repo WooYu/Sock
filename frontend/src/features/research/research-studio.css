@@ -366,7 +366,7 @@
 /* Keep SVG interaction feedback light, without the browser's full-column focus outline. */
 .rs-projection-target { -webkit-tap-highlight-color: transparent; outline: none; }
 .rs-projection-target:focus-visible .rs-projection-hit { stroke: var(--sc-primary); stroke-width: 1; vector-effect: non-scaling-stroke; opacity: .3; }
-[data-testid=chart-date-label], [data-testid=projection-date-label] { font-family: Arial, "Microsoft YaHei", sans-serif; font-variant-numeric: tabular-nums; }
+[data-testid=chart-date-label], [data-testid=projection-date-label] { font-family: var(--font-geist-sans), "PingFang SC", "Microsoft YaHei", sans-serif; font-variant-numeric: tabular-nums; }
 .rs-mobile-forecast-details { color: var(--sc-foreground); font-size: 15px; line-height: 1.6; }
 .rs-mobile-forecast-details header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
 .rs-mobile-forecast-details header button { min-height: 44px; padding: 8px 12px; }
