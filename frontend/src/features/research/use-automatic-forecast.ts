@@ -8,7 +8,7 @@ import { adaptivePeriodPlan } from '../scenario/scenario-period-policy'
 import { ANALYSIS_PERIODS } from '../scenario/scenario-calendar'
 import { buildScenarioAnalysis } from '../scenario/scenario-engine'
 import { parseScenarioLedger, SCENARIO_STORAGE_KEY } from '../scenario/scenario-ledger'
-import type { AnalysisAnnotations, Horizon } from '../scenario/scenario-types'
+import type { AnalysisAnnotations, Horizon, ScenarioRule } from '../scenario/scenario-types'
 import { resolveDailyPriceLimit } from '../scenario/scenario-price-ladder'
 
 export const FORECAST_HORIZONS: Horizon[] = [1, 2, 3, 4]
@@ -20,6 +20,15 @@ export function useAutomaticForecast({ symbol, sourceMode, client, name }: {
   const loader = useScenarioInputs({ symbol, sourceMode, client, calendar: scenarioCalendar })
   const [saved, setSaved] = useState<{ owner: string; annotations: AnalysisAnnotations } | null>(null)
   const owner = symbol + ':' + sourceMode
+  const [noteRules, setNoteRules] = useState<ScenarioRule[] | null>(null)
+  const [noteRuleError, setNoteRuleError] = useState<string | null>(null)
+  useEffect(() => {
+    let active = true
+    void import('./forecast-note-registry').then(module => {
+      if (active) setNoteRules(module.forecastNoteRegistry)
+    }).catch(() => { if (active) setNoteRuleError('笔记条件加载失败；当前仅提供指标外推，未完成入场与风险核对。') })
+    return () => { active = false }
+  }, [])
   useEffect(() => {
     let active = true
     const readSaved = () => {
@@ -49,13 +58,14 @@ export function useAutomaticForecast({ symbol, sourceMode, client, name }: {
     try {
       const input = loader.input
       return { analysis: buildScenarioAnalysis(input, annotations, { id: 'automatic:' + owner, version: 1,
-        createdAt: input.asOf, kind: 'live', registry: [], scenarios: [], horizons: FORECAST_HORIZONS,
+        createdAt: input.asOf, kind: 'live', registry: noteRules ?? [], scenarios: [], horizons: FORECAST_HORIZONS,
         executionWindow: null, mergeSelection: { method: 'average_delta', scenarioIds: {} },
         priceSelection: { limit: resolveDailyPriceLimit(symbol, name) } }), error: null }
     } catch (error) { return { analysis: null, error: error instanceof Error ? error.message : '预测计算失败' } }
-  }, [loader.input, annotations, owner, symbol, name])
+  }, [loader.input, annotations, owner, symbol, name, noteRules])
   const periods = ANALYSIS_PERIODS.filter(p => result.analysis?.input.periods[p])
-  return { ...result, periods, loading: loader.status === 'loading' || !!next, issues: loader.issues,
+  return { ...result, periods, loading: loader.status === 'loading' || !!next || !noteRules && !noteRuleError,
+    issues: [...loader.issues, ...(noteRuleError ? [noteRuleError] : [])],
     clearPeriod: plan?.clearPeriod ?? null, refresh: loader.refresh }
 }
 

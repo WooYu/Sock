@@ -5,6 +5,22 @@ import { forecastFixture } from '../scenario/scenario-test-fixtures'
 import { buildDailyPriceLadder, resolveDailyPriceLimit } from '../scenario/scenario-price-ladder'
 import { mergeReferenceLevels } from '../scenario/scenario-levels'
 import type { AutomaticForecast } from './use-automatic-forecast'
+import { analysisInputFixture, seriesFixture } from '../scenario/scenario-test-fixtures'
+import { buildScenarioAnalysis } from '../scenario/scenario-engine'
+import { forecastNoteRegistry } from './forecast-note-registry'
+
+test('explains source-backed entry exclusions alongside retained indicator prices', () => {
+  const input = analysisInputFixture(seriesFixture({ closes: Array.from({ length: 30 }, (_, i) => 20 - i / 10) }))
+  const snapshot = buildScenarioAnalysis(input, {}, { id: 'entry-filter', version: 1, createdAt: input.asOf, kind: 'live',
+    registry: forecastNoteRegistry, scenarios: [], horizons: [1, 2, 3, 4], executionWindow: null,
+    priceSelection: { limit: resolveDailyPriceLimit(input.symbol) } })
+  const forecast: AutomaticForecast = { analysis: snapshot, error: null, periods: ['day'], loading: false, issues: [], clearPeriod: null, refresh: vi.fn() }
+  render(<AutomaticForecastPanel forecast={forecast} selected={null} onSelect={vi.fn()} />)
+  expect(screen.getByRole('region', { name: '笔记预估条件核对' })).toHaveTextContent('原文入场过滤已触发')
+  expect(screen.getByText('日MA20下方的新参与过滤 · 日线 · 条件已满足')).toBeInTheDocument()
+  expect(screen.getByText(/未采用的条件/)).toBeInTheDocument()
+  expect(screen.getAllByText('入场过滤未通过 · 仅作指标参考').length).toBeGreaterThan(0)
+})
 
 test('merges nearby cross-day targets in ascending order and filters remote extrapolations from candidates', () => {
   const { snapshot } = forecastFixture()

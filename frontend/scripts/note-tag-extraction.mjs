@@ -180,7 +180,7 @@ export async function extractCodexBatch(model, documents) {
       ...EXTRACTION_SCHEMA, required: [...EXTRACTION_SCHEMA.required, 'file'], properties: { ...EXTRACTION_SCHEMA.properties, file: { type: 'string', enum: documents.map(document => document.file) } },
     } },
   } }
-  const prompt = `${PROMPT}\n本次逐篇独立提取输入的多篇笔记，不能把其他篇的内容用于某一篇的标签。每篇最多5个标签，按输出结构返回每个file的结果。不要调用工具、读写文件或联网。输入JSON数据中每篇的行号从1开始：\n${JSON.stringify(documents.map(document => ({ file: document.file, source: document.source.split(/\r?\n/).map((line, index) => `${index + 1}: ${line}`).join('\n') })))}`
+  const prompt = `${PROMPT}\n本次逐篇独立提取输入的多篇笔记，不能把其他篇的内容用于某一篇的标签。每篇最多3个标签（kind最多1，topic最多2），按输出结构返回每个file的结果。不要调用工具、读写文件或联网。输入JSON数据中每篇的行号从1开始：\n${JSON.stringify(documents.map(document => ({ file: document.file, source: document.source.split(/\r?\n/).map((line, index) => `${index + 1}: ${line}`).join('\n') })))}`
   return parseCodexBatch(await runCodex(model, prompt, schema), documents)
 }
 
@@ -208,7 +208,7 @@ export async function extract(model, source) {
   } catch (error) {
     if (attempt === 3) throw error
     if (typeof content === 'string') messages.push({ role: 'assistant', content })
-    messages.push({ role: 'user', content: `上次输出未通过校验：${error.message}。请仅根据相同原文修正，不新增猜测。必须返回对象，包含tags数组和note字符串。标签总数最多5，topic最多2，purpose/kind/timeframe各最多1，不能含unknown/data/scope/computability。每个tag字段仅为tagId、quote、startLine、endLine、reason。引文必须逐字匹配指定行；图片/视频/音频附件链接、元数据不属于正文，只有附件时tags必须为空数组。现在重新输出完整JSON。` })
+    messages.push({ role: 'user', content: `上次输出未通过校验：${error.message}。请仅根据相同原文修正，不新增猜测。必须返回对象，包含tags数组和note字符串。标签总数最多3，仅kind最多1、topic最多2，不能含unknown/purpose/timeframe/data/scope/computability。每个tag字段仅为tagId、quote、startLine、endLine、reason。引文必须逐字匹配指定行；图片/视频/音频附件链接、元数据不属于正文，只有附件时tags必须为空数组。现在重新输出完整JSON。` })
   }
   }
 }

@@ -1,4 +1,5 @@
 'use client'
+import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { importStudy, listStudyVersions } from '../scenario/scenario-api'
 import { getResearchIdentity, RESEARCH_IDENTITY_EVENT, type ResearchIdentity } from '../scenario/research-identity'
@@ -6,6 +7,7 @@ import type { NoteStudyRevision } from '../scenario/scenario-record-types'
 import type { NoteStudyIndex, NoteStudyProposal } from './note-study-types'
 import { saveStudySelection } from './note-study-selections'
 import { TAG_LABELS, type NoteTagRecord } from './note-tags'
+import { priceRuleCardForClaim } from './note-price-rule-cards'
 
 const ROLES: Record<string, string> = { trend: '趋势', granville_stage: '葛阶段', parameter_formula: '参数公式', method_selection: '方法选择', support_resistance: '支撑压力', mode: '盈利模式', risk: '交易风险', validation: '验证', context: '背景' }
 const COMPUTABILITY: Record<string, string> = { direct: '可直接表达的计算', needs_definition: '缺定义，暂不能直接计算', needs_data: '缺数据', reference: '解释与参考' }
@@ -127,6 +129,10 @@ function StudyDetail({ file, currentTags }: { file: string; currentTags: NoteTag
         <button className="kw-button kw-primary" type="button" disabled={!exactStored || busy} onClick={() => { if (exactStored) void select(exactStored) }}>选为后续分析依据</button></div>
       <section><h4>计算主张 · {study.claims.length}条</h4>{study.claims.map(claim => <article className="nt-study-claim" key={claim.claimId}>
         <h5>{claim.name}</h5><p>{COMPUTABILITY[claim.computability]} · 效果未测试</p><p>{claim.formula ? <code>{claim.formula}</code> : '数值公式尚未定义'}</p>
+        <details><summary>价格研究规则卡 · {priceRuleCardForClaim(study, claim).stage === 'shadow' ? '已接入影子研究' : '保留候选／参考'}</summary>
+          {priceRuleCardForClaim(study, claim).models.map(model => <div key={model.id}><strong>{model.name}</strong><p>{model.formula}</p><p>{model.definition}</p><p>失效：{model.invalidation}</p><Link href="/#note-price-research">打开笔记价位研究</Link></div>)}
+          {priceRuleCardForClaim(study, claim).missingForExecution.map(gap => <p key={gap}>{gap}；可计算不等于已证明预测有效。</p>)}
+        </details>
         <p>输入：{claim.inputs.join('、')} · 原文周期：{claim.periods.join('、') || '未明确'}</p>
         <p>适用条件：{claim.applicability.join('；') || '原文未明确'}</p><p>失效条件：{claim.invalidation.join('；') || '原文未明确'}</p>
         {claim.gaps.length ? <ul>{claim.gaps.map((gap, i) => <li key={i}>{gap}</li>)}</ul> : null}

@@ -38,6 +38,18 @@ test('failed smaller period keeps valid daily and hour forecasts without retryin
   expect(client.series.mock.calls.filter(c => c[1] === '15m')).toHaveLength(1)
 })
 
+test('loads source-backed forecast roles and applies entry filters while retaining price references', async () => {
+  const client = { series: vi.fn(async (symbol: string, period: ChartPeriod) => seriesFixture({ symbol,
+    period: period as AnalysisPeriod, closes: Array.from({ length: 30 }, (_, i) => 20 - i * .1),
+    fetchedAt: '2026-10-15T16:00:00+08:00' })) }
+  const { result } = renderHook(() => useAutomaticForecast({ symbol: '603533', sourceMode: 'real', client }))
+  await waitFor(() => expect(result.current.loading).toBe(false), { timeout: 15000 })
+  expect(result.current.analysis?.entryBlocked).toBe(true)
+  expect(result.current.analysis?.rules.find(rule => rule.ruleId === 'daily_ma20_entry_filter')?.status).toBe('adopted')
+  expect(result.current.analysis?.references.some(reference => reference.valid)).toBe(true)
+  expect(localStorage.length).toBe(0)
+})
+
 test('a saved valid daily trend and mode stop automatic drilling at daily', async () => {
   const input = analysisInputFixture(series('603533', 'day'))
   const origin = input.periods.day!.closed.at(-1)!

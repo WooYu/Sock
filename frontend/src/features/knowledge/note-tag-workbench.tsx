@@ -10,6 +10,8 @@ import { NOTE_TAG_STORAGE_KEY, TAG_DIMENSIONS, LEGACY_TAG_DIMENSIONS, TAG_LABELS
 import './note-tag-workbench.css'
 import { NoteTagReextract } from './note-tag-reextract'
 import { NoteDetailNavigation, NoteExcerpt, type NoteDetailTab } from './note-detail-navigation'
+import { classifyNoteForForecast, FORECAST_ROLES, type ForecastRole } from './note-forecast-classification'
+import { buildScenarioRuleRegistry } from '../scenario/scenario-rule-registry'
 
 const defaultCatalog = applyAIOriginalTags(catalogData as NoteCatalog, aiTagResults.records as AIOriginalTags[])
 const PAGE_SIZE = 10
@@ -72,6 +74,10 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
   const { records: local, ready, error } = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getServerSnapshot)
   const base = useMemo(() => [...catalog.documents, ...catalog.fragments], [catalog])
   const current = useMemo(() => currentTagRecords(base, local).map(activeTagRecord), [base, local])
+  const forecastRegistry = useMemo(() => buildScenarioRuleRegistry(catalog.fragments), [catalog])
+  const canonicalRecords = useMemo(() => new Map(base.map(record => [record.id, record])), [base])
+  const forecastClasses = useMemo(() => new Map(current.map(record => [record.id, classifyNoteForForecast(record, forecastRegistry, canonicalRecords.get(record.id))])), [current, forecastRegistry, canonicalRecords])
+  const [forecastRole, setForecastRole] = useState<ForecastRole | ''>('')
   const allVersions = useMemo(() => mergeTagVersions(base, local), [base, local])
   const [level, setLevel] = useState<'document' | 'fragment'>('document')
   const [view, setView] = useState<'tags' | 'study'>('tags')
@@ -104,7 +110,8 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
     setEditor(null); setWriteError('')
     if (window.history.state?.stockcalTagEditor) window.history.back()
   }
-  const filtered = useMemo(() => filterTagRecords(current.filter((record) => record.level === level && (status === 'all' || record.status === status)), { query: deferredQuery, facets }), [current, level, status, deferredQuery, facets])
+  const filtered = useMemo(() => filterTagRecords(current.filter((record) => record.level === level && (status === 'all' || record.status === status)
+    && (!forecastRole || forecastClasses.get(record.id)?.some(item => item.role === forecastRole))), { query: deferredQuery, facets }), [current, level, status, deferredQuery, facets, forecastRole, forecastClasses])
   const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const currentPage = Math.min(page, pages - 1)
   const selected = filtered.find((record) => record.id === selectedId) ?? filtered[0]
@@ -135,7 +142,7 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
     try {
       persist(reviseTags(editor, draft, new Date().toISOString()), editor)
       closeEditor()
-      setFacets({}); setQuery(''); setStatus('all'); setPage(0)
+      setFacets({}); setForecastRole(''); setQuery(''); setStatus('all'); setPage(0)
     } catch (cause) { setWriteError(`保存失败：${cause instanceof Error ? cause.message : '请检查存储权限。'} 输入已保留。`) }
   }
 
@@ -149,7 +156,9 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
     try {
       if (!ready || error) throw new Error('请先解决本地标签读取问题。')
       const blob = new Blob([JSON.stringify({ schemaVersion: 1, exportedAt: new Date().toISOString(), sourceCommit: catalog.sourceCommit,
-        sourceRepository: catalog.sourceRepository, taxonomy: TAG_DIMENSIONS, legacyTaxonomy: LEGACY_TAG_DIMENSIONS, records: allVersions }, null, 2)], { type: 'application/json;charset=utf-8' })
+        sourceRepository: catalog.sourceRepository, taxonomy: TAG_DIMENSIONS, legacyTaxonomy: LEGACY_TAG_DIMENSIONS, records: allVersions,
+        forecastRoles: { definitionVersion: 'forecast-roles-v1', vocabulary: FORECAST_ROLES, derived: true,
+          records: current.map(record => ({ id: record.id, sourceHash: record.sourceHash, tagVersion: record.version, roles: forecastClasses.get(record.id) })) } }, null, 2)], { type: 'application/json;charset=utf-8' })
       const url = URL.createObjectURL(blob)
       const anchor = document.createElement('a')
       anchor.href = url; anchor.download = 'stockcal-note-tags.json'; document.body.appendChild(anchor); anchor.click(); anchor.remove()
@@ -163,7 +172,7 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
     if (window.matchMedia?.('(max-width: 760px)').matches) detailRef.current?.scrollIntoView({ block: 'start', behavior: 'instant' })
   }
 
-  function reset() { setQuery(''); setFacets({}); setStatus('all'); setPage(0); setViewedKey(null) }
+  function reset() { setQuery(''); setFacets({}); setForecastRole(''); setStatus('all'); setPage(0); setViewedKey(null) }
 
   if (view === 'study') return <section className="nt-workbench" aria-label="笔记标签工作台"><nav className="nt-study-tabs" aria-label="笔记工作视图"><button type="button" onClick={() => setView('tags')}>标签与版本</button><button type="button" aria-pressed="true">逐篇学习建议</button></nav><NoteStudyWorkbench currentTags={current} /></section>
 
@@ -178,6 +187,7 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
       <label>标注层级<select value={level} onChange={(event) => { setLevel(event.target.value as typeof level); setPage(0); setViewedKey(null) }}><option value="document">整篇笔记</option><option value="fragment">规则片段</option></select></label>
       {TAG_DIMENSIONS.map((dimension) => <label key={dimension.id}>{dimension.label}<select value={facets[dimension.id] ?? ''} onChange={(event) => { setFacets((previous) => ({ ...previous, [dimension.id]: event.target.value })); setPage(0); setViewedKey(null) }}><option value="">全部</option>{dimension.options.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}</select></label>)}
       <label>标签核对状态<select value={status} onChange={(event) => { setStatus(event.target.value); setPage(0); setViewedKey(null) }}><option value="all">全部</option><option value="candidate">待核对</option><option value="reviewed">已核对标签</option></select></label>
+      <label>预估作用<select value={forecastRole} onChange={event => { setForecastRole(event.target.value as ForecastRole | ''); setPage(0); setViewedKey(null) }}><option value="">全部</option>{Object.entries(FORECAST_ROLES).map(([id, label]) => <option key={id} value={id}>{label}</option>)}</select></label>
       <button type="button" className="kw-button" onClick={reset}>重置标签筛选</button>
     </div>
     <div className="nt-columns">
@@ -203,6 +213,7 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
           </section>
           <NoteDetailNavigation active={detailTab} onChange={changeDetailTab} />
           <div role="tabpanel" id="nt-panel-overview" aria-labelledby="nt-tab-overview" hidden={detailTab !== 'overview'} tabIndex={0} className="nt-detail-panel">
+            <section className="nt-detail-card" aria-label="笔记的预估作用"><h4>预估作用</h4><p>按原文引用与已编写的条件规则分类；关键词候选仅供研究，核对标签不会自动启用公式。</p>{classifyNoteForForecast(viewed, forecastRegistry, canonicalRecords.get(viewed.id)).map(item => <details key={item.role}><summary>{FORECAST_ROLES[item.role]} · {item.status === 'defined' ? '已关联条件规则，是否适用另行核对' : '待定义／验证'}</summary>{item.ruleIds.map(id => <p key={id}>{forecastRegistry.find(rule => rule.id === id)?.name}</p>)}{item.evidence.map(e => <blockquote key={`${e.startLine}:${e.endLine}:${e.quote}`}>L{e.startLine}–{e.endLine}：{e.quote}</blockquote>)}</details>)}</section>
             <section className="nt-detail-card"><h4>笔记摘要</h4><NoteExcerpt text={viewed.summary} /></section>
             <section className="nt-detail-card nt-supplement-summary"><div className="nt-card-heading"><h4>补充说明</h4>{!historical ? <button type="button" className="kw-button" disabled={!ready || Boolean(error)} onClick={() => openEditor(viewed, true)}>{viewed.supplement ? '修改补充说明' : '补充说明'}</button> : null}</div>{viewed.supplement ? <NoteExcerpt text={viewed.supplement} /> : <p className="nt-empty-copy">还没有补充说明。可补充使用场景、理解或需要纠正的内容。</p>}</section>
             {!historical && viewed.level === 'document' ? <NoteTagReextract key={tagVersionKey(viewed)} record={viewed} disabled={!ready || Boolean(error)} onAdopt={candidate => openEditor({ ...viewed, tags: [...candidate.tags], evidence: candidate.evidence, sourceReferences: [...(viewed.sourceReferences ?? []), ...viewed.evidence], extraction: candidate.extraction }, false, true)} /> : null}

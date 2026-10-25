@@ -12,6 +12,17 @@ beforeEach(() => localStorage.clear())
 afterEach(() => vi.unstubAllGlobals())
 
 describe('note tagging workbench', () => {
+  it('filters by evidence-derived forecast role without changing editable tag dimensions', () => {
+    render(<NoteTagWorkbench catalog={fixture} />)
+    fireEvent.change(screen.getByRole('combobox', { name: '预估作用' }), { target: { value: 'entry' } })
+    expect(screen.getByRole('button', { name: '查看标签：均线金叉' })).toBeInTheDocument()
+    fireEvent.change(screen.getByRole('combobox', { name: '预估作用' }), { target: { value: 'exit' } })
+    expect(screen.queryByRole('button', { name: '查看标签：均线金叉' })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '重置标签筛选' }))
+    expect(screen.getByRole('button', { name: '查看标签：均线金叉' })).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: '分析主题' })).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: '内容分类' })).toBeInTheDocument()
+  })
   it('separates reading views with keyboard navigation and resets when choosing another note', () => {
     render(<NoteTagWorkbench catalog={fixture} />)
     const overview = screen.getByRole('tab', { name: '概览' })

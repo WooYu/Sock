@@ -12,7 +12,8 @@
     "test:e2e": "playwright test",
     "notes:tags": "node scripts/build-note-tags.mjs",
     "notes:retag": "node scripts/reextract-note-tags.mjs",
-    "notes:study": "node scripts/build-note-study.mjs"
+    "notes:study": "node scripts/build-note-study.mjs",
+    "notes:forecast:audit": "node scripts/audit-note-price-models.mjs"
   },
   "dependencies": {
     "next": "16.3.3",
