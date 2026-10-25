@@ -18,21 +18,29 @@ Malformed persisted definitions; incomplete drafts; stale edit conflicts; hidden
 ## Task 1: Versioned definition model
 
 Files: note-tags.ts, new note-forecast-definitions.ts and tests.
-- [ ] Write and run failing tests for old ledger compatibility, draft/ready validation, immutable revision, tag review preservation, malformed definitions.
-- [ ] Add ForecastDefinition with role, condition, timeframe, scope, invalidation, openQuestions and draft/ready state. Implement reviseForecastDefinition(previous, definition, reason, createdAt) and validate optional definitions during ledger parsing.
-- [ ] Run targeted tests; preserve optional definitions through existing tag revisions/export/sync.
+- [x] Write and run failing tests for old ledger compatibility, draft/ready validation, immutable revision, tag review preservation, malformed definitions.
+- [x] Add ForecastDefinition with role, condition, timeframe, scope, invalidation, openQuestions and draft/ready state. Implement reviseForecastDefinition(previous, definition, reason, createdAt) and validate optional definitions during ledger parsing.
+- [x] Run targeted tests; preserve optional definitions through existing tag revisions/export/sync.
 
 ## Task 2: Definition cards and editor
 
 Files: new note-forecast-definition-editor.tsx; note-tag-workbench.tsx/css; component tests.
-- [ ] Write failing tests for opening a role-specific editor, saving a draft, completing a definition, read-only history, cancel and retained input on failure.
-- [ ] Render separate role cards with definition readiness, linked compiled rules and collapsed source quotations. Add focused dialog with validation, dirty-close confirmation and save feedback.
-- [ ] Integrate the existing persist guard and version history without clearing browsing context after save.
+- [x] Write failing tests for opening a role-specific editor, saving a draft, completing a definition, read-only history, cancel and retained input on failure.
+- [x] Render separate role cards with definition readiness, linked compiled rules and collapsed source quotations. Add focused dialog with validation, dirty-close confirmation and save feedback.
+- [x] Integrate the existing persist guard and version history without clearing browsing context after save.
 
 ## Task 3: Browsing feedback
 
 Files: note-tag-workbench.tsx/css and tests.
-- [ ] Test paging selects an item on the visible page and saving retains the filters.
-- [ ] Add expandable advanced filters, removable active-filter chips, empty-state reset and explicit label-only review help.
-- [ ] Run model/component tests, TypeScript/lint; verify desktop/mobile in Playwright with independent storage and no production writes.
-- [ ] Review the complete diff, commit task changes and push where connectivity permits.
+- [x] Test paging selects an item on the visible page and saving retains the filters.
+- [x] Add expandable advanced filters, removable active-filter chips, empty-state reset and explicit label-only review help.
+- [x] Run model/component tests, TypeScript/lint; verify desktop/mobile in Playwright with independent storage and no production writes.
+- [x] Review the complete diff, commit task changes and push where connectivity permits.
+
+## Verification record
+
+- Knowledge and shared-sync tests: 80/80 passing (13 files), with maxWorkers=2. An earlier unconstrained run timed out in the unchanged catalog source audit under concurrent browser load; its isolated rerun and the constrained full run passed.
+- TypeScript --noEmit and scoped ESLint: passing.
+- Desktop/mobile browser regression: 14/14 passing; final definition-flow rerun after feedback/focus changes: 4/4 passing.
+- Independent review: browser Back and discard-prompt focus issues fixed with RED-to-GREEN regression tests; focus restoration and malformed role coercion also fixed. No remaining critical or important findings.
+- Execution: native managed worktree based on a9547ec; browser preview copied onto the dependency drive to avoid Windows cross-drive module-link errors. Shared API writes intercepted in browser tests.

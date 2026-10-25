@@ -1,3 +1,5 @@
+import { isForecastDefinition, type ForecastDefinition } from './note-forecast-definitions'
+
 export type TagDimension = 'kind' | 'topic' | 'purpose' | 'timeframe' | 'scope' | 'data' | 'computability'
 export type TagEvidence = { tagId: string; startLine: number; endLine: number; quote: string; method: 'dictionary' | 'catalog' | 'manual' | 'ai'; reason: string }
 export type SourceReference = Pick<TagEvidence, 'startLine' | 'endLine' | 'quote'>
@@ -9,6 +11,7 @@ export type DualTagResult = {
   candidate: AIOriginalTags | null
 }
 export interface NoteTagRecord {
+  forecastDefinitions?: ForecastDefinition[]
   supplement?: string; supplementEvidence?: SupplementEvidence[]
   sourceReferences?: SourceReference[]; extraction?: TagExtraction
   id: string; level: 'document' | 'fragment'; file: string; title: string; parentId?: string
@@ -94,6 +97,8 @@ export function filterTagRecords(records: NoteTagRecord[], filters: { query?: st
 function isTagRecord(value: unknown): value is NoteTagRecord {
   if (!value || typeof value !== 'object') return false
   const r = value as Record<string, unknown>
+  if (r.forecastDefinitions !== undefined && (!Array.isArray(r.forecastDefinitions) || !r.forecastDefinitions.every(isForecastDefinition)
+    || new Set(r.forecastDefinitions.map(item => item.role)).size !== r.forecastDefinitions.length)) return false
   if (!['id', 'file', 'title', 'sourceHash', 'sourceUrl', 'sourceExcerpt', 'summary', 'createdAt', 'revisionReason'].every((key) => typeof r[key] === 'string')) return false
   if (!r.id || !/^[a-f0-9]{64}$/.test(String(r.sourceHash)) || !Number.isFinite(Date.parse(String(r.createdAt)))) return false
   if (!['document', 'fragment'].includes(String(r.level)) || !['candidate', 'reviewed'].includes(String(r.status))) return false
