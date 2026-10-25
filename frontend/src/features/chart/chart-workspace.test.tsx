@@ -347,7 +347,7 @@ describe('ChartWorkspace', () => {
     await userEvent.click(screen.getByRole('button', { name: '买入点' }))
     await userEvent.click(screen.getByRole('img', { name: 'K线主图' }))
 
-    expect(screen.getByTestId('annotation-buy')).toHaveTextContent('价格')
+    expect(screen.getByTestId('annotation-buy')).toHaveTextContent(/买入 \d+\.\d{2}/)
   })
 
   test('commits a selected drawing body drag through DrawingEngine.move once', async () => {
