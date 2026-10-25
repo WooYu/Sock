@@ -9,7 +9,9 @@ test('historical candle details show change, amplitude and axis labels', async (
   await expect(page.getByTestId('candlestick-layer').locator('rect').first()).toBeVisible()
   const bounds = await page.getByTestId('candlestick-layer').locator('rect').nth(1).boundingBox()
   if (!bounds) throw new Error('Chart has no bounds')
-  await chart.dispatchEvent('pointermove', { pointerId: 1, pointerType: 'mouse', clientX: bounds.x + bounds.width / 2, clientY: bounds.y + bounds.height / 2 })
+  const point = { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 }
+  if (info.project.name === 'mobile') await page.touchscreen.tap(point.x, point.y)
+  else await page.mouse.move(point.x, point.y)
   const tooltip = page.getByTestId('crosshair-tooltip')
   await expect(tooltip).toContainText('当日涨跌')
   await expect(tooltip).toContainText(/振幅.*%/)
