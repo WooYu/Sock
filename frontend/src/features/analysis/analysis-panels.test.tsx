@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, test } from 'vitest'
 import { KeyLevelsPanel } from './key-levels-panel'
 import { PatternsPanel } from './patterns-panel'
+import { FutureIndicatorsPanel } from './future-indicators-panel'
 
 const analysis = {
   support: 1700,
@@ -37,7 +38,7 @@ describe('analysis panels', () => {
     render(<PatternsPanel analysis={{ ...analysis, matchedRules: [{ ruleId: 'rule-1', version: 1, name: '站上 MA5', action: 'ENTER', priority: 10, evidence: [], conditions: [{ field: 'closeAboveMa5', operator: 'equals', value: 1 }] }], ruleEvaluations: [{ ruleId: 'rule-1', status: 'matched', conditions: [{ field: 'closeAboveMa5', actual: true, passed: true }], missingFacts: [], failedConditions: [] }] }} />)
 
     expect(screen.getByText('规则条件核验')).toBeInTheDocument()
-    expect(screen.getByText('closeAboveMa5')).toBeInTheDocument()
+    expect(screen.getByText('收盘价在 MA5 上方')).toBeInTheDocument()
     expect(screen.getByText('已满足')).toBeInTheDocument()
   })
 
@@ -46,4 +47,16 @@ describe('analysis panels', () => {
 
     expect(container.querySelector('.sc-analysis-panel')).toBeInTheDocument()
   })
+})
+
+
+test('future indicators name each moving average and BOLL rail, round values and keep dates readable', () => {
+  render(<FutureIndicatorsPanel analysis={{ ...analysis, future: [{ day: '2026-10-26T00:00:00.000Z', maValues: { ma5: 12.34567, ma20: 11.298 }, bollUpper: 14.1111, bollMiddle: 12.2222, bollLower: 10.3333 }] }} />)
+  expect(screen.getByRole('heading', { name: '2026年10月26日' })).toBeInTheDocument()
+  expect(screen.getByText('MA5')).toBeInTheDocument()
+  expect(screen.getByText('12.35')).toBeInTheDocument()
+  expect(screen.getByText('BOLL 上轨')).toBeInTheDocument()
+  expect(screen.getByText('BOLL 中轨')).toBeInTheDocument()
+  expect(screen.getByText('BOLL 下轨')).toBeInTheDocument()
+  expect(screen.queryByText(/2026-10-26T/)).not.toBeInTheDocument()
 })

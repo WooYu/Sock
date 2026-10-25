@@ -103,7 +103,7 @@ describe('experience workbench', () => {
     vi.stubGlobal('fetch', vi.fn(async () => Response.json({ items: [], nextCursor: null, asOf: '2026-10-16T08:00:00Z' })))
     const user = userEvent.setup(); render(<ExperienceWorkbench data={fixture} />)
     await user.click(screen.getByRole('link', { name: '学习样本' }))
-    expect(await screen.findByRole('heading', { name: '学习样本库' }, { timeout: 20_000 })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: '已保存的计算' }, { timeout: 20_000 })).toBeInTheDocument()
     expect(window.location.search).toContain('view=samples')
     expect(screen.queryByRole('link', { name: /经验原则|经验与原则/ })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: '复盘' })).not.toBeInTheDocument()

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { StockAnalysis } from '../workspace/stock-workspace-types'
+import { DIRECTION_LABELS } from './display-labels'
 
 type KeyLevelsPanelProps = { analysis?: StockAnalysis | null }
 
@@ -14,7 +15,7 @@ export function KeyLevelsPanel({ analysis }: KeyLevelsPanelProps) {
   ].filter((card) => card.id !== 'target' || analysis.decision.action === 'ENTER')
   return (
     <section className="sc-analysis-panel rounded-2xl border border-[var(--sc-border)] bg-[var(--sc-surface)] p-4 sm:p-5">
-      <div className="sc-analysis-panel-heading"><div><p className="sc-eyebrow">决策地图</p><h2>关键位分析</h2></div><span>方向：{analysis.direction}</span></div>
+      <div className="sc-analysis-panel-heading"><div><p className="sc-eyebrow">决策地图</p><h2>关键位分析</h2></div><span>方向：{DIRECTION_LABELS[analysis.direction]}</span></div>
       <div className="sc-decision-status">
         <p className="text-sm font-semibold">决策门：{decisionLabel(analysis.decision.action)}</p>
         <p className="mt-2 text-sm text-[var(--sc-muted)]">{analysis.decision.reason}</p>
@@ -24,9 +25,9 @@ export function KeyLevelsPanel({ analysis }: KeyLevelsPanelProps) {
       <div className="sc-key-level-grid">
         {cards.map((card) => (
           <article className={`sc-key-level-card ${card.id}`} key={card.id}>
-            <div className="flex items-start justify-between gap-3"><div><p className="text-sm text-[var(--sc-muted)]">{card.title}</p><p className="mt-2 text-2xl font-semibold">{card.value == null ? '—' : card.value.toFixed(2)}</p></div><span className="text-sm text-[var(--sc-muted)]">概率 {card.probability}</span></div>
-            <button className="sc-key-level-toggle" onClick={() => setExpanded((old) => ({ ...old, [card.id]: !old[card.id] }))} type="button">{expanded[card.id] ? '收起' : `展开${card.title}`}</button>
-            {expanded[card.id] ? <div className="mt-3 space-y-2 border-t border-[var(--sc-border)] pt-3 text-sm text-[var(--sc-muted)]"><p className="font-semibold text-[var(--sc-foreground)]">计算依据</p><p>触发条件：价格与指标形成共振。</p><p>失效条件：行情快照过期或结构破坏。</p></div> : null}
+            <div className="flex items-start justify-between gap-3"><div><p className="text-sm text-[var(--sc-muted)]">{card.title}</p><p className="mt-2 text-2xl font-semibold">{card.value == null ? '—' : card.value.toFixed(2)}</p></div>{card.id === 'target' ? <span className="text-sm text-[var(--sc-muted)]">校准置信度 {card.probability}</span> : null}</div>
+            <button aria-expanded={Boolean(expanded[card.id])} aria-label={`${expanded[card.id] ? '收起' : '展开'}${card.title}`} className="sc-key-level-toggle" onClick={() => setExpanded((old) => ({ ...old, [card.id]: !old[card.id] }))} type="button">{expanded[card.id] ? '收起依据' : `展开${card.title}`}</button>
+            {expanded[card.id] ? <div className="mt-3 space-y-2 border-t border-[var(--sc-border)] pt-3 text-sm text-[var(--sc-muted)]"><p className="font-semibold text-[var(--sc-foreground)]">计算依据</p>{analysis.decision.evidence.length ? analysis.decision.evidence.map(evidence => <p key={evidence.id}>{evidence.label}{evidence.detail ? `：${evidence.detail}` : ''}</p>) : <p>当前分析未附独立计算依据。</p>}<p>触发条件：{analysis.decision.reason}</p><p>失效条件：{analysis.decision.invalidationConditions.join('；') || '当前规则未定义，需继续核对。'}</p></div> : null}
           </article>
         ))}
       </div>

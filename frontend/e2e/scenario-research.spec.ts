@@ -1,4 +1,5 @@
 import { expect, test, type Page } from './fixtures/test'
+import { openResearch } from './fixtures/chart-workbench'
 import { readFile } from 'node:fs/promises'
 import fixture from './fixtures/scenario-research.json'
 import series from './fixtures/scenario-series.json'
@@ -63,6 +64,7 @@ test('local-only failure retries the frozen version, reloads its receipt and exp
   await page.route('**/api/scenario-records/*/evaluations', route => route.fulfill({ json: evaluated ? [evaluation()] : [] }))
   await page.route('**/api/scenario-records/*/evaluate', route => { evaluated = true; return route.fulfill({ json: { latestStatus: evaluation(), latestSuccessful: evaluation() } }) })
   await page.goto('/?symbol=603533')
+  await openResearch(page)
   await page.getByRole('tab', { name: '多周期分析', exact: true }).click()
 
   await page.getByRole('button', { name: '开始多周期分析' }).click()
@@ -76,6 +78,7 @@ test('local-only failure retries the frozen version, reloads its receipt and exp
   await expect(panel.getByText('已入库', { exact: true })).toBeVisible()
   expect(uploads).toHaveLength(2); expect(uploads[1]).toEqual(uploads[0])
   await page.reload()
+  await openResearch(page)
   await page.getByRole('tab', { name: '多周期分析', exact: true }).click()
 
   await page.getByRole('button', { name: '开始多周期分析' }).click()
@@ -137,7 +140,9 @@ test('samples distinguish query errors, preserve filters during pagination and e
   await samples.getByRole('button', { name: '下一批样本', exact: true }).click()
   await expect(samples.getByRole('button', { name: '下一批样本', exact: true })).toBeDisabled()
   expect(queries.at(-1)!.get('directionCandidate')).toBe('falling'); expect(queries.at(-1)!.get('directionConfirmed')).toBe('unknown')
+  await samples.getByText('更多筛选 · 日期、资格与来源', { exact: true }).click()
   await samples.getByRole('combobox', { name: '前瞻资格筛选', exact: true }).selectOption('false')
+  await samples.getByRole('button', { name: '应用筛选', exact: true }).click()
   await expect.poll(() => queries.at(-1)!.get('forwardEligible')).toBe('false'); expect(queries.at(-1)!.has('cursor')).toBe(false)
   await samples.getByRole('button', { name: '查看冻结样本', exact: true }).click()
   const detail = page.getByRole('region', { name: '学习样本详情', exact: true })

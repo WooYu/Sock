@@ -26,6 +26,7 @@ test('login remains usable above a keyboard that leaves the layout viewport unch
 
 test('trade footer stays reachable while its fields scroll above the keyboard', async ({ page }) => {
   await page.goto('/trading/ledger?symbol=600519')
+  await page.getByRole('button', { name: '记录交易', exact: true }).click()
   const dialog = page.getByRole('dialog', { name: '新增交易' })
   await expect(dialog).toBeVisible()
   await openKeyboard(page)
@@ -33,6 +34,8 @@ test('trade footer stays reachable while its fields scroll above the keyboard', 
   await dialog.getByLabel('成交价格').fill('1290')
   const save = dialog.getByRole('button', { name: '保存交易', exact: true })
   const box = (await save.boundingBox())!
+  const cancel = (await dialog.getByRole('button', { name: '取消', exact: true }).boundingBox())!
+  expect(Math.abs(cancel.y - box.y)).toBeLessThan(2)
   expect(box.y).toBeGreaterThanOrEqual(60)
   expect(box.y + box.height).toBeLessThanOrEqual(420)
   await save.click()

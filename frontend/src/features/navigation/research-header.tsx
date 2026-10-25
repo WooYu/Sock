@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { WebAccountButton } from '../account/web-account-button'
 import { StudioIcon } from '../research/studio-icon'
 import './research-header.css'
+import { WorkspaceNavigation } from './workspace-navigation'
 
 export type KnowledgeView = 'library' | 'notes' | 'samples' | 'backtest'
 
@@ -18,19 +19,25 @@ export function ResearchHeader({ active, onKnowledgeNavigate }: {
   active: 'chart' | 'review' | KnowledgeView
   onKnowledgeNavigate?: (view: KnowledgeView) => void
 }) {
-  return <header className="sc-research-header">
+  const isKnowledge = active !== 'chart' && active !== 'review'
+  const section = isKnowledge ? 'knowledge' : 'chart'
+  const activeHref = isKnowledge ? `/knowledge?view=${active}` : '/'
+  return <><header className="sc-research-header sc-global-header">
     <Link className="sc-research-brand" href="/"><span><StudioIcon name="chart" size={20} /></span>StockCal</Link>
-    <nav className="sc-research-nav" aria-label="研究工作台导航">
-      {destinations.map(item => <Link key={item.key} id={`research-nav-${item.key}`} href={item.href}
+    <WorkspaceNavigation section={section} activeHref={activeHref} />
+    <div className="sc-research-actions"><Link className="sc-theme-settings-link" href="/settings" aria-label="设置与外观主题">外观</Link><WebAccountButton /></div>
+  </header>
+  {isKnowledge ? <nav className="sc-knowledge-tabs" aria-label="研究工作台导航">
+      {destinations.filter(item => item.key !== 'chart').map(item => <Link key={item.key} id={`research-nav-${item.key}`} href={item.href}
         aria-current={active === item.key ? 'page' : undefined}
         onClick={event => {
-          if (onKnowledgeNavigate && item.key !== 'chart'
+          if (onKnowledgeNavigate
             && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey && event.button === 0) {
             event.preventDefault()
             onKnowledgeNavigate(item.key)
           }
         }}>{item.label}</Link>)}
-    </nav>
-    <div className="sc-research-actions"><span>让每一次判断，都有依据</span><Link className="sc-theme-settings-link" href="/settings" aria-label="设置与外观主题">外观</Link><WebAccountButton /></div>
-  </header>
+    </nav> : null}
+    <WorkspaceNavigation mobile section={section} activeHref={activeHref} />
+  </>
 }

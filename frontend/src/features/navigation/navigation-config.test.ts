@@ -2,18 +2,18 @@ import { describe, expect, test } from 'vitest'
 import { desktopNavigation, mobileNavigation } from './navigation-config'
 
 describe('navigation configuration', () => {
-  test('exposes the approved four workspace destinations', () => {
+  test('exposes the four frequent workspace destinations', () => {
     expect(desktopNavigation.map((item) => item.label)).toEqual([
-      '首页',
+      '趋势',
+      '笔记',
       '分析',
-      '规则',
-      '设置',
+      '交易',
     ])
     expect(mobileNavigation.map((item) => item.label)).toEqual([
-      '首页',
+      '趋势',
+      '笔记',
       '分析',
-      '规则',
-      '设置',
+      '交易',
     ])
   })
 })

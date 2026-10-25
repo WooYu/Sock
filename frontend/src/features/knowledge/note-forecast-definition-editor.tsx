@@ -1,6 +1,8 @@
 'use client'
 
-import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useDialogFocus } from '../ui/use-dialog-focus'
+import { StudioIcon } from '../research/studio-icon'
 import { DEFINITION_FIELDS, DEFINITION_ROLES, definitionError, type DefinitionRole, type ForecastDefinition } from './note-forecast-definitions'
 
 export function ForecastDefinitionEditor({ role, title, initial, error, onSave, onCancel }: {
@@ -30,39 +32,22 @@ export function ForecastDefinitionEditor({ role, title, initial, error, onSave, 
     window.addEventListener('popstate', back)
     return () => window.removeEventListener('popstate', back)
   }, [])
-  useEffect(() => {
-    const previous = document.activeElement as HTMLElement | null
-    panel.current?.querySelector<HTMLTextAreaElement>('textarea')?.focus()
-    const overflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = overflow; if (previous?.isConnected) previous.focus() }
-  }, [])
-  useEffect(() => {
-    if (discard) continueButton.current?.focus()
-    else panel.current?.querySelector<HTMLTextAreaElement>('textarea')?.focus()
-  }, [discard])
+  useDialogFocus(panel, true, cancel)
+  useEffect(() => { if (discard) continueButton.current?.focus({ preventScroll: true }); else if (dirtyRef.current) panel.current?.querySelector<HTMLTextAreaElement>('textarea')?.focus({ preventScroll: true }) }, [discard])
   useEffect(() => {
     const warn = (event: BeforeUnloadEvent) => { if (dirty) { event.preventDefault(); event.returnValue = '' } }
     window.addEventListener('beforeunload', warn)
     return () => window.removeEventListener('beforeunload', warn)
   }, [dirty])
   function cancel() { if (dirty) setDiscard(true); else onCancel() }
-  function keyDown(event: KeyboardEvent<HTMLDivElement>) {
-    if (event.key === 'Escape') { event.preventDefault(); cancel() }
-    if (event.key !== 'Tab') return
-    const nodes = Array.from(panel.current?.querySelectorAll<HTMLElement>('textarea, input, button:not(:disabled)') ?? [])
-    const first = nodes[0], last = nodes.at(-1)
-    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus() }
-    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus() }
-  }
   function save(state: ForecastDefinition['state']) {
     const next = { ...draft, state }
     const problem = definitionError(next) || (!reason.trim() ? '请填写修订说明。' : '')
     setValidation(problem)
     if (!problem) onSave(next, reason)
   }
-  return <div className="nt-modal-backdrop"><div className="nt-editor nt-definition-editor" role="dialog" aria-modal="true" aria-labelledby="nt-definition-title" aria-describedby="nt-definition-help" ref={panel} onKeyDown={keyDown}>
-    <div className="nt-editor-heading"><h2 id="nt-definition-title">{initial ? '编辑定义' : '补充定义'} · {DEFINITION_ROLES[role]}</h2></div>
+  return <div className="nt-modal-backdrop"><div className="nt-editor nt-definition-editor" role="dialog" aria-modal="true" aria-labelledby="nt-definition-title" aria-describedby="nt-definition-help" ref={panel} tabIndex={-1}>
+    <div className="nt-editor-heading"><h2 id="nt-definition-title">{initial ? '编辑定义' : '补充定义'} · {DEFINITION_ROLES[role]}</h2><button className="sc-icon-button" type="button" aria-label="关闭定义编辑" onClick={cancel}><StudioIcon name="close" size={20} /></button></div>
     <p>{title}</p>
     <p id="nt-definition-help" className="nt-muted">先写下明确条件，也可以保存未完成的草稿。定义保存后仍需验证，不会自动启用公式或改变预测。</p>
     <form onSubmit={event => { event.preventDefault(); save('ready') }}>

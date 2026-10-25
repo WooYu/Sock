@@ -11,7 +11,7 @@ describe('AppShell', () => {
 
     expect(screen.getByTestId('desktop-primary-nav')).toBeInTheDocument()
     expect(screen.getByTestId('mobile-primary-nav')).toBeInTheDocument()
-    expect(screen.getByTestId('desktop-primary-nav').querySelector('a[aria-current="page"]')).toHaveTextContent('首页')
+    expect(screen.getByTestId('desktop-primary-nav').querySelector('a[aria-current="page"]')).toHaveTextContent('趋势')
   })
 
   test('uses one visual system regardless of the compatibility tone', () => {
@@ -19,10 +19,10 @@ describe('AppShell', () => {
 
     expect(screen.getByTestId('app-shell')).toHaveClass('sc-shell-unified')
     expect(screen.getByTestId('app-shell')).not.toHaveClass('sc-tone-feed')
-    expect(screen.getByRole('link', { name: '回到总览' })).toHaveTextContent('StockCal')
+    expect(screen.getByRole('link', { name: '回到趋势工作台' })).toHaveTextContent('StockCal')
   })
 
-  test('keeps the primary navigation focused on five workspaces', () => {
+  test('keeps four frequent workspaces and on-demand tools', () => {
     render(<AppShell section="overview" onSectionChange={vi.fn()} />)
 
     expect(screen.getByTestId('desktop-primary-nav').querySelectorAll('a')).toHaveLength(4)
@@ -34,9 +34,9 @@ describe('AppShell', () => {
     const onSectionChange = vi.fn()
     render(<AppShell section="overview" onSectionChange={onSectionChange} />)
 
-    await userEvent.click(screen.getByTestId('mobile-primary-nav').querySelector('a[href="/rules"]')!)
+    await userEvent.click(screen.getByTestId('mobile-primary-nav').querySelector('a[href="/trading/positions"]')!)
 
-    expect(onSectionChange).toHaveBeenCalledWith('rules')
+    expect(onSectionChange).toHaveBeenCalledWith('trading')
   })
 
   test('highlights the concrete workspace destination', () => {
@@ -54,7 +54,7 @@ describe('AppShell', () => {
   test('maps chart and ledger routes back to their primary workspaces', () => {
     const { rerender } = render(<AppShell activeHref="/chart" section="chart" onSectionChange={vi.fn()} />)
 
-    expect(screen.getByTestId('desktop-primary-nav').querySelector('a[href="/analysis/key-levels"]')).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByTestId('desktop-primary-nav').querySelector('a[href="/"]')).toHaveAttribute('aria-current', 'page')
 
     rerender(<AppShell activeHref="/trading/ledger" section="trading" onSectionChange={vi.fn()} />)
 
@@ -75,20 +75,21 @@ describe('AppShell', () => {
 
   test('reference shell renders the stock search field', async () => {
     render(<AppShell section="overview" onSectionChange={vi.fn()} />)
-    expect(screen.getByRole('textbox', { name: '搜索股票' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^搜索股票$/ })).toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: '搜索股票（移动端）' }))
     expect(screen.getByRole('textbox', { name: '股票代码或名称' })).toBeInTheDocument()
   })
 
   test('matches the sample feedback interactions and supports the search shortcut', async () => {
     render(<AppShell section="overview" onSectionChange={vi.fn()} />)
-    const search = screen.getByRole('textbox', { name: '搜索股票' })
 
-    await userEvent.click(screen.getByRole('button', { name: '提醒' }))
-    expect(screen.getByRole('status')).toHaveTextContent('当前没有新增提醒')
+    await userEvent.click(screen.getAllByRole('button', { name: '更多功能' })[0])
+    expect(screen.getByRole('dialog', { name: '更多功能' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /规则库/ })).toHaveAttribute('href', '/rules')
+    await userEvent.keyboard('{Escape}')
 
-    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))
-    expect(search).toHaveFocus()
+    await userEvent.keyboard('{Control>}k{/Control}')
+    expect(await screen.findByRole('textbox', { name: '股票代码或名称' })).toBeInTheDocument()
   })
 
   test('keeps the shared shell class names backed by global styles', () => {
@@ -107,8 +108,9 @@ test('mobile search shortcut focuses the visible input and Escape returns focus'
   try {
     const user = userEvent.setup()
     render(<AppShell section="overview" onSectionChange={vi.fn()} />)
+    screen.getByRole('button', { name: '搜索股票（移动端）' }).focus()
     await user.keyboard('{Control>}k{/Control}')
-    expect(screen.getByRole('textbox', { name: '股票代码或名称' })).toHaveFocus()
+    await vi.waitFor(() => expect(screen.getByRole('textbox', { name: '股票代码或名称' })).toHaveFocus())
     await user.keyboard('{Escape}')
     expect(screen.queryByRole('textbox', { name: '股票代码或名称' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: '搜索股票（移动端）' })).toHaveFocus()

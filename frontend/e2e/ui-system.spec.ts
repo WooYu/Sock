@@ -48,12 +48,12 @@ for (const [name, path] of routes) test(`UI ${name}: readable layout and bounded
     const nav = page.getByRole('navigation', { name: '研究工作台导航' })
     await expect(nav.getByRole('link', { name: '经验原则', exact: true })).toHaveCount(0)
     await expect(nav.getByRole('link', { name: '笔记标签', exact: true })).toHaveAttribute('aria-current', 'page')
-    await expect(nav.getByRole('link')).toHaveCount(4)
+    await expect(nav.getByRole('link')).toHaveCount(3)
   }
   if (name === 'notes') await expect(page.getByLabel('搜索笔记与标签', { exact: true })).toBeVisible()
   if (info.project.name === 'mobile' && ['research', 'knowledge', 'notes', 'samples', 'evidence'].includes(name)) {
-    const nav = page.getByRole('navigation', { name: '研究工作台导航' })
-    expect(await nav.evaluate(element => element.getBoundingClientRect().height)).toBeLessThan(60)
+    const nav = page.getByTestId('mobile-primary-nav')
+    expect(await nav.evaluate(element => element.getBoundingClientRect().height)).toBeLessThan(80)
   }
   await page.screenshot({ path: `artifacts/ui-refresh/${process.env.UI_AUDIT_PHASE ?? 'after'}/${info.project.name}/${name}.png` })
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true)
@@ -69,7 +69,7 @@ test('login dialog validates, reports pending work and returns keyboard focus', 
   const trigger = page.getByRole('button', { name: '登录同步', exact: true })
   await trigger.click()
   const dialog = page.getByRole('dialog', { name: '登录 StockCal' })
-  await expect(dialog.getByLabel('手机号')).toBeFocused()
+  await expect(info.project.name === 'mobile' ? dialog.getByRole('button', { name: '关闭登录' }) : dialog.getByLabel('手机号')).toBeFocused()
   await dialog.getByRole('button', { name: '获取验证码' }).click()
   await expect(dialog.getByRole('alert')).toContainText('11 位手机号')
   await dialog.getByLabel('手机号').fill('13800138000')
@@ -103,30 +103,30 @@ test('login uses the browser proxy and sign out clears both session tokens', asy
 
 test('search shortcut reaches the visible field and empty search has feedback', async ({ page }, info) => {
   await page.goto('/settings')
-  await page.getByRole('button', { name: '登录同步', exact: true }).focus()
+  const trigger = page.getByRole('button', { name: info.project.name === 'mobile' ? '搜索股票（移动端）' : '搜索股票', exact: true })
+  await trigger.focus()
   await page.keyboard.press('Control+k')
-  const input = info.project.name === 'mobile' ? page.getByRole('textbox', { name: '股票代码或名称', exact: true }) : page.getByRole('textbox', { name: '搜索股票', exact: true })
+  const input = page.getByRole('textbox', { name: '股票代码或名称', exact: true })
   await expect(input).toBeFocused()
   await input.press('Enter')
   await expect(page.getByRole('status').filter({ hasText: '请输入股票代码或名称' })).toBeVisible()
-  if (info.project.name === 'mobile') {
-    await input.press('Escape')
-    await expect(input).toHaveCount(0)
-    await expect(page.getByRole('button', { name: '搜索股票（移动端）' })).toBeFocused()
-  }
+  await input.press('Escape')
+  await expect(input).toHaveCount(0)
+  await expect(trigger).toBeFocused()
 })
 
 test('trade modal preserves draft on close and fits the viewport', async ({ page }, info) => {
   await page.goto('/trading/ledger?symbol=600519')
+  await page.getByRole('button', { name: '记录交易', exact: true }).click()
   const dialog = page.getByRole('dialog', { name: '新增交易' })
-  await expect(dialog.getByLabel('交易方向')).toBeFocused()
+  await expect(info.project.name === 'mobile' ? dialog.getByRole('button', { name: '关闭新增交易' }) : dialog.getByLabel('交易股票代码')).toBeFocused()
   await dialog.getByLabel('交易数量').fill('100')
   await dialog.screenshot({ path: `artifacts/ui-refresh/after/${info.project.name}/trade-dialog.png` })
   await page.keyboard.press('Escape')
   await expect(dialog).toHaveCount(0)
   await page.getByRole('button', { name: '记录交易', exact: true }).click()
   await expect(dialog.getByLabel('交易数量')).toHaveValue('100')
-  await dialog.getByRole('button', { name: '取消', exact: true }).focus()
+  await dialog.getByRole('button', { name: '保存交易', exact: true }).focus()
   await page.keyboard.press('Tab')
   await expect(dialog.getByRole('button', { name: '关闭新增交易' })).toBeFocused()
 })
@@ -142,4 +142,25 @@ test('knowledge filters reset and selected records stay readable', async ({ page
   await first.click()
   await expect(first).toHaveAttribute('aria-pressed', 'true')
   await expect(page.getByRole('region', { name: '标签详情', exact: true })).toBeVisible()
+})
+
+
+test('stock name search resolves candidates and recovers from failure without losing the query', async ({ page }, info) => {
+  let fail = true
+  await page.route('**/api/market/search?*', route => fail ? route.fulfill({ status: 503 }) : route.fulfill({ json: [{ code: '600519', name: '贵州茅台', exchange: 'SH' }] }))
+  await page.goto('/settings')
+  await page.getByRole('button', { name: info.project.name === 'mobile' ? '搜索股票（移动端）' : '搜索股票', exact: true }).click()
+  const dialog = page.getByRole('dialog', { name: '搜索股票' })
+  const input = dialog.getByLabel('股票代码或名称', { exact: true })
+  await input.fill('茅台')
+  await expect(dialog.getByRole('status')).toContainText('搜索暂不可用')
+  await expect(input).toHaveValue('茅台')
+  fail = false
+  await dialog.getByRole('button', { name: '重试搜索' }).click()
+  const candidate = dialog.getByRole('link', { name: /贵州茅台/ })
+  await expect(candidate).toHaveAttribute('href', '/analysis/key-levels?symbol=600519')
+  await dialog.screenshot({ path: `artifacts/ui-refresh/after/${info.project.name}/stock-search.png` })
+  await input.press('Enter')
+  await expect(page).toHaveURL(/analysis\/key-levels\?symbol=600519/)
+  await expect(dialog).toHaveCount(0)
 })

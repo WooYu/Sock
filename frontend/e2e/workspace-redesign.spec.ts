@@ -21,7 +21,8 @@ test('product navigation and retired review links use the current workspaces', a
   await page.goto('/overview?symbol=600519')
   const navigation = page.getByTestId(info.project.name === 'desktop' ? 'desktop-primary-nav' : 'mobile-primary-nav')
   await expect(navigation.getByRole('link')).toHaveCount(4)
-  await navigation.getByRole('link', { name: '规则', exact: true }).click()
+  await navigation.getByRole('button', { name: '更多功能', exact: true }).click()
+  await page.getByRole('dialog', { name: '更多功能' }).getByRole('link', { name: /规则库/ }).click()
   await expect(page.getByRole('searchbox', { name: '搜索规则' })).toBeVisible()
   for (const route of ['/review', '/review/daily', '/review/trade', '/review/history', '/review/backtest']) {
     await page.goto(route)
@@ -52,6 +53,7 @@ test('rule drafts persist, retain details and require computable conditions befo
 
 test('saved trades appear in positions and survive navigation and reload', async ({ page }) => {
   await page.goto('/trading/ledger?symbol=600519')
+  await page.getByRole('button', { name: '记录交易', exact: true }).click()
   const dialog = page.getByRole('dialog', { name: '新增交易' })
   await dialog.getByLabel('交易数量').fill('100')
   await dialog.getByLabel('成交价格').fill('1290')

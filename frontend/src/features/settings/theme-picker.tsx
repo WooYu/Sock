@@ -36,8 +36,8 @@ export function ThemePicker() {
     <p className="sc-theme-description">选择适合你的阅读方式，自动记住本机偏好。</p>
     <div className="sc-theme-options" role="group" aria-label="外观主题">
       {([
-        ['c', 'C · 清爽自然', '等线 · 灰绿配色，柔和耐看'],
-        ['d', 'D · 深色科技', '雅黑 · 深蓝青色，突出行情数字'],
+        ['c', 'C · 清爽自然', '柔和灰绿，适合日常阅读'],
+        ['d', 'D · 深色科技', '深蓝青色，适合较暗环境'],
       ] as const).map(([key, title, description]) => <button key={key} type="button"
         className="sc-theme-option" data-palette={key} aria-pressed={theme === key}
         onClick={() => select(key)}>

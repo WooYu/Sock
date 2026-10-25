@@ -3,6 +3,7 @@
 import { ResearchHeader, type KnowledgeView } from '../navigation/research-header'
 import dynamic from 'next/dynamic'
 import { useDeferredValue, useEffect, useMemo, useRef, useState, useSyncExternalStore, type FormEvent } from 'react'
+import { useDialogFocus } from '../ui/use-dialog-focus'
 import { StudioIcon } from '../research/studio-icon'
 import researchPackage from './research-package.json'
 import noteSummary from './note-tag-summary.json'
@@ -199,7 +200,7 @@ export function ExperienceWorkbench({ data = researchPackage as KnowledgePackage
         <div className="kw-summary-note"><StudioIcon name="layers" size={24} /><p><strong>经验 ≠ 可执行规则</strong><span>定义缺失时保持参考；确认解释不代表启用交易。</span></p></div>
       </div> : null}
 
-      {tab !== 'notes' ? <p className="kw-view-caption">{tab === 'samples' ? '保存版本与实际核对' : '原研究更新 ' + data.generatedAt.slice(0, 10)}</p> : null}
+      {tab === 'library' ? <p className="kw-view-caption">原研究更新 {data.generatedAt.slice(0, 10)}</p> : null}
 
       {tab === 'library' ? <div id="kw-panel-library" role="region" aria-label="历史经验记录" className="kw-library">
         <aside className="kw-sidebar" aria-label="记录筛选">
@@ -262,25 +263,7 @@ function EntryEditor({ entry, today, error, onCancel, onSave }: { entry?: Experi
   const [gaps, setGaps] = useState(entry?.gaps.join('\n') ?? '')
   const [errors, setErrors] = useState<ReturnType<typeof validateManualDraft>>({})
   const panel = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const originalFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null
-    panel.current?.querySelector<HTMLElement>(sourceLocked ? '#kw-entry-interpretation' : '#kw-entry-title')?.focus()
-    const onKeyDown = (event: globalThis.KeyboardEvent) => {
-      if (event.key === 'Escape') { event.preventDefault(); onCancel() }
-      if (event.key === 'Tab') {
-        const targets = Array.from(panel.current?.querySelectorAll<HTMLElement>('input, select, textarea, button:not(:disabled), [href]') ?? [])
-        const first = targets[0], last = targets.at(-1)
-        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus() }
-        if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus() }
-      }
-    }
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    window.addEventListener('keydown', onKeyDown)
-    return () => { document.body.style.overflow = previousOverflow; window.removeEventListener('keydown', onKeyDown); originalFocus?.focus() }
-    // The dialog owns focus for its lifetime; the parent callback always closes this instance.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  useDialogFocus(panel, true, onCancel)
   function submit(event: FormEvent) {
     event.preventDefault()
     const next = { ...draft, gaps: lines(gaps) }
@@ -294,7 +277,7 @@ function EntryEditor({ entry, today, error, onCancel, onSave }: { entry?: Experi
     onSave(next)
   }
   const update = <K extends keyof ManualEntryDraft>(key: K, value: ManualEntryDraft[K]) => setDraft((current) => ({ ...current, [key]: value }))
-  return <div className="kw-modal-backdrop"><div className="kw-editor" role="dialog" aria-modal="true" aria-labelledby="kw-editor-title" ref={panel}>
+  return <div className="kw-modal-backdrop"><div className="kw-editor" role="dialog" aria-modal="true" aria-labelledby="kw-editor-title" ref={panel} tabIndex={-1}>
     <header><div><h2 id="kw-editor-title">{sourceLocked ? '修正 AI 解释' : entry ? '编辑为新版本' : '新增记录'}</h2><p>{entry ? `保存为 v${entry.version + 1}，v${entry.version} 仍可在历史中查看。` : '先记下原话，解释和定义可以稍后补充。'}</p></div><button type="button" aria-label="关闭编辑表单" onClick={onCancel}><StudioIcon name="close" size={20} /></button></header>
     <form onSubmit={submit} noValidate>
       <div className="kw-editor-body">
@@ -322,7 +305,7 @@ function BacktestEvidence({ data }: { data: KnowledgePackage }) {
     <dl className="kw-backtest-facts"><div><dt>行情区间</dt><dd>{result.start} — {result.end}</dd></div><div><dt>日 K 样本</dt><dd>{result.sessions} <small>个交易日</small></dd></div><div><dt>留出测试起点</dt><dd>{result.holdoutStart}</dd></div><div><dt>资料生成日期</dt><dd>{data.generatedAt.slice(0, 10)}</dd></div></dl>
     <div className="kw-comparison-heading"><h3>模型对照</h3><p>切换期限后，表格同步展示对应结果。</p><label className="kw-sort">排列方式<select value={sort} onChange={event => setSort(event.target.value)}><option value="default">默认顺序</option><option value="error">价格误差从低到高</option><option value="direction">方向一致率从高到低</option></select></label></div>
     <details className="ls-advanced"><summary>如何读懂这些指标？</summary><p>价格误差 MAPE 越低越好，表示预测价与实际价的平均相对偏差；方向一致率越高，表示涨跌方向判断越准确。“不适用”表示该方法没有方向评分。测试样本是参与该项评价的记录数，不等于盈利次数。</p><p>这里展示新易盛已有的历史研究；学习样本则记录你每次保存计算后的实际核对。</p></details>
-    <div className="kw-table-scroll" tabIndex={0} role="region" aria-label="模型误差对照表"><table><thead><tr><th scope="col">预测方法</th><th scope="col">价格误差 MAPE</th><th scope="col">方向一致率</th><th scope="col">测试样本</th></tr></thead><tbody>{models.map((model) => <tr key={`${model.horizon}-${model.id}`}><th scope="row">{model.label}<small>{model.id}</small></th><td><strong>{model.mape.toFixed(2)}%</strong><div className="kw-metric-track" aria-hidden="true"><i style={{ width: `${Math.max(2, model.mape / maxMape * 100)}%` }} /></div></td><td>{model.direction === null ? <span className="kw-muted">不适用</span> : `${model.direction.toFixed(2)}%`}</td><td>{model.samples}</td></tr>)}</tbody></table>{!models.length ? <p className="kw-empty">当前资料没有这个期限的结果。</p> : null}</div>
+    <div className="kw-table-scroll" tabIndex={0} role="region" aria-label="模型误差对照表"><table className="sc-mobile-record-table"><thead><tr><th scope="col">预测方法</th><th scope="col">价格误差 MAPE</th><th scope="col">方向一致率</th><th scope="col">测试样本</th></tr></thead><tbody>{models.map((model) => <tr key={`${model.horizon}-${model.id}`}><th scope="row">{model.label}<small>{model.id}</small></th><td data-label="价格误差 MAPE"><strong>{model.mape.toFixed(2)}%</strong><div className="kw-metric-track" aria-hidden="true"><i style={{ width: `${Math.max(2, model.mape / maxMape * 100)}%` }} /></div></td><td data-label="方向一致率">{model.direction === null ? <span className="kw-muted">不适用</span> : `${model.direction.toFixed(2)}%`}</td><td data-label="测试样本">{model.samples}</td></tr>)}</tbody></table>{!models.length ? <p className="kw-empty">当前资料没有这个期限的结果。</p> : null}</div>
     <div className="kw-evidence-grid"><section><h3>结果如何理解</h3><ul>{result.findings.map((finding, index) => <li key={index}>{finding}</li>)}</ul></section><section><h3>验证方法</h3><ol>{result.methodology.map((method, index) => <li key={index}>{method}</li>)}</ol></section></div>
     <details className="kw-source-quality"><summary>数据口径与局限</summary><ul>{result.sourceQuality.map((quality, index) => <li key={index}>{quality}</li>)}</ul><p>来源文档 {data.docCount} 份 · 知识版本 <code>{data.sourceCommit}</code></p></details>
   </section>

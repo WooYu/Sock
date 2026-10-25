@@ -1,13 +1,13 @@
 import { expect, test } from './fixtures/test'
 
-test('supplement is discoverable and editor actions stay visible while scrolling', async ({ page }) => {
+test('supplement is discoverable and editor actions stay visible while scrolling', async ({ page }, info) => {
   await page.route('**/api/sync/**', route => route.fulfill({ json: { nextCursor: 0, changes: [], applied: true, cursor: 0 } }))
   await page.goto('/knowledge?view=notes')
   const detail = page.getByRole('region', { name: '标签详情' })
   await page.locator('.nt-secondary-actions > summary').click()
   await detail.getByRole('button', { name: '补充说明', exact: true }).click()
   const dialog = page.getByRole('dialog', { name: '修订笔记标签' })
-  await expect(dialog.getByLabel('补充说明', { exact: true })).toBeFocused()
+  await expect(info.project.name === 'mobile' ? dialog.getByRole('button', { name: '关闭标签编辑' }) : dialog.getByLabel('补充说明', { exact: true })).toBeFocused()
   await expect(dialog.getByLabel('补充说明', { exact: true })).toBeInViewport()
   const cancel = dialog.getByRole('button', { name: '取消标签编辑' })
   const save = dialog.getByRole('button', { name: '保存标签新版本' })

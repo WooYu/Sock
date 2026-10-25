@@ -4,6 +4,7 @@ import { useStockWorkspace } from '../workspace/stock-workspace-provider'
 import type { OperationCycle } from '../workspace/stock-workspace-types'
 
 const cycles: Array<[OperationCycle, string]> = [['short', '短线'], ['swing', '波段'], ['long', '中长线']]
+const statusLabels = { idle: '等待加载', loading: '正在加载', refreshing: '正在更新', ready: '已更新', stale: '显示缓存', error: '更新失败', offline: '离线缓存', searching: '正在搜索' }
 
 export function StockHeader() {
   const workspace = useStockWorkspace()
@@ -22,12 +23,12 @@ export function StockHeader() {
           <h1 className="mt-1 text-2xl font-semibold">{security.name}</h1>
         </div>
         <div className="text-right">
-          <p className="text-2xl font-semibold">{quote?.price ?? '—'}</p>
-          <p className="text-sm text-[var(--sc-muted)]">数据状态：{workspace.status}</p>
+          <p className="text-2xl font-semibold">{formatPrice(quote?.price)}</p>
+          <p className="text-sm text-[var(--sc-muted)]">{statusLabels[workspace.status]}</p>
         </div>
       </div>
       <div className="mt-4 flex flex-wrap gap-2 text-sm text-[var(--sc-muted)]">
-        <span>开 {quote?.open ?? '—'}</span><span>高 {quote?.high ?? '—'}</span><span>低 {quote?.low ?? '—'}</span><span>量 {quote?.volume ?? '—'}</span>
+        <span>开 {formatPrice(quote?.open)}</span><span>高 {formatPrice(quote?.high)}</span><span>低 {formatPrice(quote?.low)}</span><span>量 {quote?.volume == null ? '—' : quote.volume.toLocaleString('zh-CN', { maximumFractionDigits: 0 })}</span>
       </div>
       <div className="mt-4 flex flex-wrap gap-2" aria-label="操作周期">
         {cycles.map(([value, label]) => (
@@ -45,3 +46,5 @@ export function StockHeader() {
     </section>
   )
 }
+
+function formatPrice(value?: number) { return value == null || !Number.isFinite(value) ? '—' : value.toFixed(2) }

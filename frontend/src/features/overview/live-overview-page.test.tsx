@@ -27,7 +27,7 @@ describe('LiveOverviewPage', () => {
     render(<LiveOverviewPage snapshot={snapshot} />)
 
     expect(screen.getByRole('region', { name: '投资决策' })).toHaveClass('sc-decision-primary')
-    expect(screen.getByRole('region', { name: '关键位' })).toBeVisible()
+    expect(screen.getByRole('region', { name: '行情摘要' })).toBeVisible()
     expect(screen.getByRole('region', { name: '下一步' })).toBeVisible()
   })
 

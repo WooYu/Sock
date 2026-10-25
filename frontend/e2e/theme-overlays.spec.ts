@@ -18,13 +18,15 @@ for (const theme of ['c', 'd'] as const) {
     await expect(login).toHaveCSS('background-color', surface)
     expect(await login.evaluate(el => getComputedStyle(el).fontFamily)).toContain(font)
     await expect(login.getByLabel('手机号')).toHaveCSS('background-color', surface)
+    await login.getByLabel('手机号').focus()
     await expect(login.getByLabel('手机号')).toHaveCSS('outline-color', primary)
     await expect(login.getByRole('button', { name: '确认登录' })).toHaveCSS('background-color', primary)
     await login.screenshot({ path: `artifacts/theme-overlays/${info.project.name}/${theme}-login.png` })
     await page.keyboard.press('Escape')
 
     await page.goto('/trading/ledger?symbol=600519')
-    // An empty ledger opens its first-trade dialog automatically.
+  await page.getByRole('button', { name: '记录交易', exact: true }).click()
+    // Start recording only when requested.
     await expect(page.getByRole('dialog', { name: '新增交易' })).toBeVisible()
     const trade = page.getByRole('dialog', { name: '新增交易' })
     await expect(trade).toHaveCSS('background-color', surface)
@@ -45,10 +47,11 @@ for (const theme of ['c', 'd'] as const) {
   test(`theme ${theme}: rule import focus uses the theme accent`, async ({ page }) => {
     await setTheme(page, theme)
     await page.goto('/rules')
+    await page.locator('.sc-page-disclosure > summary').filter({ hasText: '导入股票笔记' }).click()
     const field = page.getByRole('textbox', { name: '粘贴 Markdown', exact: true })
     await field.focus()
     const soft = theme === 'c' ? 'rgb(228, 242, 233)' : 'rgb(32, 62, 73)'
-    expect(await field.evaluate(el => getComputedStyle(el).boxShadow)).toContain(soft)
+    await expect.poll(() => field.evaluate(el => getComputedStyle(el).boxShadow)).toContain(soft)
   })
 
   test(`theme ${theme}: inline forecast follows appearance and keeps curve keys`, async ({ page }, info) => {

@@ -22,9 +22,12 @@ export function AnalysisPage({ tab }: { tab: AnalysisTab }) {
   const hasMarketSnapshot = Boolean(workspace.current ?? workspace.lastSuccessful)
   const initialLoading = !hasMarketSnapshot && (workspace.status === 'loading' || workspace.status === 'refreshing' || (workspace.status === 'idle' && workspace.selectedSymbol))
   const initialError = !hasMarketSnapshot && workspace.status === 'error'
-  const [saved, setSaved] = useState(false)
+  const [savedKey, setSavedKey] = useState('')
+  const [saveError, setSaveError] = useState('')
+  const snapshotKey = `${workspace.current?.symbol}:${workspace.cycle}:${workspace.current?.market.source.fetchedAt}`
+  const saved = savedKey === snapshotKey
   const savePrediction = () => {
-    if (!analysis || !workspace.current) return
+    if (!analysis || !workspace.current || saved) return
     const record: PredictionRecord = {
       id: createRecordId('prediction'),
       symbol: workspace.current.symbol,
@@ -38,16 +41,17 @@ export function AnalysisPage({ tab }: { tab: AnalysisTab }) {
       target: analysis.target,
       reason: analysis.decision.reason,
     }
-    addRecord('predictions', record)
+    setSaveError('')
+    try { addRecord('predictions', record) } catch { setSaveError('本机保存失败，请检查存储权限后重试。'); return }
     void syncRecord('predictions', record).catch(() => undefined)
-    setSaved(true)
+    setSavedKey(snapshotKey)
   }
   return <div className="sc-analysis-page">
     <StockHeader />
-    {!initialLoading && !initialError ? <section aria-label="规则结论" className="sc-analysis-decision"><p className="sc-eyebrow">规则结论</p><strong>{decisionLabel(analysis?.decision.action)}</strong><p>{analysis?.decision.reason ?? '正在等待可计算的规则与行情条件。'}</p>{analysis?.decision.missingFacts.length ? <p>待补充：{analysis.decision.missingFacts.join('、')}</p> : null}<Link href={`/chart${workspace.selectedSymbol ? `?symbol=${workspace.selectedSymbol}` : ''}`}>查看 K 线与预测路径</Link></section> : null}
     <nav aria-label="分析页签" className="sc-analysis-tabs">
       {tabs.map(([value, label]) => <Link aria-current={tab === value ? 'page' : undefined} className={tab === value ? 'is-active' : ''} href={`/analysis/${value}${workspace.selectedSymbol ? `?symbol=${workspace.selectedSymbol}` : ''}`} key={value}>{label}</Link>)}
     </nav>
+    {!initialLoading && !initialError ? <section aria-label="规则结论" className="sc-analysis-decision"><p className="sc-eyebrow">当前结论</p><strong>{decisionLabel(analysis?.decision.action)}</strong><p>{analysis?.decision.reason ?? '正在等待可计算的规则与行情条件。'}</p>{analysis?.decision.missingFacts.length ? <details><summary>查看待补充条件</summary><p>{analysis.decision.missingFacts.join('、')}</p></details> : null}</section> : null}
     <div className="sc-analysis-content">
       {initialLoading ? <MarketLoadingState variant="analysis" /> : initialError ? <MarketFeedback errorMessage={workspace.errorMessage} onRetry={() => void workspace.refresh()} status={workspace.status} /> : <MarketFeedback errorMessage={workspace.errorMessage} hasSnapshot={hasMarketSnapshot} onRetry={() => void workspace.refresh()} status={workspace.status} />}
       {!initialLoading && !initialError && tab === 'key-levels' ? <KeyLevelsPanel analysis={analysis} /> : null}
@@ -56,10 +60,11 @@ export function AnalysisPage({ tab }: { tab: AnalysisTab }) {
       {!initialLoading && !initialError && tab === 'ai' ? <AiStrategyPanel analysis={analysis} /> : null}
     </div>
     <aside aria-label="分析操作" className="sc-analysis-actions sc-context-rail">
-      <button disabled={!analysis} onClick={savePrediction} type="button">保存预测快照</button>
+      <button disabled={!analysis || saved} onClick={savePrediction} type="button">{saved ? '当前快照已保存' : '保存预测快照'}</button>
       <Link href={`/trading/predictions${workspace.selectedSymbol ? `?symbol=${workspace.selectedSymbol}` : ''}`}>查看预测记录</Link>
       <Link href={`/chart${workspace.selectedSymbol ? `?symbol=${workspace.selectedSymbol}` : ''}`}>在专业 K 线中查看</Link>
     </aside>
+    {saveError ? <p role="alert" className="sc-field-error">{saveError}</p> : null}
     {saved ? <p className="sc-analysis-saved" role="status">预测快照已保存</p> : null}
   </div>
 }

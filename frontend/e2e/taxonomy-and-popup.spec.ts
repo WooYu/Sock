@@ -9,6 +9,7 @@ test.beforeEach(async ({ page }) => {
 test('filters and editor contain exactly the new taxonomy', async ({ page }) => {
   await page.goto('/knowledge?view=notes')
   await expect(page.getByRole('heading', { name: '笔记标签目录' })).toBeVisible({ timeout: 60_000 })
+  await page.getByRole('button', { name: '更多筛选', exact: true }).click()
   for (const dimension of taxonomy) {
     const select = page.getByRole('combobox', { name: dimension.label, exact: true })
     await expect(select.locator('option')).toHaveText(['全部', ...dimension.options.map(item => item.label)])
@@ -16,6 +17,7 @@ test('filters and editor contain exactly the new taxonomy', async ({ page }) => 
   for (const label of ['使用目的', '周期', '适用范围', '数据依赖', '可计算性']) {
     await expect(page.getByRole('combobox', { name: label, exact: true })).toHaveCount(0)
   }
+  await page.locator('.nt-secondary-actions > summary').click()
   await page.getByRole('button', { name: '编辑标签', exact: true }).click()
   const editor = page.getByRole('dialog')
   await expect(editor.locator('fieldset')).toHaveCount(2)

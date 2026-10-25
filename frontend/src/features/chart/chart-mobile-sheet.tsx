@@ -1,30 +1,9 @@
 'use client'
 
+import { lockPageScroll } from '../ui/page-scroll-lock'
 import { useEffect, useId, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 
 const focusableSelector = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-let scrollLocks = 0
-let restoreScroll: (() => void) | undefined
-
-function lockPageScroll() {
-  if (!scrollLocks) {
-    const root = document.documentElement
-    const body = document.body
-    const previous = { root: root.style.overflow, body: body.style.overflow, overscroll: root.style.overscrollBehavior, x: window.scrollX, y: window.scrollY }
-    root.style.overflow = 'hidden'
-    body.style.overflow = 'hidden'
-    root.style.overscrollBehavior = 'none'
-    restoreScroll = () => {
-      root.style.overflow = previous.root
-      body.style.overflow = previous.body
-      root.style.overscrollBehavior = previous.overscroll
-      if (window.scrollX !== previous.x || window.scrollY !== previous.y) window.scrollTo({ left: previous.x, top: previous.y, behavior: 'instant' })
-    }
-  }
-  scrollLocks++
-  return () => { if (!--scrollLocks) { restoreScroll?.(); restoreScroll = undefined } }
-}
-
 export function ChartMobileSheet({ title, onClose, children, expanded = false }: { title: string; onClose: () => void; children: ReactNode; expanded?: boolean }) {
   const titleId = `${useId()}-title`
   const dialogRef = useRef<HTMLElement>(null)

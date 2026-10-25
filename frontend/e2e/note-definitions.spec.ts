@@ -2,7 +2,7 @@ import { test, expect } from './fixtures/test'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 
-test('reading view reveals secondary actions and purpose editing only when requested', async ({ page }) => {
+test('reading view reveals secondary actions and purpose editing only when requested', async ({ page }, info) => {
   let extractionRequests = 0
   page.on('request', request => { if (request.url().includes('/api/note-tag-extraction')) extractionRequests++ })
   await page.goto('/knowledge?view=notes')
@@ -17,7 +17,7 @@ test('reading view reveals secondary actions and purpose editing only when reque
   await expect(detail.getByRole('button', { name: 'AI 重新提取标签', exact: true })).toBeVisible()
   expect(extractionRequests).toBe(0)
   await detail.getByRole('button', { name: '补充说明', exact: true }).click()
-  await expect(page.getByRole('dialog').getByLabel('补充说明', { exact: true })).toBeFocused()
+  await expect(info.project.name === 'mobile' ? page.getByRole('button', { name: '关闭标签编辑' }) : page.getByRole('dialog').getByLabel('补充说明', { exact: true })).toBeFocused()
   await page.getByRole('button', { name: '取消标签编辑' }).click()
   await more.click()
   await expect(detail.getByRole('button', { name: '补充说明', exact: true })).not.toBeVisible()
@@ -42,7 +42,7 @@ test('note definitions keep browsing context, survive reload, and retain read-on
   await page.locator('.nt-purpose-disclosure > summary').filter({ hasText: '入场条件' }).click()
   await page.getByRole('button', { name: '补充定义：入场条件' }).click()
   let editor = page.getByRole('dialog')
-  await expect(editor.getByLabel('条件或计算方法')).toBeFocused()
+  await expect(info.project.name === 'mobile' ? editor.getByRole('button', { name: '关闭定义编辑' }) : editor.getByLabel('条件或计算方法')).toBeFocused()
   await editor.getByLabel('条件或计算方法').fill('MA5 向上穿越 MA20，以收盘数据判断。')
   await editor.getByRole('button', { name: '保存草稿' }).click()
   await expect(editor).not.toBeVisible()

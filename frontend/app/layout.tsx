@@ -8,6 +8,7 @@ import "./workspace-polish.css"
 import "./kline-layout.css"
 import "./interface-system.css"
 import "./themes.css"
+import "./interaction-system.css"
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] })
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] })

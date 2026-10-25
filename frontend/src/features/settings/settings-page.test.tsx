@@ -10,7 +10,7 @@ describe('SettingsPage', () => {
 
     expect(screen.getByRole('heading', { name: '设置' })).toBeVisible()
     expect(screen.getByText('行情与数据')).toBeVisible()
-    expect(screen.getByText('本机偏好')).toBeVisible()
+    expect(screen.getByText('记录与同步')).toBeVisible()
   })
 
   test('defines the complete settings card layout instead of browser-default text', () => {

@@ -1,10 +1,12 @@
 import { test, expect } from './fixtures/test'
 import { readFile } from 'node:fs/promises'
+import { openResearch } from './fixtures/chart-workbench'
 
 test('note prices expose roles and source, freeze definitions, restore and export on desktop and mobile', async ({ page }, info) => {
   const errors: string[] = []
   page.on('pageerror', error => errors.push(error.message))
   await page.goto('/?example=1')
+  await openResearch(page)
   const research = page.getByRole('region', { name: '笔记条件价格研究', exact: true })
   await expect(research).toBeVisible({ timeout: 30000 })
   const boundary = research.getByRole('article', { name: '明日收盘站上MA5的临界价' })
@@ -20,6 +22,7 @@ test('note prices expose roles and source, freeze definitions, restore and expor
   const original = await page.evaluate(() => JSON.parse(localStorage.getItem('stockcal.note-price-shadow.v1')!))
   expect(original.records.map((record: { run: { config: { upperMapping: number } } }) => record.run.config.upperMapping)).toEqual([2, 1])
   await page.reload()
+  await openResearch(page)
   await expect(research.getByText('本地冻结记录 · 2 条', { exact: true })).toBeVisible({ timeout: 30000 })
   const downloading = page.waitForEvent('download')
   await research.getByRole('button', { name: '导出笔记影子记录', exact: true }).click()

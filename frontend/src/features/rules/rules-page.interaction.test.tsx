@@ -1,10 +1,11 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { RulesPage } from './rules-page'
 
 describe('RulesPage interactions', () => {
   beforeEach(() => localStorage.clear())
+  afterEach(() => vi.restoreAllMocks())
 
   test('exposes the redesigned rules workspace regions', () => {
     const { container } = render(<RulesPage />)
@@ -24,12 +25,12 @@ describe('RulesPage interactions', () => {
     expect(screen.getByText('破位5日线不做')).toBeInTheDocument()
   })
 
-  test('does not present built-in counts as live statistics while the server request is pending', () => {
+  test('shows counts for the rules currently displayed while shared data is pending', () => {
     render(<RulesPage client={{ list: () => new Promise(() => undefined), toggle: async (_id, enabled) => ({ enabled }) }} />)
 
     const statistics = within(screen.getByLabelText('规则统计'))
-    expect(statistics.getAllByText('—')).toHaveLength(4)
-    expect(statistics.queryByText('10')).not.toBeInTheDocument()
+    expect(statistics.getAllByText('10').length).toBeGreaterThan(0)
+    expect(statistics.getByText('0')).toBeInTheDocument()
   })
 
   test('filters the information-flow list by rule name', async () => {
@@ -78,5 +79,17 @@ describe('RulesPage interactions', () => {
 
     expect(toggle).toHaveBeenCalledWith('builtin-5ma-priority', false)
     expect(screen.getByRole('button', { name: '启用规则 5日线上方优先参与' })).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  test('keeps a rule draft and its inputs available when browser storage rejects the save', async () => {
+    const user = userEvent.setup()
+    render(<RulesPage client={{ list: async () => [], toggle: async (_id, enabled) => ({ enabled }) }} />)
+    await user.click(screen.getByRole('button', { name: '新建规则' }))
+    await user.type(screen.getByLabelText('规则名称'), '保留输入')
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new DOMException('Blocked', 'SecurityError') })
+    await user.click(screen.getByRole('button', { name: '保存规则草稿' }))
+    expect(within(screen.getByRole('dialog', { name: '新建规则' })).getByRole('alert')).toHaveTextContent('本机保存失败')
+    expect(screen.getByLabelText('规则名称')).toHaveValue('保留输入')
+    expect(screen.getByRole('dialog', { name: '新建规则' })).toBeVisible()
   })
 })

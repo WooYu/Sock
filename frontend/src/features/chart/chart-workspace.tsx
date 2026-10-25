@@ -52,7 +52,7 @@ function RecoveryPanel({ records, onRestore }: { records: DrawingRecoveryRecord[
   )
 }
 
-export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', errorMessage, onRetry, variant = 'classic', forecastStatus, forecastError, forecastPanel, forecastReferences, footer, loadSeries, period: controlledPeriod, onPeriodChange }: { snapshot?: MarketSnapshot | null; prediction?: PredictionSnapshot | null; status?: WorkspaceStatus; errorMessage?: string | null; onRetry?: () => void; variant?: 'classic' | 'studio'; forecastStatus?: 'idle' | 'loading' | 'ready' | 'error'; forecastError?: string | null; forecastPanel?: React.ReactNode; forecastReferences?: PriceReference[]; footer?: React.ReactNode; loadSeries?: ChartSeriesLoader; period?: ChartPeriod; onPeriodChange?: (period: ChartPeriod) => void }) {
+export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', errorMessage, onRetry, variant = 'classic', forecastStatus, forecastError, forecastPanel, forecastReferences, footer, loadSeries, period: controlledPeriod, onPeriodChange, researchOpen, onResearchOpenChange }: { snapshot?: MarketSnapshot | null; prediction?: PredictionSnapshot | null; status?: WorkspaceStatus; errorMessage?: string | null; onRetry?: () => void; variant?: 'classic' | 'studio'; forecastStatus?: 'idle' | 'loading' | 'ready' | 'error'; forecastError?: string | null; forecastPanel?: React.ReactNode; forecastReferences?: PriceReference[]; footer?: React.ReactNode; loadSeries?: ChartSeriesLoader; period?: ChartPeriod; onPeriodChange?: (period: ChartPeriod) => void; researchOpen?: boolean; onResearchOpenChange?: (open: boolean) => void }) {
   const isStudio = variant === 'studio'
   const [activeTool, setActiveTool] = useState<ChartTool>('pointer')
   const navigationMode = 'pan'
@@ -352,7 +352,7 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
         </div>
 
         {!isStudio ? <aside aria-label="图层与对象属性" className="sc-kline-side-column sc-chart-right-rail"><ChartLayerPanel layers={layers} onChange={(key, value) => setLayers(old => ({ ...old, [key]: value }))} />{inspector}{recovery}<section className="sc-kline-side-card"><p className="sc-eyebrow">当前观察</p><h2>{snapshot.quote.security.name}</h2><dl><div><dt>现价</dt><dd>{priceText(currentPrice)}</dd></div><div><dt>数据源</dt><dd>{snapshot.source.name}</dd></div><div><dt>更新时间</dt><dd>{new Date(snapshot.source.fetchedAt).toLocaleString('zh-CN')}</dd></div></dl></section></aside> : null}
-        {footer && !fiveDay ? <div className="sc-chart-results">{isStudio ? <details className="rs-workbench-research"><summary><strong>研究结果与依据</strong><span>预测价位 · 笔记规则 · 多周期分析</span></summary>{footer}</details> : footer}</div> : null}
+        {footer && !fiveDay ? <div className="sc-chart-results">{isStudio ? <details className="rs-workbench-research" open={researchOpen} onToggle={event => onResearchOpenChange?.(event.currentTarget.open)}><summary><strong>研究结果与依据</strong><span>预测价位 · 笔记规则 · 多周期分析</span></summary>{footer}</details> : footer}</div> : null}
       </div>
 
 

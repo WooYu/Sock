@@ -1,7 +1,9 @@
 'use client'
 
-import { useDeferredValue, useMemo, useRef, useState, useSyncExternalStore, useEffect, type FormEvent, type KeyboardEvent } from 'react'
+import { useDeferredValue, useMemo, useRef, useState, useSyncExternalStore, useEffect, type FormEvent } from 'react'
 import Link from 'next/link'
+import { useDialogFocus } from '../ui/use-dialog-focus'
+import { StudioIcon } from '../research/studio-icon'
 import dynamic from 'next/dynamic'
 import catalogData from './note-tag-catalog.json'
 import aiTagResults from './note-tag-ai-results.json'
@@ -286,7 +288,7 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
   </section>
 }
 
-function TagEditor({ record, supplementEntry, aiEntry, error, onSave, onCancel }: { record: NoteTagRecord; supplementEntry: boolean; aiEntry: boolean; error: string; onSave: (draft: TagRevisionDraft) => void; onCancel: () => void }) {
+function TagEditor({ record, aiEntry, error, onSave, onCancel }: { record: NoteTagRecord; supplementEntry: boolean; aiEntry: boolean; error: string; onSave: (draft: TagRevisionDraft) => void; onCancel: () => void }) {
   const [tags, setTags] = useState(record.tags)
   const [reason, setReason] = useState(aiEntry ? `采用 ${record.extraction?.models.join(' 与 ') || 'AI'} 从完整原文重新提取的核心标签。` : '')
   const [supplement, setSupplement] = useState(record.supplement ?? '')
@@ -300,20 +302,8 @@ function TagEditor({ record, supplementEntry, aiEntry, error, onSave, onCancel }
   const evidence = useMemo(() => [...new Map([...record.evidence, ...(record.sourceReferences ?? [])].map((item) => [`${item.startLine}:${item.endLine}:${item.quote}`, item])).values()], [record])
   const [sourceIndex, setSourceIndex] = useState(0)
   const panel = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const previous = document.activeElement as HTMLElement | null
-    if (supplementEntry) supplementInput.current?.focus()
-    else panel.current?.querySelector<HTMLElement>('input, select, button')?.focus()
-    return () => { requestController.current?.abort(); if (previous?.isConnected) previous.focus() }
-  }, [supplementEntry])
-  function keyDown(event: KeyboardEvent<HTMLDivElement>) {
-    if (event.key === 'Escape') { event.preventDefault(); onCancel() }
-    if (event.key !== 'Tab') return
-    const nodes = Array.from(panel.current?.querySelectorAll<HTMLElement>('input, select, textarea, button:not(:disabled)') ?? [])
-    const first = nodes[0], last = nodes.at(-1)
-    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus() }
-    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus() }
-  }
+  useDialogFocus(panel, true, onCancel)
+  useEffect(() => () => { requestController.current?.abort() }, [])
   async function suggest() {
     const controller = new AbortController()
     requestController.current = controller
@@ -334,8 +324,8 @@ function TagEditor({ record, supplementEntry, aiEntry, error, onSave, onCancel }
     setSuggestions(null); setAccepted([])
   }
   function submit(event: FormEvent) { event.preventDefault(); onSave({ tags, reason, evidence: evidence[sourceIndex], supplement, supplementEvidence: appliedEvidence }) }
-  return <div className="nt-modal-backdrop"><div className="nt-editor" role="dialog" aria-modal="true" aria-labelledby="nt-editor-title" ref={panel} onKeyDown={keyDown}>
-    <div className="nt-editor-heading"><h2 id="nt-editor-title">修订笔记标签</h2></div>
+  return <div className="nt-modal-backdrop"><div className="nt-editor" role="dialog" aria-modal="true" aria-labelledby="nt-editor-title" ref={panel} tabIndex={-1}>
+    <div className="nt-editor-heading"><h2 id="nt-editor-title">修订笔记标签</h2><button className="sc-icon-button" type="button" aria-label="关闭标签编辑" onClick={onCancel}><StudioIcon name="close" size={20} /></button></div>
     <p>{record.title} · 保存将追加 v{record.version + 1}，原文与旧标签保留。</p>
     <form onSubmit={submit}>
       <div className="nt-editor-body">
