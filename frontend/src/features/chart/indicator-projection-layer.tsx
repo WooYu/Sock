@@ -5,9 +5,9 @@ import type { ChartTransform } from './chart-coordinates'
 import { formatChartTime, indicatorColor, MA_PERIODS, type ChartPeriod, type IndicatorKey, type IndicatorValues, type MaKey } from './chart-periods'
 import { projectionLimitDays, type ProjectionKey, type IndicatorProjection } from './indicator-projection'
 
-type Props = { baseClose?: number; previousClose?: number; limitRatio?: number; times: string[]; estimated?: boolean; ranges?: IndicatorProjection['ranges'][]; historicalCount: number; transform: ChartTransform; period: ChartPeriod; indicators: Partial<Record<IndicatorKey, boolean>>; values: IndicatorValues; interactive: boolean; selectedTime?: string | null; onSelect?: (time: string | null) => void }
+type Props = { baseClose?: number; previousClose?: number; limitRatio?: number; times: string[]; estimated?: boolean; ranges?: IndicatorProjection['ranges'][]; historicalCount: number; transform: ChartTransform; period: ChartPeriod; indicators: Partial<Record<IndicatorKey, boolean>>; values: IndicatorValues; interactive: boolean; selectedTime?: string | null; onSelect?: (time: string | null) => void; showTooltip?: boolean }
 const labels: Record<string, string> = { bollUpper: 'BOLL上', bollMiddle: 'BOLL中', bollLower: 'BOLL下' }
-export function IndicatorProjectionLayer({ baseClose, previousClose, limitRatio, times, estimated, ranges, historicalCount, transform, period, indicators, values, interactive, selectedTime: controlledTime, onSelect }: Props) {
+export function IndicatorProjectionLayer({ baseClose, previousClose, limitRatio, times, estimated, ranges, historicalCount, transform, period, indicators, values, interactive, selectedTime: controlledTime, onSelect, showTooltip = true }: Props) {
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
   const [hoveredTime, setHoveredTime] = useState<string | null>(null)
   const chosenTime = controlledTime === undefined ? selectedTime : controlledTime
@@ -36,7 +36,7 @@ export function IndicatorProjectionLayer({ baseClose, previousClose, limitRatio,
   const textTime = (time: string) => time.startsWith('forecast:') ? `第${times.indexOf(time) + 1}根 · 日期待核实` : formatChartTime(time, period)
   return <g data-testid="indicator-projection" onKeyDown={e => { if (e.key === 'Escape') { selectTime(null); setHoveredTime(null) } }}>
     <rect x={x} y={transform.rect.top} width={transform.rect.left + transform.rect.width - x} height={transform.rect.height} fill="var(--sc-muted)" opacity=".035" pointerEvents="none" />
-    <ChartTooltipFrame x={x + 4} y={transform.rect.top + 15} maxWidth={140} testId="projection-hint">{() => <text fill="var(--sc-muted)" fontSize="12">后4根 · 点选查看</text>}</ChartTooltipFrame>
+    {showTooltip ? <ChartTooltipFrame x={x + 4} y={transform.rect.top + 15} maxWidth={140} testId="projection-hint">{() => <text fill="var(--sc-muted)" fontSize="12">后4根 · 点选查看</text>}</ChartTooltipFrame> : null}
     {times.map((time, i) => <g key={time} data-last-projection={i === times.length - 1 || undefined}>
       <line data-testid="projection-day-line" x1={transform.xForTime(time)} x2={transform.xForTime(time)} y1={transform.rect.top + 20} y2={400} stroke="var(--sc-muted)" strokeDasharray="3 4" opacity=".65" pointerEvents="none" />
       {keys.map(key => { const value = valueAt(key, i); return value != null && withinLimit(value, i) ? <g key={key} pointerEvents="none"><circle data-testid="projection-within-limit" cx={transform.xForTime(time)} cy={transform.yForPrice(value)} r="4" fill={color(key)} stroke="var(--sc-surface)" strokeWidth="1.5"><title>{`${labels[key] ?? key.toUpperCase()} ${value.toFixed(2)} (${percent(value)}) · 涨跌幅限制内`}</title></circle></g> : null })}
@@ -52,7 +52,7 @@ export function IndicatorProjectionLayer({ baseClose, previousClose, limitRatio,
       const px = transform.xForTime(times[selected])
       return <g key={key} pointerEvents="none">{range ? <line x1={px} x2={px} y1={transform.yForPrice(range[0])} y2={transform.yForPrice(range[1])} stroke={color(key)} strokeWidth="3" opacity=".4" /> : null}<circle cx={px} cy={transform.yForPrice(value)} r="3" fill={color(key)} stroke="var(--sc-surface)" /></g>
     }) : null}
-    {selected >= 0 ? <ChartTooltipFrame x={transform.rect.left + 6} y={transform.rect.top + 24} maxWidth={transform.rect.width - 12} testId="projection-tooltip">{availableWidth => <>
+    {showTooltip && selected >= 0 ? <ChartTooltipFrame x={transform.rect.left + 6} y={transform.rect.top + 24} maxWidth={transform.rect.width - 12} testId="projection-tooltip">{availableWidth => <>
       <rect x={0} y={0} width={Math.min(530, availableWidth)} height={92 + keys.length * 23} rx="7" className="sc-chart-tooltip-bg" />
       <text x={10} y={19} className="sc-chart-tooltip-title">{estimated ? '预计 ' : ''}{textTime(times[selected])} · 预测 / 情景区间</text>
       {keys.map((key, i) => {

@@ -30,6 +30,8 @@ export function AutomaticForecastPanel({ forecast, selected, onSelect, rules = [
       cancelAnimationFrame(frame)
       frame = requestAnimationFrame(() => {
         initialAnchorHandled.current = true
+        const disclosure = sectionRef.current?.closest('details')
+        if (disclosure) disclosure.open = true
         sectionRef.current?.scrollIntoView({ block: 'start' })
       })
     }

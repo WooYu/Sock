@@ -1,20 +1,30 @@
 import type { ChartPeriod } from '../chart/chart-types'
-import { MA_COLORS, MA_PERIODS, PERIOD_LABELS, isMinutePeriod, type IndicatorKey } from '../chart/chart-periods'
+import { CHART_PERIODS, PERIOD_LABELS } from '../chart/chart-periods'
 import { StudioIcon } from './studio-icon'
 
-const mainPeriods: ChartPeriod[] = ['intraday', '5day', 'day', 'week', 'month', 'quarter', 'year']
-const minutePeriods: ChartPeriod[] = ['1m', '5m', '15m', '30m', '60m', '120m']
+const mainPeriods: ChartPeriod[] = ['intraday', 'day', 'week', 'month']
+const otherPeriods = CHART_PERIODS.filter(period => !mainPeriods.includes(period))
 
-export function StudioChartControls({ period, onPeriod, indicators, onIndicator, onMaVisibility, maVisible, predictionVisible, onPrediction, onReset, onUndo, onRedo, crosshair, onCrosshair }: { period: ChartPeriod; onPeriod: (period: ChartPeriod) => void; indicators: Record<IndicatorKey, boolean>; onIndicator: (key: IndicatorKey, visible: boolean) => void; maVisible: boolean; onMaVisibility: () => void; predictionVisible: boolean; onPrediction: (visible: boolean) => void; zoom: number; onZoom: (zoom: number) => void; onReset: () => void; onUndo: () => void; onRedo: () => void; crosshair: boolean; onCrosshair: () => void }) {
-  return <div className="rs-chart-controls">
-    <div className="rs-chart-primary-controls">
-      <div role="tablist" aria-label="K线周期" className="rs-periods">{mainPeriods.map((key) => <button type="button" key={key} role="tab" aria-selected={period === key} onClick={() => onPeriod(key)}>{PERIOD_LABELS[key]}</button>)}</div>
-      <select className={`rs-minute-select ${isMinutePeriod(period) ? 'is-active' : ''}`} aria-label="分钟K线周期" value={isMinutePeriod(period) ? period : ''} onChange={(event) => onPeriod(event.target.value as ChartPeriod)}><option value="" disabled>分钟 K 线</option>{minutePeriods.map((key) => <option key={key} value={key}>{PERIOD_LABELS[key]}</option>)}</select>
-      {period !== '5day' ? <label className="rs-prediction-toggle"><input type="checkbox" role="switch" aria-label="未来推演" checked={predictionVisible} onChange={(event) => onPrediction(event.target.checked)} /><span>未来推演</span></label> : null}
+export function StudioChartControls({ period, onPeriod, mode, onMode, onSettings }: {
+  period: ChartPeriod
+  onPeriod: (period: ChartPeriod) => void
+  mode: 'read' | 'draw'
+  onMode: (mode: 'read' | 'draw') => void
+  onSettings: () => void
+}) {
+  return <div className="rs-workbench-controls">
+    <div className="rs-workbench-periods">
+      <div role="tablist" aria-label="K线周期">{mainPeriods.map(key => <button type="button" key={key} role="tab" aria-selected={period === key} onClick={() => onPeriod(key)}>{PERIOD_LABELS[key]}</button>)}</div>
+      <select aria-label="更多K线周期" className={otherPeriods.includes(period) ? 'is-active' : ''} value={otherPeriods.includes(period) ? period : ''} onChange={event => onPeriod(event.target.value as ChartPeriod)}>
+        <option value="" disabled>更多周期</option>{otherPeriods.map(key => <option key={key} value={key}>{PERIOD_LABELS[key]}</option>)}
+      </select>
     </div>
-    {period !== '5day' ? <div className="rs-indicator-master"><button type="button" aria-label="MA总开关" aria-pressed={maVisible} onClick={onMaVisibility}>MA {maVisible ? '开' : '关'}</button><button type="button" aria-label="BOLL总开关" aria-pressed={indicators.boll} onClick={() => onIndicator('boll', !indicators.boll)}>BOLL {indicators.boll ? '开' : '关'}</button><details className="rs-chart-secondary-controls rs-indicator-settings"><summary>均线 / BOLL</summary>
-      <div className="rs-indicators" aria-label="均线与布林指标">{MA_PERIODS.map((value) => { const key = `ma${value}` as const; return <label className={`rs-indicator rs-${key}`} key={key} style={{ color: MA_COLORS[key] }}><input type="checkbox" role="switch" aria-label={`MA${value}`} checked={indicators[key]} onChange={(event) => onIndicator(key, event.target.checked)} /><i /><span>MA{value}</span></label> })}<label className="rs-indicator rs-boll"><input type="checkbox" role="switch" aria-label="BOLL" checked={indicators.boll} onChange={(event) => onIndicator('boll', event.target.checked)} /><i /><span>BOLL</span></label></div>
-    </details></div> : null}
-    <div className="rs-chart-view-controls" aria-label="视图控制"><button title="撤销 Ctrl+Z" aria-label="撤销" className="rs-icon-button" onClick={onUndo} type="button"><StudioIcon name="undo" size={16} /></button><button title="重做 Ctrl+Y" aria-label="重做" className="rs-icon-button" onClick={onRedo} type="button"><StudioIcon name="redo" size={16} /></button><span className="rs-control-divider" /><button aria-label="复位视图" title="复位视图" className="rs-icon-button" onClick={onReset} type="button"><StudioIcon name="refresh" size={16} /></button><button aria-label="十字光标" title="十字光标" aria-pressed={crosshair} className="rs-icon-button" onClick={onCrosshair} type="button"><StudioIcon name="crosshair" size={16} /></button></div>
+    <div className="rs-workbench-mode-row">
+      <div className="rs-workbench-modes" role="group" aria-label="图表操作模式">
+        <button type="button" aria-pressed={mode === 'read'} onClick={() => onMode('read')}><StudioIcon name="chart" size={16} />看图</button>
+        <button type="button" aria-pressed={mode === 'draw'} onClick={() => onMode('draw')}><StudioIcon name="trend-line" size={16} />绘图</button>
+      </div>
+      <button type="button" className="rs-workbench-settings" aria-haspopup="dialog" onClick={onSettings}><StudioIcon name="layers" size={16} />图表设置</button>
+    </div>
   </div>
 }

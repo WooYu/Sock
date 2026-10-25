@@ -1,7 +1,9 @@
 import { expect, test } from './fixtures/test'
+import { openResearch } from './fixtures/chart-workbench'
 
 test('keeps research entry labels and positions stable when switching panels', async ({ page }) => {
   await page.goto('/?example=1')
+  await openResearch(page)
   await expect(page.getByRole('region', { name: '自动 MA/BOLL 预测', exact: true }).getByRole('button', { name: '30分钟', exact: true })).toBeEnabled()
   const tabs = page.getByRole('tablist', { name: '研究依据类型' })
   await tabs.scrollIntoViewIfNeeded()

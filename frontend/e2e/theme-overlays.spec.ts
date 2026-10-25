@@ -51,7 +51,7 @@ for (const theme of ['c', 'd'] as const) {
     expect(await field.evaluate(el => getComputedStyle(el).boxShadow)).toContain(soft)
   })
 
-  test(`theme ${theme}: forecast tooltip follows appearance and keeps curve keys`, async ({ page }, info) => {
+  test(`theme ${theme}: inline forecast follows appearance and keeps curve keys`, async ({ page }, info) => {
     test.setTimeout(90_000)
     await setTheme(page, theme)
     await page.goto('/?example=1')
@@ -59,22 +59,12 @@ for (const theme of ['c', 'd'] as const) {
     await expect(chart).toBeVisible({ timeout: 60_000 })
     await chart.scrollIntoViewIfNeeded()
     const target = page.getByRole('button', { name: /^查看预测/ }).first()
-    if (info.project.name === 'mobile') {
-      await target.dispatchEvent('click')
-      const sheet = page.getByTestId('chart-mobile-sheet')
-      await expect(sheet).toBeVisible()
-      await expect(sheet).toHaveCSS('background-color', theme === 'c' ? 'rgb(252, 254, 252)' : 'rgb(24, 36, 49)')
-      expect(await sheet.evaluate(el => getComputedStyle(el).fontFamily)).toContain(theme === 'c' ? 'DengXian' : 'Microsoft YaHei')
-      await sheet.screenshot({ path: `artifacts/theme-overlays/${info.project.name}/${theme}-forecast-sheet.png` })
-      return
-    }
-    await target.focus()
-    const tooltip = page.getByTestId('projection-tooltip')
-    await expect(tooltip).toBeVisible()
-    await expect(tooltip.locator('.sc-chart-tooltip-bg')).toHaveCSS('fill', theme === 'c' ? 'rgb(252, 254, 252)' : 'rgb(24, 36, 49)')
-    await expect(tooltip.locator('text').nth(1)).toHaveCSS('fill', theme === 'c' ? 'rgb(32, 60, 50)' : 'rgb(230, 237, 245)')
-    expect(await tooltip.locator('text').first().evaluate(el => getComputedStyle(el).fontFamily)).toContain(theme === 'c' ? 'DengXian' : 'Microsoft YaHei')
-    await expect(tooltip.locator('[data-indicator=ma5]')).toHaveAttribute('fill', '#c47a08')
-    await chart.screenshot({ path: `artifacts/theme-overlays/${info.project.name}/${theme}-forecast.png` })
+    await target.click()
+    const values = page.locator('.rs-inline-forecast-details')
+    await expect(values).toBeVisible()
+    expect(await values.evaluate(element => getComputedStyle(element).fontFamily)).toContain(theme === 'c' ? 'DengXian' : 'Microsoft YaHei')
+    await expect(values.locator('[data-indicator=ma5]')).toHaveCSS('color', 'rgb(196, 122, 8)')
+    await expect(page.locator('.rs-workbench')).toHaveCSS('background-color', theme === 'c' ? 'rgb(252, 254, 252)' : 'rgb(24, 36, 49)')
+    await values.screenshot({ path: `artifacts/theme-overlays/${info.project.name}/${theme}-forecast.png` })
   })
 }

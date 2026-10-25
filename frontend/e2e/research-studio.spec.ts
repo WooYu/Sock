@@ -1,4 +1,5 @@
 import { expect, test, type Page } from './fixtures/test'
+import { openResearch, startDrawing } from './fixtures/chart-workbench'
 import { createPreviewData, loadPreviewSeries } from '../src/features/research/preview-data'
 import { aggregateCandles } from '../src/features/chart/chart-math'
 import type { ChartPeriod } from '../src/features/chart/chart-periods'
@@ -35,6 +36,7 @@ async function marketApi(page: Page, failPrediction = false) {
 test.describe('K-line research studio', () => {
   test('shows per-period trend and mode context and supports 15 minute forecasts', async ({ page }, info) => {
     await page.goto('/?example=1')
+    await openResearch(page)
     const panel = page.getByRole('region', { name: '自动 MA/BOLL 预测', exact: true })
     const periods = panel.getByRole('navigation', { name: '预测计算周期' })
     await expect(periods.getByRole('button', { name: '15分钟', exact: true })).toBeEnabled({ timeout: 20000 })
@@ -56,6 +58,7 @@ test.describe('K-line research studio', () => {
 
   test('shows indicator movement and sorts forecast rows', async ({ page }) => {
     await page.goto('/?example=1')
+    await openResearch(page)
     const panel = page.getByRole('region', { name: '自动 MA/BOLL 预测', exact: true })
     const table = panel.getByRole('table', { name: /日线 MA\/BOLL参考位/ })
     await expect(panel.getByLabel('指标排序')).toBeVisible({ timeout: 20000 })
@@ -114,6 +117,7 @@ test.describe('K-line research studio', () => {
     const requested: string[] = []
     page.on('request', request => { if (request.url().includes('/candles?')) requested.push(new URL(request.url()).searchParams.get('period')!) })
     await page.goto('/')
+    await openResearch(page)
     const panel = page.getByRole('region', { name: '自动 MA/BOLL 预测', exact: true })
     await expect(panel.getByRole('button', { name: '30分钟', exact: true })).toBeEnabled()
     expect(requested).toContain('60m')
@@ -123,10 +127,12 @@ test.describe('K-line research studio', () => {
     await expect(table.getByRole('columnheader', { name: /未来第/ })).toHaveCount(4)
     await expect(page.getByTestId('prediction-candle')).toHaveCount(0)
     await expect(page.getByTestId('indicator-projection')).toHaveCount(1)
+    await page.getByRole('button', { name: '图表设置', exact: true }).click()
     await page.getByRole('button', { name: 'MA总开关' }).click()
     await expect(page.locator('[data-chart-layer=indicator] [data-indicator]')).toHaveCount(0)
     await page.getByRole('button', { name: 'MA总开关' }).click()
     await expect(page.locator('[data-chart-layer=indicator] [data-indicator]')).toHaveCount(8)
+    await page.getByRole('button', { name: '关闭图表设置', exact: true }).click()
     await panel.locator('.rs-auto-levels button').first().click()
     await expect(panel.getByRole('region', { name: '所选价位依据' })).toBeVisible()
     await page.getByRole('tab', { name: '笔记规则', exact: true }).click()
@@ -159,10 +165,12 @@ test.describe('K-line research studio', () => {
     await marketApi(page)
     await page.goto('/chart')
     await expect(page.getByTestId('indicator-projection')).toHaveCount(1)
-    await page.getByLabel('桌面绘图工具').getByRole('button', { name: '水平线', exact: true }).click()
+    await startDrawing(page, '水平线')
     await page.getByRole('img', { name: 'K线主图' }).click({ position: { x: 240, y: 150 } })
     await expect(page.getByTestId('annotation-horizontal-line')).toHaveCount(1)
+    await page.getByRole('button', { name: /^对象 / }).click()
     await page.getByLabel('控制点 1 价格').fill('65.10')
+    await page.getByRole('button', { name: '关闭对象属性', exact: true }).click()
     await expect(page.getByTestId('drawing-price-label')).toHaveText('65.10')
     await page.getByRole('button', { name: '撤销', exact: true }).click()
     await expect(page.getByTestId('drawing-price-label')).not.toHaveText('65.10')
@@ -170,8 +178,9 @@ test.describe('K-line research studio', () => {
     await expect(page.getByTestId('drawing-price-label')).toHaveText('65.10')
     await page.reload()
     await expect(page.getByTestId('drawing-price-label')).toHaveText('65.10')
-    await page.getByRole('button', { name: '近期复位', exact: true }).click()
-    await expect(page.getByText(`共 ${sample.market.dailyCandles.length} 根 K 线`)).toBeVisible()
+    await page.getByRole('button', { name: '回到最新', exact: true }).click()
+    await page.locator('.rs-workbench-data > summary').click()
+    await expect(page.getByText(`共 ${sample.market.dailyCandles.length} 根 K 线`, { exact: false })).toBeVisible()
     await page.getByRole('tab', { name: '周线', exact: true }).click()
     await expect(page.getByTestId('annotation-horizontal-line')).toHaveCount(0)
     await expect(page.getByTestId('prediction-candle')).toHaveCount(0)
@@ -179,13 +188,13 @@ test.describe('K-line research studio', () => {
     await expect(page.getByTestId('annotation-horizontal-line')).toHaveCount(1)
   })
 
-  test('shows forecast failure without losing the chart and offers an explicit sample on market failure', async ({ page }, info) => {
+  test('shows forecast failure without losing the chart and offers an explicit sample on market failure', async ({ page }) => {
     await marketApi(page, true)
     await page.goto('/')
     await expect(page.getByRole('img', { name: 'K线主图' })).toBeVisible()
-    if (info.project.name === 'mobile') await page.getByRole('button', { name: '预测详情', exact: true }).click()
-    await expect(page.getByRole('region', { name: info.project.name === 'mobile' ? '预测候选价位' : '自动 MA/BOLL 预测', exact: true }).locator('.rs-auto-levels button').first()).toBeVisible()
-    if (info.project.name === 'mobile') await page.getByRole('button', { name: '关闭预测详情', exact: true }).click()
+    await openResearch(page)
+    await expect(page.getByRole('region', { name: '自动 MA/BOLL 预测', exact: true }).locator('.rs-auto-levels button').first()).toBeVisible()
+    await page.locator('.rs-workbench-research > summary').click()
     await page.route('**/api/market/stocks/*/snapshot', (route) => route.fulfill({ status: 502, json: {} }))
     await page.goto('/?symbol=000001')
     await expect(page.getByRole('button', { name: '先探索示例' })).toBeVisible()
@@ -196,16 +205,17 @@ test.describe('K-line research studio', () => {
     await expect(page.getByTestId('indicator-projection')).toHaveCount(1)
   })
 
-  test('opens the full mobile forecast and keeps drawing tools reachable', async ({ page }, info) => {
-    test.skip(info.project.name !== 'mobile', 'Phone forecast sheet')
+  test('keeps full mobile research and drawing tools directly reachable', async ({ page }, info) => {
+    test.skip(info.project.name !== 'mobile', 'Phone research disclosure')
     await marketApi(page)
     await page.goto('/')
     await expect(page.getByTestId('indicator-projection')).toHaveCount(1)
-    await expect(page.getByRole('navigation', { name: '移动绘图工具' }).getByRole('button', { name: '水平线', exact: true })).toBeVisible()
-    await page.getByRole('button', { name: '预测详情', exact: true }).click()
-    const sheet = page.getByRole('dialog', { name: '预测详情' })
-    await expect(sheet.getByRole('heading', { name: '合并候选价位' })).toBeVisible()
-    await expect(sheet.locator('.rs-auto-levels button').first()).toBeVisible()
+    await startDrawing(page, '水平线')
+    await expect(page.getByRole('navigation', { name: '绘图工具', exact: true }).getByRole('button', { name: '水平线', exact: true })).toBeVisible()
+    await openResearch(page)
+    const panel = page.getByRole('region', { name: '自动 MA/BOLL 预测', exact: true })
+    await expect(panel.locator('.rs-auto-levels button').first()).toBeVisible()
+    await expect(page.getByRole('dialog')).toHaveCount(0)
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true)
   })
 })
@@ -232,7 +242,6 @@ test('navigates continuous history without changing drawings and restores foreca
   await page.mouse.wheel(0, -150)
   await page.keyboard.up('Control')
   await expect.poll(async () => Number(await surface.getAttribute('data-visible-start'))).toBeGreaterThan(start)
-  await page.getByRole('button', { name: '移动图表', exact: true }).click()
   await page.mouse.move(box!.x + box!.width * 0.4, box!.y + box!.height * 0.5)
   await page.mouse.down()
   await page.mouse.move(box!.x + box!.width * 0.7, box!.y + box!.height * 0.5, { steps: 8 })

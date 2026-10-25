@@ -27,28 +27,16 @@ test('filters and editor contain exactly the new taxonomy', async ({ page }) => 
   await editor.getByRole('button', { name: '取消标签编辑' }).click()
 })
 
-test('prediction popup rows match their chart curves', async ({ page }) => {
+test('inline forecast rows match their chart curves', async ({ page }) => {
   await page.goto('/?example=1')
-  const chart = page.getByRole('img', { name: 'K线主图', exact: true })
-  await expect(chart).toBeVisible({ timeout: 90_000 })
-  await chart.scrollIntoViewIfNeeded()
-  const date = page.getByRole('button', { name: /^查看预测/ }).first()
-  await expect(date).toBeVisible({ timeout: 90_000 })
-  await date.dispatchEvent('click')
-  const tooltip = page.getByTestId('projection-tooltip')
-  const mobile = (page.viewportSize()?.width ?? 1000) <= 720
-  if (!mobile) await expect(tooltip).toBeVisible()
+  await page.getByRole('button', { name: /^查看预测/ }).first().click()
+  const details = page.locator('.rs-inline-forecast-details')
+  await expect(details).toBeVisible()
   for (const [key, color] of Object.entries(MA_COLORS)) {
-    await expect(tooltip.locator(`[data-indicator="${key}"]`)).toHaveAttribute('fill', color)
+    expect(await details.locator(`[data-indicator="${key}"]`).evaluate(element => (element as HTMLElement).style.color)).toBe(await page.evaluate(color => { const element = document.createElement('span'); element.style.color = color; return element.style.color }, color))
     await expect(page.locator(`[data-chart-layer="indicator"] [data-indicator="${key}"] path`).first()).toHaveAttribute('stroke', color)
   }
-  await expect(tooltip.locator('[data-indicator="bollUpper"]')).toHaveAttribute('fill', '#6f7fd8')
-  await expect(tooltip.locator('[data-indicator="bollMiddle"]')).toHaveAttribute('fill', MA_COLORS.ma20)
-  await expect(tooltip.locator('[data-indicator="bollLower"]')).toHaveAttribute('fill', '#6f7fd8')
-  const details = page.getByRole('region', { name: '指标预测详情' })
-  if (mobile) {
-    await expect(details.locator('[data-indicator=ma5]').last()).toHaveCSS('color', 'rgb(196, 122, 8)')
-    await details.scrollIntoViewIfNeeded()
-  } else await tooltip.scrollIntoViewIfNeeded()
-  await page.screenshot({ path: test.info().outputPath('popup-colors.png') })
+  await expect(details.locator('[data-indicator=bollUpper]')).toHaveCSS('color', 'rgb(111, 127, 216)')
+  await expect(details.locator('[data-indicator=ma5]')).toHaveCSS('color', 'rgb(196, 122, 8)')
+  await details.screenshot({ path: test.info().outputPath('forecast-colors.png') })
 })

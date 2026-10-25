@@ -1,4 +1,5 @@
 import { expect, test } from './fixtures/test'
+import { openRecords } from './fixtures/chart-workbench'
 import { mkdir } from 'node:fs/promises'
 
 test('four forecast dates expose every MA and solid BOLL on desktop and phone', async ({ page }, info) => {
@@ -19,13 +20,14 @@ test('four forecast dates expose every MA and solid BOLL on desktop and phone', 
   await expect(page.getByRole('button', { name: /^查看预测/ }).nth(3)).toHaveAttribute('aria-pressed', 'true')
   await mkdir('artifacts/indicator-forecast', { recursive: true })
   await details.screenshot({ path: `artifacts/indicator-forecast/${info.project.name}-values.png` })
-  await page.getByRole('combobox', { name: '分钟K线周期' }).selectOption('60m')
+  await page.getByRole('combobox', { name: '更多K线周期' }).selectOption('60m')
   await expect(details.getByRole('button').filter({ hasText: '第' })).toHaveCount(4)
   await details.getByRole('button').filter({ hasText: '第' }).first().click()
-  await expect(details.locator('.rs-forecast-value-grid').last().getByText('MA250', { exact: true })).toBeVisible()
+  await expect(details.locator('.rs-inline-forecast-details .rs-forecast-value-grid').getByText('MA250', { exact: true })).toBeVisible()
   await details.locator('.rs-session-reach > summary').click()
   await expect(details.locator('.rs-session-reach').getByText('MA250', { exact: true })).toBeVisible()
   await expect(page.getByTestId('indicator-projection').locator('tspan').first()).toContainText(/\d{2}:\d{2}/)
+  await openRecords(page)
   await page.locator('.rs-research-journal > summary').click()
   await page.getByLabel('研究状态', { exact: true }).selectOption('研究中')
   await page.getByLabel('下一步做什么', { exact: true }).fill('观察次日收盘')
@@ -35,6 +37,7 @@ test('four forecast dates expose every MA and solid BOLL on desktop and phone', 
   await expect(page.locator('.rs-research-journal article').first()).toContainText('等待均线确认')
   await page.reload()
   await expect(page.locator('.rs-research-journal button[type=submit]')).toBeEnabled()
+  await openRecords(page)
   await page.locator('.rs-research-journal > summary').click()
   await expect(page.locator('.rs-research-journal article').first()).toContainText('跌破前日低点')
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true)

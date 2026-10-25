@@ -1,4 +1,5 @@
 import { expect, test, type Page } from './fixtures/test'
+import { openResearch } from './fixtures/chart-workbench'
 import fixture from './fixtures/scenario-series.json'
 import { loadPreviewSeries } from '../src/features/research/preview-data'
 
@@ -40,6 +41,7 @@ test.describe('multi-period scenario analysis', () => {
     await page.route('**/api/market/stocks/*/snapshot', route => route.fulfill({ json: { quote: { security: { code: '603533', name: '掌阅科技', exchange: 'SH' }, price: 10, previousClose: 10 }, dailyCandles: fixture.day.map(bar => ({ ...bar, open: 10, close: 10, low: 9.9, high: 10.1 })), source: { name: '合成1%平均价验收', fetchedAt: '2026-09-22T08:00:00Z', online: true, state: 'TEST' } } }))
     await page.goto('/?symbol=603533', { waitUntil: 'domcontentloaded' })
     await expect(page).toHaveTitle(/StockCal/)
+    await openResearch(page)
     await page.getByRole('tab', { name: '多周期分析', exact: true }).click()
 
     await page.getByRole('button', { name: '开始多周期分析' }).click()
@@ -93,6 +95,7 @@ test.describe('multi-period scenario analysis', () => {
       expect(level.changeRatio).toBeCloseTo(level.value / 10 - 1)
     }
     await page.reload()
+    await openResearch(page)
     await page.getByRole('tab', { name: '多周期分析', exact: true }).click()
 
     await page.getByRole('button', { name: '开始多周期分析' }).click()
@@ -126,6 +129,7 @@ test.describe('multi-period scenario analysis', () => {
     })
     await page.goto('/?symbol=603533', { waitUntil: 'domcontentloaded' })
     await expect(page.getByRole('heading', { name: '*ST样例', exact: true })).toBeVisible()
+    await openResearch(page)
     await page.getByRole('tab', { name: '多周期分析', exact: true }).click()
 
     await page.getByRole('button', { name: '开始多周期分析' }).click()
@@ -157,6 +161,7 @@ test.describe('multi-period scenario analysis', () => {
     await installScenarioApi(page)
     await page.goto('/?symbol=603533', { waitUntil: 'domcontentloaded' })
     await expect(page).toHaveTitle(/StockCal/)
+    await openResearch(page)
     await page.getByRole('tab', { name: '多周期分析', exact: true }).click()
 
     await page.getByRole('button', { name: '开始多周期分析' }).click()
@@ -180,7 +185,7 @@ test.describe('multi-period scenario analysis', () => {
     await expect(panel.getByRole('button', { name: '继续看30分钟' })).toBeDisabled()
     expect(requestedPeriods).toContain('60m') // Main forecast now precomputes unclear lower periods automatically.
     await panel.getByRole('button', { name: '看1小时' }).click()
-    await expect(page.getByLabel('分钟K线周期', { exact: true })).toHaveValue('60m')
+    await expect(page.getByLabel('更多K线周期', { exact: true })).toHaveValue('60m')
     await expect(panel.getByRole('table', { name: '1小时 MA/BOLL参考位' })).toBeVisible()
     await panel.getByLabel('趋势方向', { exact: true }).selectOption('rising')
     await panel.getByLabel('上涨形态', { exact: true }).selectOption('climbing')
@@ -197,6 +202,7 @@ test.describe('multi-period scenario analysis', () => {
     await panel.getByRole('button', { name: '保存分析快照' }).click()
     await expect(panel.getByText('已保存分析版本1')).toBeVisible()
     await page.reload()
+    await openResearch(page)
     await page.getByRole('tab', { name: '多周期分析', exact: true }).click()
 
     await page.getByRole('button', { name: '开始多周期分析' }).click()
@@ -228,6 +234,7 @@ test.describe('multi-period scenario analysis', () => {
   test('failed_30m_keeps_day_and_hour_evidence', async ({ page }) => {
     await installScenarioApi(page, true)
     await page.goto('/?symbol=603533', { waitUntil: 'domcontentloaded' })
+    await openResearch(page)
     await page.getByRole('tab', { name: '多周期分析', exact: true }).click()
 
     await page.getByRole('button', { name: '开始多周期分析' }).click()
@@ -254,6 +261,7 @@ test.describe('multi-period scenario analysis', () => {
       try { await route.fulfill({ json: { symbol: '603533', period: '60m', adjustment: 'none', kind: 'candles', bars: fixture['60m'], source: { name: '旧股票延迟响应', fetchedAt: '2026-09-22T08:00:00Z', online: true, state: 'TEST' } } }) } catch { /* The old request may already be aborted. */ }
     })
     await page.goto('/?symbol=603533', { waitUntil: 'domcontentloaded' })
+    await openResearch(page)
     await page.getByRole('tab', { name: '多周期分析', exact: true }).click()
 
     await page.getByRole('button', { name: '开始多周期分析' }).click()

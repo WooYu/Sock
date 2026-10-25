@@ -30,6 +30,7 @@ type ChartCanvasProps = {
   showKeyLevels: boolean
   drawings: DrawingObject[]
   showDrawings: boolean
+  editingEnabled?: boolean
   selectedId: string | null
   hoveredDay: string | null
   selectedPredictionDay?: string | null
@@ -50,6 +51,7 @@ type ChartCanvasProps = {
   onPanEnd?: () => void
   panOnPointer?: boolean
   navigationMode?: 'inspect' | 'pan'
+  inspectionTarget?: HTMLElement | null
   onPricePan?: (fraction: number) => void
   onPriceScale?: (factor: number) => void
   onPriceReset?: () => void
@@ -226,7 +228,7 @@ function IndicatorLayer({ indicators, indicatorValues, transform, candles }: Pic
   )
 }
 
-function CrosshairTooltip({ candle, price, index, kind, period, transform, indicators, indicatorValues, referenceClose, cursorX, onDismiss }: Pick<ChartCanvasProps, 'kind' | 'period' | 'transform' | 'indicators' | 'indicatorValues'> & { candle: Candle | PredictionSnapshot['days'][number]; price: number; index: number; referenceClose?: number; cursorX: number; onDismiss: () => void }) {
+function CrosshairTooltip({ candle, price, index, kind, period, transform, indicators, indicatorValues, inspectionTarget, referenceClose, cursorX, onDismiss }: Pick<ChartCanvasProps, 'kind' | 'period' | 'transform' | 'indicators' | 'indicatorValues' | 'inspectionTarget'> & { candle: Candle | PredictionSnapshot['days'][number]; price: number; index: number; referenceClose?: number; cursorX: number; onDismiss: () => void }) {
   const cells: Array<{ label: string; value: string; color?: string }> = kind === 'intraday'
     ? [{ label: '价格', value: priceText(candle.close) }, { label: '均价', value: optionalPriceText('averagePrice' in candle ? candle.averagePrice : undefined), color: 'var(--sc-warning)' }]
     : [{ label: '开', value: priceText(candle.open) }, { label: '高', value: priceText(candle.high) }, { label: '低', value: priceText(candle.low) }, { label: '收', value: priceText(candle.close) }]
@@ -255,6 +257,16 @@ function CrosshairTooltip({ candle, price, index, kind, period, transform, indic
   const maxWidth = transform.rect.width - 12
   const onRight = cursorX < transform.rect.left + transform.rect.width / 2
   const anchorX = onRight ? transform.rect.left + transform.rect.width - 6 : transform.rect.left + 6
+  if (inspectionTarget) {
+    const main = cells.slice(0, kind === 'intraday' ? 2 : 4)
+    const rest = cells.slice(main.length)
+    const renderCells = (items: typeof cells) => items.map(cell => <div key={cell.label}><dt>{cell.color ? <i style={{ background: cell.color }} /> : null}{cell.label}</dt><dd>{cell.value}</dd></div>)
+    return createPortal(<section aria-label="K线数据详情" className="rs-candle-inspection" data-testid="candle-touch-details" onPointerDown={event => event.stopPropagation()} onPointerMove={event => event.stopPropagation()} onClick={event => event.stopPropagation()}>
+      <header><strong>{formatChartTime(candle.day, period)}{'volume' in candle ? '' : ' · 预测'}</strong><button type="button" aria-label="关闭K线数据详情" onClick={onDismiss}>收起</button></header>
+      <dl className="rs-candle-main-values">{renderCells(main)}</dl>
+      <details><summary>涨跌、成交量与指标</summary><dl className="rs-candle-extra-values">{renderCells(rest)}</dl></details>
+    </section>, inspectionTarget)
+  }
   return <ChartTooltipFrame x={anchorX} y={transform.rect.top + 8} maxWidth={maxWidth} testId="crosshair-tooltip">{availableWidth => {
     const width = Math.min(430, availableWidth)
     const x = onRight ? -width : 0
@@ -319,7 +331,7 @@ export function ChartCanvas(props: ChartCanvasProps) {
   const createPointDrawing = (event: ReactMouseEvent<SVGSVGElement>) => {
     if (consumeGestureClick.current) { consumeGestureClick.current = false; return }
     if (props.activeTool === 'pointer' || props.activeTool === 'pan' || props.activeTool === 'trend-line' || props.activeTool === 'rectangle') {
-      if (props.activeTool === 'pointer') { props.onSelectDrawing(null); setCrosshairPoint(svgPoint(event)) }
+      if (props.activeTool === 'pointer') { props.onSelectDrawing(null); pinnedCrosshair.current = true; setCrosshairPoint(svgPoint(event)); props.onSelectProjectionTime?.(null) }
       return
     }
     if (!dataPoint(event).time.startsWith('forecast:')) props.onCreateDrawing(drawing(props.activeTool, [dataPoint(event)]))
@@ -392,7 +404,7 @@ export function ChartCanvas(props: ChartCanvasProps) {
     const end = dataPoint(event)
     if (active.kind !== 'pan' && active.kind !== 'price-axis' && end.time.startsWith('forecast:')) { releaseGestureCapture(active); consumeGestureClick.current = true; return }
     if (active.kind === 'pan') {
-      if (active.moved) consumeGestureClick.current = true
+      if (active.moved || active.direction === 'vertical') consumeGestureClick.current = true
       const finalDelta = (active.lastClientX ?? event.clientX) - event.clientX
       if (active.moved && finalDelta) props.onPan?.(finalDelta)
       if (active.moved) props.onPanEnd?.()
@@ -460,11 +472,13 @@ export function ChartCanvas(props: ChartCanvasProps) {
         else if (Math.abs(dy) > Math.abs(dx) * 1.4) active.direction = 'vertical'
         else return
       }
-      if (active.direction === 'vertical') { setCrosshairPoint(svgPoint(event)); return }
+      if (active.direction === 'vertical') return
       const delta = (active.lastClientX ?? event.clientX) - event.clientX
       if (delta) { props.onPan?.(delta); active.moved = true }
       active.lastClientX = event.clientX
+      if (event.pointerType === 'touch') { pinnedCrosshair.current = false; setCrosshairPoint(null); return }
     }
+    if (event.pointerType === 'touch' && props.navigationMode === 'pan') return
     if (props.crosshair || props.activeTool === 'pointer') setCrosshairPoint(svgPoint(event))
   }
   const handleKeyDown = (event: ReactKeyboardEvent<SVGSVGElement>) => {
@@ -524,13 +538,13 @@ export function ChartCanvas(props: ChartCanvasProps) {
       <HistoricalLayer priceClipId={priceClipId} candles={props.candles} keyLevels={props.keyLevels} showKeyLevels={props.showKeyLevels} transform={props.transform} kind={kind} previousClose={props.previousClose} period={props.period} />
       <g clipPath={`url(#${priceClipId})`}><IndicatorLayer candles={props.candles} indicatorValues={props.indicatorValues} indicators={props.indicators} transform={props.transform} /></g>
       <g data-chart-layer="prediction" clipPath={`url(#${priceClipId})`}>{prediction ? <PredictionLayer hoveredDay={props.hoveredDay} onHoverDay={props.onHoverDay} onSelectDay={props.onSelectPredictionDay} prediction={prediction} selectedDay={props.selectedPredictionDay} transform={props.transform} /> : null}</g>
-      {props.projectedTimes?.length ? <IndicatorProjectionLayer previousClose={props.previousClose} baseClose={props.candles.at(-1)?.close} limitRatio={props.limitRatio} selectedTime={props.selectedProjectionTime} onSelect={props.onSelectProjectionTime} times={props.projectedTimes} estimated={props.projectedEstimated} ranges={props.projectedRanges} historicalCount={props.candles.length} transform={props.transform} period={props.period} indicators={props.indicators} values={props.indicatorValues} interactive={props.activeTool === 'pointer'} /> : null}
-      <g data-chart-layer="drawing">{props.showDrawings ? <DrawingLayer drawings={props.drawings} interactionsDisabled={props.activeTool === 'pan'} onFocusEditor={() => svgRef.current?.focus()} onMoveDrawing={beginDrawingMove} onMovePoint={beginPointMove} onSelect={props.onSelectDrawing} selectedId={props.selectedId} transform={props.transform} /> : null}</g>
+      {props.projectedTimes?.length ? <IndicatorProjectionLayer showTooltip={!props.inspectionTarget} previousClose={props.previousClose} baseClose={props.candles.at(-1)?.close} limitRatio={props.limitRatio} selectedTime={props.selectedProjectionTime} onSelect={props.onSelectProjectionTime} times={props.projectedTimes} estimated={props.projectedEstimated} ranges={props.projectedRanges} historicalCount={props.candles.length} transform={props.transform} period={props.period} indicators={props.indicators} values={props.indicatorValues} interactive={props.activeTool === 'pointer'} /> : null}
+      <g data-chart-layer="drawing">{props.showDrawings ? <DrawingLayer drawings={props.drawings} interactionsDisabled={props.activeTool === 'pan' || props.editingEnabled === false} onFocusEditor={() => svgRef.current?.focus()} onMoveDrawing={beginDrawingMove} onMovePoint={beginPointMove} onSelect={props.onSelectDrawing} selectedId={props.selectedId} transform={props.transform} /> : null}</g>
       {props.onPricePan ? <rect data-price-axis="true" data-testid="price-axis-hit-area" x={props.transform.rect.left + props.transform.rect.width} y={props.transform.rect.top} width={viewBox.width - props.transform.rect.left - props.transform.rect.width} height={props.transform.rect.height} fill="transparent" className="sc-price-axis-hit"><title>上下拖动移动价格 · Shift+拖动缩放 · 双击自动适配</title></rect> : null}
-      <g data-chart-layer="crosshair" pointerEvents="none">{(props.crosshair || props.activeTool === 'pointer') && crosshairPoint && crosshairCandle && crosshairPrice !== null ? <g data-testid="crosshair-layer"><line className="sc-crosshair" x1={props.transform.xForTime(crosshairCandle.day)} x2={props.transform.xForTime(crosshairCandle.day)} y1={props.transform.rect.top} y2={volumeTop + volumeHeight} /><line className="sc-crosshair" x1={props.transform.rect.left} x2={props.transform.rect.left + props.transform.rect.width} y1={props.transform.yForPrice(crosshairPrice)} y2={props.transform.yForPrice(crosshairPrice)} /><g data-testid="crosshair-axis-labels" pointerEvents="none">
+      <g data-chart-layer="crosshair" pointerEvents="none">{(props.crosshair || props.activeTool === 'pointer') && !props.selectedProjectionTime && crosshairPoint && crosshairCandle && crosshairPrice !== null ? <g data-testid="crosshair-layer"><line className="sc-crosshair" x1={props.transform.xForTime(crosshairCandle.day)} x2={props.transform.xForTime(crosshairCandle.day)} y1={props.transform.rect.top} y2={volumeTop + volumeHeight} /><line className="sc-crosshair" x1={props.transform.rect.left} x2={props.transform.rect.left + props.transform.rect.width} y1={props.transform.yForPrice(crosshairPrice)} y2={props.transform.yForPrice(crosshairPrice)} /><g data-testid="crosshair-axis-labels" pointerEvents="none">
         <ChartTooltipFrame x={viewBox.width - 2} y={Math.max(12, Math.min(volumeTop + volumeHeight - 12, crosshairPoint.y))} maxWidth={90} testId="crosshair-price-label">{() => <g><rect x={-82} y={-12} width={82} height={24} rx={4} fill="var(--sc-primary)" /><text x={-7} y={4} textAnchor="end" fill="var(--sc-on-primary)" fontSize={12} fontWeight={600}>{priceText(crosshairPrice)}</text></g>}</ChartTooltipFrame>
         <ChartTooltipFrame x={Math.max(80, Math.min(viewBox.width - 80, props.transform.xForTime(crosshairCandle.day)))} y={volumeTop + volumeHeight + 16} maxWidth={160} testId="crosshair-time-label">{() => <g><rect x={-74} y={-12} width={148} height={24} rx={4} fill="var(--sc-primary)" /><text y={4} textAnchor="middle" fill="var(--sc-on-primary)" fontSize={12} fontWeight={600}>{formatChartTime(crosshairCandle.day, props.period)}</text></g>}</ChartTooltipFrame>
-      </g><CrosshairTooltip onDismiss={() => { pinnedCrosshair.current = false; setCrosshairPoint(null) }} referenceClose={referenceClose} cursorX={crosshairPoint.x} candle={crosshairCandle} price={crosshairPrice} index={crosshairIndex} kind={kind} period={props.period} transform={props.transform} indicators={props.indicators} indicatorValues={props.indicatorValues} /></g> : null}</g>
+      </g><CrosshairTooltip inspectionTarget={props.inspectionTarget} onDismiss={() => { pinnedCrosshair.current = false; setCrosshairPoint(null) }} referenceClose={referenceClose} cursorX={crosshairPoint.x} candle={crosshairCandle} price={crosshairPrice} index={crosshairIndex} kind={kind} period={props.period} transform={props.transform} indicators={props.indicators} indicatorValues={props.indicatorValues} /></g> : null}</g>
     </svg>
   )
 }

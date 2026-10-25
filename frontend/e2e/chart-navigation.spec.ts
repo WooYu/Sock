@@ -1,13 +1,15 @@
 import { expect, test } from './fixtures/test'
 
-test('inspect, deliberate navigation and price axis operate independently', async ({ page }, info) => {
+test('tap, horizontal navigation and price axis work without a navigation mode switch', async ({ page }, info) => {
   test.setTimeout(120_000)
   await page.route('**/api/**', route => route.fulfill({ status: 503, json: { message: '离线交互验证' } }))
   await page.goto('/?example=1')
   const chart = page.getByRole('img', { name: 'K线主图' })
   const surface = page.locator('.sc-kline-chart-surface')
   await expect(chart).toBeVisible({ timeout: 60_000 })
-  await expect(page.getByRole('button', { name: '查看价格', exact: true })).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.getByRole('button', { name: '看图', exact: true })).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.getByRole('navigation', { name: '绘图工具', exact: true })).toHaveCount(0)
+  await page.evaluate(() => { document.documentElement.style.scrollBehavior = 'auto' })
   const initialStart = await surface.getAttribute('data-visible-start')
   const initialEnd = await surface.getAttribute('data-visible-end')
   const zoom = await surface.getAttribute('data-zoom')
@@ -23,11 +25,11 @@ test('inspect, deliberate navigation and price axis operate independently', asyn
   await drag(60, 100)
   await expect(surface).toHaveAttribute('data-visible-start', initialStart!)
   await expect(surface).toHaveAttribute('data-zoom', zoom!)
-  await expect(page.getByTestId('crosshair-tooltip')).toBeVisible()
+  await chart.click({ position: { x: 100, y: 100 } })
+  await expect(page.getByRole('region', { name: 'K线数据详情' })).toBeVisible()
   await page.mouse.wheel(0, 100)
   await expect(surface).toHaveAttribute('data-zoom', zoom!)
 
-  await page.getByRole('button', { name: '移动图表', exact: true }).click()
   await drag(5, 70)
   await expect(surface).toHaveAttribute('data-visible-start', initialStart!)
   await drag(85, 3)
@@ -49,13 +51,6 @@ test('inspect, deliberate navigation and price axis operate independently', asyn
   await page.getByRole('button', { name: '自动价格', exact: true }).click()
   await expect(surface).toHaveAttribute('data-price-auto', 'true')
   await expect(surface).toHaveAttribute('data-price-min', min!)
-  await page.getByRole('button', { name: '查看价格', exact: true }).click()
-  if (info.project.name === 'mobile') {
-    await chart.dispatchEvent('pointerdown', { pointerId: 12, pointerType: 'touch', button: 0, clientX: 150, clientY: 200, bubbles: true })
-    await chart.dispatchEvent('pointerup', { pointerId: 12, pointerType: 'touch', clientX: 150, clientY: 200, bubbles: true })
-    await chart.dispatchEvent('pointerleave', { pointerId: 12, pointerType: 'touch' })
-    await expect(page.getByTestId('crosshair-tooltip')).toBeVisible()
-  }
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
   await page.locator('.sc-kline-chart-panel').screenshot({ path: `artifacts/chart-navigation-${info.project.name}.png` })
 })

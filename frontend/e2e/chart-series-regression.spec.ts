@@ -31,12 +31,17 @@ for (const symbol of ['sh000001', '600519']) {
     const basis = page.getByLabel('价格复权方式')
     const chart = page.getByRole('img', { name: /^(K线|分时)主图$/ })
     await expect(chart).toBeVisible({ timeout: 60_000 })
+    await page.getByRole('button', { name: '图表设置', exact: true }).click()
     await expect(basis).toHaveValue(index ? 'none' : 'qfq')
     if (!index) await basis.selectOption('hfq')
-    for (const period of ['分时', '季线', '分时', '年线', '日线']) {
-      await page.getByRole('tab', { name: period, exact: true }).click()
+    await page.getByRole('button', { name: '关闭图表设置', exact: true }).click()
+    for (const [value, period] of [['intraday', '分时'], ['quarter', '季线'], ['intraday', '分时'], ['year', '年线'], ['day', '日线']]) {
+      if (['quarter', 'year'].includes(value)) await page.getByLabel('更多K线周期').selectOption(value)
+      else await page.getByRole('tab', { name: period, exact: true }).click()
       await expect(chart).toBeVisible()
+      await page.getByRole('button', { name: '图表设置', exact: true }).click()
       await expect(basis).toHaveValue(index || period === '分时' ? 'none' : 'hfq')
+      await page.getByRole('button', { name: '关闭图表设置', exact: true }).click()
       if (period === '分时') {
         await expect(page.getByTestId('intraday-price-line')).toBeVisible()
         if (index) await expect(page.getByTestId('intraday-average-line')).toHaveCount(0)

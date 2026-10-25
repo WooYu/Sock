@@ -1,4 +1,5 @@
 import { expect, test, type Page } from './fixtures/test'
+import { startDrawing, openResearch } from './fixtures/chart-workbench'
 import { createPreviewData, loadPreviewSeries } from '../src/features/research/preview-data'
 import { aggregateCandles } from '../src/features/chart/chart-math'
 import type { ChartPeriod } from '../src/features/chart/chart-periods'
@@ -68,15 +69,14 @@ test('saved trades appear in positions and survive navigation and reload', async
 test('drawing edits, delete confirmation and undo preserve anchored data', async ({ page }, info) => {
   if (info.project.name === 'mobile') await page.setViewportSize({ width: 375, height: 812 })
   await page.goto('/?example=1')
-  const tools = info.project.name === 'mobile' ? page.getByRole('navigation', { name: '移动绘图工具' }) : page.getByLabel('桌面绘图工具')
-  await tools.getByRole('button', { name: '水平线', exact: true }).click()
+  await startDrawing(page, '水平线')
   const chart = page.getByRole('img', { name: 'K线主图', exact: true })
   await chart.scrollIntoViewIfNeeded()
   const box = (await chart.boundingBox())!
   await chart.click({ position: { x: box.width * .5, y: box.height * .4 } })
   const line = page.getByTestId('annotation-horizontal-line')
   await expect(line).toHaveCount(1)
-  if (info.project.name === 'mobile') await page.getByRole('button', { name: '对象属性', exact: true }).click()
+  await page.getByRole('button', { name: /^对象 / }).click()
   const inspector = page.getByRole('region', { name: '对象属性', exact: true })
   const price = (sample.market.dailyCandles.at(-1)!.close + .25).toFixed(2)
   await inspector.getByLabel('控制点 1 价格').fill(price)
@@ -87,7 +87,7 @@ test('drawing edits, delete confirmation and undo preserve anchored data', async
   page.once('dialog', dialog => dialog.accept())
   await inspector.getByRole('button', { name: '删除对象' }).click()
   await expect(line).toHaveCount(0)
-  if (info.project.name === 'mobile') await page.getByRole('button', { name: '关闭对象属性', exact: true }).click()
+  await page.getByRole('button', { name: '关闭对象属性', exact: true }).click()
   await page.getByRole('button', { name: '撤销', exact: true }).click()
   await expect(line).toHaveCount(1)
   await page.reload()
@@ -99,24 +99,28 @@ test('drawing edits, delete confirmation and undo preserve anchored data', async
   await expect(line).toHaveCount(0)
   await page.getByRole('tab', { name: '日线', exact: true }).click()
   await expect(line).toHaveCount(1)
-  if (info.project.name === 'mobile') await page.locator('.rs-chart-controls').screenshot({ path: info.outputPath('mobile-chart-controls.png') })
+  if (info.project.name === 'mobile') await page.locator('.rs-workbench-controls').screenshot({ path: info.outputPath('mobile-chart-controls.png') })
 })
 
-test('mobile forecast and object sheets return to reachable chart tools', async ({ page }, info) => {
-  test.skip(info.project.name !== 'mobile', 'Phone sheet layout')
+test('mobile research, settings and objects return to reachable chart tools', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mobile', 'Phone disclosure and sheet layout')
   await page.goto('/?example=1')
-  await page.getByRole('button', { name: '预测详情', exact: true }).click()
-  const sheet = page.getByRole('dialog', { name: '预测详情', exact: true })
-  await expect(sheet.getByRole('heading', { name: '合并候选价位' })).toBeVisible()
-  await sheet.getByRole('button', { name: '关闭预测详情', exact: true }).click()
-  await expect(sheet).toHaveCount(0)
-  await expect(page.getByRole('button', { name: '预测详情', exact: true })).toBeFocused()
-  const lineTool = page.getByRole('navigation', { name: '移动绘图工具' }).getByRole('button', { name: '水平线', exact: true })
-  await lineTool.scrollIntoViewIfNeeded()
+  await openResearch(page)
+  await expect(page.getByRole('region', { name: '自动 MA/BOLL 预测', exact: true }).getByRole('table', { name: /日线 MA\/BOLL参考位/ })).toBeVisible()
+  await page.locator('.rs-workbench-research > summary').click()
+  await page.getByRole('button', { name: '图表设置', exact: true }).click()
+  const sheet = page.getByRole('dialog', { name: '图表设置', exact: true })
+  await expect(sheet).toBeVisible()
+  await sheet.getByRole('button', { name: '关闭图表设置', exact: true }).click()
+  await expect(page.getByRole('button', { name: '图表设置', exact: true })).toBeFocused()
+  await startDrawing(page, '水平线')
+  const lineTool = page.getByRole('navigation', { name: '绘图工具', exact: true }).getByRole('button', { name: '水平线', exact: true })
   await expect(lineTool).toBeInViewport()
-  await page.getByRole('button', { name: '对象属性', exact: true }).click()
+  await page.getByRole('button', { name: /^对象 / }).click()
   const objects = page.getByRole('dialog', { name: '对象属性', exact: true })
   await expect(objects).toBeVisible()
   await objects.getByRole('button', { name: '关闭对象属性', exact: true }).click()
+  await page.getByRole('button', { name: '看图', exact: true }).click()
+  await expect(page.getByRole('navigation', { name: '绘图工具', exact: true })).toHaveCount(0)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true)
 })
