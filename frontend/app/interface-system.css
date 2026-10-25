@@ -183,8 +183,8 @@ body { background: var(--sc-background); color: var(--sc-foreground); line-heigh
 :is(.sc-shell-unified, .kw-workbench, .rs-studio) [role=alert] { line-height: 1.75; }
 
 /* Modal behavior and appearance are shared; panels retain their own fields. */
-.sc-dialog-backdrop { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 24px; background: var(--sc-backdrop); backdrop-filter: blur(3px); }
-.sc-account-dialog { width: min(100%, 440px); max-height: calc(100dvh - 48px); overflow-y: auto; border: 1px solid var(--sc-border); border-radius: 16px; background: var(--sc-surface); box-shadow: var(--sc-shadow-dialog); padding: 28px; color: var(--sc-foreground); font-size: 14px; line-height: 1.65; }
+.sc-dialog-backdrop { position: fixed; inset: var(--sc-viewport-top, 0px) 0 auto; height: var(--sc-viewport-height, 100dvh); z-index: 120; display: grid; place-items: center; padding: 24px; background: var(--sc-backdrop); backdrop-filter: blur(3px); }
+.sc-account-dialog { width: min(100%, 440px); max-height: calc(var(--sc-viewport-height, 100dvh) - 48px); overflow-y: auto; border: 1px solid var(--sc-border); border-radius: 16px; background: var(--sc-surface); box-shadow: var(--sc-shadow-dialog); padding: 28px; color: var(--sc-foreground); font-size: 14px; line-height: 1.65; }
 .sc-account-dialog > header { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
 .sc-account-dialog h2 { margin: 0; font-size: 23px; font-weight: 700; letter-spacing: -.5px; }
 .sc-account-dialog header p { margin: 8px 0 0; color: var(--sc-muted); }
@@ -278,7 +278,7 @@ body { background: var(--sc-background); color: var(--sc-foreground); line-heigh
   .sc-rules-header { gap: 16px; }
   .sc-rule-card, .sc-rule-editor { padding: 18px; }
   .sc-dialog-backdrop { padding: 16px; }
-  .sc-account-dialog { padding: 24px 20px; max-height: calc(100dvh - 32px); }
+  .sc-account-dialog { padding: 24px 20px; max-height: calc(var(--sc-viewport-height, 100dvh) - 32px); }
   .sc-account-dialog > header { margin-bottom: 20px; }
   :is(.rs-studio, .kw-workbench, .sc-shell-unified) :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]), select, textarea) { font-size: 16px; }
   :is(.rs-studio, .kw-workbench, .sc-shell-unified) :is(button, summary) { min-height: 44px; }

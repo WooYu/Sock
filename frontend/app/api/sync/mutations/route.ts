@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { applySyncMutation, BackendRequestError } from '@/lib/api/backend-client'
 
 export async function POST(request: Request) {
-  const payload = await request.json()
+  const payload = await request.json().catch(() => null)
   if (!payload || typeof payload !== 'object' || typeof payload.idempotencyKey !== 'string' || typeof payload.entityType !== 'string' || typeof payload.entityId !== 'string' || typeof payload.operation !== 'string' || typeof payload.revision !== 'number') {
     return NextResponse.json({ message: '同步变更格式不正确' }, { status: 400 })
   }

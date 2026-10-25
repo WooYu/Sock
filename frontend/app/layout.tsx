@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import type { ReactNode } from "react"
 import { Geist, Geist_Mono } from "next/font/google"
 import { SharedDataSyncProvider } from "@/features/records/shared-data-sync-provider"
+import { VisualViewportProvider } from "@/features/ui/visual-viewport-provider"
 import "./globals.css"
 import "./workspace-polish.css"
 import "./kline-layout.css"
@@ -25,7 +26,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head><script dangerouslySetInnerHTML={{ __html: `(function(){try{document.documentElement.dataset.theme=localStorage.getItem('stockcal-theme')==='d'?'d':'c'}catch(e){}})()` }} /></head>
-      <body className="min-h-full flex flex-col"><SharedDataSyncProvider />{children}</body>
+      <body className="min-h-full flex flex-col"><VisualViewportProvider /><SharedDataSyncProvider />{children}</body>
     </html>
   )
 }
