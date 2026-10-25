@@ -20,7 +20,7 @@
 .nt-record-row { position: relative; border-top: 1px solid var(--sc-surface-muted); }
 .kw-workbench .nt-record { display: grid; gap: 7px; width: 100%; padding: 15px 18px; text-align: left; color: var(--sc-foreground); }
 .nt-record-row > .nt-source-link { position: absolute; right: 18px; bottom: 12px; margin: 0; }
-.nt-record-row .nt-record-status { display: flex; align-items: center; min-height: 34px; padding-right: 104px; }
+.nt-record-row .nt-record-status { display: flex; align-items: center; min-height: 34px; }
 .kw-workbench .nt-record[aria-pressed=true] { background: var(--sc-primary-soft); box-shadow: inset 3px 0 var(--sc-primary); }
 .nt-record strong, .nt-record small { overflow-wrap: anywhere; }
 .nt-record small, .nt-record-status { color: var(--sc-muted); font-size: 12px; }
@@ -224,6 +224,18 @@
 .kw-notes-page .kw-page-heading { align-items: center; gap: 12px; padding: 0 0 18px; }
 .kw-notes-page .kw-page-heading h1 { margin-top: 0; }
 .kw-notes-page .kw-page-heading p { line-height: 1.7; }
+.nt-purpose-disclosure > summary { cursor: pointer; min-height: 48px; gap: 10px; flex-wrap: wrap; border-radius: 8px; }
+.nt-purpose-disclosure > summary::before { content: '›'; color: var(--sc-muted); font-size: 20px; }
+.nt-purpose-disclosure[open] > summary::before { transform: rotate(90deg); }
+.nt-purpose-disclosure > summary strong { flex: 1; }
+.nt-purpose-hint { color: var(--sc-muted); font-size: 12px; }
+.nt-purpose-disclosure[open] .nt-purpose-hint { display: none; }
+.nt-purpose-body { padding-top: 12px; border-top: 1px solid var(--sc-border); }
+.nt-purpose-body > button { margin-bottom: 10px; min-height: 44px; }
+.nt-secondary-actions > summary { cursor: pointer; min-height: 44px; align-content: center; color: var(--sc-muted); }
+.nt-secondary-content { display: grid; gap: 20px; padding-top: 12px; }
+.nt-secondary-content > .nt-detail-card { margin: 0; }
+.nt-purpose-disclosure > summary:focus-visible, .nt-secondary-actions > summary:focus-visible { outline: 2px solid var(--sc-primary); outline-offset: 3px; }
 .nt-updated { flex-shrink: 0; color: var(--sc-muted); font-size: 12px; }
 .nt-top-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--sc-border); }
 .nt-top-toolbar .nt-study-tabs { margin: 0; gap: 4px; padding: 4px; background: var(--sc-surface-hover); border-radius: 10px; }

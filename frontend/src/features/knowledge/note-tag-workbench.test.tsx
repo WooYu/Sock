@@ -12,6 +12,22 @@ beforeEach(() => localStorage.clear())
 afterEach(() => vi.unstubAllGlobals())
 
 describe('note tagging workbench', () => {
+  it('keeps secondary actions and definition controls out of the reading view until requested', () => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    render(<NoteTagWorkbench catalog={fixture} />)
+    expect(screen.getByRole('button', { name: '补充说明' })).not.toBeVisible()
+    expect(screen.getByRole('button', { name: 'AI 重新提取标签' })).not.toBeVisible()
+    expect(screen.queryByRole('button', { name: '重置标签筛选' })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByText('更多操作', { exact: true }))
+    expect(screen.getByRole('button', { name: '补充说明' })).toBeVisible()
+    expect(screen.getByRole('button', { name: 'AI 重新提取标签' })).toBeVisible()
+    expect(fetchMock).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: '查看标签：均线金叉' }))
+    expect(screen.getByRole('button', { name: '补充定义：入场条件' })).not.toBeVisible()
+    fireEvent.click(screen.getByText('入场条件', { selector: 'strong' }))
+    expect(screen.getByRole('button', { name: '补充定义：入场条件' })).toBeVisible()
+  })
   it('edits a forecast definition, retains filters, and restores its draft after reopening', () => {
     render(<NoteTagWorkbench catalog={fixture} />)
     fireEvent.change(screen.getByRole('textbox', { name: '搜索笔记与标签' }), { target: { value: '均线金叉' } })
@@ -151,10 +167,11 @@ describe('note tagging workbench', () => {
     render(<NoteTagWorkbench catalog={fixture} />)
     expect(screen.getByText('增加卖出研究')).toBeInTheDocument()
   })
-  it('opens the selected original from both the catalog and detail heading', () => {
+  it('opens the selected original from the detail heading without repeating links in the catalog', () => {
     render(<NoteTagWorkbench catalog={fixture} />)
     const record = currentTagRecords(fixture.documents, [])[0]
-    const link = screen.getByRole('link', { name: `查看原文：${record.title}` })
+    expect(within(screen.getByRole('region', { name: '笔记目录' })).queryByRole('link')).not.toBeInTheDocument()
+    const link = screen.getByRole('link', { name: '查看原文 ↗' })
     expect(link).toHaveAttribute('href', record.sourceUrl)
     expect(link).toHaveAttribute('target', '_blank')
     expect(within(screen.getByRole('region', { name: '标签详情' })).getByRole('link', { name: '查看原文 ↗' })).toHaveAttribute('href', record.sourceUrl)
@@ -214,6 +231,7 @@ describe('note tagging workbench', () => {
     render(<NoteTagWorkbench catalog={fixture} />)
     await screen.findByRole('button', { name: '确认标签' })
     fireEvent.click(screen.getByRole('button', { name: '确认标签' }))
+    expect(screen.queryByRole('button', { name: '确认标签' })).not.toBeInTheDocument()
     const versions = parseTagLedger(localStorage.getItem(NOTE_TAG_STORAGE_KEY))
     expect(versions.at(-1)?.status).toBe('reviewed')
     expect(versions.at(-1)?.tags).toEqual(activeTagRecord(versions[0]).tags)

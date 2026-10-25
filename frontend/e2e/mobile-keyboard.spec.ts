@@ -42,6 +42,7 @@ test('trade footer stays reachable while its fields scroll above the keyboard', 
 
 test('note editor keeps both actions visible while the keyboard is open', async ({ page }) => {
   await page.goto('/knowledge?view=notes')
+  await page.locator('.nt-secondary-actions > summary').click()
   await page.getByRole('button', { name: '补充说明', exact: true }).click()
   const dialog = page.getByRole('dialog', { name: '修订笔记标签' })
   await openKeyboard(page)

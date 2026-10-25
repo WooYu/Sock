@@ -20,6 +20,7 @@ test('note detail reading, keyboard navigation and AI previews stay coherent', a
   await expect(detail.getByRole('tabpanel', { name: '概览', exact: true })).toBeVisible()
   await detail.screenshot({ path: test.info().outputPath('overview.png') })
 
+  await page.locator('.nt-secondary-actions > summary').click()
   await detail.getByRole('button', { name: 'AI 重新提取标签', exact: true }).click()
   await expect(detail.getByRole('button', { name: '采用本次结果并编辑' })).toBeVisible()
   const source = detail.getByRole('tab', { name: '原文与依据', exact: true })

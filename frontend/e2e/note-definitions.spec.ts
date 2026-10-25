@@ -2,6 +2,35 @@ import { test, expect } from './fixtures/test'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 
+test('reading view reveals secondary actions and purpose editing only when requested', async ({ page }) => {
+  let extractionRequests = 0
+  page.on('request', request => { if (request.url().includes('/api/note-tag-extraction')) extractionRequests++ })
+  await page.goto('/knowledge?view=notes')
+  const detail = page.getByRole('region', { name: '标签详情', exact: true })
+  await expect(detail.getByRole('button', { name: '编辑标签', exact: true })).toBeVisible()
+  await expect(detail.getByRole('button', { name: '补充说明', exact: true })).not.toBeVisible()
+  await expect(detail.getByRole('button', { name: 'AI 重新提取标签', exact: true })).not.toBeVisible()
+  const more = detail.locator('.nt-secondary-actions > summary')
+  await more.focus()
+  await page.keyboard.press('Enter')
+  await expect(detail.getByRole('button', { name: '补充说明', exact: true })).toBeVisible()
+  await expect(detail.getByRole('button', { name: 'AI 重新提取标签', exact: true })).toBeVisible()
+  expect(extractionRequests).toBe(0)
+  await detail.getByRole('button', { name: '补充说明', exact: true }).click()
+  await expect(page.getByRole('dialog').getByLabel('补充说明', { exact: true })).toBeFocused()
+  await page.getByRole('button', { name: '取消标签编辑' }).click()
+  await more.click()
+  await expect(detail.getByRole('button', { name: '补充说明', exact: true })).not.toBeVisible()
+  await page.getByRole('textbox', { name: '搜索笔记与标签' }).fill('01-ma-golden-cross.md')
+  const purpose = detail.locator('.nt-purpose-disclosure > summary').filter({ hasText: '入场条件' })
+  await expect(detail.getByRole('button', { name: '补充定义：入场条件' })).not.toBeVisible()
+  await purpose.focus()
+  await page.keyboard.press('Enter')
+  await expect(detail.getByRole('button', { name: '补充定义：入场条件' })).toBeVisible()
+  await expect(detail.getByRole('link', { name: '查看原文 ↗' })).toBeVisible()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true)
+})
+
 test('note definitions keep browsing context, survive reload, and retain read-only history', async ({ page }, info) => {
   const errors: string[] = []
   page.on('pageerror', error => errors.push(error.message))
@@ -10,6 +39,7 @@ test('note definitions keep browsing context, survive reload, and retain read-on
   const search = page.getByRole('textbox', { name: '搜索笔记与标签' })
   await search.fill('01-ma-golden-cross.md')
   await page.getByRole('button', { name: '查看标签：均线金叉', exact: true }).click()
+  await page.locator('.nt-purpose-disclosure > summary').filter({ hasText: '入场条件' }).click()
   await page.getByRole('button', { name: '补充定义：入场条件' }).click()
   let editor = page.getByRole('dialog')
   await expect(editor.getByLabel('条件或计算方法')).toBeFocused()
@@ -22,6 +52,7 @@ test('note definitions keep browsing context, survive reload, and retain read-on
   await page.reload()
   await search.fill('01-ma-golden-cross.md')
   await page.getByRole('button', { name: '查看标签：均线金叉', exact: true }).click()
+  await page.locator('.nt-purpose-disclosure > summary').filter({ hasText: '入场条件' }).click()
   await page.getByRole('button', { name: '编辑定义：入场条件' }).click()
   editor = page.getByRole('dialog')
   await expect(editor.getByLabel('条件或计算方法')).toHaveValue('MA5 向上穿越 MA20，以收盘数据判断。')
@@ -51,6 +82,7 @@ test('dirty edits require explicit discard and pagination keeps the detail in th
   const list = page.getByRole('region', { name: '笔记目录', exact: true })
   await expect(list.getByRole('button', { name: /^查看标签：/ }).first()).toHaveAttribute('aria-pressed', 'true')
   await page.getByRole('textbox', { name: '搜索笔记与标签' }).fill('01-ma-golden-cross.md')
+  await page.locator('.nt-purpose-disclosure > summary').filter({ hasText: '入场条件' }).click()
   await page.getByRole('button', { name: '补充定义：入场条件' }).click()
   const editor = page.getByRole('dialog')
   await editor.getByLabel('条件或计算方法').fill('尚未保存')
