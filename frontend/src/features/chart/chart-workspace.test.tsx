@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { ChartWorkspace, aggregateCandles } from './chart-workspace'
@@ -26,13 +26,110 @@ const prediction: PredictionSnapshot = {
 const renderChart = () => render(<ChartWorkspace prediction={prediction} snapshot={snapshot} />)
 
 describe('ChartWorkspace', () => {
+  test.each(['qfq', 'hfq'] as const)('persists %s drawings across remounts and isolates price bases', async (adjustment) => {
+    const adjusted = { ...snapshot, adjustment }
+    const view = render(<ChartWorkspace variant="studio" snapshot={adjusted} />)
+    await userEvent.click(within(screen.getByLabelText('桌面绘图工具')).getByRole('button', { name: /^水平线$/ }))
+    fireEvent.click(screen.getByRole('img', { name: 'K线主图' }), { clientX: 300, clientY: 160 })
+    expect(screen.getByTestId('annotation-horizontal-line')).toBeInTheDocument()
+    const saved = loadChartWorkspace(`600519-${adjustment}`, 'day')!
+    expect(saved.drawings).toHaveLength(1)
+    expect(saved.drawings[0].symbol).toBe(`600519-${adjustment}`)
+    await userEvent.selectOptions(screen.getByLabelText('价格复权方式'), 'none')
+    expect(screen.queryByTestId('annotation-horizontal-line')).not.toBeInTheDocument()
+    view.unmount()
+    render(<ChartWorkspace variant="studio" snapshot={adjusted} />)
+    expect(screen.getByTestId('annotation-horizontal-line')).toBeInTheDocument()
+  }, 15000)
+
+  test('ordinary wheel preserves the viewport while Ctrl+wheel zooms around the pointer', () => {
+    const { container } = render(<ChartWorkspace variant="studio" snapshot={snapshot} />)
+    const scroll = container.querySelector('.sc-kline-chart-scroll')!
+    const surface = container.querySelector('.sc-kline-chart-surface')!
+    const initial = surface.getAttribute('data-zoom')
+    const wheel = new WheelEvent('wheel', { deltaY: -100, bubbles: true, cancelable: true })
+    fireEvent(scroll, wheel)
+    expect(wheel.defaultPrevented).toBe(false)
+    expect(surface).toHaveAttribute('data-zoom', initial)
+    fireEvent.wheel(scroll, { deltaY: -100, clientX: 400, ctrlKey: true })
+    expect(surface.getAttribute('data-zoom')).not.toBe(initial)
+  })
+
+  test('manual price navigation leaves time bounds intact and auto restores the price domain', () => {
+    const { container } = render(<ChartWorkspace variant="studio" snapshot={snapshot} />)
+    const surface = container.querySelector('.sc-kline-chart-surface')!
+    const initialMin = surface.getAttribute('data-price-min')
+    const initialEnd = surface.getAttribute('data-visible-end')
+    const axis = screen.getByTestId('price-axis-hit-area')
+    const chart = screen.getByRole('img', { name: 'K线主图' })
+    fireEvent.pointerDown(axis, { pointerId: 11, clientX: 930, clientY: 120 })
+    fireEvent.pointerMove(chart, { pointerId: 11, clientX: 930, clientY: 150 })
+    fireEvent.pointerUp(chart, { pointerId: 11, clientX: 930, clientY: 150 })
+    expect(surface).toHaveAttribute('data-price-auto', 'false')
+    expect(surface.getAttribute('data-price-min')).not.toBe(initialMin)
+    expect(surface).toHaveAttribute('data-visible-end', initialEnd)
+    fireEvent.click(screen.getByRole('button', { name: '自动价格' }))
+    expect(surface).toHaveAttribute('data-price-auto', 'true')
+    expect(surface).toHaveAttribute('data-price-min', initialMin)
+  })
+
+  test('retains the stock adjustment preference across minute and calendar periods', async () => {
+    const loadSeries = vi.fn<import('./use-chart-series').ChartSeriesLoader>(async (symbol, period, _signal, adjustment) => ({
+      symbol, period, adjustment: adjustment!, kind: period === 'intraday' ? 'intraday' : 'candles',
+      bars: period === 'intraday' ? snapshot.dailyCandles.slice(0, 2).map((bar, i) => ({ ...bar, day: `2026-09-01T09:3${i}:00+08:00` })) : aggregateCandles(snapshot.dailyCandles, period),
+      source: snapshot.source, limitedHistory: true,
+    }))
+    render(<ChartWorkspace variant="studio" snapshot={snapshot} loadSeries={loadSeries} />)
+    const basis = screen.getByLabelText('价格复权方式')
+    expect(basis).toHaveValue('qfq')
+    await waitFor(() => expect(screen.getByRole('img', { name: 'K线主图' })).toBeInTheDocument())
+    await userEvent.selectOptions(basis, 'hfq')
+    await userEvent.click(screen.getByRole('tab', { name: '分时' }))
+    expect(basis).toHaveValue('none')
+    expect(basis).toBeDisabled()
+    await waitFor(() => expect(screen.getByTestId('intraday-price-line')).toBeInTheDocument())
+    await userEvent.click(screen.getByRole('tab', { name: '季线' }))
+    expect(basis).toHaveValue('hfq')
+    expect(basis).toBeEnabled()
+    await waitFor(() => expect(screen.getByRole('img', { name: 'K线主图' })).toBeInTheDocument())
+    expect(screen.queryByText('返回的股票或周期与请求不一致')).not.toBeInTheDocument()
+  })
+
+  test('ignores legacy cached index averages so intraday prices retain a useful vertical scale', async () => {
+    const index = { ...snapshot, quote: { ...snapshot.quote, security: { code: 'sh000001', name: '上证指数' } } }
+    const loadSeries: import('./use-chart-series').ChartSeriesLoader = async (symbol, period) => ({
+      symbol, period, adjustment: 'none', kind: 'intraday',
+      bars: [3710, 3658].map((price, i) => ({ day: `2026-09-01T09:3${i}:00+08:00`, open: price, high: price, low: price, close: price, volume: 100, averagePrice: 14 })),
+      previousClose: 3713, source: snapshot.source, limitedHistory: true,
+    })
+    render(<ChartWorkspace variant="studio" snapshot={index} period="intraday" loadSeries={loadSeries} />)
+    await waitFor(() => expect(screen.getByTestId('intraday-price-line')).toBeInTheDocument())
+    expect(screen.queryByTestId('intraday-average-line')).not.toBeInTheDocument()
+    expect(screen.getByLabelText('价格复权方式')).toBeDisabled()
+    expect(screen.getByText('指数无需复权，各周期统一使用原始点位')).toBeInTheDocument()
+  })
+
+  test('accepts_external_period_and_reports_toolbar_changes', async () => {
+    const onPeriodChange = vi.fn()
+    const loadSeries = async (symbol: string, period: import('./chart-periods').ChartPeriod) => ({
+      symbol, period, adjustment: 'none' as const, kind: 'candles' as const, bars: period === 'day' ? snapshot.dailyCandles
+        : snapshot.dailyCandles.slice(0, 3).map((bar, i) => ({ ...bar, day: '2026-09-01T' + ['10:30', '11:30', '14:00'][i] + ':00+08:00' })),
+      source: snapshot.source, limitedHistory: true,
+    })
+    const { rerender } = render(<ChartWorkspace variant="studio" snapshot={snapshot} period="60m" onPeriodChange={onPeriodChange} loadSeries={loadSeries} />)
+    expect(screen.getByLabelText('分钟K线周期')).toHaveValue('60m')
+    await userEvent.selectOptions(screen.getByLabelText('分钟K线周期'), '30m')
+    expect(onPeriodChange).toHaveBeenCalledWith('30m')
+    rerender(<ChartWorkspace variant="studio" snapshot={snapshot} period="30m" onPeriodChange={onPeriodChange} loadSeries={loadSeries} />)
+    expect(screen.getByLabelText('分钟K线周期')).toHaveValue('30m')
+  })
   test('reveals a saved marker outside the current window from the drawing list', async () => {
     saveChartWorkspace(workspaceFixture({ drawings: [drawingFixture({ kind: 'text', text: '早期观察', points: [{ time: snapshot.dailyCandles[0].day, price: 1430 }] })] }))
     render(<ChartWorkspace variant="studio" prediction={prediction} snapshot={snapshot} />)
-    await userEvent.click(screen.getByRole('button', { name: '30 根' }))
+    await userEvent.click(screen.getByRole('button', { name: '放大图表' }))
     await userEvent.click(screen.getByRole('tab', { name: /绘图与图层/ }))
     await userEvent.click(within(screen.getByRole('region', { name: '已保存的绘图' })).getByRole('button', { name: /早期观察/ }))
-    expect(screen.getByRole('button', { name: '全部' })).toHaveAttribute('aria-pressed', 'true')
+    expect(document.querySelector('.sc-kline-chart-surface')).toHaveAttribute('data-visible-start', '0')
   })
   test('keeps a drag-created trend line selected through the browser follow-up click', async () => {
     render(<ChartWorkspace variant="studio" prediction={prediction} snapshot={snapshot} />)
@@ -47,7 +144,7 @@ describe('ChartWorkspace', () => {
   test('keeps an older anchored horizontal line visible when narrowing the history window', async () => {
     saveChartWorkspace(workspaceFixture({ drawings: [drawingFixture({ points: [{ time: snapshot.dailyCandles[0].day, price: 1430 }] })] }))
     render(<ChartWorkspace variant="studio" prediction={prediction} snapshot={snapshot} />)
-    await userEvent.click(screen.getByRole('button', { name: '30 根' }))
+    await userEvent.click(screen.getByRole('button', { name: '放大图表' }))
     expect(screen.getByTestId('annotation-horizontal-line')).toBeInTheDocument()
     expect(screen.getByTestId('drawing-price-label')).toHaveTextContent('1430.00')
   })

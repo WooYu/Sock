@@ -1,0 +1,21 @@
+{
+  "verified": true,
+  "sampleDays": 60,
+  "formulaReferences": 3240,
+  "mergedGroups": 1480,
+  "priceComparisons": 4916,
+  "sourceSha256": "4ed1ad37756d99395b7cc6e2221759874c23b9ad55c08a40e174a0e2388d72bb",
+  "checks": [
+    "all input prefixes stop before their target day",
+    "all three formulas independently recomputed with Python",
+    "complete-link 1% groups and means checked",
+    "bands, exclusions, cents and complete price sets checked",
+    "strict <1% and exact-price comparisons recomputed with Fraction",
+    "per-day and aggregate denominators checked",
+    "candidate frozen before validation ledger",
+    "training and validation target dates disjoint",
+    "no live or intraday performance claimed"
+  ],
+  "possibleSpecialSessionDates": [],
+  "scopeLimit": "verifies this 60-day retrospective evidence; not source authority, market prediction advantage or profits"
+}

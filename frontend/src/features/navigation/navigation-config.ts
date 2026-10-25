@@ -24,7 +24,6 @@ export const desktopNavigation: NavigationItem[] = [
   { section: 'overview', label: '首页', href: '/', icon: 'home' },
   { section: 'analysis', label: '分析', href: '/analysis/key-levels', icon: 'analysis' },
   { section: 'rules', label: '规则', href: '/rules', icon: 'rules' },
-  { section: 'review', label: '复盘', href: '/review/daily', icon: 'review' },
   { section: 'settings', label: '设置', href: '/settings', icon: 'settings' },
 ]
 
@@ -32,6 +31,5 @@ export const mobileNavigation: NavigationItem[] = [
   { section: 'overview', label: '首页', href: '/', icon: 'home' },
   { section: 'analysis', label: '分析', href: '/analysis/key-levels', icon: 'analysis' },
   { section: 'rules', label: '规则', href: '/rules', icon: 'rules' },
-  { section: 'review', label: '复盘', href: '/review/daily', icon: 'review' },
   { section: 'settings', label: '设置', href: '/settings', icon: 'settings' },
 ]

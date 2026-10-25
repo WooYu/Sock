@@ -1,0 +1,97 @@
+/* C and D follow docs/typography-color-preview.html. */
+:root, :root[data-theme="c"] {
+  color-scheme: light;
+  --sc-background: #f1f5f2;
+  --sc-foreground: #203c32;
+  --sc-surface: #fcfefc;
+  --sc-surface-muted: #edf3ee;
+  --sc-surface-hover: #e4eee7;
+  --sc-border: #d5e2d9;
+  --sc-border-strong: #a7bfb0;
+  --sc-muted: #526b60;
+  --sc-text-muted: #526b60;
+  --sc-primary: #176b52;
+  --sc-primary-hover: #10543f;
+  --sc-primary-soft: #e4f2e9;
+  --sc-on-primary: #fcfefc;
+  --sc-focus: #176b52;
+  --sc-gain: #c93f50;
+  --sc-loss: #087e66;
+  --sc-warning: #876014;
+  --sc-warning-soft: #faf2df;
+  --sc-danger: #bc3347;
+  --sc-danger-soft: #fcebed;
+  --sc-success: #08785f;
+  --sc-success-soft: #e4f2e9;
+  --sc-font-body: "DengXian", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --sc-font-numeric: "DengXian", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --sc-shadow: 0 3px 14px rgb(32 60 50 / 4%);
+  --sc-shadow-dialog: 0 20px 70px rgb(15 35 26 / 22%);
+  --sc-backdrop: rgb(15 35 26 / 46%);
+}
+:root[data-theme="d"] {
+  color-scheme: dark;
+  --sc-background: #101923;
+  --sc-foreground: #e6edf5;
+  --sc-surface: #182431;
+  --sc-surface-muted: #1d2d3c;
+  --sc-surface-hover: #26394a;
+  --sc-border: #344558;
+  --sc-border-strong: #5c738b;
+  --sc-muted: #a2b3c7;
+  --sc-text-muted: #a2b3c7;
+  --sc-primary: #67dce8;
+  --sc-primary-hover: #8de8f1;
+  --sc-primary-soft: #203e49;
+  --sc-on-primary: #101923;
+  --sc-focus: #67dce8;
+  --sc-gain: #ff8798;
+  --sc-loss: #62d7b0;
+  --sc-warning: #ebc574;
+  --sc-warning-soft: #3a3122;
+  --sc-danger: #ff8798;
+  --sc-danger-soft: #402b38;
+  --sc-success: #62d7b0;
+  --sc-success-soft: #203d36;
+  --sc-font-body: "Microsoft YaHei", "PingFang SC", sans-serif;
+  --sc-font-numeric: "Bahnschrift", "Microsoft YaHei", sans-serif;
+  --sc-shadow: 0 3px 14px rgb(0 0 0 / 12%);
+  --sc-shadow-dialog: 0 20px 70px rgb(0 0 0 / 50%);
+  --sc-backdrop: rgb(0 0 0 / 60%);
+}
+html[data-theme] {
+  --font-geist-sans: var(--sc-font-body);
+  --font-geist-mono: var(--sc-font-numeric);
+  --soft-line: var(--sc-border);
+  --rise-soft: var(--sc-danger-soft);
+  --fall-soft: var(--sc-success-soft);
+}
+body { font-family: var(--sc-font-body); }
+button, input, select, textarea { font-family: inherit; }
+.rs-stock-price, .rs-quote-facts dd, .sc-trading-stat-card > p:last-child {
+  font-family: var(--sc-font-numeric);
+  font-variant-numeric: tabular-nums;
+}
+::selection { background: var(--sc-primary-soft); color: var(--sc-foreground); }
+.sc-theme-section { grid-column: 1 / -1; }
+.sc-theme-description { margin: 18px 20px 0; color: var(--sc-muted); font-size: 14px; }
+.sc-theme-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 16px 20px 20px; }
+.sc-theme-option { display: grid; gap: 8px; border: 1px solid var(--sc-border-strong); border-radius: 12px; padding: 20px; text-align: left; background: var(--sc-surface); color: var(--sc-foreground); cursor: pointer; }
+.sc-theme-option:hover { background: var(--sc-surface-hover); }
+.sc-theme-option[aria-pressed="true"] { border-color: var(--sc-primary); box-shadow: 0 0 0 1px var(--sc-primary); background: var(--sc-primary-soft); }
+.sc-theme-option > span:not(.sc-theme-swatches) { font-size: 13px; color: var(--sc-muted); }
+.sc-theme-option small { color: var(--sc-primary); font-size: 12px; }
+.sc-theme-swatches { display: flex; gap: 6px; margin-bottom: 6px; }
+.sc-theme-swatches i { width: 32px; height: 12px; border-radius: 4px; border: 1px solid rgb(128 128 128 / 30%); }
+[data-palette="c"] .sc-theme-swatches i:nth-child(1) { background: #f1f5f2; }
+[data-palette="c"] .sc-theme-swatches i:nth-child(2) { background: #203c32; }
+[data-palette="c"] .sc-theme-swatches i:nth-child(3) { background: #176b52; }
+[data-palette="d"] .sc-theme-swatches i:nth-child(1) { background: #101923; }
+[data-palette="d"] .sc-theme-swatches i:nth-child(2) { background: #e6edf5; }
+[data-palette="d"] .sc-theme-swatches i:nth-child(3) { background: #67dce8; }
+.sc-theme-settings-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding-inline: 12px; border-radius: 8px; color: var(--sc-muted); font-size: 13px; }
+.sc-theme-settings-link:hover { color: var(--sc-primary); background: var(--sc-primary-soft); }
+@media (max-width: 540px) { .sc-theme-options { grid-template-columns: 1fr; } }
+
+/* SVG labels and native popovers use the same typeface as the surrounding UI. */
+svg text, dialog, [role="dialog"], [popover] { font-family: var(--sc-font-body); }

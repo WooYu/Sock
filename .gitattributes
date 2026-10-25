@@ -1,0 +1,6 @@
+# Frozen research hashes refer to the committed LF bytes, including on Windows.
+/notes/** text eol=lf
+/research/zhangyue-scenario-v1/note-study-2026-10-16/*.json text eol=lf
+/frontend/src/features/knowledge/note-tag-catalog.json text eol=lf
+/frontend/src/server/note-study-seed.json text eol=lf
+/backend/src/main/resources/scenario/note-tag-ids.json text eol=lf

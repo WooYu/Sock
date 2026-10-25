@@ -1,0 +1,1065 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-16T16:27:46.420903+00:00",
+  "sourceCommit": "0014c94a6225dd23f8313d9b166cacae2e633df3",
+  "sourceRepository": "https://github.com/WooYu/Sock/tree/agent/local-first-watchlist/notes",
+  "sourceCatalogSha256": "b7005d1ea19d42c4378bdcc026a7aca429c99043579fa370af31af7b853f45c1",
+  "intent": "Read every note semantically and propose source-backed calculation-related tags and conditions; no product activation or proof of prediction improvement.",
+  "documents": [
+    {
+      "file": "01-ma-golden-cross.md",
+      "bytes": 157,
+      "lineCount": 1,
+      "sourceHash": "02c05834d53b07623d0ad1056d256d6149c4a3679c69d5484eaf648c15722402"
+    },
+    {
+      "file": "02-ma-death-cross.md",
+      "bytes": 100,
+      "lineCount": 1,
+      "sourceHash": "89ba2fb5198f4798536e38bc8632159f4d89ce46d3eeb49696e7349ca09f7af1"
+    },
+    {
+      "file": "03-stop-loss.md",
+      "bytes": 106,
+      "lineCount": 1,
+      "sourceHash": "95dca677c3a277fac9962a59a759669e46aae4594f8ea9331fd09cb2f8c602d1"
+    },
+    {
+      "file": "04-position-sizing.md",
+      "bytes": 110,
+      "lineCount": 1,
+      "sourceHash": "ff098791ebbe324bf40601389a9531487aec969da3ab70638267113bfbe10e38"
+    },
+    {
+      "file": "05-breakout-buy.md",
+      "bytes": 106,
+      "lineCount": 1,
+      "sourceHash": "94edf9eeb016fa24d5a1a93a599a3fb9c56cc88fd1def00d41a270928b3d1be4"
+    },
+    {
+      "file": "06-trend-filter.md",
+      "bytes": 116,
+      "lineCount": 1,
+      "sourceHash": "dd895a26d47f94d86e719c082666a3acb03432d55eba2e72cc6843bcda6b669b"
+    },
+    {
+      "file": "1234.md",
+      "bytes": 128,
+      "lineCount": 10,
+      "sourceHash": "613c02a5837657351b976a9aca25a91bf4f75ddfe7175cbad25e5b83f111860d"
+    },
+    {
+      "file": "2021 台历.md",
+      "bytes": 1566,
+      "lineCount": 9,
+      "sourceHash": "fc2583df242cf53da40ff275cd3c2547433cc180239f98cde8b35ae96a23b670"
+    },
+    {
+      "file": "20220908_收盘_关于参数的计算.md",
+      "bytes": 6053,
+      "lineCount": 45,
+      "sourceHash": "f2d79d08910e9919c5bbc98e77e0b0f5c553a8a237c2133cfbb06764e2fb3e80"
+    },
+    {
+      "file": "20220913_参数的算法.md",
+      "bytes": 2304,
+      "lineCount": 26,
+      "sourceHash": "2509541908f70f4dfd46c7ea02ba44fb4e96d7710aba7659f27e28bd40f5b875"
+    },
+    {
+      "file": "20220913_收盘_关于长线下跌趋势个股的底部博弈问题.md",
+      "bytes": 1651,
+      "lineCount": 22,
+      "sourceHash": "9debff5268a08faae43d7998d725ca2d68f7e5e65d295f29cb6172ad0b45c7f9"
+    },
+    {
+      "file": "20220915_午盘_三分法分析板块冷热.md",
+      "bytes": 7948,
+      "lineCount": 57,
+      "sourceHash": "8f2e396d35d87763cc37e26dc29ca6f767e66eb33b30c8ecac8bcfd660438ce9"
+    },
+    {
+      "file": "20220915_收盘_月线炒股法.md",
+      "bytes": 5755,
+      "lineCount": 45,
+      "sourceHash": "9e5c5f704bf2304960de07da7d09d19645a69e3f4d1b19ca8ced7414e31bc3ca"
+    },
+    {
+      "file": "20220916_午盘_破五断头后反抽五日线.md",
+      "bytes": 208,
+      "lineCount": 11,
+      "sourceHash": "1890849e63891b8277be4165829ee8a249e1f05b299c51eacb5c6c60fea2ffed"
+    },
+    {
+      "file": "20220916_早盘_关键点和目标位心态调整.md",
+      "bytes": 327,
+      "lineCount": 19,
+      "sourceHash": "d1461dc6382d08281f6e8114b413b0ba3d83f02e656808d8ea62e49fea2e170a"
+    },
+    {
+      "file": "20221108_晚评_葛兰碧第四天大涨大跌日.md",
+      "bytes": 7625,
+      "lineCount": 57,
+      "sourceHash": "c4a595396c3fafbea98e8d92ce0a306f9db54bb4f71e63ddf6d0e81bdc57f7bf"
+    },
+    {
+      "file": "20221111-早盘-复合型摸线照镜子算参数.md",
+      "bytes": 5939,
+      "lineCount": 41,
+      "sourceHash": "ec7a97a48a66bd5cf7ed3105d96bb064f6c46948dd473be0544d25957efd6f58"
+    },
+    {
+      "file": "20221117-早餐-今天回档五日线-原始文件.md",
+      "bytes": 166,
+      "lineCount": 9,
+      "sourceHash": "72bdf53dfe378e85976ec4e71ae4efebe0060fb84f3d923e99277cceb266ee74"
+    },
+    {
+      "file": "20221117-早餐-今天回档五日线.md",
+      "bytes": 45403,
+      "lineCount": 281,
+      "sourceHash": "bfd9030aa0987b45150015d1e0abc9a1a4d214a4db3a36edb607ccc6d46df3b6"
+    },
+    {
+      "file": "20221221-早盘-海龟+二转三等于博弈.md",
+      "bytes": 212,
+      "lineCount": 9,
+      "sourceHash": "faded143d20db2e74634b46fc53061ff80459ae2862f95e7bd03de516143937e"
+    },
+    {
+      "file": "20221223 午餐 葛兰碧第二天反弹.md",
+      "bytes": 204,
+      "lineCount": 9,
+      "sourceHash": "5e8cfd7cd225577e4671e027b555e86f3893e1fac04f6eeba0b322e29d090766"
+    },
+    {
+      "file": "20221223 早餐 葛兰碧的时候顺便看看开口几天.md",
+      "bytes": 240,
+      "lineCount": 9,
+      "sourceHash": "98099cab3a338b77b5e63803ded38f2a5dc0d954b8dd39d02943aace9b210930"
+    },
+    {
+      "file": "2025-03-21 三期走势.md",
+      "bytes": 339,
+      "lineCount": 6,
+      "sourceHash": "77174af4652a290bec1907e6d7ef3aa8701ab0e88f3a3a8971db28a6d05862ea"
+    },
+    {
+      "file": "202509 ximi开课 - 831晚上拆k线直播.md",
+      "bytes": 38138,
+      "lineCount": 906,
+      "sourceHash": "2cd7d43b72741d97b8322ca20b0b0c476f95209a7daf356604bf622a5cc04ec3"
+    },
+    {
+      "file": "20250901晚评.md",
+      "bytes": 18361,
+      "lineCount": 50,
+      "sourceHash": "4d35bdffe6883e963cfe75b361740ca6dbadd1797f6b472fd1c7be4683bda5be"
+    },
+    {
+      "file": "20250902-再接再厉再创辉煌.md",
+      "bytes": 18664,
+      "lineCount": 66,
+      "sourceHash": "e1a35823805ea9f143df44bc6fce3d94bf5e5bfc3db8336ccfb9f6155b83c179"
+    },
+    {
+      "file": "20250903-三期震荡确立.md",
+      "bytes": 17532,
+      "lineCount": 8,
+      "sourceHash": "7cd7098ebb407ea87cc2566591ed0144cac2c0942b5d22f0b720b18bdd99b3f7"
+    },
+    {
+      "file": "20250904-###为什么没有葛二很重要###.md",
+      "bytes": 23285,
+      "lineCount": 17,
+      "sourceHash": "cf0801b81ca3812b932b6ba1100d0120f8d5f4685e39cde859d27da3ded9d03c"
+    },
+    {
+      "file": "20250905-晚小白的挣钱法 海龟战法千股跌停出现.md",
+      "bytes": 31416,
+      "lineCount": 852,
+      "sourceHash": "7699104c27466813803da94d317ae25f26cc4a12e8f6a47e3cd677aae7dc82f1"
+    },
+    {
+      "file": "20250908-晚-5日线破位要走.md",
+      "bytes": 12898,
+      "lineCount": 332,
+      "sourceHash": "4bb6c1b9554177e856c9710c95fb8041afe09def9509e17aa386dad2401444bc"
+    },
+    {
+      "file": "20250908-晚两天反弹葛二各种形态.md",
+      "bytes": 22786,
+      "lineCount": 470,
+      "sourceHash": "afaa924d05f67c384053e1fc28767f50c479a5a82bc9deb7353ed4ab10acffff"
+    },
+    {
+      "file": "20250909-晚海龟锂电池-案例分析.md",
+      "bytes": 30265,
+      "lineCount": 708,
+      "sourceHash": "7e6da045286230bf26d9f6cecc75de9817ef091bdc14bfcc49c3b1ad627ee83e"
+    },
+    {
+      "file": "20250910-锂电池按照计划进行（前三天后三天算参数）.md",
+      "bytes": 28488,
+      "lineCount": 16,
+      "sourceHash": "71daf097ea7080147052b9b2eec447d577443bc3d51ef3a90bb88fee63871f2b"
+    },
+    {
+      "file": "20250911-科技股三期回升...参数的验证（前三后三，预期的预期）.md",
+      "bytes": 20833,
+      "lineCount": 532,
+      "sourceHash": "e58321b1e3a666bb43b8f81809bbed3850172e13ea64dde12419d41b4e62f26a"
+    },
+    {
+      "file": "20250912晚 顶部怎么确认.md",
+      "bytes": 5553,
+      "lineCount": 114,
+      "sourceHash": "a7cab414782dddfc7585061dcc50df0d8cbf2eaf7ce005b84d04d7d73516d39b"
+    },
+    {
+      "file": "20250915-晚破位之后再起行情问题和三期震荡模式.md",
+      "bytes": 20488,
+      "lineCount": 420,
+      "sourceHash": "5e9589081ebb959c1283dedea49e49ce124627c7296c1b483561e3274bce784b"
+    },
+    {
+      "file": "20250916-晚－三期参数.md",
+      "bytes": 15515,
+      "lineCount": 10,
+      "sourceHash": "8ab2e71fbbc743e89709e5baff1b9700777fbde28dbe598678d21fbc5f27aaf0"
+    },
+    {
+      "file": "20250917-晚.md",
+      "bytes": 15649,
+      "lineCount": 11,
+      "sourceHash": "9163dae729fcd1fa8dec87df50c08daccb9af0cff9566eaa9a2f0af4e5e526cd"
+    },
+    {
+      "file": "32.5.md",
+      "bytes": 282,
+      "lineCount": 10,
+      "sourceHash": "466aa0142da6fcb3a09b191165e51b905e18bbd1ababbbbbf30c45206eb8d57d"
+    },
+    {
+      "file": "5日线.md",
+      "bytes": 219,
+      "lineCount": 10,
+      "sourceHash": "ebe91370fd09443c1b0cac114546424431618cdd4299e631c0fc13d3c05c0d3b"
+    },
+    {
+      "file": "A股权重.md",
+      "bytes": 320,
+      "lineCount": 6,
+      "sourceHash": "3516eb206346f00ff1a5d4de779b916c7de98a3f82f7a5457dedd8e92d8cf623"
+    },
+    {
+      "file": "三期开口的标识.md",
+      "bytes": 106,
+      "lineCount": 6,
+      "sourceHash": "94c982bfbe3756c56d3ff6001548d2ceff53fcb567e73359235099cd4b082b4a"
+    },
+    {
+      "file": "上证指数.md",
+      "bytes": 551,
+      "lineCount": 19,
+      "sourceHash": "8ca206f67f948ad8cca687ea8d8a48ae018c6a29ee6a963418bd6c2732060a05"
+    },
+    {
+      "file": "下跌三部曲.md",
+      "bytes": 154,
+      "lineCount": 10,
+      "sourceHash": "d29618961d2e1e41783b3b64beff9893b0b297e6dcd4a2fc7626a51e00d172ea"
+    },
+    {
+      "file": "下跌扭转.md",
+      "bytes": 104,
+      "lineCount": 6,
+      "sourceHash": "a7ba7cad8abac49ff2c76c0293aa42ee55d1f4bc997840daa77c77fe06b3b3c8"
+    },
+    {
+      "file": "不做原则.md",
+      "bytes": 206,
+      "lineCount": 8,
+      "sourceHash": "d85726380b8fd3389ef516b972ca817ef7e1a59a149fb8d6a249def496da860a"
+    },
+    {
+      "file": "中国芯片.md",
+      "bytes": 236,
+      "lineCount": 6,
+      "sourceHash": "08aac619b8e3a9c6e20c45414ef5e32903d7173b966b103f9b8e55db9b57606b"
+    },
+    {
+      "file": "主力切换.md",
+      "bytes": 117,
+      "lineCount": 6,
+      "sourceHash": "716370a3239bc47f480e7137924f7ac11db54f4dc3cf3d71a3d113ec7b6dd628"
+    },
+    {
+      "file": "买卖模式24678.md",
+      "bytes": 755,
+      "lineCount": 40,
+      "sourceHash": "0c5eade4a3e4b50159872f7dadad0131501275f598768db2b6a6331c9b723723"
+    },
+    {
+      "file": "买股原则.md",
+      "bytes": 530,
+      "lineCount": 22,
+      "sourceHash": "83c73a5ea098fa2cccaade2a743fed0a140751027dad8ca47e943741e59166b9"
+    },
+    {
+      "file": "买股原则2.md",
+      "bytes": 9248,
+      "lineCount": 110,
+      "sourceHash": "468799a1fbd8e0ce02cb570d75637af745d99b21862552b27b4aa7f562be25de"
+    },
+    {
+      "file": "二八.md",
+      "bytes": 124,
+      "lineCount": 8,
+      "sourceHash": "913eb3179ac95626e08008d5c74f3b487ead4734608771074bf4a04b2a82f96d"
+    },
+    {
+      "file": "二次探底.md",
+      "bytes": 95,
+      "lineCount": 6,
+      "sourceHash": "55cd9e6122e62b7a100c904a5dbab4c4924b70f5b41ebd462c2eb11d92fd9d53"
+    },
+    {
+      "file": "五日线.md",
+      "bytes": 508,
+      "lineCount": 23,
+      "sourceHash": "57024c9912caf327a4e2da50892f93c2ad6dbbeff653fcf1e0666143a089515a"
+    },
+    {
+      "file": "今日分析.md",
+      "bytes": 1304,
+      "lineCount": 54,
+      "sourceHash": "7dfb4e6da66609eebc1970697f6758f07314d6a3c19fa577f4a62026ba431b24"
+    },
+    {
+      "file": "低位炒作.md",
+      "bytes": 131,
+      "lineCount": 6,
+      "sourceHash": "c13b3294962a05fced85613080e7a64bb668daa3e50811100b857b9ec0cfa684"
+    },
+    {
+      "file": "保险的影响.md",
+      "bytes": 136,
+      "lineCount": 8,
+      "sourceHash": "3d92e15e59e5c1f1cf5e1d478ee4cf44067a282fb4dbc680627e951042c49636"
+    },
+    {
+      "file": "信托股.md",
+      "bytes": 201,
+      "lineCount": 8,
+      "sourceHash": "f0c5f98967c1ce3e6fc00d284f610f14b775947307ac403497fd00ed17f37203"
+    },
+    {
+      "file": "偷桃子.md",
+      "bytes": 319,
+      "lineCount": 15,
+      "sourceHash": "e2c8415c311cdd793bc88e0a02cf6e6f60e80827b6273449f0af58bf31722cbb"
+    },
+    {
+      "file": "关于近期热议的限售股转融通流程梳理.md",
+      "bytes": 22893,
+      "lineCount": 162,
+      "sourceHash": "afd078d4a5face4ae874ba579a11433a050cd74f8079b7bde9d8d07e0818a57a"
+    },
+    {
+      "file": "关键点.md",
+      "bytes": 145,
+      "lineCount": 8,
+      "sourceHash": "eaaa9ce34a3898bc701a277f66b7f5d0319e2ea18a0490b0b7621c3f1cf22e8e"
+    },
+    {
+      "file": "关键点目标位20251024晚评.md",
+      "bytes": 134,
+      "lineCount": 10,
+      "sourceHash": "ec3b0eedcacd57160739415a3c5603b6c6eb804100ab645d01fe3d58d41ebb40"
+    },
+    {
+      "file": "凯莱英.md",
+      "bytes": 175,
+      "lineCount": 10,
+      "sourceHash": "5fe054d5fed1414bf7d031bc2284dd92159fdb88cd9f3eb88f7292d814b229d0"
+    },
+    {
+      "file": "利好不涨隔日涨，利空不跌隔日跌.md",
+      "bytes": 68,
+      "lineCount": 6,
+      "sourceHash": "7d5d072d497a282a2fc55de58795969139685a13bdef89beb0f481e4500b3e73"
+    },
+    {
+      "file": "北方华创.md",
+      "bytes": 80,
+      "lineCount": 6,
+      "sourceHash": "a530a20bcfa542aed1ce60aead699c82948217129ab66a20357980c23b5124d7"
+    },
+    {
+      "file": "十不做.md",
+      "bytes": 329,
+      "lineCount": 26,
+      "sourceHash": "6f657b011a855477cef9b2fe7b8cc3832cc3b20b9ad598b6bcda69cd3b5998ca"
+    },
+    {
+      "file": "参数计算.md",
+      "bytes": 568,
+      "lineCount": 18,
+      "sourceHash": "5236f14e7c9eee49c0c40bae494a5e69dd498863c44587bb5bed614fa85364aa"
+    },
+    {
+      "file": "参数计算_1.md",
+      "bytes": 327,
+      "lineCount": 12,
+      "sourceHash": "923452521d5124fbb7ca5d2101ecf0f44fb14670257f8100866ed486f71d289e"
+    },
+    {
+      "file": "参数计算注意点（20251023-晚评）.md",
+      "bytes": 474,
+      "lineCount": 20,
+      "sourceHash": "253db2347019bcce8e0405b1e9173a37b4af78f007e181002bb2530a62fc8cbf"
+    },
+    {
+      "file": "周线.md",
+      "bytes": 291,
+      "lineCount": 17,
+      "sourceHash": "58250a39e0dc565ab9b1ae313d4e572e5fa4616afc84f29073cebddde5506f6d"
+    },
+    {
+      "file": "四期第一课.md",
+      "bytes": 7375,
+      "lineCount": 62,
+      "sourceHash": "dd97e317b49adcf2d12769167c270d2cb3050c6f7f129134b5c28a2dbbd2e581"
+    },
+    {
+      "file": "四期第七课-三不做第三不做-除权股不做.md",
+      "bytes": 3292,
+      "lineCount": 31,
+      "sourceHash": "cd9dbfd39f23087ea6db244b2e853f634f28e910532669a27e86ef0f2b291c83"
+    },
+    {
+      "file": "四期第三课.md",
+      "bytes": 10210,
+      "lineCount": 103,
+      "sourceHash": "7aa8247a45257502dc1c8a0c8cddff6abc7d16523ff084eb0e5935d17d48ab9b"
+    },
+    {
+      "file": "四期第二课-关键点（目标位）.md",
+      "bytes": 3616,
+      "lineCount": 112,
+      "sourceHash": "4211ab0cf31cf42d235850a0f8e73f9d3e14c98455e4e48be1893ada2f974cd5"
+    },
+    {
+      "file": "四期第二课-第一讲.md",
+      "bytes": 68,
+      "lineCount": 6,
+      "sourceHash": "ca684e079c2e8db2b3b1cb6fe03d67f2fd278f25f30062d57138fd95a5fef9eb"
+    },
+    {
+      "file": "四期第五课-摸线八字箴言.md",
+      "bytes": 4004,
+      "lineCount": 72,
+      "sourceHash": "feeb97a523af9a745c8d9e7851fa489fed7e46a33abd4d9cfb0775ce13e87ecc"
+    },
+    {
+      "file": "四期第八课-五不做第一不做-信托股.md",
+      "bytes": 6771,
+      "lineCount": 79,
+      "sourceHash": "4ab912291989fc27f2ea05662834cbcadfd21d837cb8cc0f786f5e8a1cb18dcc"
+    },
+    {
+      "file": "四期第八课-五不做第二不做-高速公路.md",
+      "bytes": 4514,
+      "lineCount": 50,
+      "sourceHash": "2eedfad83ffe9ede519e7722d5fde4aecbf6052aeab4e49b453d1830c68ceead"
+    },
+    {
+      "file": "四期第六课-三不做第二不做-次新股.md",
+      "bytes": 9278,
+      "lineCount": 56,
+      "sourceHash": "0c73d68c39f9acf34415d3609aafcefba0604277f2169e9bd2e4e4de3420c7c1"
+    },
+    {
+      "file": "四期第四课-三不做第一不做-女鬼.md",
+      "bytes": 4978,
+      "lineCount": 81,
+      "sourceHash": "ab0b8b1687709aaf4637a596a9805e8719bc5ee8b94a2e46f21ff48a1b9576ff"
+    },
+    {
+      "file": "国科微.md",
+      "bytes": 320,
+      "lineCount": 13,
+      "sourceHash": "53eccb37c5cc7cca243af7f7045560b6dfbf8f08a1bdead34743c7221dface9b"
+    },
+    {
+      "file": "图片 从 建党节.md",
+      "bytes": 604,
+      "lineCount": 10,
+      "sourceHash": "07478dbefd5bf0f6cac589cb2f4db3ca4750a3ae8f6c38915ab1909187f25649"
+    },
+    {
+      "file": "图片 从 建党节_1.md",
+      "bytes": 608,
+      "lineCount": 10,
+      "sourceHash": "21a05ee2c5c9b0f825e108d7e67d5bea0d0ca26dc6fe17f6037726fb452170ab"
+    },
+    {
+      "file": "地平线原理.md",
+      "bytes": 119,
+      "lineCount": 6,
+      "sourceHash": "93b7317bd326ffc935bd7aa79d04e7ee8c71e8710ba61553116785d815132d8a"
+    },
+    {
+      "file": "复合型摸线.md",
+      "bytes": 138,
+      "lineCount": 9,
+      "sourceHash": "6ef6a0883aec245554d61961c29279b3432ffe3aee7b9ac09072e42dd9fef24b"
+    },
+    {
+      "file": "复合型摸线_1.md",
+      "bytes": 142,
+      "lineCount": 10,
+      "sourceHash": "f0e44b22586f839604eb49950a5375bf551ebcc1acde315985d3979c902dbd51"
+    },
+    {
+      "file": "大事件.md",
+      "bytes": 866,
+      "lineCount": 50,
+      "sourceHash": "09f5d8ca4165badf6cf75b43e3c8098b857452fd732970a22abe37af6ee34f9a"
+    },
+    {
+      "file": "大四喜总结.md",
+      "bytes": 184,
+      "lineCount": 8,
+      "sourceHash": "b760e73f38e35b356c079189930457d28a602cffdf344333f18057d754f7d2d0"
+    },
+    {
+      "file": "大时代.md",
+      "bytes": 1016,
+      "lineCount": 54,
+      "sourceHash": "3179a47593b743fc6c409cdd3c4ae2d22b24b4b99ed84362b4ceae0205223f77"
+    },
+    {
+      "file": "大盘反弹.md",
+      "bytes": 434,
+      "lineCount": 12,
+      "sourceHash": "2089f46d63b631f2ed8fd68413ea7194f3b842b376008c2d5c626410416e76a7"
+    },
+    {
+      "file": "大盘反弹2.md",
+      "bytes": 179,
+      "lineCount": 8,
+      "sourceHash": "0ed56742d265aac8fda202eb8c770d4501ed685ed59e3199475e0337cb9e8fa7"
+    },
+    {
+      "file": "大盘股摸线表象.md",
+      "bytes": 830,
+      "lineCount": 20,
+      "sourceHash": "7c7a9e836b65fa5d4b32806f8ec73e652fc65019d023e80daa98517ba602035c"
+    },
+    {
+      "file": "妖股上影线.md",
+      "bytes": 184,
+      "lineCount": 8,
+      "sourceHash": "2e5c492c8870110caec8f880ad8ffcc74c1d902daeca1bc7642ba7a2cb1ed75e"
+    },
+    {
+      "file": "妖股原则.md",
+      "bytes": 293,
+      "lineCount": 16,
+      "sourceHash": "e59b67606439a853306cc13efe0de1e2bdcf27b60cefbb0001daea695b00695b"
+    },
+    {
+      "file": "学习营课程大纲.md",
+      "bytes": 1520,
+      "lineCount": 26,
+      "sourceHash": "09472b48c2b8637c4ee80f8e034e3b3c6371b8372b7f3c54e6b4f4ae780ec7f9"
+    },
+    {
+      "file": "宁德时代.md",
+      "bytes": 787,
+      "lineCount": 46,
+      "sourceHash": "9ab724849cd8f914c4f8d5704618eeac3e824a1235629f7a29f28ee9fab965f5"
+    },
+    {
+      "file": "小锤20到大锤80.md",
+      "bytes": 89,
+      "lineCount": 6,
+      "sourceHash": "3b796ba26aa7df80cb31b04d23a2d31b29d3fbb4fdc1787256651ac2461dcee9"
+    },
+    {
+      "file": "开口笑.md",
+      "bytes": 304,
+      "lineCount": 14,
+      "sourceHash": "c1900e55658d62e8536c17bd7a79df4ecf413ce9900deca68b4d0db1283a5d49"
+    },
+    {
+      "file": "开年第一天.md",
+      "bytes": 118,
+      "lineCount": 8,
+      "sourceHash": "c2e52a8d2ec969cd3bbfc531c5119acdb948022434d27549b10fd067457d5059"
+    },
+    {
+      "file": "开盘五分钟十分钟半小时.md",
+      "bytes": 307,
+      "lineCount": 11,
+      "sourceHash": "ed2d525b7f5e0d594b3514e95ba0e022e05a3837cfb5658f6617795fd6a5858c"
+    },
+    {
+      "file": "开盘十分钟.md",
+      "bytes": 679,
+      "lineCount": 6,
+      "sourceHash": "aee46ce2c7faa367836f8aa4735e26918926cba7ed659318ef374b14396cfa46"
+    },
+    {
+      "file": "感悟.md",
+      "bytes": 532,
+      "lineCount": 24,
+      "sourceHash": "26d2fea6bac7c270536aad16d7f1b20f0c1ee71a299d54ce13fbf22bf99f0d98"
+    },
+    {
+      "file": "拆分K线.md",
+      "bytes": 204,
+      "lineCount": 12,
+      "sourceHash": "7b3d51fcc51c6b963bfa3f9939ac4fc997db32d558b6392743ceab78874e7263"
+    },
+    {
+      "file": "摸线-一期.md",
+      "bytes": 426,
+      "lineCount": 18,
+      "sourceHash": "19ecdf513053efa7076f53f8d8065a687571b77f5ac47d2bbd976a39a902c2db"
+    },
+    {
+      "file": "摸线-三期.md",
+      "bytes": 743,
+      "lineCount": 36,
+      "sourceHash": "dcd749b838302e115092274c53d398d95a963cb8029d988ba84b9f1930bcd567"
+    },
+    {
+      "file": "摸线-三期结束.md",
+      "bytes": 219,
+      "lineCount": 8,
+      "sourceHash": "5b3978a2f1a4bed562a024aa15466e93238fada5f16f0187e53f78507afd2b87"
+    },
+    {
+      "file": "摸线-二期.md",
+      "bytes": 287,
+      "lineCount": 16,
+      "sourceHash": "a636fc8804140dfcffd5389feb2ac5a2d35e3d63e96099d47e730553b74f13d8"
+    },
+    {
+      "file": "摸线.md",
+      "bytes": 554,
+      "lineCount": 15,
+      "sourceHash": "835f69d57c5e0b837f2a67a7135fed306b2a0f9d8068a7c7d89b4be7507fa0bb"
+    },
+    {
+      "file": "摸线实战.md",
+      "bytes": 1115,
+      "lineCount": 23,
+      "sourceHash": "d9dcb9587e02f6ffee3b1b74e76c6097450be92b404c33cbfd082ea935d9070c"
+    },
+    {
+      "file": "摸线示意图.md",
+      "bytes": 130,
+      "lineCount": 8,
+      "sourceHash": "7e8c6fafe857e8c99ee02d75b51f70588263b54a36709ef27babef4d2aaff2af"
+    },
+    {
+      "file": "操盘风格短期相似性.md",
+      "bytes": 124,
+      "lineCount": 8,
+      "sourceHash": "0d556fa5feea5d5c188c01a74d76688a503615fc9a2568d3d561e22167d89bad"
+    },
+    {
+      "file": "攀升过程是否照镜子.md",
+      "bytes": 181,
+      "lineCount": 8,
+      "sourceHash": "7e198a33bc607b594e4e048facd8d5864c5872f66a24c7a69e97faf421e8aebc"
+    },
+    {
+      "file": "断头铡刀.md",
+      "bytes": 160,
+      "lineCount": 8,
+      "sourceHash": "d9137c1559d8c5df6e93627a5ee0af2f1fadc4ff18253db7e91921a7dbe00608"
+    },
+    {
+      "file": "朗科科技.md",
+      "bytes": 244,
+      "lineCount": 12,
+      "sourceHash": "f21c7f41980cc73e71971a27f6effbecf2d7fe710c92a9522818118d744d4a4a"
+    },
+    {
+      "file": "杭州电热.md",
+      "bytes": 82,
+      "lineCount": 6,
+      "sourceHash": "1442fd846825b4d395f0470ae2b8ec90c53ba4fcda12ac5939034988a88ae8db"
+    },
+    {
+      "file": "格兰碧.md",
+      "bytes": 548,
+      "lineCount": 26,
+      "sourceHash": "17869e49700a6e20cb4fc292167693c6fbb178722cc37bc4ee1ef0b894f96ed8"
+    },
+    {
+      "file": "格兰碧_1.md",
+      "bytes": 194,
+      "lineCount": 11,
+      "sourceHash": "1414013d98256d205747f0a33c0934b0ce064589daa249438f67240bb3cb20cf"
+    },
+    {
+      "file": "次新股.md",
+      "bytes": 92,
+      "lineCount": 6,
+      "sourceHash": "e17c86dda729408ed6b879b9d8ed5cffee2bdd696983864f0a3bd7f5a386807a"
+    },
+    {
+      "file": "毕业课.md",
+      "bytes": 372,
+      "lineCount": 11,
+      "sourceHash": "12ef1cd5f99d1cac496d1d98b94c696a603e06a9d36bf151e7ae476432f3bed7"
+    },
+    {
+      "file": "海看股份.md",
+      "bytes": 306,
+      "lineCount": 10,
+      "sourceHash": "b93cb0b24a0abfd5d846b40cdbff5d4df48019de8e113d9e95772f7eddec15a9"
+    },
+    {
+      "file": "海龟.md",
+      "bytes": 235,
+      "lineCount": 10,
+      "sourceHash": "df12920fa15f3ee2aef9cbf153995b366fcad452a799d92ed7ed6b3e99375e82"
+    },
+    {
+      "file": "海龟_1.md",
+      "bytes": 206,
+      "lineCount": 8,
+      "sourceHash": "d01faa5b3730eed1741916ffe1e732a5b7cd4adb3ee3cff2184f65362aad01fd"
+    },
+    {
+      "file": "滑滑梯.md",
+      "bytes": 801,
+      "lineCount": 22,
+      "sourceHash": "326fa8e32ae17826b83fd5e71ffd0d1bb6e46c9eb52ae65fc5dc115417d0b776"
+    },
+    {
+      "file": "照镜子.md",
+      "bytes": 213,
+      "lineCount": 10,
+      "sourceHash": "e7d3275b1c4f76a02bb901b06cb055bf2a43111e1b3c832b3813c5701c5c9e35"
+    },
+    {
+      "file": "牛十条.md",
+      "bytes": 1978,
+      "lineCount": 28,
+      "sourceHash": "3b5cfb8499b94b896123fb6bc1828941454c41f83315ca0f7ef278554dbf32d7"
+    },
+    {
+      "file": "牛市.md",
+      "bytes": 504,
+      "lineCount": 9,
+      "sourceHash": "df0ac54f85fa2692fd4acef7cb18006063f4e1f0afb98ea07ed63eb0f5c35897"
+    },
+    {
+      "file": "牛市指南.md",
+      "bytes": 271,
+      "lineCount": 14,
+      "sourceHash": "a7a709c52a31e1f1e025776b26f7ed99bd43abb29ab26e4adc8688e5b68d223c"
+    },
+    {
+      "file": "牛市选股策略.md",
+      "bytes": 105,
+      "lineCount": 7,
+      "sourceHash": "09335b96dbcb22cf4b322047ded1d2398c6ed57a31d8a00f95813d31cc4b1d4c"
+    },
+    {
+      "file": "画趋势图.md",
+      "bytes": 161,
+      "lineCount": 6,
+      "sourceHash": "5b64a8a7324ba62a654a63ae8b23f212f803a37d51d0b1f67951634b8f088cb2"
+    },
+    {
+      "file": "盈利模式.md",
+      "bytes": 833,
+      "lineCount": 16,
+      "sourceHash": "181b8fb7def5f8c9f4b9adaca8bde4969b1a91c0fd651d034819b8d8df69f1eb"
+    },
+    {
+      "file": "石油的影响.md",
+      "bytes": 113,
+      "lineCount": 6,
+      "sourceHash": "af65cb55c1a0e0fd9dbdc19a773610ca3bb1eb9bcdf3c3061a39c71a620dddc0"
+    },
+    {
+      "file": "罗平锌电002114.md",
+      "bytes": 388,
+      "lineCount": 8,
+      "sourceHash": "7be5025802cb6717b056d5196bfebc247297250ffe4d2767ec0e7db368dd7f16"
+    },
+    {
+      "file": "美股.md",
+      "bytes": 102,
+      "lineCount": 8,
+      "sourceHash": "498fdf8d27f1fb8931f845d63c95ed654de558c9491203afd14e878574e179ff"
+    },
+    {
+      "file": "老鸭头.md",
+      "bytes": 173,
+      "lineCount": 6,
+      "sourceHash": "6c5733bf1c4bce733cee963fddc7b9c1d534284c9f552589a3f1aafc8e7cdbc3"
+    },
+    {
+      "file": "联特科技.md",
+      "bytes": 724,
+      "lineCount": 34,
+      "sourceHash": "344cf649e45f9925871267b2378d06cde4408b14c47a49c9ce28af0604cacbd9"
+    },
+    {
+      "file": "股市周期0123456789.md",
+      "bytes": 682,
+      "lineCount": 36,
+      "sourceHash": "76be8802eef0d0c1a3dfeb7dab9512041ec1db8641bf804f4b393113a40cf583"
+    },
+    {
+      "file": "股票价格.md",
+      "bytes": 510,
+      "lineCount": 12,
+      "sourceHash": "ff10042707d8aa493db85c27c014853737cb68bffc3cffc339194f9cddbaee38"
+    },
+    {
+      "file": "股票对称性-海龟和下跌.md",
+      "bytes": 173,
+      "lineCount": 6,
+      "sourceHash": "54d0c4ec566f31a4840c62292434d884c75b6af243518b2cce0a38aae46c67a5"
+    },
+    {
+      "file": "葛兰碧.md",
+      "bytes": 143,
+      "lineCount": 6,
+      "sourceHash": "136e276683db01a0faa96c60909b3bafae2afd0e2640cf9be204fe8028e067f2"
+    },
+    {
+      "file": "蓝筹见底的判断.md",
+      "bytes": 83,
+      "lineCount": 6,
+      "sourceHash": "5afe1f0d4ca832ce8924d099e5a5138c69f64fe3758c71cce37cd51a2e19d3f8"
+    },
+    {
+      "file": "见底信号.md",
+      "bytes": 356,
+      "lineCount": 12,
+      "sourceHash": "8996d33c0eaceac959c1cd666497116d5dfd5bc3b3ed266150bf36a9382fcbed"
+    },
+    {
+      "file": "赛力斯.md",
+      "bytes": 222,
+      "lineCount": 16,
+      "sourceHash": "c49e32421c252e383f185e895a9cb2ef70e218950075565526ba04f5bf054f94"
+    },
+    {
+      "file": "选股总结.md",
+      "bytes": 209,
+      "lineCount": 12,
+      "sourceHash": "6da1624dd3780f2e5384063f021624621aaf4a7b239abc8c46729c621da89c04"
+    },
+    {
+      "file": "震荡筑底-摸线一期.md",
+      "bytes": 210,
+      "lineCount": 10,
+      "sourceHash": "1303754bc7e4cc2071356d6802ecd2055f09fc6d7421f25c1aad5900a0c4b3f8"
+    },
+    {
+      "file": "非典型摸线.md",
+      "bytes": 138,
+      "lineCount": 9,
+      "sourceHash": "7cf140ae2387cbc72c4f13bc36378f8ca2d7efbca07f82655e009782dc5713a8"
+    },
+    {
+      "file": "非典摸线.md",
+      "bytes": 296,
+      "lineCount": 9,
+      "sourceHash": "16ee68470563753a192c3810956f304d099fa466e740df273a72d837b0408e66"
+    }
+  ],
+  "batches": [
+    {
+      "id": 1,
+      "bytes": 105588,
+      "files": [
+        "06-trend-filter.md",
+        "20220915_收盘_月线炒股法.md",
+        "20221108_晚评_葛兰碧第四天大涨大跌日.md",
+        "20221117-早餐-今天回档五日线.md",
+        "20221223 午餐 葛兰碧第二天反弹.md",
+        "20250915-晚破位之后再起行情问题和三期震荡模式.md",
+        "20250916-晚－三期参数.md",
+        "三期开口的标识.md",
+        "下跌三部曲.md",
+        "关键点目标位20251024晚评.md",
+        "十不做.md",
+        "参数计算.md",
+        "四期第七课-三不做第三不做-除权股不做.md",
+        "大盘反弹.md",
+        "大盘股摸线表象.md",
+        "妖股原则.md",
+        "学习营课程大纲.md",
+        "小锤20到大锤80.md",
+        "开盘五分钟十分钟半小时.md",
+        "开盘十分钟.md",
+        "操盘风格短期相似性.md",
+        "攀升过程是否照镜子.md",
+        "断头铡刀.md",
+        "朗科科技.md",
+        "海龟.md",
+        "股票价格.md",
+        "蓝筹见底的判断.md",
+        "震荡筑底-摸线一期.md"
+      ]
+    },
+    {
+      "id": 2,
+      "bytes": 105584,
+      "files": [
+        "03-stop-loss.md",
+        "2021 台历.md",
+        "20220908_收盘_关于参数的计算.md",
+        "20220913_参数的算法.md",
+        "202509 ximi开课 - 831晚上拆k线直播.md",
+        "20250911-科技股三期回升...参数的验证（前三后三，预期的预期）.md",
+        "20250917-晚.md",
+        "5日线.md",
+        "中国芯片.md",
+        "买股原则2.md",
+        "凯莱英.md",
+        "参数计算_1.md",
+        "参数计算注意点（20251023-晚评）.md",
+        "四期第二课-第一讲.md",
+        "四期第四课-三不做第一不做-女鬼.md",
+        "图片 从 建党节.md",
+        "图片 从 建党节_1.md",
+        "地平线原理.md",
+        "大事件.md",
+        "开年第一天.md",
+        "感悟.md",
+        "拆分K线.md",
+        "摸线-二期.md",
+        "海看股份.md",
+        "滑滑梯.md",
+        "美股.md",
+        "老鸭头.md",
+        "葛兰碧.md",
+        "选股总结.md",
+        "非典型摸线.md"
+      ]
+    },
+    {
+      "id": 3,
+      "bytes": 105590,
+      "files": [
+        "04-position-sizing.md",
+        "05-breakout-buy.md",
+        "20220913_收盘_关于长线下跌趋势个股的底部博弈问题.md",
+        "20220915_午盘_三分法分析板块冷热.md",
+        "20220916_早盘_关键点和目标位心态调整.md",
+        "20221111-早盘-复合型摸线照镜子算参数.md",
+        "20221117-早餐-今天回档五日线-原始文件.md",
+        "20221221-早盘-海龟+二转三等于博弈.md",
+        "20221223 早餐 葛兰碧的时候顺便看看开口几天.md",
+        "20250903-三期震荡确立.md",
+        "20250905-晚小白的挣钱法 海龟战法千股跌停出现.md",
+        "20250908-晚两天反弹葛二各种形态.md",
+        "买卖模式24678.md",
+        "二次探底.md",
+        "偷桃子.md",
+        "关键点.md",
+        "北方华创.md",
+        "周线.md",
+        "四期第六课-三不做第二不做-次新股.md",
+        "复合型摸线.md",
+        "妖股上影线.md",
+        "摸线-一期.md",
+        "摸线-三期.md",
+        "摸线实战.md",
+        "摸线示意图.md",
+        "格兰碧.md",
+        "海龟_1.md",
+        "牛十条.md",
+        "牛市.md",
+        "赛力斯.md"
+      ]
+    },
+    {
+      "id": 4,
+      "bytes": 105589,
+      "files": [
+        "01-ma-golden-cross.md",
+        "1234.md",
+        "2025-03-21 三期走势.md",
+        "20250901晚评.md",
+        "20250909-晚海龟锂电池-案例分析.md",
+        "20250912晚 顶部怎么确认.md",
+        "A股权重.md",
+        "上证指数.md",
+        "不做原则.md",
+        "五日线.md",
+        "今日分析.md",
+        "低位炒作.md",
+        "信托股.md",
+        "关于近期热议的限售股转融通流程梳理.md",
+        "四期第一课.md",
+        "四期第三课.md",
+        "四期第二课-关键点（目标位）.md",
+        "大盘反弹2.md",
+        "开口笑.md",
+        "摸线-三期结束.md",
+        "杭州电热.md",
+        "次新股.md",
+        "牛市指南.md",
+        "牛市选股策略.md",
+        "画趋势图.md",
+        "盈利模式.md",
+        "石油的影响.md",
+        "罗平锌电002114.md",
+        "联特科技.md"
+      ]
+    },
+    {
+      "id": 5,
+      "bytes": 105582,
+      "files": [
+        "02-ma-death-cross.md",
+        "20220916_午盘_破五断头后反抽五日线.md",
+        "20250902-再接再厉再创辉煌.md",
+        "20250904-###为什么没有葛二很重要###.md",
+        "20250908-晚-5日线破位要走.md",
+        "20250910-锂电池按照计划进行（前三天后三天算参数）.md",
+        "32.5.md",
+        "下跌扭转.md",
+        "主力切换.md",
+        "买股原则.md",
+        "二八.md",
+        "保险的影响.md",
+        "利好不涨隔日涨，利空不跌隔日跌.md",
+        "四期第五课-摸线八字箴言.md",
+        "四期第八课-五不做第一不做-信托股.md",
+        "四期第八课-五不做第二不做-高速公路.md",
+        "国科微.md",
+        "复合型摸线_1.md",
+        "大四喜总结.md",
+        "大时代.md",
+        "宁德时代.md",
+        "摸线.md",
+        "格兰碧_1.md",
+        "毕业课.md",
+        "照镜子.md",
+        "股市周期0123456789.md",
+        "股票对称性-海龟和下跌.md",
+        "见底信号.md",
+        "非典摸线.md"
+      ]
+    }
+  ],
+  "sourceProtection": "Original notes and existing catalog are unchanged; all proposed tags remain AI candidates."
+}

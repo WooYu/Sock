@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
-const providerSnapshot = { code: 0, data: { sz300502: { day: [['2026-09-15', '10', '11', '12', '9', '100'], ['2026-09-16', '11', '12', '13', '10', '150']], qt: { sz300502: ['51', '新易盛', '300502', '12', '11', '11', '150'] } } } }
+const providerSnapshot = { code: 0, data: { sz300502: { qfqday: [['2026-09-15', '10', '11', '12', '9', '100'], ['2026-09-16', '11', '12', '13', '10', '150']], qt: { sz300502: ['51', '新易盛', '300502', '12', '11', '11', '150'] } } } }
 const callSnapshot = async (symbol = '300502') => (await import('./stocks/[symbol]/snapshot/route')).GET(new Request(`http://localhost/api/market/stocks/${symbol}/snapshot`), { params: Promise.resolve({ symbol }) })
 const callSearch = async (query: string) => (await import('./search/route')).GET(new Request(`http://localhost/api/market/search?q=${encodeURIComponent(query)}`))
 
@@ -18,7 +18,7 @@ describe('market BFF source selection', () => {
 
   test('keeps the configured backend path and response unchanged', async () => {
     vi.stubEnv('STOCKCAL_API_BASE_URL', 'https://backend.example/')
-    const fetcher = vi.fn(async () => Response.json({ quote: { security: { code: '600519', name: '后端股票' }, price: 1200 }, dailyCandles: [] }))
+    const fetcher = vi.fn(async () => Response.json({ adjustment: 'qfq', quote: { security: { code: '600519', name: '后端股票' }, price: 1200 }, dailyCandles: [] }))
     vi.stubGlobal('fetch', fetcher)
     const response = await callSnapshot('600519')
     expect(response.status).toBe(200)
@@ -34,6 +34,18 @@ describe('market BFF source selection', () => {
     expect(response.status).toBe(502)
     expect(await response.json()).toEqual({ message: '行情暂时不可用' })
     expect(fetcher).toHaveBeenCalledTimes(1)
+  })
+
+  test('upgrades legacy backend raw history to explicit forward adjustment without changing its quote', async () => {
+    vi.stubEnv('STOCKCAL_API_BASE_URL', 'https://backend.example/')
+    const fetcher = vi.fn(async (url: string) => url.startsWith('https://backend.example/')
+      ? Response.json({ quote: { security: { code: '300502', name: '新易盛' }, price: 12 }, dailyCandles: [], source: { name: '后端日线' } })
+      : Response.json(providerSnapshot))
+    vi.stubGlobal('fetch', fetcher)
+    const response = await callSnapshot()
+    expect(response.status).toBe(200)
+    expect(await response.json()).toMatchObject({ adjustment: 'qfq', quote: { price: 12 }, dailyCandles: [{ close: 11 }, { close: 12 }], source: { name: '腾讯公开行情·延时 · 报价 后端日线' } })
+    expect(fetcher).toHaveBeenCalledTimes(2)
   })
 
   test('rejects invalid symbols before requesting data', async () => {
@@ -66,4 +78,19 @@ describe('market BFF source selection', () => {
     expect(response.status).toBe(502)
     expect(JSON.stringify(await response.json())).not.toContain('secret')
   })
+})
+
+test('supports index search and snapshots with a legacy backend configured', async () => {
+  vi.stubEnv('STOCKCAL_API_BASE_URL', 'https://backend.example/')
+  const fetcher = vi.fn<typeof fetch>(async () => Response.json({ code: 0, data: { sh000001: { day: [['2026-09-16', '10', '11', '12', '9', '100']], qt: { sh000001: ['1', '上证指数', '000001', '11', '10', '10', '100'] } } } }))
+  vi.stubGlobal('fetch', fetcher)
+  try {
+    const search = await callSearch('上证指数')
+    expect(await search.json()).toMatchObject([{ code: 'sh000001', name: '上证指数' }])
+    expect(fetcher).not.toHaveBeenCalled()
+    const snapshot = await callSnapshot('sh000001')
+    expect(snapshot.status).toBe(200)
+    expect(await snapshot.json()).toMatchObject({ adjustment: 'none', quote: { security: { code: 'sh000001', exchange: 'SH' } } })
+    expect(String(fetcher.mock.calls[0][0])).toContain('web.ifzq.gtimg.cn')
+  } finally { vi.unstubAllGlobals(); vi.unstubAllEnvs() }
 })

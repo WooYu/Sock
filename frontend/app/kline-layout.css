@@ -1,0 +1,65 @@
+/* Shared chart hierarchy: plot first, full-width results below, tools beside plot. */
+.sc-kline-workspace.sc-kline-terminal { min-width: 0; }
+.sc-kline-terminal .sc-kline-main-grid { align-items: start; }
+.sc-chart-results { grid-column: 2 / -1; min-width: 0; border-top: 1px solid var(--sc-border); }
+.sc-chart-results > section { border-top: 0; }
+.sc-kline-terminal .sc-kline-legend { flex-wrap: wrap; gap: 6px 16px; line-height: 1.7; font-variant-numeric: tabular-nums; }
+.sc-kline-terminal .sc-kline-statusbar { display: flex; flex-wrap: wrap; gap: 5px 16px; line-height: 1.7; color: var(--sc-muted); }
+.sc-kline-terminal:not(.rs-chart-workspace) { padding: 16px; gap: 16px; box-shadow: none; }
+.sc-kline-terminal:not(.rs-chart-workspace) .sc-kline-control-row { flex-wrap: wrap; gap: 8px; padding: 8px 0; }
+.sc-kline-terminal:not(.rs-chart-workspace) .sc-kline-hint { flex-basis: 100%; padding-left: 76px; }
+.sc-kline-terminal .sc-kline-side-column { min-width: 0; }
+.rs-studio .rs-main { padding: 0 20px; }
+.rs-studio .rs-stock-summary { padding: 18px 20px; gap: 24px; }
+.rs-studio .rs-chart-workspace.sc-kline-terminal .sc-kline-main-grid { grid-template-columns: 48px minmax(0, 1fr) 248px; }
+.rs-studio .rs-chart-workspace .sc-kline-chart-surface svg.sc-kline-svg-interactive { height: clamp(380px, 32vw, 520px); }
+.rs-studio .rs-chart-results .rs-auto-forecast { padding: 24px; }
+.rs-studio .rs-chart-results .rs-auto-forecast > header { padding-bottom: 12px; border-bottom: 1px solid var(--sc-surface-muted); }
+.rs-studio .rs-auto-forecast .sa-table-scroll { border: 1px solid var(--sc-border); border-radius: 8px; margin: 12px 0; }
+.rs-studio .rs-auto-levels { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+.rs-studio .rs-auto-levels button { min-height: 96px; padding: 14px; }
+.rs-studio .rs-auto-forecast.is-compact .rs-auto-levels { grid-template-columns: 1fr; }
+.rs-studio .rs-chart-results .rs-evidence { border-top: 1px solid var(--sc-border); }
+.rs-studio .rs-chart-results .rs-evidence-body { height: clamp(240px, 28dvh, 320px); }
+.rs-studio .rs-chart-navigator { gap: 4px 12px; }
+.rs-studio .rs-chart-history-slider { flex-wrap: wrap; }
+.rs-studio .rs-chart-history-slider span:last-child { font-size: 11px; }
+.sa-panel .sa-controls, .sa-panel .sa-form-grid { gap: 16px; }
+.sa-panel .sa-section { padding-top: 24px; margin-top: 24px; }
+.sa-panel .sa-reference-table th, .sa-panel .sa-reference-table td { padding: 12px; white-space: nowrap; }
+.sa-panel .sa-reference-table tr > th:first-child { position: sticky; left: 0; background: var(--sc-surface); z-index: 1; }
+@media (min-width: 1051px) and (max-width: 1279px) {
+  .rs-studio .rs-chart-workspace.sc-kline-terminal .sc-kline-main-grid { grid-template-columns: 48px minmax(0, 1fr); }
+  .rs-studio .rs-chart-workspace .sc-chart-right-rail { grid-column: 2; border-left: 0; border-top: 1px solid var(--sc-border); }
+  .rs-studio .rs-chart-workspace .sc-chart-right-rail .rs-auto-levels { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 1050px) {
+  .rs-studio .rs-chart-workspace.sc-kline-terminal .sc-kline-main-grid { grid-template-columns: 48px minmax(0, 1fr); }
+  .rs-studio .rs-chart-workspace .sc-chart-right-rail { display: none; }
+}
+@media (max-width: 720px) {
+  .rs-studio .rs-main { padding: 0 8px; }
+  .rs-studio .rs-stock-summary { display: grid; grid-template-columns: minmax(0, 1fr) auto; padding: 16px 12px; gap: 12px; }
+  .rs-studio .rs-stock-identity { flex: 1; min-width: 130px; }
+  .rs-studio .rs-stock-price > strong { font-size: 26px; }
+  .rs-studio .rs-quote-facts { grid-column: 1; grid-row: 2; order: initial; justify-content: space-between; gap: 12px; border: 0; padding: 0; }
+  .rs-studio .rs-stock-summary .rs-refresh { grid-column: 2; grid-row: 2; min-height: 44px; }
+  .rs-studio .rs-chart-workspace.sc-kline-terminal .sc-kline-main-grid { grid-template-columns: minmax(0, 1fr); }
+  .rs-studio .rs-chart-workspace .sc-chart-left-tools { display: none; }
+  .sc-chart-results { grid-column: 1 / -1; }
+  .rs-studio .rs-chart-workspace .sc-kline-chart-surface svg.sc-kline-svg-interactive { height: 340px; }
+  .rs-studio .rs-chart-results .rs-auto-forecast { padding: 20px 12px; }
+  .rs-studio .rs-auto-forecast > header { flex-wrap: wrap; }
+  .rs-studio .rs-auto-levels { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .rs-studio .rs-auto-levels button { padding: 12px 10px; overflow-wrap: anywhere; }
+  .rs-studio .rs-chart-workspace .sc-kline-statusbar { font-size: 11px; }
+  .sc-kline-terminal:not(.rs-chart-workspace) { padding: 0; }
+  .sc-kline-terminal:not(.rs-chart-workspace) .sc-kline-control-row { align-items: stretch; }
+  .sc-kline-terminal:not(.rs-chart-workspace) .sc-kline-hint { padding-left: 0; }
+  .sc-kline-terminal:not(.rs-chart-workspace) .sc-kline-segmented,
+  .sc-kline-terminal:not(.rs-chart-workspace) .sc-kline-indicator-buttons { display: flex; flex-wrap: nowrap; overflow-x: auto; max-width: 100%; }
+  .sc-kline-terminal .sc-chart-mobile-toolbar { position: static; width: 100%; margin: 0; box-shadow: none; }
+  .sa-panel .sa-controls, .sa-panel .sa-form-grid { grid-template-columns: 1fr; gap: 12px; }
+  .sa-panel .sa-wide { grid-column: auto; }
+  .sa-panel select, .sa-panel input:not([type=checkbox]), .sa-panel textarea { font-size: 16px; }
+}

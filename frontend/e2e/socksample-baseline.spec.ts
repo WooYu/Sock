@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures/test";
 
 test.describe("live StockCal baseline", () => {
   test("renders the live-data shell without demo modules", async ({ page }) => {

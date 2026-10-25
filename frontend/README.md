@@ -5,12 +5,12 @@ StockCal 的 Web-first 前端，使用 Next.js App Router 和 TypeScript，面�
 ## 本地运行
 
 ```bash
-npm install
+npm ci
 cp .env.example .env.local
 npm run dev
 ```
 
-默认访问 http://localhost:3000。STOCKCAL_API_BASE_URL 指向本地或阿里云上的 Spring Boot API；行情和 AI 密钥只配置在后端。
+默认访问 http://localhost:3000。模板通过`STOCKCAL_RECORDS_API_BASE_URL`连接本机研究记录后端，并使用腾讯公开行情。仅在后端行情供应商已配置时启用`STOCKCAL_API_BASE_URL`；行情和AI密钥只配置在后端。数据库、后端与Windows启动步骤见[本地运行指南](../docs/handoff/2026-10-17-stockcal-local-run.md)。已有`.env.local`应保留并合并设置。
 
 ## 验证
 

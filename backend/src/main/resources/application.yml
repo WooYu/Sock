@@ -18,6 +18,11 @@ server:
   port: ${PORT:8080}
 
 stockcal:
+  scenario:
+    jobs-enabled: ${STOCKCAL_SCENARIO_JOBS_ENABLED:true}
+    scan-ms: ${STOCKCAL_SCENARIO_SCAN_MS:900000}
+    retry-base-seconds: ${STOCKCAL_SCENARIO_RETRY_BASE_SECONDS:900}
+    retry-max-seconds: ${STOCKCAL_SCENARIO_RETRY_MAX_SECONDS:21600}
   prediction:
     # Comma-separated exchange closure dates (YYYY-MM-DD); weekends are always excluded.
     exchange-holidays: ${STOCKCAL_PREDICTION_EXCHANGE_HOLIDAYS:}

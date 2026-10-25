@@ -2,7 +2,7 @@ import type { MarketSnapshot } from '../workspace/stock-workspace-types'
 import type { PredictionSnapshot } from '../chart/chart-types'
 import { bollinger, movingAverage } from '../chart/chart-math'
 import { aggregateCandles } from '../chart/chart-math'
-import { isMinutePeriod, type ChartPeriod } from '../chart/chart-periods'
+import { isMinutePeriod, isPriceLinePeriod, type ChartPeriod } from '../chart/chart-periods'
 import type { ChartSeries } from '../chart/chart-market-types'
 
 // Explicit, fictional interaction example. Never returned by a market API or stored under a real security.
@@ -42,10 +42,10 @@ export async function loadPreviewSeries(symbol: string, period: ChartPeriod): Pr
   if (symbol !== 'DEMO') throw new Error('示例数据仅限 DEMO 工作区')
   const { market } = createPreviewData()
   let bars = market.dailyCandles
-  if (period === 'intraday' || isMinutePeriod(period)) {
-    const interval = period === 'intraday' ? 1 : Number(period.slice(0, -1))
+  if (isPriceLinePeriod(period) || isMinutePeriod(period)) {
+    const interval = isPriceLinePeriod(period) ? 1 : Number(period.slice(0, -1))
     const perDay = 240 / interval
-    const dayCount = period === 'intraday' ? 1 : Math.ceil(640 / perDay)
+    const dayCount = period === '5day' ? 5 : period === 'intraday' ? 1 : Math.ceil(640 / perDay)
     const dates: string[] = []
     const date = new Date(`${market.dailyCandles.at(-1)!.day}T00:00:00Z`)
     while (dates.length < dayCount) {
@@ -66,7 +66,7 @@ export async function loadPreviewSeries(symbol: string, period: ChartPeriod): Pr
         cumulativeAmount += turnover; cumulativeVolume += volume
         return { day: time, open, close, high: Math.max(open, close) + base * .003, low: Math.min(open, close) - base * .003, volume, turnover, averagePrice: cumulativeAmount / cumulativeVolume }
       })
-    }).slice(-640)
+    }).slice(period === '5day' ? -1200 : -640)
   } else bars = aggregateCandles(bars, period)
-  return { symbol: 'DEMO', period, adjustment: 'none', kind: period === 'intraday' ? 'intraday' : 'candles', bars, source: market.source, previousClose: market.quote.previousClose, limitedHistory: true, note: '明确标注的合成交互示例，不对应真实证券' }
+  return { symbol: 'DEMO', period, adjustment: 'none', kind: isPriceLinePeriod(period) ? 'intraday' : 'candles', bars, source: market.source, previousClose: market.quote.previousClose, limitedHistory: true, note: '明确标注的合成交互示例，不对应真实证券' }
 }

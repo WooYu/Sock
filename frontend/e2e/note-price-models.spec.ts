@@ -1,0 +1,37 @@
+import { test, expect } from './fixtures/test'
+import { readFile } from 'node:fs/promises'
+
+test('note prices expose roles and source, freeze definitions, restore and export on desktop and mobile', async ({ page }, info) => {
+  const errors: string[] = []
+  page.on('pageerror', error => errors.push(error.message))
+  await page.goto('/?example=1')
+  const research = page.getByRole('region', { name: '笔记条件价格研究', exact: true })
+  await expect(research).toBeVisible({ timeout: 30000 })
+  const boundary = research.getByRole('article', { name: '明日收盘站上MA5的临界价' })
+  await expect(boundary).toContainText('条件临界价')
+  await boundary.getByText('计算、原文与失效条件', { exact: true }).click()
+  await expect(boundary).toContainText('五日线就是五天的收盘价的平均值')
+  await expect(boundary.getByRole('link', { name: /查看原文/ })).toHaveAttribute('href', /\/notes\//)
+  await research.getByRole('button', { name: '冻结本次笔记计算', exact: true }).click()
+  await expect(research.getByRole('region', { name: '冻结笔记计算核对', exact: true })).toContainText('合成示例')
+  await research.getByText('研究定义与人工调整', { exact: true }).click()
+  await research.getByRole('combobox', { name: '攀升指标目标', exact: true }).selectOption('1')
+  await research.getByRole('button', { name: '冻结本次笔记计算', exact: true }).click()
+  const original = await page.evaluate(() => JSON.parse(localStorage.getItem('stockcal.note-price-shadow.v1')!))
+  expect(original.records.map((record: { run: { config: { upperMapping: number } } }) => record.run.config.upperMapping)).toEqual([2, 1])
+  await page.reload()
+  await expect(research.getByText('本地冻结记录 · 2 条', { exact: true })).toBeVisible({ timeout: 30000 })
+  const downloading = page.waitForEvent('download')
+  await research.getByRole('button', { name: '导出笔记影子记录', exact: true }).click()
+  const download = await downloading
+  const path = info.outputPath('note-price-shadow.json')
+  await download.saveAs(path)
+  const exported = JSON.parse(await readFile(path, 'utf8'))
+  expect(exported.records).toEqual(original.records)
+  expect(exported.records[0].run.results[0].card.source.sourceHash).toMatch(/^[a-f0-9]{64}$/)
+  expect(exported.records.every((record: { timing: string }) => record.timing === 'demo')).toBe(true)
+  await research.scrollIntoViewIfNeeded()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true)
+  await page.screenshot({ path: `artifacts/note-price-${process.env.PLAYWRIGHT_THEME ?? 'c'}-${info.project.name}.png` })
+  expect(errors).toEqual([])
+})

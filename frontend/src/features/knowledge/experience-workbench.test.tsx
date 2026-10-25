@@ -31,7 +31,7 @@ const fixture: KnowledgePackage = {
 const draft = { title: '观察量能', originalText: '突破时观察量能。', interpretation: '', type: 'experience' as const }
 
 beforeEach(() => { localStorage.clear() })
-afterEach(() => { vi.restoreAllMocks() })
+afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals() })
 
 describe('immutable knowledge records', () => {
   it('keeps manually saved text uninterpreted until a person supplies an interpretation', () => {
@@ -99,6 +99,27 @@ describe('immutable knowledge records', () => {
 })
 
 describe('experience workbench', () => {
+  it('opens learning samples without retired navigation entries', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => Response.json({ items: [], nextCursor: null, asOf: '2026-10-16T08:00:00Z' })))
+    const user = userEvent.setup(); render(<ExperienceWorkbench data={fixture} />)
+    await user.click(screen.getByRole('link', { name: '学习样本' }))
+    expect(await screen.findByRole('heading', { name: '学习样本库' }, { timeout: 20_000 })).toBeInTheDocument()
+    expect(window.location.search).toContain('view=samples')
+    expect(screen.queryByRole('link', { name: /经验原则|经验与原则/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: '复盘' })).not.toBeInTheDocument()
+    vi.unstubAllGlobals()
+  })
+  it('opens the source tagging view without a separate experience entry', async () => {
+    const user = userEvent.setup()
+    render(<ExperienceWorkbench data={fixture} />)
+    await user.click(screen.getByRole('link', { name: '笔记标签' }))
+    // The actual lazy-loaded source catalog can take longer to import under a parallel suite.
+    expect(await screen.findByRole('heading', { name: '笔记标签目录' }, { timeout: 20_000 })).toBeInTheDocument()
+    expect(window.location.search).toContain('view=notes')
+    expect(screen.queryByRole('link', { name: /经验原则|经验与原则/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: '复盘' })).not.toBeInTheDocument()
+  }, 30_000)
+
   it('saves a manual entry, edits a new version and makes the old text inspectable after reload', async () => {
     const user = userEvent.setup()
     const view = render(<ExperienceWorkbench data={fixture} />)
@@ -170,9 +191,16 @@ describe('experience workbench', () => {
   it('shows data-backed horizon comparisons and source details', async () => {
     const user = userEvent.setup()
     render(<ExperienceWorkbench data={fixture} />)
-    await user.click(screen.getByRole('tab', { name: '回测证据' }))
+    await user.click(screen.getByRole('link', { name: '回测证据' }))
     expect(screen.getByText('经验规则代理尚未显示稳定优势。')).toBeInTheDocument()
     expect(screen.getByText('3.10%')).toBeInTheDocument()
+    await user.selectOptions(screen.getByLabelText('排列方式'), 'error')
+    const table = screen.getByRole('region', { name: '模型误差对照表' })
+    const errors = within(table).getAllByRole('row').slice(1).map(row => Number(within(row).getAllByRole('cell')[0].textContent?.replace('%', '')))
+    expect(errors).toEqual([...errors].sort((a, b) => a - b))
+    await user.click(screen.getByText('如何读懂这些指标？'))
+    expect(screen.getByText(/测试样本是参与该项评价的记录数/)).toBeVisible()
+
     await user.click(screen.getByRole('button', { name: '未来 4 日' }))
     expect(screen.getByText('3.60%')).toBeInTheDocument()
     expect(screen.queryByText('4.30%')).not.toBeInTheDocument()

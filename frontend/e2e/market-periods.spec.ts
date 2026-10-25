@@ -1,21 +1,24 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures/test'
 
-test('eight moving averages and all calendar/minute periods work in the explicitly labeled example', async ({ page }) => {
+test('eight moving averages and all calendar/minute periods work in the explicitly labeled example', async ({ page }, info) => {
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))
   await page.goto('/?example=1')
   await expect(page.getByRole('heading', { name: '示例股票' })).toBeVisible()
+  await page.getByText('均线 / BOLL', { exact: true }).click()
   for (const period of [5, 10, 20, 30, 60, 90, 120, 250]) await expect(page.getByRole('switch', { name: `MA${period}`, exact: true })).toBeChecked()
-  await expect(page.getByTestId('predicted-indicator-line')).toHaveCount(11)
+  await expect(page.getByTestId('predicted-indicator-line')).toHaveCount(10)
   await page.getByRole('switch', { name: 'MA250', exact: true }).uncheck()
   await expect(page.getByRole('switch', { name: 'MA250', exact: true })).not.toBeChecked()
   await page.getByRole('switch', { name: 'MA250', exact: true }).check()
+  await page.getByText('均线 / BOLL', { exact: true }).click()
 
   for (const period of ['周线', '月线', '季线', '年线']) {
     await page.getByRole('tab', { name: period, exact: true }).click()
     await expect(page.getByText(`当前周期：${period}`, { exact: true })).toBeVisible()
     await expect(page.getByTestId('candlestick-layer')).toBeVisible()
     await expect(page.getByTestId('prediction-candle')).toHaveCount(0)
+    await expect(page.getByTestId('projection-day-line')).toHaveCount(4)
   }
   await expect(page.getByText(/MA250 历史不足|MA.*历史不足/)).toBeVisible()
   for (const [value, name] of [['1m', '1分钟'], ['5m', '5分钟'], ['15m', '15分钟'], ['30m', '30分钟'], ['60m', '1小时'], ['120m', '2小时']]) {
@@ -23,12 +26,16 @@ test('eight moving averages and all calendar/minute periods work in the explicit
     await expect(page.getByText(`当前周期：${name}`, { exact: true })).toBeVisible()
     await expect(page.getByTestId('candlestick-layer')).toBeVisible()
     await expect(page.getByText(/正在加载.*行情/)).toHaveCount(0)
+    await expect(page.getByTestId('projection-day-line')).toHaveCount(4)
   }
   await page.getByRole('tab', { name: '分时', exact: true }).click()
   await expect(page.getByText('当前周期：分时', { exact: true })).toBeVisible()
   await expect(page.getByTestId('candlestick-layer')).toHaveCount(0)
-  await expect(page.getByRole('switch', { name: 'MA250', exact: true })).toHaveCount(0)
+  await expect(page.getByTestId('projection-day-line')).toHaveCount(4)
+  await page.getByText('均线 / BOLL', { exact: true }).click()
+  await expect(page.getByRole('switch', { name: 'MA250', exact: true })).toBeChecked()
   await expect(page.getByRole('img', { name: '分时主图' })).toBeVisible()
+  await page.screenshot({ path: `artifacts/chart-periods-${info.project.name}.png`, fullPage: true })
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true)
   expect(errors).toEqual([])
 })

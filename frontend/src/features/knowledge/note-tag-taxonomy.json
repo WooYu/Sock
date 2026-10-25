@@ -1,0 +1,122 @@
+[
+  {
+    "id": "kind",
+    "label": "内容分类",
+    "options": [
+      {
+        "id": "kind.parameter",
+        "label": "参数"
+      },
+      {
+        "id": "kind.experience",
+        "label": "经验"
+      },
+      {
+        "id": "kind.principle",
+        "label": "交易原则"
+      },
+      {
+        "id": "kind.case",
+        "label": "案例"
+      },
+      {
+        "id": "kind.screen",
+        "label": "选股"
+      },
+      {
+        "id": "kind.profit",
+        "label": "盈利模式"
+      },
+      {
+        "id": "kind.review",
+        "label": "解释与复盘"
+      },
+      {
+        "id": "kind.unknown",
+        "label": "类型待补充"
+      }
+    ]
+  },
+  {
+    "id": "topic",
+    "label": "分析主题",
+    "options": [
+      {
+        "id": "topic.formula",
+        "label": "计算公式"
+      },
+      {
+        "id": "topic.parameter-thinking",
+        "label": "参数计算思想"
+      },
+      {
+        "id": "topic.risk",
+        "label": "风险控制"
+      },
+      {
+        "id": "topic.buy",
+        "label": "买入"
+      },
+      {
+        "id": "topic.sell",
+        "label": "卖出"
+      },
+      {
+        "id": "topic.ma",
+        "label": "MA均线"
+      },
+      {
+        "id": "topic.boll",
+        "label": "Boll线"
+      },
+      {
+        "id": "topic.volume",
+        "label": "量价"
+      },
+      {
+        "id": "topic.phase1",
+        "label": "摸线一期"
+      },
+      {
+        "id": "topic.phase2",
+        "label": "摸线二期"
+      },
+      {
+        "id": "topic.phase3",
+        "label": "摸线三期"
+      },
+      {
+        "id": "topic.climb",
+        "label": "攀升"
+      },
+      {
+        "id": "topic.surge",
+        "label": "飙升"
+      },
+      {
+        "id": "topic.double-high",
+        "label": "双高"
+      },
+      {
+        "id": "topic.granville",
+        "label": "葛兰碧"
+      },
+      {
+        "id": "topic.turtle",
+        "label": "海龟"
+      },
+      {
+        "id": "topic.mirror",
+        "label": "照镜子"
+      },
+      {
+        "id": "topic.position",
+        "label": "仓位"
+      },
+      {
+        "id": "topic.unknown",
+        "label": "主题待补充"
+      }
+    ]
+  }
+]

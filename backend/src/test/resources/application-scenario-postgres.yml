@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: ${SCENARIO_TEST_DATABASE_URL}
+    username: ${DATABASE_USER:stockcal}
+    password: ${DATABASE_PASSWORD:stockcal}
+  flyway:
+    enabled: true
+    schemas: ${SCENARIO_TEST_SCHEMA}
+  sql:
+    init:
+      mode: never
+stockcal:
+  ai:
+    enabled: false
+  knowledge:
+    auto-extract: false
+  scenario:
+    jobs-enabled: false

@@ -1,9 +1,11 @@
 'use client'
 
-import Link from 'next/link'
-import { useDeferredValue, useEffect, useMemo, useRef, useState, useSyncExternalStore, type FormEvent, type KeyboardEvent } from 'react'
+import { ResearchHeader, type KnowledgeView } from '../navigation/research-header'
+import dynamic from 'next/dynamic'
+import { useDeferredValue, useEffect, useMemo, useRef, useState, useSyncExternalStore, type FormEvent } from 'react'
 import { StudioIcon } from '../research/studio-icon'
 import researchPackage from './research-package.json'
+import noteSummary from './note-tag-summary.json'
 import {
   KNOWLEDGE_STORAGE_KEY, TYPE_LABELS, createManualVersion, isExpired, latestEntries,
   mergeVersions, parseLedger, reviewVersion, reviseSourceInterpretation, shanghaiToday, validateManualDraft,
@@ -11,7 +13,11 @@ import {
 } from './knowledge-types'
 import './experience-workbench.css'
 
-type WorkbenchTab = 'library' | 'backtest'
+type WorkbenchTab = KnowledgeView
+const LearningSamplesView = dynamic(() => import('./learning-samples-view').then(module => module.LearningSamplesView), { loading: () => <p role="status">正在读取学习样本…</p> })
+const NoteTagWorkbench = dynamic(() => import('./note-tag-workbench').then((module) => module.NoteTagWorkbench), {
+  loading: () => <p role="status">正在读取笔记标签目录…</p>,
+})
 const PAGE_SIZE = 12
 const dateTime = new Intl.DateTimeFormat('zh-CN', { timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })
 const displayDate = (value: string) => Number.isFinite(Date.parse(value)) ? dateTime.format(new Date(value)) : value
@@ -74,7 +80,10 @@ export function ExperienceWorkbench({ data = researchPackage as KnowledgePackage
   const detailRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
-    const onLocation = () => setTab(new URL(window.location.href).searchParams.get('view') === 'backtest' ? 'backtest' : 'library')
+    const onLocation = () => {
+      const view = new URL(window.location.href).searchParams.get('view')
+      setTab(view === 'backtest' || view === 'notes' || view === 'samples' ? view : 'notes')
+    }
     window.addEventListener('popstate', onLocation)
     return () => window.removeEventListener('popstate', onLocation)
   }, [])
@@ -101,11 +110,12 @@ export function ExperienceWorkbench({ data = researchPackage as KnowledgePackage
   const historical = Boolean(viewed && selected && viewed.version !== selected.version)
 
   function switchTab(next: WorkbenchTab) {
+    if (next === tab) return
     setTab(next)
     const url = new URL(window.location.href)
-    if (next === 'backtest') url.searchParams.set('view', 'backtest')
+    if (next !== 'library') url.searchParams.set('view', next)
     else url.searchParams.delete('view')
-    window.history.replaceState(null, '', `${url.pathname}${url.search}`)
+    window.history.pushState(null, '', `${url.pathname}${url.search}`)
   }
 
   function chooseEntry(entry: ExperienceEntry) {
@@ -167,47 +177,31 @@ export function ExperienceWorkbench({ data = researchPackage as KnowledgePackage
   const resetFilters = () => { setType('all'); setSource('all'); setStatus('all'); setSearch(''); setPage(0) }
 
   return <div className="kw-workbench">
-    <header className="kw-header">
-      <Link className="kw-brand" href="/"><span><StudioIcon name="chart" size={20} /></span>StockCal</Link>
-      <nav aria-label="研究导航">
-        <Link href="/?symbol=300502">K线工作台</Link>
-        <a href="/knowledge" aria-current={tab === 'library' ? 'page' : undefined} onClick={(event) => { event.preventDefault(); switchTab('library') }}>经验与原则</a>
-        <a href="/knowledge?view=backtest" aria-current={tab === 'backtest' ? 'page' : undefined} onClick={(event) => { event.preventDefault(); switchTab('backtest') }}>回测证据</a>
-      </nav>
-      <span className="kw-header-note"><i />研究档案 · 本地保存</span>
-    </header>
+    <ResearchHeader active={tab} onKnowledgeNavigate={switchTab} />
 
-    <main className="kw-main">
-      <div className="kw-breadcrumb"><StudioIcon name="book" size={15} /><span>研究工作区</span><span>/</span><strong>{tab === 'library' ? '经验与原则' : '回测证据'}</strong></div>
+    <a className="sc-skip-link" href="#knowledge-main">跳到知识内容</a>
+    <main id="knowledge-main" tabIndex={-1} className={`kw-main${tab === 'notes' ? ' kw-notes-page' : ''}`}>
+      <div className="kw-breadcrumb"><StudioIcon name="book" size={15} /><span>研究工作区</span><span>/</span><strong>{tab === 'library' ? '经验与原则' : tab === 'notes' ? '笔记标签' : tab === 'samples' ? '学习样本' : '回测证据'}</strong></div>
       <div className="kw-page-heading">
-        <div><h1>经验与原则</h1><p>保留原话，核对解释，让每条经验在被使用前先经得起检查。</p></div>
-        <div className="kw-actions"><button className="kw-button" onClick={exportRecords} type="button"><StudioIcon name="layers" size={16} />导出记录</button><button className="kw-button kw-primary" disabled={!ready} onClick={() => { setEditor('new'); setWriteError('') }} type="button"><StudioIcon name="plus" size={16} />新增记录</button></div>
+        <div><h1>{tab === 'notes' ? '笔记标签' : tab === 'samples' ? '学习样本' : tab === 'backtest' ? '回测证据' : '经验与原则'}</h1><p>{tab === 'notes' ? '按内容分类与分析主题整理笔记，保留原文依据与修订历史。' : tab === 'samples' ? '把保存时的计算、所用笔记与实际行情连在一起，保留每次核对结果。' : tab === 'backtest' ? '对照历史数据与基线方法，检验经验规则是否改善预测。' : '保留原话，核对解释，让每条经验在被使用前先经得起检查。'}</p></div>
+        {tab === 'notes' ? <span className="nt-updated">目录更新 <time dateTime={noteSummary.generatedAt}>{shanghaiToday(new Date(noteSummary.generatedAt))}</time></span> : null}
+        {tab === 'library' ? <div className="kw-actions"><button className="kw-button" onClick={exportRecords} type="button"><StudioIcon name="layers" size={16} />导出记录</button><button className="kw-button kw-primary" disabled={!ready} onClick={() => { setEditor('new'); setWriteError('') }} type="button"><StudioIcon name="plus" size={16} />新增记录</button></div> : null}
       </div>
 
       {storageError ? <div className="kw-alert" role="alert"><span>{storageError}</span><button type="button" onClick={ledger.refresh}>重新读取</button></div> : null}
       {writeError && !editor ? <div className="kw-alert" role="alert">{writeError}</div> : null}
       {message ? <div className="kw-notice" role="status"><StudioIcon name="book" size={16} /><span>{message}</span><button type="button" aria-label="关闭保存提示" onClick={() => setMessage('')}><StudioIcon name="close" size={14} /></button></div> : null}
 
-      <div className="kw-summary" aria-label="知识库概况">
-        <div><span>来源资料</span><strong>{data.docCount}<small>篇</small></strong><p>保留 GitHub 原文与行号</p></div>
+      {tab === 'library' ? <div className="kw-summary" aria-label="知识库概况">
+        <div><span>原研究来源</span><strong>{data.docCount}<small>篇</small></strong><p>保留 GitHub 原文与行号</p></div>
         <div><span>经验与原则</span><strong>{entries.length}<small>条</small></strong><p>包括 {counts.manual} 条手工记录</p></div>
         <div><span>待核对解释</span><strong>{counts.pending}<small>条</small></strong><p>确认含义后再开展研究</p></div>
         <div className="kw-summary-note"><StudioIcon name="layers" size={24} /><p><strong>经验 ≠ 可执行规则</strong><span>定义缺失时保持参考；确认解释不代表启用交易。</span></p></div>
-      </div>
+      </div> : null}
 
-      <div className="kw-tabs" role="tablist" aria-label="知识工作区视图" onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
-        if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
-          event.preventDefault()
-          const next = event.key === 'Home' ? 'library' : event.key === 'End' ? 'backtest' : tab === 'library' ? 'backtest' : 'library'
-          switchTab(next)
-          document.getElementById(`kw-tab-${next}`)?.focus()
-        }
-      }}>
-        {(['library', 'backtest'] as const).map((key) => <button id={`kw-tab-${key}`} key={key} role="tab" tabIndex={tab === key ? 0 : -1} aria-selected={tab === key} aria-controls={`kw-panel-${key}`} onClick={() => switchTab(key)} type="button"><StudioIcon name={key === 'library' ? 'book' : 'chart'} size={16} />{key === 'library' ? '经验库' : '回测证据'}{key === 'library' ? <span>{entries.length}</span> : null}</button>)}
-        <span className="kw-tabs-caption">资料更新 {data.generatedAt.slice(0, 10)}</span>
-      </div>
+      {tab !== 'notes' ? <p className="kw-view-caption">{tab === 'samples' ? '保存版本与实际核对' : '原研究更新 ' + data.generatedAt.slice(0, 10)}</p> : null}
 
-      {tab === 'library' ? <div id="kw-panel-library" role="tabpanel" aria-labelledby="kw-tab-library" className="kw-library">
+      {tab === 'library' ? <div id="kw-panel-library" role="region" aria-label="历史经验记录" className="kw-library">
         <aside className="kw-sidebar" aria-label="记录筛选">
           <h2>我的知识库</h2>
           <div className="kw-type-filters" aria-label="按类型筛选">
@@ -254,8 +248,9 @@ export function ExperienceWorkbench({ data = researchPackage as KnowledgePackage
             {!historical ? <div className="kw-detail-actions"><span>{viewed.status === 'reviewed' ? '解释已核对，边界仍然保留' : '核对原话与解释是否一致'}</span><div><button className="kw-button" type="button" disabled={!ready} onClick={() => { setEditor(viewed); setWriteError('') }}>{viewed.sourceType === 'manual' ? '编辑记录' : '修正解释'}</button><button className="kw-button kw-primary" type="button" disabled={!ready || viewed.status === 'reviewed' || !viewed.interpretation.trim() || isExpired(viewed, today)} onClick={confirmInterpretation}>{viewed.status === 'reviewed' ? '解释已确认' : '确认解释'}</button></div><small>确认仅记录审阅状态，不会启用交易或改变生产预测。</small></div> : null}
           </> : <div className="kw-empty"><StudioIcon name="book" size={28} /><h3>{entries.length ? '等待选择记录' : '从一条经验开始'}</h3><p>{entries.length ? '调整左侧筛选，查看记录详情。' : '新增记录，保留你当时的观察和判断。'}</p></div>}
         </section>
-      </div> : <BacktestEvidence data={data} />}
-      <footer className="kw-footer"><span>StockCal · 研究、记录、验证</span><span>来源版本 {data.sourceCommit.slice(0, 8)} · 记录保存在当前浏览器</span>{externalUrl(data.sourceRepository) ? <a href={externalUrl(data.sourceRepository)} target="_blank" rel="noopener noreferrer">查看来源仓库<StudioIcon name="arrow" size={13} /></a> : null}</footer>
+      </div> : tab === 'notes' ? <div id="kw-panel-notes" role="region" aria-labelledby="research-nav-notes"><NoteTagWorkbench /></div>
+        : tab === 'samples' ? <div id="kw-panel-samples" role="region" aria-labelledby="research-nav-samples"><LearningSamplesView /></div> : <BacktestEvidence data={data} />}
+      <footer className="kw-footer"><span>StockCal · 研究、记录、验证</span><span>{tab === 'samples' ? '计算与核对版本保存在研究记录服务' : `来源版本 ${(tab === 'notes' ? noteSummary.sourceCommit : data.sourceCommit).slice(0, 8)} · 记录保存在当前浏览器`}</span>{externalUrl(data.sourceRepository) ? <a href={tab === 'notes' ? 'https://github.com/WooYu/Sock/tree/agent/local-first-watchlist/notes' : externalUrl(data.sourceRepository)} target="_blank" rel="noopener noreferrer">查看来源仓库<StudioIcon name="arrow" size={13} /></a> : null}</footer>
     </main>
     {editor ? <EntryEditor key={editor === 'new' ? 'new' : `${editor.id}-${editor.version}`} entry={editor === 'new' ? undefined : editor} today={today} error={writeError} onCancel={() => { setEditor(null); setWriteError('') }} onSave={saveEntry} /> : null}
   </div>
@@ -317,14 +312,16 @@ function EntryEditor({ entry, today, error, onCancel, onSave }: { entry?: Experi
 
 function BacktestEvidence({ data }: { data: KnowledgePackage }) {
   const [horizon, setHorizon] = useState(3)
+  const [sort, setSort] = useState('default')
   const result = data.backtest
-  const models = result.models.filter((model) => model.horizon === horizon)
+  const models = result.models.filter((model) => model.horizon === horizon).sort((a, b) => sort === 'error' ? a.mape - b.mape : sort === 'direction' ? (b.direction ?? -1) - (a.direction ?? -1) : 0)
   const maxMape = Math.max(...models.map((model) => model.mape), 0.01)
-  return <section className="kw-backtest" id="kw-panel-backtest" role="tabpanel" aria-labelledby="kw-tab-backtest">
+  return <section className="kw-backtest" id="kw-panel-backtest" role="region" aria-labelledby="research-nav-backtest">
     <div className="kw-backtest-heading"><div><span className="kw-eyebrow">历史回溯验证</span><h2>新易盛 <span>300502</span></h2><p>用真实历史日 K，检验经验能否改善未来 {horizon} 日推演。</p></div><div className="kw-horizon" role="group" aria-label="预测时间范围">{[3, 4].map((day) => <button type="button" key={day} aria-pressed={horizon === day} onClick={() => setHorizon(day)}>未来 {day} 日</button>)}</div></div>
     <div className="kw-evidence-verdict"><StudioIcon name="target" size={25} /><div><span>本次研究结论</span><h3>尚未证实经验规则带来稳定优势</h3><p>价格预测误差与方向判断需要对照基线评估；这些结果不构成交易收益证明。</p></div></div>
     <dl className="kw-backtest-facts"><div><dt>行情区间</dt><dd>{result.start} — {result.end}</dd></div><div><dt>日 K 样本</dt><dd>{result.sessions} <small>个交易日</small></dd></div><div><dt>留出测试起点</dt><dd>{result.holdoutStart}</dd></div><div><dt>资料生成日期</dt><dd>{data.generatedAt.slice(0, 10)}</dd></div></dl>
-    <div className="kw-comparison-heading"><h3>模型对照</h3><p>MAPE 越低，价格的平均相对误差越小</p></div>
+    <div className="kw-comparison-heading"><h3>模型对照</h3><p>切换期限后，表格同步展示对应结果。</p><label className="kw-sort">排列方式<select value={sort} onChange={event => setSort(event.target.value)}><option value="default">默认顺序</option><option value="error">价格误差从低到高</option><option value="direction">方向一致率从高到低</option></select></label></div>
+    <details className="ls-advanced"><summary>如何读懂这些指标？</summary><p>价格误差 MAPE 越低越好，表示预测价与实际价的平均相对偏差；方向一致率越高，表示涨跌方向判断越准确。“不适用”表示该方法没有方向评分。测试样本是参与该项评价的记录数，不等于盈利次数。</p><p>这里展示新易盛已有的历史研究；学习样本则记录你每次保存计算后的实际核对。</p></details>
     <div className="kw-table-scroll" tabIndex={0} role="region" aria-label="模型误差对照表"><table><thead><tr><th scope="col">预测方法</th><th scope="col">价格误差 MAPE</th><th scope="col">方向一致率</th><th scope="col">测试样本</th></tr></thead><tbody>{models.map((model) => <tr key={`${model.horizon}-${model.id}`}><th scope="row">{model.label}<small>{model.id}</small></th><td><strong>{model.mape.toFixed(2)}%</strong><div className="kw-metric-track" aria-hidden="true"><i style={{ width: `${Math.max(2, model.mape / maxMape * 100)}%` }} /></div></td><td>{model.direction === null ? <span className="kw-muted">不适用</span> : `${model.direction.toFixed(2)}%`}</td><td>{model.samples}</td></tr>)}</tbody></table>{!models.length ? <p className="kw-empty">当前资料没有这个期限的结果。</p> : null}</div>
     <div className="kw-evidence-grid"><section><h3>结果如何理解</h3><ul>{result.findings.map((finding, index) => <li key={index}>{finding}</li>)}</ul></section><section><h3>验证方法</h3><ol>{result.methodology.map((method, index) => <li key={index}>{method}</li>)}</ol></section></div>
     <details className="kw-source-quality"><summary>数据口径与局限</summary><ul>{result.sourceQuality.map((quality, index) => <li key={index}>{quality}</li>)}</ul><p>来源文档 {data.docCount} 份 · 知识版本 <code>{data.sourceCommit}</code></p></details>

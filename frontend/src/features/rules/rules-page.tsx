@@ -44,6 +44,15 @@ export function RulesPage({ initialRules = [], client = defaultClient }: { initi
   const [selectedRule, setSelectedRule] = useState<RuleRecord | null>(null)
   const [query, setQuery] = useState('')
   const [serverStatistics, setServerStatistics] = useState<{ total: number; published: number; enabled: number; drafts: number } | null>(null)
+  const [sharedRefresh, setSharedRefresh] = useState(0)
+  useEffect(() => {
+    const reloadShared = () => setSharedRefresh(n => n + 1)
+    const localChanged = (event: StorageEvent) => { if (event.key === 'stockcal:rules') setRules(initialRulesWithBuiltIns()) }
+    window.addEventListener('storage', localChanged)
+    window.addEventListener('focus', reloadShared)
+    const timer = setInterval(reloadShared, 10000)
+    return () => { clearInterval(timer); window.removeEventListener('focus', reloadShared); window.removeEventListener('storage', localChanged) }
+  }, [])
   const visibleRules = rules.filter((rule) => `${rule.title} ${rule.description ?? ''}`.toLowerCase().includes(query.trim().toLowerCase()))
 
   useEffect(() => {
@@ -70,7 +79,7 @@ export function RulesPage({ initialRules = [], client = defaultClient }: { initi
       })
     }).catch(() => undefined)
     return () => { active = false }
-  }, [client])
+  }, [client, sharedRefresh])
 
   const toggleRule = async (rule: RuleRecord) => {
     const enabled = !(enabledRules[rule.id] ?? rule.status === 'published')
@@ -158,9 +167,9 @@ export function RulesPage({ initialRules = [], client = defaultClient }: { initi
       {open ? <form className="sc-rule-editor" onSubmit={saveDraft}>
         <label className="block space-y-1 text-sm"><span>规则名称</span><input aria-label="规则名称" className="min-h-12 w-full rounded-xl border border-[var(--sc-border)] bg-transparent px-3" onChange={(event) => setTitle(event.target.value)} value={title} /></label>
         <label className="block space-y-1 text-sm"><span>规则说明</span><textarea aria-label="规则说明" className="min-h-28 w-full rounded-xl border border-[var(--sc-border)] bg-transparent p-3" onChange={(event) => setDescription(event.target.value)} value={description} /></label>
-        <div className="flex gap-3"><button className="min-h-12 rounded-xl bg-[var(--sc-primary)] px-4 text-sm font-semibold text-white" type="submit">保存规则草稿</button><button className="min-h-12 rounded-xl border border-[var(--sc-border)] px-4" onClick={() => setOpen(false)} type="button">取消</button></div>
+        <div className="flex gap-3"><button className="min-h-12 rounded-xl bg-[var(--sc-primary)] px-4 text-sm font-semibold text-[var(--sc-on-primary)]" type="submit">保存规则草稿</button><button className="min-h-12 rounded-xl border border-[var(--sc-border)] px-4" onClick={() => setOpen(false)} type="button">取消</button></div>
       </form> : null}
-      {message ? <p className="text-sm text-emerald-700" role="status">{message}</p> : null}
+      {message ? <p className="text-sm text-[var(--sc-success)]" role="status">{message}</p> : null}
       {visibleRules.length === 0 ? <div className="sc-rules-empty">没有匹配的规则。</div> : <div className="sc-rules-table-wrap"><table aria-label="规则表格" className="sc-rules-table">
         <thead><tr><th>规则名称</th><th>周期</th><th>模式</th><th>条件完整性</th><th>状态</th><th>操作</th></tr></thead>
         <tbody>{visibleRules.map((rule) => <tr className="sc-rule-card" key={rule.id}>
@@ -175,7 +184,7 @@ export function RulesPage({ initialRules = [], client = defaultClient }: { initi
           </div></td>
         </tr>)}</tbody>
       </table></div>}
-      {selectedRule ? <div className="modal-layer" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setSelectedRule(null)}><section aria-label={`规则详情 ${selectedRule.title}`} aria-modal="true" className="rule-detail-panel" role="dialog"><button aria-label="关闭规则详情" className="modal-close" onClick={() => setSelectedRule(null)} type="button">×</button><p className="text-sm text-[var(--sc-muted)]">规则详情 · {selectedRule.status === 'published' ? '已发布' : '草稿'}</p><h2 className="mt-2 text-xl font-semibold">{selectedRule.title}</h2><p className="mt-3 text-sm text-[var(--sc-muted)]">{selectedRule.description || '暂无规则说明。'}</p><dl className="mt-4 space-y-2 text-sm"><div className="flex justify-between gap-4"><dt className="text-[var(--sc-muted)]">状态</dt><dd>{selectedRule.status === 'published' && enabledRules[selectedRule.id] ? '已启用' : selectedRule.status === 'published' ? '已停用' : '草稿'}</dd></div>{selectedRule.timeframe ? <div className="flex justify-between gap-4"><dt className="text-[var(--sc-muted)]">周期</dt><dd>{selectedRule.timeframe}</dd></div> : null}{selectedRule.mode ? <div className="flex justify-between gap-4"><dt className="text-[var(--sc-muted)]">模式</dt><dd>{selectedRule.mode}</dd></div> : null}</dl><div className="mt-5 flex justify-end"><button className="min-h-12 rounded-xl bg-[var(--sc-primary)] px-4 text-sm font-semibold text-white" onClick={() => setSelectedRule(null)} type="button">返回规则列表</button></div></section></div> : null}
+      {selectedRule ? <div className="modal-layer" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setSelectedRule(null)}><section aria-label={`规则详情 ${selectedRule.title}`} aria-modal="true" className="rule-detail-panel" role="dialog"><button aria-label="关闭规则详情" className="modal-close" onClick={() => setSelectedRule(null)} type="button">×</button><p className="text-sm text-[var(--sc-muted)]">规则详情 · {selectedRule.status === 'published' ? '已发布' : '草稿'}</p><h2 className="mt-2 text-xl font-semibold">{selectedRule.title}</h2><p className="mt-3 text-sm text-[var(--sc-muted)]">{selectedRule.description || '暂无规则说明。'}</p><dl className="mt-4 space-y-2 text-sm"><div className="flex justify-between gap-4"><dt className="text-[var(--sc-muted)]">状态</dt><dd>{selectedRule.status === 'published' && enabledRules[selectedRule.id] ? '已启用' : selectedRule.status === 'published' ? '已停用' : '草稿'}</dd></div>{selectedRule.timeframe ? <div className="flex justify-between gap-4"><dt className="text-[var(--sc-muted)]">周期</dt><dd>{selectedRule.timeframe}</dd></div> : null}{selectedRule.mode ? <div className="flex justify-between gap-4"><dt className="text-[var(--sc-muted)]">模式</dt><dd>{selectedRule.mode}</dd></div> : null}</dl><div className="mt-5 flex justify-end"><button className="min-h-12 rounded-xl bg-[var(--sc-primary)] px-4 text-sm font-semibold text-[var(--sc-on-primary)]" onClick={() => setSelectedRule(null)} type="button">返回规则列表</button></div></section></div> : null}
     </section>
   )
 }

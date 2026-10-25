@@ -12,7 +12,7 @@ describe('Tencent public market adapter', () => {
   afterEach(() => { vi.unstubAllGlobals(); vi.useRealTimers(); vi.restoreAllMocks() })
 
   test('uses unadjusted daily data by default, converts lots to shares, and preserves actual provider identity', async () => {
-    const fetcher = vi.fn<typeof fetch>(async () => Response.json(payload('day', daily)))
+    const fetcher = vi.fn<typeof fetch>(async () => Response.json({ code: 0, data: { sz300502: { ...payload('day', daily).data.sz300502, qfqday: daily } } }))
     vi.stubGlobal('fetch', fetcher)
     const { getPublicChartSeries, getPublicMarketSnapshot } = await load()
     const series = await getPublicChartSeries('300502')
@@ -20,7 +20,8 @@ describe('Tencent public market adapter', () => {
     const snapshot = await getPublicMarketSnapshot('300502')
     expect(snapshot.quote).toMatchObject({ security: { code: '300502', name: '新易盛', exchange: 'SZ' }, price: 12, previousClose: 11, volume: 15000 })
     expect(snapshot.source).toMatchObject({ name: '腾讯公开行情·延时', state: 'DELAYED', online: true })
-    expect(fetcher).toHaveBeenCalledTimes(1)
+    expect(snapshot.adjustment).toBe('qfq')
+    expect(fetcher).toHaveBeenCalledTimes(2)
     expect(new URL(fetcher.mock.calls[0][0] as string).searchParams.get('param')).toBe('sz300502,day,,,640,')
   })
 
@@ -85,6 +86,15 @@ describe('Tencent public market adapter', () => {
     expect(result.bars.map((bar) => [bar.day, bar.close, bar.volume])).toEqual([['2026-09-15', 11, 10000], ['2026-09-16', 12.5, 17000]])
   })
 
+  test('does not treat aggregate constituent turnover per share as an index-point average', async () => {
+    const data = { date: '20260916', data: ['0930 3710 2000 2800000', '0931 3658 3000 4200000'] }
+    vi.stubGlobal('fetch', vi.fn(async () => Response.json(payload('data', data, 'sh000001'))))
+    const result = await (await load()).getPublicChartSeries('sh000001', 'intraday')
+    expect(result.bars.map(bar => bar.close)).toEqual([3710, 3658])
+    expect(result.bars.every(bar => bar.averagePrice === undefined)).toBe(true)
+    expect(result.note).toContain('不代表指数均价')
+  })
+
   test.each([
     { rows: [['2026-02-30', '10', '11', '12', '9', '100']] },
     { rows: [['2026-09-16', '10', '11', '10.5', '9', '100']] },
@@ -145,8 +155,44 @@ describe('Tencent public market adapter', () => {
     expect(await (await load()).searchPublicSecurities('xys')).toEqual([{ code: '300502', name: '新易盛', exchange: 'SZ', initials: 'xys' }])
   })
 
+  test.each(['上证指数', '上证', '上证综指', 'SH000001', 'szzs'])('finds the index by %s without a stock-code collision', async query => {
+    const fetcher = vi.fn(); vi.stubGlobal('fetch', fetcher)
+    expect(await (await load()).searchPublicSecurities(query)).toEqual([{ code: 'sh000001', name: '上证指数', exchange: 'SH', initials: 'szzs' }])
+    expect(fetcher).not.toHaveBeenCalled()
+  })
+
+  test('loads raw index history and keeps its qualified identity separate from Ping An Bank', async () => {
+    const data = payload('day', daily, 'sh000001')
+    data.data.sh000001.qt.sh000001[1] = '上证指数'
+    const fetcher = vi.fn<typeof fetch>(async () => Response.json(data)); vi.stubGlobal('fetch', fetcher)
+    const api = await load()
+    const snapshot = await api.getPublicMarketSnapshot('sh000001')
+    expect(snapshot).toMatchObject({ adjustment: 'none', quote: { security: { code: 'sh000001', name: '上证指数', exchange: 'SH' } } })
+    expect(await api.getPublicChartSeries('sh000001', 'day', 'qfq')).toMatchObject({ symbol: 'sh000001', adjustment: 'none', bars: [{ close: 11 }, { close: 12 }] })
+    expect(new URL(fetcher.mock.calls[0][0] as string).searchParams.get('param')).toBe('sh000001,day,,,640,')
+  })
+
   test('does not evaluate script returned by smartbox', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => new Response('globalThis.pwned = true;')))
     await expect((await load()).searchPublicSecurities('xys')).rejects.toMatchObject({ status: 502 })
   })
+})
+
+test('five-day samples are chronological and reset volume and VWAP each trading day', async () => {
+  const days = ['20261023', '20261022', '20261021', '20261020', '20261019'].map(date => ({ date, data: ['0930 10.00 2 2000.00', '0931 11.00 5 5200.00'] }))
+  vi.resetModules()
+  vi.stubGlobal('fetch', vi.fn(async () => Response.json(payload('data', days))))
+  try {
+    const result = await (await load()).getPublicChartSeries('300502', '5day')
+    expect(result).toMatchObject({ period: '5day', kind: 'intraday', adjustment: 'none' })
+    expect(result.bars).toHaveLength(10)
+    expect(result.bars[0].day).toContain('2026-10-19')
+    expect(result.bars.at(-1)!.day).toContain('2026-10-23')
+    for (let i = 0; i < 10; i += 2) {
+      expect(result.bars[i]).toMatchObject({ volume: 200, averagePrice: 10 })
+      expect(result.bars[i + 1]).toMatchObject({ volume: 300, averagePrice: 10.4 })
+    }
+    expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/appstock/app/day/query?code=sz300502'), expect.anything())
+    expect(result.previousClose).toBeUndefined()
+  } finally { vi.unstubAllGlobals() }
 })

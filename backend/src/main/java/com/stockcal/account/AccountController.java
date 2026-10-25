@@ -27,10 +27,7 @@ public class AccountController {
             .param("phone", phone).query(String.class).optional().orElse(null);
         if (userId == null) return;
 
-        jdbc.sql("delete from sync_change where user_id=:phone")
-            .param("phone", phone).update();
-        jdbc.sql("delete from account_trade where user_id=:phone")
-            .param("phone", phone).update();
+        // Shared business records survive account deletion.
         jdbc.sql("""
                 delete from sync_mutation
                 where user_id in (select id from app_user where phone=:phone)

@@ -35,6 +35,8 @@ export type Candle = {
 }
 
 export type MarketSnapshot = {
+  /** Missing on historical snapshots means unadjusted. */
+  adjustment?: 'none' | 'qfq' | 'hfq'
   quote: {
     security: Security
     price: number
@@ -164,5 +166,5 @@ export type StockWorkspaceSnapshot = {
   generatedAt: string
   prediction?: PredictionSnapshot | null
   publishedRules?: DecisionRule[]
-  rulesStatus?: 'ready' | 'error'
+  rulesStatus?: 'loading' | 'ready' | 'error'
 }

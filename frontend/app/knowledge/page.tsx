@@ -2,11 +2,11 @@ import type { Metadata } from 'next'
 import { ExperienceWorkbench } from '@/features/knowledge/experience-workbench'
 
 export const metadata: Metadata = {
-  title: '经验与原则 · StockCal',
-  description: '核对投资经验的原文、解释与适用边界，管理版本并查看历史回测证据。',
+  title: '笔记标签 · StockCal',
+  description: '按标签整理笔记、查看原文与修订历史，关联学习样本及回测证据。',
 }
 
 export default async function KnowledgePage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
   const { view } = await searchParams
-  return <ExperienceWorkbench initialTab={view === 'backtest' ? 'backtest' : 'library'} />
+  return <ExperienceWorkbench initialTab={view === 'backtest' || view === 'notes' || view === 'samples' ? view : 'notes'} />
 }

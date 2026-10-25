@@ -1,0 +1,157 @@
+import { createServer } from '/workspace/Sock/frontend/node_modules/vite/dist/node/index.js'
+import { readFile, writeFile, mkdir } from 'node:fs/promises'
+import { createHash } from 'node:crypto'
+import assert from 'node:assert/strict'
+
+const root = '/workspace/Sock/research/zhangyue-scenario-v1/learning-2026-10-16'
+const phase = process.argv[2]
+assert(['train', 'validate'].includes(phase))
+const digest = data => createHash('sha256').update(data).digest('hex')
+const writeNew = (name, data) => writeFile(root + '/' + name, JSON.stringify(data, null, 2) + '\n', { flag: 'wx' })
+let protocol, rawSource, candidate = null
+if (phase === 'train') {
+  const previous = JSON.parse(await readFile('/tmp/stockcal-603533-2026-10-16T05-06-00-081Z-analysis.json', 'utf8'))
+  rawSource = await readFile(previous.sourceFile, 'utf8')
+  assert.equal(digest(rawSource), previous.sourceSha256)
+  const history = JSON.parse(rawSource).bars.filter(bar => bar.day <= '2026-10-15')
+  assert.equal(new Set(history.map(bar => bar.day)).size, history.length)
+  assert(history.every((bar, i) => !i || bar.day > history[i - 1].day))
+  assert(history.every(bar => [bar.open, bar.high, bar.low, bar.close].every(Number.isFinite) && bar.low > 0 && bar.low <= Math.min(bar.open, bar.close) && bar.high >= Math.max(bar.open, bar.close)))
+  protocol = {
+    definitionVersion: 'price-learning-replay-v1', createdAt: new Date().toISOString(), symbol: '603533',
+    sourceSha256: digest(rawSource), latestCompleteDay: '2026-10-15', period: 'day', horizons: [1, 2, 3],
+    targetMeaning: 'next observed complete daily candle; future 1/2/3 indicator levels tested against this one preselected price window',
+    methods: ['average_delta', 'last_delta', 'rolling_close', 'previous_close'],
+    rollingCondition: 'future closes stay at origin close; no later price selected',
+    matching: { definitionVersion: 'ohlc-price-closeness-v1', fields: ['open', 'high', 'low', 'close'],
+      relativeDenominator: 'actual_price', threshold: 0.01, operator: 'lt', tickSize: 0.01 },
+    consolidation: { tolerance: 0.01, definitionVersion: 'reference-mean-1pct-v1' },
+    band: { ratio: 0.10, source: 'ordinary_main_board_assumption', verifiedSpecialStatus: false },
+    split: { trainingTargets: history.slice(-60, -20).map(bar => bar.day), validationTargets: history.slice(-20).map(bar => bar.day) },
+    regime: { source: 'existing daily directionCandidate; never a confirmed trend or Granville stage',
+      minimumTrainingSamplesForConditionalChoice: 8 },
+    selection: { primary: 'harmonic mean of mean per-day level precision and mean per-day OHLC target coverage',
+      zeroCandidateDay: 'both per-day level precision and selection score use zero; empty count retained',
+      tieBreak: ['higher mean target coverage', 'fewer mean candidates', 'average_delta then last_delta then rolling_close'],
+      candidateLimit: 'one rule frozen after training; no revisions based on validation results' },
+    previouslyInspectedValidationDates: ['2026-09-10', '2026-09-11', '2026-10-14', '2026-10-15'],
+    constraints: ['No hour or 30m price forecasting requested for this study.',
+      'Validation segment is retrospective and partly previously inspected, not a strict blind or live test.',
+      'No intraday support/resistance score without intraday evidence.',
+      'No automatic activation, changes to original notes, or modification of saved analyses.'],
+  }
+  await mkdir(root, { recursive: true })
+  await writeFile(root + '/source.json', rawSource, { flag: 'wx' })
+  await writeNew('protocol.json', protocol)
+} else {
+  protocol = JSON.parse(await readFile(root + '/protocol.json', 'utf8'))
+  rawSource = await readFile(root + '/source.json', 'utf8')
+  candidate = JSON.parse(await readFile(root + '/candidate.json', 'utf8'))
+  assert.equal(candidate.trainingSha256, digest(await readFile(root + '/training-ledger.json')))
+  assert(candidate.createdAt && candidate.status === 'research_candidate')
+}
+assert.equal(digest(rawSource), protocol.sourceSha256)
+const source = JSON.parse(rawSource)
+const bars = source.bars.filter(bar => bar.day <= protocol.latestCompleteDay)
+const selectedTargets = protocol.split[phase === 'train' ? 'trainingTargets' : 'validationTargets']
+const server = await createServer({ configFile: false, server: { middlewareMode: true, watch: null }, appType: 'custom' })
+
+function match(price, actual) {
+  const predicted = Math.round(price * 100), tick = Math.round(actual * 100)
+  // Integer comparison enforces strict <1%, including the exact boundary.
+  return { relativeError: Math.abs(predicted - tick) / tick, close: Math.abs(predicted - tick) * 100 < tick, exact: predicted === tick }
+}
+function evaluate(levels, actual) {
+  const details = levels.map(level => {
+    const fields = Object.fromEntries(protocol.matching.fields.map(field => [field, match(level.value, actual[field])]))
+    return { price: level.value, groupIds: level.groupIds, fields,
+      close: Object.values(fields).some(value => value.close), exact: Object.values(fields).some(value => value.exact) }
+  })
+  const targets = protocol.matching.fields.map(field => {
+    const nearest = details.toSorted((a, b) => a.fields[field].relativeError - b.fields[field].relativeError)[0]
+    return { field, actual: actual[field], nearestPrice: nearest?.price ?? null,
+      relativeError: nearest?.fields[field].relativeError ?? null,
+      close: nearest?.fields[field].close ?? false, exact: nearest?.fields[field].exact ?? false }
+  })
+  const closeCount = details.filter(row => row.close).length
+  const targetCount = targets.filter(row => row.close).length
+  return { levels: details, targets, count: details.length, closeCount, exactCount: details.filter(row => row.exact).length,
+    precision: details.length ? closeCount / details.length : 0, coverage: targetCount / 4,
+    targetCount, empty: details.length === 0 }
+}
+function summary(records, key) {
+  const rows = records.map(record => record.methods[key])
+  const sum = mapper => rows.reduce((total, row) => total + mapper(row), 0)
+  const p = sum(row => row.precision) / rows.length, c = sum(row => row.coverage) / rows.length
+  return { samples: rows.length, meanDailyPrecision: p, meanDailyCoverage: c, selectionScore: p + c ? 2 * p * c / (p + c) : 0,
+    totalLevels: sum(row => row.count), closeLevels: sum(row => row.closeCount), exactLevels: sum(row => row.exactCount),
+    microPrecision: sum(row => row.count) ? sum(row => row.closeCount) / sum(row => row.count) : null,
+    meanCandidates: sum(row => row.count) / rows.length, emptyDays: rows.filter(row => row.empty).length,
+    targetCoverage: Object.fromEntries(protocol.matching.fields.map(field => [field, sum(row => Number(row.targets.find(target => target.field === field).close)) / rows.length])),
+    meanNearestTargetRelativeError: Object.fromEntries(protocol.matching.fields.map(field => {
+      const values = rows.map(row => row.targets.find(target => target.field === field).relativeError).filter(value => value !== null)
+      return [field, values.length ? values.reduce((a, b) => a + b, 0) / values.length : null]
+    })),
+  }
+}
+try {
+  const { normalizeScenarioSeries } = await server.ssrLoadModule('/src/features/scenario/scenario-inputs.ts')
+  const { buildScenarioAnalysis } = await server.ssrLoadModule('/src/features/scenario/scenario-engine.ts')
+  const { consolidateReferencePrices } = await server.ssrLoadModule('/src/features/scenario/scenario-levels.ts')
+  const { buildDailyPriceLadder, resolveDailyPriceLimit } = await server.ssrLoadModule('/src/features/scenario/scenario-price-ladder.ts')
+  const records = []
+  for (const day of selectedTargets) {
+    const targetIndex = bars.findIndex(bar => bar.day === day)
+    assert(targetIndex > 22)
+    const history = bars.slice(0, targetIndex), origin = history.at(-1), actual = bars[targetIndex]
+    const asOf = origin.day + 'T15:00:00+08:00'
+    const period = normalizeScenarioSeries({ ...source, bars: history }, asOf)
+    assert.equal(period.observed.length, 0)
+    assert.equal(period.closed.at(-1).day, origin.day)
+    const input = { symbol: protocol.symbol, asOf, sourceMode: 'real', calendar: null, periods: { day: period }, loadIssues: {} }
+    const priceSelection = { limit: resolveDailyPriceLimit(protocol.symbol, '掌阅科技') }
+    const analysis = buildScenarioAnalysis(input, {}, { id: 'learning-' + day, version: 1, createdAt: protocol.createdAt,
+      kind: 'replay', registry: [], scenarios: [], horizons: protocol.horizons, executionWindow: null, priceSelection })
+    assert(analysis.references.every(ref => ref.originBarKey === origin.day))
+    const methods = {}
+    const refDetails = {}
+    for (const method of protocol.methods.filter(method => method !== 'previous_close')) {
+      const consolidated = consolidateReferencePrices(analysis.references, analysis.scenarios, { method, scenarioIds: {} })
+      const ladder = buildDailyPriceLadder(input, consolidated.mergedLevels, priceSelection)
+      assert.equal(ladder.issues.length, 0)
+      const levels = [...ladder.up, ...ladder.down]
+      methods[method] = evaluate(levels, actual)
+      refDetails[method] = { selectedReferences: consolidated.mergedLevels.flatMap(group => group.references),
+        mergedLevels: consolidated.mergedLevels.map(group => ({ id: group.id, value: group.value, referenceIds: group.references.map(ref => ref.id) })),
+        excludedGroupIds: ladder.excludedGroupIds, band: ladder.band }
+    }
+    methods.previous_close = evaluate([{ value: origin.close, groupIds: ['baseline:previous_close'] }], actual)
+    const direction = analysis.states.day.directionCandidate
+    if (candidate) {
+      const selectedMethod = candidate.methodByDirection[direction] ?? candidate.defaultMethod
+      assert(protocol.methods.includes(selectedMethod) && selectedMethod !== 'previous_close')
+      methods.candidate = { ...structuredClone(methods[selectedMethod]), selectedMethod }
+    }
+    records.push({ targetDay: day, cutoff: asOf, origin: structuredClone(origin), actual: structuredClone(actual),
+      directionCandidate: direction, trendConfirmed: false, facts: analysis.states.day.facts,
+      originPreviousClose: history.at(-2).close, methods, refDetails })
+  }
+  const keys = [...protocol.methods, ...(candidate ? ['candidate'] : [])]
+  const summarise = records => Object.fromEntries(keys.map(key => [key, summary(records, key)]))
+  const output = { kind: 'retrospective_replay', phase, sourceSha256: protocol.sourceSha256,
+    protocolSha256: digest(await readFile(root + '/protocol.json')),
+    ...(candidate ? { candidateSha256: digest(await readFile(root + '/candidate.json')) } : {}),
+    generatedAt: new Date().toISOString(), forwardEligible: false, records, summary: summarise(records),
+    byDirection: Object.fromEntries([...new Set(records.map(row => row.directionCandidate))].map(direction => {
+      const subset = records.filter(row => row.directionCandidate === direction)
+      return [direction, { samples: subset.length, summary: summarise(subset) }]
+    })),
+    intraday: { status: 'not_evaluated', reason: 'daily OHLC alone does not establish repeated support/resistance interactions' } }
+  await writeNew(phase === 'train' ? 'training-ledger.json' : 'validation-ledger.json', output)
+  const compact = summary => Object.fromEntries(Object.entries(summary).map(([key, value]) => [key,
+    { samples: value.samples, precision: value.meanDailyPrecision, coverage: value.meanDailyCoverage,
+      score: value.selectionScore, candidates: value.meanCandidates, emptyDays: value.emptyDays, fields: value.targetCoverage }]))
+  console.log(JSON.stringify({ root, phase, first: records[0].targetDay, last: records.at(-1).targetDay,
+    summary: compact(output.summary), byDirection: Object.fromEntries(Object.entries(output.byDirection).map(([key, value]) => [key,
+      { samples: value.samples, summary: compact(value.summary) }])) }, null, 2))
+} finally { await server.close() }

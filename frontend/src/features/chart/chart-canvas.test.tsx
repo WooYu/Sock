@@ -54,6 +54,80 @@ const baseProps = {
 }
 
 describe('ChartCanvas', () => {
+  test('inspect mode moves the crosshair without moving the time viewport', () => {
+    const onPan = vi.fn()
+    render(<ChartCanvas {...baseProps} panOnPointer navigationMode="inspect" onPan={onPan} />)
+    const chart = screen.getByRole('img', { name: 'K线主图' })
+    fireEvent.pointerDown(chart, { pointerId: 1, clientX: 240, clientY: 120 })
+    fireEvent.pointerMove(chart, { pointerId: 1, clientX: 190, clientY: 220 })
+    fireEvent.pointerUp(chart, { pointerId: 1, clientX: 170, clientY: 220 })
+    expect(onPan).not.toHaveBeenCalled()
+    expect(screen.getByTestId('crosshair-tooltip')).toBeInTheDocument()
+  })
+
+  test('pan mode ignores jitter and locks a vertical drag against subsequent horizontal drift', () => {
+    const onPan = vi.fn()
+    render(<ChartCanvas {...baseProps} panOnPointer navigationMode="pan" onPan={onPan} />)
+    const chart = screen.getByRole('img', { name: 'K线主图' })
+    fireEvent.pointerDown(chart, { pointerId: 2, clientX: 240, clientY: 120 })
+    fireEvent.pointerMove(chart, { pointerId: 2, clientX: 243, clientY: 123 })
+    fireEvent.pointerMove(chart, { pointerId: 2, clientX: 245, clientY: 160 })
+    fireEvent.pointerMove(chart, { pointerId: 2, clientX: 170, clientY: 180 })
+    fireEvent.pointerUp(chart, { pointerId: 2, clientX: 150, clientY: 180 })
+    expect(onPan).not.toHaveBeenCalled()
+    fireEvent.pointerDown(chart, { pointerId: 3, clientX: 240, clientY: 120 })
+    fireEvent.pointerMove(chart, { pointerId: 3, clientX: 190, clientY: 122 })
+    expect(onPan).toHaveBeenCalledWith(50)
+  })
+
+  test('price-axis drag and double click affect only the price range', () => {
+    const onPan = vi.fn(), onPricePan = vi.fn(), onPriceScale = vi.fn(), onPriceReset = vi.fn(), onViewportReset = vi.fn()
+    render(<ChartCanvas {...baseProps} panOnPointer onPan={onPan} onPricePan={onPricePan} onPriceScale={onPriceScale} onPriceReset={onPriceReset} onViewportReset={onViewportReset} />)
+    const chart = screen.getByRole('img', { name: 'K线主图' })
+    const axis = screen.getByTestId('price-axis-hit-area')
+    fireEvent.pointerDown(axis, { pointerId: 4, clientX: 930, clientY: 120 })
+    fireEvent.pointerMove(chart, { pointerId: 4, clientX: 935, clientY: 150 })
+    fireEvent.pointerUp(chart, { pointerId: 4, clientX: 935, clientY: 150 })
+    expect(onPricePan).toHaveBeenCalledWith(0.1)
+    expect(onPan).not.toHaveBeenCalled()
+    fireEvent.pointerDown(axis, { pointerId: 5, clientX: 930, clientY: 120, shiftKey: true })
+    fireEvent.pointerMove(chart, { pointerId: 5, clientX: 930, clientY: 150 })
+    expect(onPriceScale).toHaveBeenCalled()
+    fireEvent.doubleClick(axis)
+    expect(onPriceReset).toHaveBeenCalledOnce()
+    expect(onViewportReset).not.toHaveBeenCalled()
+  })
+
+  test('touch inspection retains readout after lifting the finger and Escape dismisses it', () => {
+    render(<ChartCanvas {...baseProps} panOnPointer navigationMode="inspect" />)
+    const chart = screen.getByRole('img', { name: 'K线主图' })
+    fireEvent.pointerDown(chart, { pointerId: 6, pointerType: 'touch', clientX: 240, clientY: 120 })
+    fireEvent.pointerMove(chart, { pointerId: 6, pointerType: 'touch', clientX: 260, clientY: 180 })
+    fireEvent.pointerUp(chart, { pointerId: 6, pointerType: 'touch', clientX: 260, clientY: 180 })
+    fireEvent.pointerLeave(chart, { pointerId: 6, pointerType: 'touch' })
+    expect(screen.getByTestId('crosshair-tooltip')).toBeInTheDocument()
+    fireEvent.keyDown(chart, { key: 'Escape' })
+    expect(screen.queryByTestId('crosshair-tooltip')).not.toBeInTheDocument()
+  })
+
+  test('historical change uses previous close and amplitude uses the high-low range', () => {
+    render(<ChartCanvas {...baseProps} prediction={null} />)
+    fireEvent.pointerMove(screen.getByRole('img', { name: 'K线主图' }), { pointerId: 3, clientX: transform.xForTime(candles[1].day), clientY: 172 })
+    const tooltip = screen.getByTestId('crosshair-tooltip')
+    expect(tooltip).toHaveTextContent('当日涨跌 +1.00 / +1.00%')
+    expect(tooltip).toHaveTextContent('振幅 4.00 / 4.00%')
+    expect(tooltip).toHaveTextContent('前收 100.00')
+    expect(screen.getByTestId('crosshair-axis-labels')).toHaveTextContent('2026-09-07')
+  })
+
+  test.each([undefined, 0, Number.NaN, 105])('first visible candle uses only a valid preceding close: %s', precedingClose => {
+    render(<ChartCanvas {...baseProps} prediction={null} precedingClose={precedingClose} previousClose={999} />)
+    fireEvent.pointerMove(screen.getByRole('img', { name: 'K线主图' }), { pointerId: 3, clientX: transform.xForTime(candles[0].day), clientY: 172 })
+    const tooltip = screen.getByTestId('crosshair-tooltip')
+    expect(tooltip).toHaveTextContent(precedingClose === 105 ? '当日涨跌 -5.00 / -4.76%' : '当日涨跌 -- / --')
+    expect(tooltip).toHaveTextContent(precedingClose === 105 ? '振幅 5.00 / 4.76%' : '振幅 5.00 / --')
+  })
+
   test('owns the svg and renders chart layers in the required order', () => {
     const { container } = render(<ChartCanvas {...baseProps} />)
 
@@ -389,14 +463,15 @@ describe('ChartCanvas', () => {
   })
 
   test('intraday crosshair shows timestamp, price and supplied average without invented OHLC or VWAP', () => {
-    const { container } = render(<ChartCanvas {...baseProps} kind="intraday" period="intraday" prediction={null} candles={intraday.map((candle) => ({ ...candle, averagePrice: undefined }))} transform={intradayTransform} crosshair />)
+    const { container } = render(<ChartCanvas {...baseProps} kind="intraday" period="intraday" prediction={null} indicators={{ ma5: true, boll: true }} candles={intraday.map((candle) => ({ ...candle, averagePrice: undefined }))} transform={intradayTransform} crosshair />)
     const chart = screen.getByRole('img', { name: '分时主图' })
     fireEvent.pointerMove(chart, { pointerId: 3, clientX: intradayTransform.xForTime(intraday[1].day), clientY: 172 })
     const tooltip = screen.getByTestId('crosshair-tooltip')
     expect(tooltip).toHaveTextContent('2026-09-16 09:32 +08:00')
     expect(tooltip).toHaveTextContent('价格 10.20')
     expect(tooltip).toHaveTextContent('均价 --')
-    expect(tooltip).not.toHaveTextContent(/开 |高 |低 |收 |MA5/)
+    expect(tooltip).not.toHaveTextContent(/开 |高 |低 |收 /)
+    expect(tooltip).toHaveTextContent('MA5 --')
     expect(screen.queryByTestId('intraday-average-line')).not.toBeInTheDocument()
     expect(screen.queryByTestId('previous-close-line')).not.toBeInTheDocument()
     expect(within(container.querySelector('[aria-label="交易时间"]') as HTMLElement).getByText('09:31')).toBeInTheDocument()
@@ -424,5 +499,29 @@ describe('ChartCanvas', () => {
     expect(container.querySelector('[aria-label="交易日期"]')).toHaveTextContent(label)
     fireEvent.pointerMove(screen.getByRole('img', { name: 'K线主图' }), { pointerId: 3, clientX: calendarTransform.xForTime(time), clientY: 172 })
     expect(screen.getByTestId('crosshair-tooltip')).toHaveTextContent(label)
+  })
+})
+
+
+describe('历史信息与预测涨跌范围', () => {
+  test('指针模式在十字光标关闭时仍显示历史价格和指标', () => {
+    render(<ChartCanvas {...baseProps} indicators={{ ma5: true, boll: true }} indicatorValues={{ ...baseProps.indicatorValues, ma5: [99, 100], boll: { upper: [105, 106], middle: [100, 101], lower: [95, 96] } }} />)
+    fireEvent.pointerMove(screen.getByRole('img', { name: 'K线主图' }), { clientX: transform.xForTime(candles[0].day), clientY: 150 })
+    const tooltip = screen.getByTestId('crosshair-tooltip')
+    expect(within(tooltip).getByText((_, node) => node?.tagName.toLowerCase() === 'text' && node.textContent === '收 100.00')).toBeInTheDocument()
+    expect(within(tooltip).getByText((_, node) => node?.tagName.toLowerCase() === 'text' && node.textContent === 'MA5 99.00')).toBeInTheDocument()
+    expect(within(tooltip).getByText((_, node) => node?.tagName.toLowerCase() === 'text' && node.textContent === 'BOLL上 105.00')).toBeInTheDocument()
+    fireEvent.pointerLeave(screen.getByRole('img', { name: 'K线主图' }))
+    expect(screen.queryByTestId('crosshair-tooltip')).not.toBeInTheDocument()
+  })
+
+  test('预测每日竖线常显，仅标记累计涨跌限制内的值并备注百分比', () => {
+    const times = ['2026-09-08', '2026-09-09', '2026-09-10', '2026-09-11']
+    const forecastTransform = createChartTransform({ times: [...candles.map(c => c.day), ...times], minPrice: 80, maxPrice: 150, rect: { left: 58, top: 22, width: 850, height: 300 } })
+    render(<ChartCanvas {...baseProps} prediction={null} transform={forecastTransform} projectedTimes={times} limitRatio={0.1} selectedProjectionTime={times[0]} indicators={{ ma5: true }} indicatorValues={{ ...baseProps.indicatorValues, ma5: [99, 100, 110, 140, null, 120] }} />)
+    expect(screen.getAllByTestId('projection-day-line')).toHaveLength(4)
+    expect(screen.getAllByTestId('projection-within-limit')).toHaveLength(2)
+    expect(screen.getByTestId('projection-tooltip')).toHaveTextContent('+8.91%')
+    expect(screen.getByTestId('projection-tooltip')).toHaveTextContent('每日 ±10.00%')
   })
 })

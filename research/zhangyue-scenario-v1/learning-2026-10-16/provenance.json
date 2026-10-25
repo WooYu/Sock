@@ -1,0 +1,25 @@
+{
+  "repositoryHead": "0014c94a6225dd23f8313d9b166cacae2e633df3",
+  "note": "Current repository has local changes; hashes identify exact calculation files used.",
+  "calculationFileSha256": {
+    "frontend/src/features/scenario/scenario-engine.ts": "4d3b6e5410eb0bd0a6c5740764cf39fc460922c8e493108bb772263eb134933f",
+    "frontend/src/features/scenario/scenario-calculator.ts": "8a2ada226e9c5fdd2aae592d17bc0f7b1d26c5823f96cf0ad91d75e612a0990f",
+    "frontend/src/features/scenario/scenario-levels.ts": "a51f1a8c09490ea5bc4af8c9949108ed1b6dcc1826664457fb4b6253901dd1dc",
+    "frontend/src/features/scenario/scenario-price-ladder.ts": "dcbd3c2b3aa0253d1dd0c02c2137969baa2ba056295f3429020376caada23279",
+    "frontend/src/features/scenario/scenario-state.ts": "f7285379f95a6985dfe337c527be21c8eb0eb47d8fe9d3622ac3705348061f9c",
+    "frontend/src/features/scenario/scenario-inputs.ts": "8759397e28c9c3f6ed95e13f7f9dbfffebba321a9dddcf52c5e960d049ef0034",
+    "frontend/src/features/chart/chart-math.ts": "8beded0a23c5d3b24a03a372341ed6a60829cbec34c0370bf9f762b26ec5b20f"
+  },
+  "runnerFile": "replay-used.mjs.txt",
+  "runnerSha256": "065ea49879754e180bfded37ef578d51d96926db8c54e90c2b0159023af71173",
+  "runnerNote": "Exact scratch runner retained as text for inspection. It contains fixed local input/output paths and is not a background service.",
+  "artifactSha256": {
+    "source.json": "4ed1ad37756d99395b7cc6e2221759874c23b9ad55c08a40e174a0e2388d72bb",
+    "protocol.json": "b65d30a11ac54a15062c52a1af398edb0e89ad42ba5841d49145f8d3b66e57b2",
+    "training-ledger.json": "7804c7cc642753353436d7d41c2d92c6588e3cfdcdba0b84f8754de17de0239d",
+    "candidate.json": "231ca591d8d8b806a4fc7b6096b54d8dd54551e753af689bbc0c9b8c52400f88",
+    "validation-ledger.json": "c557eb8f043142eddb94730697f143af570cec11a714f9f7d46a38f85ac1a66d",
+    "candidate-validation.json": "6f8d6343c3b8f94d970ed6288eb9ccd28e8f223a0a47965b6d612bd84d2a6124",
+    "independent-verification.json": "f1679ca8da81194cd4a57580d7a874f6b75a766cebef5ac9d50e614020ecbc1e"
+  }
+}

@@ -32,7 +32,7 @@ describe('chart workspace command persistence', () => {
     const saved = localStorage.getItem('stockcal:chart-workspace:600519:day')
     const { result, rerender } = renderHook(() => useChartWorkspace({ symbol: '600519', period: 'day' }), { wrapper: StrictMode })
     expect(result.current.drawings[0].id).toBe('line-1')
-    expect(result.current.syncStatus).toBe('本机保存')
+    expect(result.current.syncStatus).toBe('已同步')
     act(() => result.current.commands.select('line-1'))
     rerender()
     expect(result.current.selectedId).toBe('line-1')
@@ -42,7 +42,8 @@ describe('chart workspace command persistence', () => {
 
   test('saves and enqueues every completed command immediately but debounces only network by350ms', async () => {
     const { result } = renderHook(() => useChartWorkspace({ symbol: '600519', period: 'day' }))
-    localStorage.setItem('stockcal.accessToken', 'token')
+    expect(fetch).toHaveBeenCalledWith('/api/sync/changes?cursor=0', expect.anything())
+    vi.mocked(fetch).mockClear()
     act(() => result.current.commands.create(drawingFixture({ version: 0 })))
     expect(loadChartWorkspace('600519', 'day')?.drawings).toHaveLength(1)
     expect(loadChartSyncQueue()).toHaveLength(1)

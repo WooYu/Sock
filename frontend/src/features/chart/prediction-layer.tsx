@@ -1,3 +1,4 @@
+import { ChartTooltipFrame } from './chart-tooltip-frame'
 import type { ChartTransform } from './chart-coordinates'
 import type { PredictionSnapshot } from './chart-types'
 
@@ -22,18 +23,18 @@ export function PredictionLayer({ prediction, transform, hoveredDay, onHoverDay,
 
   return (
     <g data-testid="prediction-layer">
-      <rect data-testid="prediction-region" fill="#eaf6ff" height={transform.rect.height} opacity="0.7" pointerEvents="none" width={regionWidth} x={boundaryX} y={transform.rect.top} />
+      <rect data-testid="prediction-region" fill="var(--sc-primary-soft)" height={transform.rect.height} opacity="0.7" pointerEvents="none" width={regionWidth} x={boundaryX} y={transform.rect.top} />
       <line
         data-testid="prediction-boundary"
         pointerEvents="none"
-        stroke="#60a5fa"
+        stroke="var(--sc-primary)"
         strokeDasharray="6 4"
         x1={boundaryX}
         x2={boundaryX}
         y1={transform.rect.top}
         y2={transform.rect.top + transform.rect.height}
       />
-      <text fill="#2563eb" fontSize="11" pointerEvents="none" x={boundaryX + 8} y={transform.rect.top + 14}>未来推演</text>
+      <ChartTooltipFrame x={boundaryX + 8} y={transform.rect.top + 14} maxWidth={100} testId="prediction-heading">{() => <text fill="var(--sc-primary)" fontSize="12">未来推演</text>}</ChartTooltipFrame>
       {days.map((day) => {
         const x = transform.xForTime(day.day)
         const openY = transform.yForPrice(day.open)
@@ -62,12 +63,12 @@ export function PredictionLayer({ prediction, transform, hoveredDay, onHoverDay,
             strokeDasharray="4 3"
             tabIndex={0}
           >
-            {highlighted || selected ? <rect fill="#bfdbfe" height={transform.rect.height} opacity={selected ? '0.8' : '0.65'} width={step} x={x - step / 2} y={transform.rect.top} /> : null}
-            <line stroke={rising ? '#dc2626' : '#16a34a'} strokeWidth="1.5" x1={x} x2={x} y1={transform.yForPrice(day.high)} y2={transform.yForPrice(day.low)} />
+            {highlighted || selected ? <rect fill="var(--sc-primary-soft)" height={transform.rect.height} opacity={selected ? '0.8' : '0.65'} width={step} x={x - step / 2} y={transform.rect.top} /> : null}
+            <line stroke={rising ? 'var(--sc-gain)' : 'var(--sc-loss)'} strokeWidth="1.5" x1={x} x2={x} y1={transform.yForPrice(day.high)} y2={transform.yForPrice(day.low)} />
             <rect
-              fill={rising ? '#fecaca' : '#bbf7d0'}
+              fill={rising ? 'var(--sc-danger-soft)' : 'var(--sc-success-soft)'}
               height={Math.max(3, Math.abs(closeY - openY))}
-              stroke={rising ? '#dc2626' : '#16a34a'}
+              stroke={rising ? 'var(--sc-gain)' : 'var(--sc-loss)'}
               width={candleWidth}
               x={x - candleWidth / 2}
               y={Math.min(openY, closeY)}

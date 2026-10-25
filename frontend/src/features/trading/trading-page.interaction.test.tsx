@@ -1,4 +1,6 @@
-import { render, screen } from '@testing-library/react'
+import { renderToString } from 'react-dom/server'
+import { hydrateRoot } from 'react-dom/client'
+import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, test } from 'vitest'
 import { TradingPage } from './trading-page'
@@ -31,4 +33,45 @@ describe('TradingPage interactions', () => {
     expect(screen.getByText('交易已保存')).toBeInTheDocument()
     expect(screen.getByText('买入 100 股')).toBeInTheDocument()
   })
+})
+
+test('hydrates saved trades without a server/client mismatch', async () => {
+  localStorage.clear()
+  const html = renderToString(<TradingPage initialTab="positions" symbol="600519" />)
+  localStorage.setItem('stockcal:trades', JSON.stringify([{ id: 'hydration-trade', symbol: '600519', side: 'buy', quantity: 100, price: 1290, fee: 0, tradedAt: '2026-10-23T00:00:00Z', note: '', revision: 1 }]))
+  const container = document.createElement('div')
+  container.innerHTML = html
+  document.body.append(container)
+  const errors: unknown[] = []
+  let root!: ReturnType<typeof hydrateRoot>
+  try {
+    await act(async () => {
+      root = hydrateRoot(container, <TradingPage initialTab="positions" symbol="600519" />, { onRecoverableError: error => errors.push(error) })
+    })
+    expect(errors).toEqual([])
+    expect(container.textContent).toContain('600519')
+    expect(container.querySelector('tbody')?.textContent).toContain('100')
+  } finally {
+    await act(async () => root?.unmount())
+    container.remove()
+    localStorage.clear()
+  }
+})
+
+test('trade dialog traps keyboard focus and supports Escape without discarding the draft', async () => {
+  localStorage.clear()
+  const user = userEvent.setup()
+  render(<TradingPage initialTab="ledger" symbol="600519" />)
+  expect(screen.getByLabelText('交易方向')).toHaveFocus()
+  await user.type(screen.getByLabelText('交易数量'), '100')
+  await user.keyboard('{Escape}')
+  expect(screen.queryByRole('dialog', { name: '新增交易' })).not.toBeInTheDocument()
+  const trigger = screen.getByRole('button', { name: '记录交易' })
+  await user.click(trigger)
+  expect(screen.getByLabelText('交易数量')).toHaveValue(100)
+  screen.getByRole('button', { name: '取消' }).focus()
+  await user.tab()
+  expect(screen.getByRole('button', { name: '关闭新增交易' })).toHaveFocus()
+  await user.keyboard('{Escape}')
+  expect(trigger).toHaveFocus()
 })

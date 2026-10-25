@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-17T02:23:08.677Z",
+  "collection": "股市警示语",
+  "sourceFile": "notes/用户补充/股市警示语.md",
+  "sourceHash": "5e9f2d3d147ba297f55ead0f162b7ae140c3aed421bf733d1c51096d51caac7a",
+  "records": [
+    {
+      "id": "manual-20261017-warning-granville4",
+      "version": 1,
+      "type": "experience",
+      "title": "股市警示语：葛四大涨大跌日的开盘下跌",
+      "originalText": "葛四如果是大涨大跌日，开盘下跌是为了更好上涨。",
+      "interpretation": "",
+      "sourceType": "manual",
+      "status": "unreviewed",
+      "createdAt": "2026-10-17T02:23:08.677Z",
+      "scope": [
+        "A_SHARE",
+        "股市警示语",
+        "葛四",
+        "大涨大跌日"
+      ],
+      "gaps": [
+        "尚未填写解释，原始内容暂不能计算。",
+        "需先确认葛四计数和大涨大跌日情境。",
+        "开盘下跌后转强的条件、失效情形及效果尚待核对。"
+      ],
+      "caveats": [
+        "用户经验原话，保留适用前提，作为复盘提醒收集。"
+      ],
+      "references": [
+        {
+          "file": "notes/用户补充/股市警示语.md",
+          "startLine": 7,
+          "endLine": 7,
+          "quote": "葛四如果是大涨大跌日，开盘下跌是为了更好上涨。",
+          "url": ""
+        }
+      ]
+    }
+  ]
+}

@@ -13,5 +13,7 @@ spring:
     init:
       mode: always
 stockcal:
+  scenario:
+    jobs-enabled: false
   ai:
     enabled: false

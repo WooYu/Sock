@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-16T16:47:30.777889+00:00",
+  "sourceQuoteChecks": 1863,
+  "claims": 271,
+  "documents": 146,
+  "tagAssignments": 1367,
+  "documentsWithTagChanges": 134,
+  "documentsWithDefinitionOrDataGaps": 146,
+  "documentsWithUninspectedAttachments": 53,
+  "documentsWithUserRuleConflicts": 11,
+  "roleCounts": {
+    "validation": 14,
+    "trend": 52,
+    "method_selection": 69,
+    "risk": 71,
+    "mode": 59,
+    "context": 78,
+    "parameter_formula": 25,
+    "support_resistance": 47,
+    "granville_stage": 37
+  },
+  "claimComputability": {
+    "needs_definition": 227,
+    "direct": 6,
+    "reference": 37,
+    "needs_data": 1
+  },
+  "studyStatus": "ai_candidate",
+  "predictionsImprovementEstablished": false,
+  "originalNotesAndApplicationTagsUnchanged": true
+}

@@ -38,7 +38,7 @@ class AccountPortfolioApiTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value("trade-1"));
 
-        mvc.perform(get("/api/v1/account/portfolio").header("X-Client-Id", "browser-1"))
+        mvc.perform(get("/api/v1/account/portfolio").header("X-Client-Id", "browser-2"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.trades.length()").value(1))
             .andExpect(jsonPath("$.holdings[0].symbol").value("600519"))
@@ -54,7 +54,7 @@ class AccountPortfolioApiTest {
         mvc.perform(post("/api/v1/account/trades").header("X-Client-Id", "browser-1")
                 .contentType(MediaType.APPLICATION_JSON).content(body))
             .andExpect(status().isOk());
-        mvc.perform(post("/api/v1/account/trades").header("X-Client-Id", "browser-1")
+        mvc.perform(post("/api/v1/account/trades").header("X-Client-Id", "browser-2")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body.replace("\"revision\":2", "\"revision\":1")))
             .andExpect(status().isConflict());

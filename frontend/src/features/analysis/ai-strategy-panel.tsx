@@ -108,7 +108,7 @@ export function AiStrategyPanel({ analysis }: { analysis?: StockAnalysis | null 
       </article>
     </div>
     <div className="mt-4 flex flex-wrap items-center gap-3">
-      <button className="min-h-12 rounded-xl bg-[var(--sc-primary)] px-4 text-sm font-semibold text-white disabled:opacity-50" disabled={loading} onClick={() => void explain()} type="button">{loading ? '解释中…' : '解释当前确定结果'}</button>
+      <button className="min-h-12 rounded-xl bg-[var(--sc-primary)] px-4 text-sm font-semibold text-[var(--sc-on-primary)] disabled:opacity-50" disabled={loading} onClick={() => void explain()} type="button">{loading ? '解释中…' : '解释当前确定结果'}</button>
       {analysis.confidence == null ? <span className="text-sm text-[var(--sc-muted)]">历史样本不足，暂不显示校准置信度。</span> : <span className="text-sm text-[var(--sc-muted)]">历史校准置信度 {Math.round(analysis.confidence * 100)}%</span>}
     </div>
     {error ? <p className="mt-3 text-sm text-[var(--sc-danger)]">{error}</p> : null}
