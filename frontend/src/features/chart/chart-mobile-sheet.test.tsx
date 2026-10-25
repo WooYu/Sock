@@ -13,6 +13,7 @@ test('contains forward and reverse keyboard navigation and restores the opener o
   const user = userEvent.setup()
   render(<SheetHarness />)
   const opener = screen.getByRole('button', { name: '打开属性' })
+  const restoreFocus = vi.spyOn(opener, 'focus')
   await user.click(opener)
   const dialog = screen.getByRole('dialog', { name: '对象属性' })
   expect(dialog).toHaveAttribute('aria-modal', 'true')
@@ -25,6 +26,29 @@ test('contains forward and reverse keyboard navigation and restores the opener o
   await user.keyboard('{Escape}')
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   expect(opener).toHaveFocus()
+  expect(restoreFocus).toHaveBeenLastCalledWith({ preventScroll: true })
+  restoreFocus.mockRestore()
+})
+
+test('keeps the page locked until the last sheet closes and restores its original styles', () => {
+  const root = document.documentElement, body = document.body
+  const original = { root: root.style.overflow, body: body.style.overflow, overscroll: root.style.overscrollBehavior }
+  root.style.overflow = 'scroll'
+  body.style.overflow = 'clip'
+  root.style.overscrollBehavior = 'contain'
+  const first = render(<ChartMobileSheet onClose={() => {}} title="第一层">内容</ChartMobileSheet>)
+  const second = render(<ChartMobileSheet onClose={() => {}} title="第二层">内容</ChartMobileSheet>)
+  expect(root.style.overflow).toBe('hidden')
+  expect(body.style.overflow).toBe('hidden')
+  first.unmount()
+  expect(root.style.overflow).toBe('hidden')
+  second.unmount()
+  expect(root.style.overflow).toBe('scroll')
+  expect(body.style.overflow).toBe('clip')
+  expect(root.style.overscrollBehavior).toBe('contain')
+  root.style.overflow = original.root
+  body.style.overflow = original.body
+  root.style.overscrollBehavior = original.overscroll
 })
 
 test('short drags remain open even when the browser dispatches a following click', () => {

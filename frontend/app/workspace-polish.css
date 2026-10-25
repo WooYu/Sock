@@ -483,16 +483,15 @@
 .sc-chart-recovery li span { color: var(--sc-muted); font-size: 12px; }
 .sc-chart-recovery li button { min-height: 36px; border: 1px solid var(--sc-primary); border-radius: 6px; background: var(--sc-surface); color: var(--sc-primary); font-size: 12px; font-weight: 700; }
 .sc-chart-mobile-context, .sc-chart-mobile-toolbar { display: none; }
-.sc-candle-touch-tooltip { display: flex; flex-direction: column; height: 100%; min-height: 0; overflow: hidden; border: 1px solid var(--sc-border); border-radius: 8px; background: var(--sc-surface); color: var(--sc-foreground); font-size: 12px; box-shadow: var(--sc-shadow-dialog); }
-.sc-candle-touch-tooltip > header { display: flex; flex-shrink: 0; align-items: center; justify-content: space-between; gap: 8px; padding-left: 12px; border-bottom: 1px solid var(--sc-border); }
-.sc-candle-touch-tooltip > header strong { min-width: 0; overflow-wrap: anywhere; }
-.sc-candle-touch-tooltip > header button { flex-shrink: 0; width: 44px; height: 44px; border: 0; background: transparent; color: var(--sc-foreground); font-size: 22px; }
-.sc-candle-touch-tooltip > dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; min-height: 0; margin: 0; padding: 12px; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; }
-.sc-candle-touch-tooltip dt { display: flex; align-items: center; gap: 5px; color: var(--sc-muted); }
+.sc-candle-touch-tooltip { color: var(--sc-foreground); font-size: 13px; line-height: 1.4; }
+.sc-candle-touch-tooltip > header { margin-bottom: 12px; }
+.sc-candle-touch-tooltip > dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 14px; margin: 0; }
+.sc-candle-touch-tooltip dt { display: flex; align-items: center; gap: 5px; color: var(--sc-muted); font-size: 12px; }
 .sc-candle-touch-tooltip dt i { width: 6px; height: 6px; border-radius: 50%; }
-.sc-candle-touch-tooltip dd { margin: 2px 0 0; overflow-wrap: anywhere; font-weight: 600; }
+.sc-candle-touch-tooltip dd { margin: 2px 0 0; overflow-wrap: anywhere; font-family: var(--sc-font-numeric); font-size: 14px; font-weight: 600; }
 .sc-chart-sheet-layer { position: fixed; inset: var(--sc-viewport-top, 0px) 0 auto; height: var(--sc-viewport-height, 100dvh); z-index: 80; display: grid; align-items: end; background: var(--sc-backdrop); }
 .sc-chart-mobile-sheet { display: grid; grid-template-rows: auto auto minmax(0, 1fr); max-height: min(82dvh, 760px, var(--sc-viewport-height, 100dvh)); overflow: hidden; border: 1px solid var(--sc-border); border-bottom: 0; border-radius: 14px 14px 0 0; background: var(--sc-surface); box-shadow: 0 -16px 42px rgb(15 23 42 / 16%); transition: transform 100ms ease-out; }
+.sc-chart-mobile-sheet.is-expanded { max-height: calc(var(--sc-viewport-height, 100dvh) - 12px); }
 .sc-chart-sheet-handle { display: grid; min-height: 44px; place-items: center; border: 0; background: transparent; touch-action: none; }
 .sc-chart-sheet-handle span { width: 42px; height: 4px; border-radius: 2px; background: var(--sc-border); }
 .sc-chart-mobile-sheet > header { display: flex; min-height: 52px; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--sc-border); padding: 0 16px; }

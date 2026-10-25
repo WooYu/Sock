@@ -367,6 +367,8 @@
 .rs-projection-target { -webkit-tap-highlight-color: transparent; outline: none; }
 .rs-projection-target:focus-visible .rs-projection-hit { stroke: var(--sc-primary); stroke-width: 1; vector-effect: non-scaling-stroke; opacity: .3; }
 [data-testid=chart-date-label], [data-testid=projection-date-label] { font-family: var(--font-geist-sans), "PingFang SC", "Microsoft YaHei", sans-serif; font-variant-numeric: tabular-nums; }
+.rs-chart-workspace .sc-kline-axis-labels [data-testid=chart-date-label] text,
+.rs-chart-workspace [data-testid=projection-date-label] text { font-family: var(--sc-font-numeric); font-size: 11px; transform: none; }
 .rs-mobile-forecast-details { color: var(--sc-foreground); font-size: 15px; line-height: 1.6; }
 .rs-mobile-forecast-details header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
 .rs-mobile-forecast-details header button { min-height: 44px; padding: 8px 12px; }
@@ -377,6 +379,6 @@
 .rs-mobile-forecast-details .rs-forecast-value-grid small { font-size: 13px; }
 .rs-mobile-forecast-details p { color: var(--sc-muted); font-size: 14px; }
 @media(max-width:720px) {
-  [data-testid=indicator-projection] > g:nth-of-type(2) [data-testid=projection-date-label],
-  [data-testid=indicator-projection] > g:nth-of-type(3) [data-testid=projection-date-label] { display: none; }
+  [data-testid=indicator-projection] [data-testid=projection-date-label] { display: none; }
+  [data-testid=indicator-projection] [data-last-projection=true] [data-testid=projection-date-label] { display: inline; }
 }

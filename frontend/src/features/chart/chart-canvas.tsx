@@ -9,6 +9,8 @@ import { MA_COLORS, MA_PERIODS, formatChartTime, isIntradayPeriod, type ChartPer
 import type { DrawingMove } from './drawing-engine'
 import { DrawingLayer } from './drawing-layer'
 import { ChartTooltipFrame } from './chart-tooltip-frame'
+import { createPortal } from 'react-dom'
+import { ChartMobileSheet } from './chart-mobile-sheet'
 import { PredictionLayer } from './prediction-layer'
 import { IndicatorProjectionLayer } from './indicator-projection-layer'
 import type { IndicatorProjection } from './indicator-projection'
@@ -253,15 +255,15 @@ function CrosshairTooltip({ candle, price, index, kind, period, transform, indic
   const maxWidth = transform.rect.width - 12
   const onRight = cursorX < transform.rect.left + transform.rect.width / 2
   const anchorX = onRight ? transform.rect.left + transform.rect.width - 6 : transform.rect.left + 6
-  return <ChartTooltipFrame x={anchorX} y={transform.rect.top + 8} maxWidth={maxWidth} testId="crosshair-tooltip">{(availableWidth, scale) => {
+  return <ChartTooltipFrame x={anchorX} y={transform.rect.top + 8} maxWidth={maxWidth} testId="crosshair-tooltip">{availableWidth => {
     const width = Math.min(430, availableWidth)
     const x = onRight ? -width : 0
-    if (width < 360) return <foreignObject x={x} y={0} width={width} height={(volumeTop + volumeHeight - transform.rect.top - 8) * scale.y} pointerEvents="auto" onPointerDown={event => event.stopPropagation()} onPointerMove={event => event.stopPropagation()} onClick={event => event.stopPropagation()}>
-      <section aria-label="K线数据详情" className="sc-candle-touch-tooltip">
-        <header><strong>{formatChartTime(candle.day, period)}{'volume' in candle ? '' : ' · 预测'}</strong><button aria-label="关闭K线数据详情" onClick={onDismiss} type="button">×</button></header>
+    if (width < 360) return createPortal(<ChartMobileSheet title="K线数据详情" onClose={onDismiss} expanded>
+      <section aria-label="K线数据详情" className="sc-candle-touch-tooltip" data-testid="candle-touch-details" onPointerDown={event => event.stopPropagation()} onPointerMove={event => event.stopPropagation()} onClick={event => event.stopPropagation()}>
+        <header><strong>{formatChartTime(candle.day, period)}{'volume' in candle ? '' : ' · 预测'}</strong></header>
         <dl>{cells.map(cell => <div key={cell.label}><dt>{cell.color ? <i style={{ background: cell.color }} /> : null}{cell.label}</dt><dd>{cell.value}</dd></div>)}</dl>
       </section>
-    </foreignObject>
+    </ChartMobileSheet>, document.body)
     const columns = width < 360 ? 1 : 2
     const rowHeight = 22
     const height = 42 + Math.ceil(cells.length / columns) * rowHeight

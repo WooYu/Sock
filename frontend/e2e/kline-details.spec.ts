@@ -12,7 +12,7 @@ test('historical candle details show change, amplitude and axis labels', async (
   const point = { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 }
   if (info.project.name === 'mobile') await page.touchscreen.tap(point.x, point.y)
   else await page.mouse.move(point.x, point.y)
-  const tooltip = page.getByTestId('crosshair-tooltip')
+  const tooltip = page.getByTestId(info.project.name === 'mobile' ? 'candle-touch-details' : 'crosshair-tooltip')
   await expect(tooltip).toContainText('当日涨跌')
   await expect(tooltip).toContainText(/振幅.*%/)
   await expect(page.getByTestId('crosshair-axis-labels')).toBeVisible()
