@@ -172,6 +172,53 @@
   .nt-reading-detail .nt-note-prose { font-size: 16px; line-height: 1.9; }
   .nt-note-title { gap: 10px; }
 }
+/* Definition editing stays separate from label review. */
+.nt-review-help { margin: 0; padding: 0 24px 16px; color: var(--sc-muted); font-size: 12px; line-height: 1.8; }
+.nt-purpose-list { display: grid; gap: 12px; margin-top: 16px; }
+.nt-purpose-card { min-width: 0; border: 1px solid var(--sc-border); border-radius: 8px; padding: 16px; }
+.nt-purpose-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.nt-purpose-heading > div { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.nt-purpose-heading > button { flex-shrink: 0; min-height: 36px; }
+.nt-definition-state { font-size: 11px; color: var(--sc-muted); background: var(--sc-surface-hover); border-radius: 12px; padding: 3px 8px; }
+.nt-definition-state.is-ready { color: var(--sc-primary); background: color-mix(in srgb, var(--sc-primary) 8%, transparent); }
+.nt-definition-condition, .nt-definition-content dd { white-space: pre-wrap; overflow-wrap: anywhere; }
+.nt-purpose-card p, .nt-purpose-card summary { font-size: 13px; line-height: 1.8; }
+.nt-purpose-card details { margin-top: 12px; }
+.nt-purpose-card summary { cursor: pointer; color: var(--sc-muted); }
+.nt-definition-content dl { display: grid; grid-template-columns: 100px minmax(0, 1fr); gap: 8px 12px; font-size: 13px; line-height: 1.8; }
+.nt-definition-content dt { color: var(--sc-muted); }
+.nt-definition-content dd { margin: 0; }
+.nt-purpose-evidence blockquote { max-height: 240px; overflow-y: auto; overscroll-behavior: contain; }
+.nt-add-purpose { display: flex; align-items: end; flex-wrap: wrap; gap: 12px; margin: 12px 0; }
+.nt-add-purpose label { display: grid; gap: 6px; font-size: 12px; color: var(--sc-muted); }
+.nt-add-purpose select, .nt-definition-editor input { min-height: 44px; width: 100%; border: 1px solid var(--sc-border); border-radius: 6px; padding: 8px; color: var(--sc-foreground); background: var(--sc-surface); }
+.nt-definition-editor { width: min(720px, 100%); }
+.nt-definition-editor .nt-editor-field { font-size: 13px; }
+.nt-definition-editor textarea { font-size: 14px; line-height: 1.7; resize: vertical; }
+.nt-editor-footer { flex-shrink: 0; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; padding-top: 16px; border-top: 1px solid var(--sc-border); background: var(--sc-surface); }
+.nt-discard-prompt { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 10px; font-size: 13px; }
+.nt-advanced-filters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; grid-column: 1 / -1; border-top: 1px solid var(--sc-border); padding-top: 14px; }
+.nt-advanced-filters[hidden] { display: none; }
+.nt-active-filters { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: -6px 0 16px; color: var(--sc-muted); font-size: 12px; }
+.nt-active-filters button { display: flex; align-items: center; gap: 10px; min-height: 36px; max-width: 100%; overflow-wrap: anywhere; padding: 6px 10px; border: 1px solid var(--sc-border); border-radius: 18px; color: var(--sc-primary); background: var(--sc-surface); }
+.nt-active-filters button span { font-size: 17px; }
+.nt-save-feedback { position: fixed; z-index: 80; right: 24px; bottom: 24px; display: flex; align-items: flex-start; gap: 12px; width: min(460px, calc(100vw - 32px)); margin: 0; border: 1px solid var(--sc-border); background: var(--sc-surface); color: var(--sc-foreground); box-shadow: var(--sc-shadow-dialog); font-size: 13px; line-height: 1.8; }
+.nt-save-feedback button { flex-shrink: 0; min-width: 32px; min-height: 32px; border-radius: 6px; background: var(--sc-surface-hover); color: var(--sc-muted); font-size: 20px; }
+@media (max-width: 760px) {
+  .nt-save-feedback { right: 16px; bottom: calc(80px + env(safe-area-inset-bottom)); }
+  .nt-review-help { padding-inline: 16px; }
+  .nt-purpose-card { padding: 12px; }
+  .nt-purpose-heading { align-items: center; }
+  .nt-purpose-heading > button { min-height: 44px; }
+  .nt-definition-content dl { grid-template-columns: 1fr; gap: 4px; }
+  .nt-definition-content dd { margin-bottom: 8px; }
+  .nt-advanced-filters { grid-template-columns: 1fr; }
+  .nt-definition-editor .nt-editor-footer { display: grid; grid-template-columns: 1fr 1fr; }
+  .nt-definition-editor .nt-editor-footer > :last-child { grid-column: 1 / -1; }
+  .nt-editor-footer button { min-height: 44px; }
+  .nt-discard-prompt { grid-column: 1 / -1; }
+}
+
 /* Compact notes header and catalog controls. */
 .kw-notes-page .kw-breadcrumb { height: 40px; }
 .kw-notes-page .kw-page-heading { align-items: center; gap: 12px; padding: 0 0 18px; }

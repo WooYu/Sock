@@ -12,6 +12,9 @@ import { NoteTagReextract } from './note-tag-reextract'
 import { NoteDetailNavigation, NoteExcerpt, type NoteDetailTab } from './note-detail-navigation'
 import { classifyNoteForForecast, FORECAST_ROLES, type ForecastRole } from './note-forecast-classification'
 import { buildScenarioRuleRegistry } from '../scenario/scenario-rule-registry'
+import { ForecastDefinitionCards } from './note-forecast-definition-cards'
+import { ForecastDefinitionEditor } from './note-forecast-definition-editor'
+import { reviseForecastDefinition, type DefinitionRole, type ForecastDefinition } from './note-forecast-definitions'
 
 const defaultCatalog = applyAIOriginalTags(catalogData as NoteCatalog, aiTagResults.records as AIOriginalTags[])
 const PAGE_SIZE = 10
@@ -90,6 +93,9 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
   const [detailNavigation, setDetailNavigation] = useState<{ id: string; tab: NoteDetailTab }>({ id: '', tab: 'overview' })
   const [page, setPage] = useState(0)
   const [editor, setEditor] = useState<NoteTagRecord | null>(null)
+  const [definitionEditor, setDefinitionEditor] = useState<{ record: NoteTagRecord; role: DefinitionRole } | null>(null)
+  const [advancedFilters, setAdvancedFilters] = useState(false)
+  const [definitionState, setDefinitionState] = useState('all')
   const [supplementEntry, setSupplementEntry] = useState(false)
   const [aiEntry, setAIEntry] = useState(false)
   const [writeError, setWriteError] = useState('')
@@ -111,10 +117,12 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
     if (window.history.state?.stockcalTagEditor) window.history.back()
   }
   const filtered = useMemo(() => filterTagRecords(current.filter((record) => record.level === level && (status === 'all' || record.status === status)
-    && (!forecastRole || forecastClasses.get(record.id)?.some(item => item.role === forecastRole))), { query: deferredQuery, facets }), [current, level, status, deferredQuery, facets, forecastRole, forecastClasses])
+    && (!forecastRole || forecastClasses.get(record.id)?.some(item => item.role === forecastRole) || record.forecastDefinitions?.some(item => item.role === forecastRole))
+    && (definitionState === 'all' || (definitionState === 'missing' ? !record.forecastDefinitions?.length : record.forecastDefinitions?.some(item => item.state === definitionState)))), { query: deferredQuery, facets }), [current, level, status, deferredQuery, facets, forecastRole, forecastClasses, definitionState])
   const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const currentPage = Math.min(page, pages - 1)
-  const selected = filtered.find((record) => record.id === selectedId) ?? filtered[0]
+  const visibleRecords = filtered.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE)
+  const selected = visibleRecords.find((record) => record.id === selectedId) ?? visibleRecords[0]
   const detailTab = detailNavigation.id === selected?.id ? detailNavigation.tab : 'overview'
   const changeDetailTab = (tab: NoteDetailTab) => setDetailNavigation({ id: selected?.id ?? '', tab })
   const history = allVersions.filter((record) => record.id === selected?.id).sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.version - a.version)
@@ -142,13 +150,36 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
     try {
       persist(reviseTags(editor, draft, new Date().toISOString()), editor)
       closeEditor()
-      setFacets({}); setForecastRole(''); setQuery(''); setStatus('all'); setPage(0)
     } catch (cause) { setWriteError(`保存失败：${cause instanceof Error ? cause.message : '请检查存储权限。'} 输入已保留。`) }
+  }
+
+  function saveDefinition(definition: ForecastDefinition, reason: string) {
+    if (!definitionEditor) return
+    try {
+      const next = reviseForecastDefinition(definitionEditor.record, definition, reason, new Date().toISOString())
+      persist(next, definitionEditor.record)
+      closeDefinitionEditor()
+      setMessage(`已保存定义 v${next.version}。${definition.state === 'draft' ? '草稿仍需补齐条件；可继续编辑。' : '定义已整理，下一步通过研究验证；尚未启用预测。'} 当前筛选已保留。`)
+    } catch (cause) { setWriteError(`保存失败：${cause instanceof Error ? cause.message : '请检查存储权限。'} 输入已保留。`) }
+  }
+
+  function openDefinitionEditor(record: NoteTagRecord, role: DefinitionRole) {
+    window.history.pushState({ ...window.history.state, stockcalDefinitionEditor: true }, '', window.location.href)
+    setDefinitionEditor({ record, role }); setWriteError('')
+  }
+
+  function closeDefinitionEditor() {
+    setDefinitionEditor(null); setWriteError('')
+    if (window.history.state?.stockcalDefinitionEditor) window.history.back()
   }
 
   function confirmTags() {
     if (!selected) return
-    try { persist(reviewTags(selected, new Date().toISOString()), selected) }
+    try {
+      const next = reviewTags(selected, new Date().toISOString())
+      persist(next, selected)
+      setMessage(`已核对标签 v${next.version}。定义与验证状态不变。`)
+    }
     catch (cause) { setWriteError(cause instanceof Error ? cause.message : '标签确认失败。') }
   }
 
@@ -172,7 +203,15 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
     if (window.matchMedia?.('(max-width: 760px)').matches) detailRef.current?.scrollIntoView({ block: 'start', behavior: 'instant' })
   }
 
-  function reset() { setQuery(''); setFacets({}); setForecastRole(''); setStatus('all'); setPage(0); setViewedKey(null) }
+  function reset() { setQuery(''); setFacets({}); setForecastRole(''); setStatus('all'); setDefinitionState('all'); setPage(0); setViewedKey(null) }
+
+  const activeFilters = [
+    ...(query.trim() ? [{ id: 'query', label: query.trim(), remove: () => setQuery('') }] : []),
+    ...Object.entries(facets).filter(([, value]) => value).map(([id, value]) => ({ id, label: TAG_LABELS[value!], remove: () => setFacets(previous => ({ ...previous, [id]: '' })) })),
+    ...(forecastRole ? [{ id: 'role', label: FORECAST_ROLES[forecastRole], remove: () => setForecastRole('') }] : []),
+    ...(status !== 'all' ? [{ id: 'status', label: status === 'reviewed' ? '已核对标签' : '待核对标签', remove: () => setStatus('all') }] : []),
+    ...(definitionState !== 'all' ? [{ id: 'definition', label: definitionState === 'ready' ? '已定义、待验证' : definitionState === 'draft' ? '定义草稿' : '尚未补充定义', remove: () => setDefinitionState('all') }] : []),
+  ]
 
   if (view === 'study') return <section className="nt-workbench" aria-label="笔记标签工作台"><nav className="nt-study-tabs" aria-label="笔记工作视图"><button type="button" onClick={() => setView('tags')}>标签与版本</button><button type="button" aria-pressed="true">逐篇学习建议</button></nav><NoteStudyWorkbench currentTags={current} /></section>
 
@@ -180,21 +219,26 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
     <div className="nt-top-toolbar"><nav className="nt-study-tabs" aria-label="笔记工作视图"><button type="button" aria-pressed="true">标签与版本</button><button type="button" onClick={() => setView('study')}>逐篇学习建议</button></nav><button type="button" className="kw-button" disabled={!ready || Boolean(error)} onClick={exportTags}>导出标签与历史</button></div>
     <div className="nt-catalog-overview"><h2>笔记标签目录</h2><div className="nt-catalog-stats" aria-label="目录概况"><span><strong>{catalog.documents.length}</strong> 篇笔记</span><span><strong>{catalog.fragments.length}</strong> 个原文片段</span><span><strong>{catalog.audit.addedFiles.length}</strong> 篇补充资料</span></div><details className="nt-catalog-help"><summary>研究范围与标签说明</summary><p className="nt-context">后续研究对象：<Link href="/?symbol=603533">掌阅科技 · 603533</Link>。通用笔记保留通用范围，股票案例按原文处理。</p><p className="nt-disclaimer">自动标签为待核对候选；标签核对不代表计算定义或预测效果已验证。</p></details></div>
     {error ? <div className="kw-alert" role="alert">{error}<button type="button" onClick={store.refresh}>重新读取标签</button></div> : null}
-    {writeError && !editor ? <div className="kw-alert" role="alert">{writeError}</div> : null}
-    {message ? <div className="kw-notice" role="status">{message}</div> : null}
+    {writeError && !editor && !definitionEditor ? <div className="kw-alert" role="alert">{writeError}</div> : null}
+    {message ? <div className="kw-notice nt-save-feedback" role="status"><span>{message}</span><button type="button" aria-label="关闭保存提示" onClick={() => setMessage('')}>×</button></div> : null}
     <div className="nt-filters" aria-label="标签筛选">
       <label>搜索笔记与标签<input aria-label="搜索笔记与标签" value={query} placeholder="标题、原文片段、MA均线…" onChange={(event) => { setQuery(event.target.value); setPage(0); setViewedKey(null) }} /></label>
       <label>标注层级<select value={level} onChange={(event) => { setLevel(event.target.value as typeof level); setPage(0); setViewedKey(null) }}><option value="document">整篇笔记</option><option value="fragment">规则片段</option></select></label>
-      {TAG_DIMENSIONS.map((dimension) => <label key={dimension.id}>{dimension.label}<select value={facets[dimension.id] ?? ''} onChange={(event) => { setFacets((previous) => ({ ...previous, [dimension.id]: event.target.value })); setPage(0); setViewedKey(null) }}><option value="">全部</option>{dimension.options.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}</select></label>)}
       <label>标签核对状态<select value={status} onChange={(event) => { setStatus(event.target.value); setPage(0); setViewedKey(null) }}><option value="all">全部</option><option value="candidate">待核对</option><option value="reviewed">已核对标签</option></select></label>
       <label>预估作用<select value={forecastRole} onChange={event => { setForecastRole(event.target.value as ForecastRole | ''); setPage(0); setViewedKey(null) }}><option value="">全部</option>{Object.entries(FORECAST_ROLES).map(([id, label]) => <option key={id} value={id}>{label}</option>)}</select></label>
+      <button type="button" className="kw-button" aria-expanded={advancedFilters} aria-controls="nt-advanced-filters" onClick={() => setAdvancedFilters(value => !value)}>{advancedFilters ? '收起更多筛选' : '更多筛选'}</button>
+      <div id="nt-advanced-filters" className="nt-advanced-filters" hidden={!advancedFilters}>
+        {TAG_DIMENSIONS.map(dimension => <label key={dimension.id}>{dimension.label}<select value={facets[dimension.id] ?? ''} onChange={event => { setFacets(previous => ({ ...previous, [dimension.id]: event.target.value })); setPage(0); setViewedKey(null) }}><option value="">全部</option>{dimension.options.map(option => <option key={option.id} value={option.id}>{option.label}</option>)}</select></label>)}
+        <label>定义进度<select value={definitionState} onChange={event => { setDefinitionState(event.target.value); setPage(0); setViewedKey(null) }}><option value="all">全部</option><option value="missing">尚未补充定义</option><option value="draft">定义草稿</option><option value="ready">已定义、待验证</option></select></label>
+      </div>
       <button type="button" className="kw-button" onClick={reset}>重置标签筛选</button>
     </div>
+    {activeFilters.length ? <div className="nt-active-filters" aria-label="已选筛选条件"><span>已选条件</span>{activeFilters.map(filter => <button type="button" key={filter.id} aria-label={`移除筛选：${filter.label}`} onClick={() => { filter.remove(); setPage(0); setViewedKey(null) }}>{filter.label}<span aria-hidden="true">×</span></button>)}</div> : null}
     <div className="nt-columns">
       <section className="nt-list" aria-label="笔记目录">
         <div className="nt-list-heading"><strong>{level === 'document' ? '整篇笔记' : '规则片段'}</strong><span>{filtered.length} 条结果</span></div>
-        {filtered.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE).map((record) => <div key={record.id} className="nt-record-row"><button type="button" className="nt-record" aria-label={`查看标签：${record.title}`} aria-pressed={record.id === selected?.id} onClick={() => choose(record)}><strong>{record.title}</strong><small>{record.file}</small><span className="nt-chips">{(record.extraction ? record.tags.slice(0, 5) : record.tags.filter((tag) => tag.startsWith('topic.')).slice(0, 4)).map((tag) => <span key={tag}>{TAG_LABELS[tag]}</span>)}</span><span className="nt-record-status">{record.status === 'reviewed' ? '标签已核对' : '候选 · 待核对'} · v{record.version}</span></button><a className="nt-source-link" href={record.sourceUrl} target="_blank" rel="noopener noreferrer" aria-label={`查看原文：${record.title}`}>查看原文 ↗</a></div>)}
-        {!filtered.length ? <div className="kw-empty"><h3>没有符合条件的笔记</h3><p>调整内容分类、分析主题或关键词后再试。</p></div> : null}
+        {visibleRecords.map((record) => <div key={record.id} className="nt-record-row"><button type="button" className="nt-record" aria-label={`查看标签：${record.title}`} aria-pressed={record.id === selected?.id} onClick={() => choose(record)}><strong>{record.title}</strong><small>{record.file}</small><span className="nt-chips">{(record.extraction ? record.tags.slice(0, 5) : record.tags.filter((tag) => tag.startsWith('topic.')).slice(0, 4)).map((tag) => <span key={tag}>{TAG_LABELS[tag]}</span>)}</span><span className="nt-record-status">{record.status === 'reviewed' ? '标签已核对' : '候选 · 待核对'} · v{record.version}</span>{record.forecastDefinitions?.length ? <span className="nt-record-status">{record.forecastDefinitions.some(item => item.state === 'draft') ? '有定义草稿' : '定义待验证'}</span> : null}</button><a className="nt-source-link" href={record.sourceUrl} target="_blank" rel="noopener noreferrer" aria-label={`查看原文：${record.title}`}>查看原文 ↗</a></div>)}
+        {!filtered.length ? <div className="kw-empty"><h3>没有符合条件的笔记</h3><p>调整内容分类、分析主题或关键词后再试。</p><button className="kw-button" type="button" onClick={reset}>清空条件并查看全部</button></div> : null}
         <div className="nt-pagination"><button type="button" className="kw-button" disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}>上一页</button><span>{currentPage + 1} / {pages}</span><button type="button" className="kw-button" disabled={currentPage + 1 >= pages} onClick={() => setPage(currentPage + 1)}>下一页</button></div>
       </section>
       <section className="nt-detail nt-reading-detail" aria-label="标签详情" ref={detailRef}>
@@ -208,12 +252,13 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
             <button type="button" className="kw-button kw-primary" disabled={!ready || Boolean(error)} onClick={() => openEditor(viewed)}>编辑标签</button>
             <button type="button" className="kw-button" disabled={!ready || Boolean(error) || !viewed.tags.length || viewed.status === 'reviewed'} onClick={confirmTags}>{viewed.status === 'reviewed' ? '标签已核对' : '确认标签'}</button>
           </div>}
+          {!historical ? <p className="nt-review-help">标签核对确认分类；具体使用条件请在下方“预估作用”中补充定义。</p> : null}
           <section className="nt-current-tags" aria-label="当前标签">
             <div className="nt-facets">{(historical ? [...TAG_DIMENSIONS, ...LEGACY_TAG_DIMENSIONS.filter(dimension => !TAG_DIMENSIONS.some(active => active.id === dimension.id))] : TAG_DIMENSIONS).map((dimension) => <div key={dimension.id}><strong>{dimension.label}</strong><span className="nt-chips">{viewed.tags.filter(tag => tag.startsWith(`${dimension.id}.`)).map(tag => <span key={tag}>{TAG_LABELS[tag]}</span>)}{!viewed.tags.some(tag => tag.startsWith(`${dimension.id}.`)) ? <small className="nt-muted">待补充</small> : null}</span></div>)}</div>
           </section>
           <NoteDetailNavigation active={detailTab} onChange={changeDetailTab} />
           <div role="tabpanel" id="nt-panel-overview" aria-labelledby="nt-tab-overview" hidden={detailTab !== 'overview'} tabIndex={0} className="nt-detail-panel">
-            <section className="nt-detail-card" aria-label="笔记的预估作用"><h4>预估作用</h4><p>按原文引用与已编写的条件规则分类；关键词候选仅供研究，核对标签不会自动启用公式。</p>{classifyNoteForForecast(viewed, forecastRegistry, canonicalRecords.get(viewed.id)).map(item => <details key={item.role}><summary>{FORECAST_ROLES[item.role]} · {item.status === 'defined' ? '已关联条件规则，是否适用另行核对' : '待定义／验证'}</summary>{item.ruleIds.map(id => <p key={id}>{forecastRegistry.find(rule => rule.id === id)?.name}</p>)}{item.evidence.map(e => <blockquote key={`${e.startLine}:${e.endLine}:${e.quote}`}>L{e.startLine}–{e.endLine}：{e.quote}</blockquote>)}</details>)}</section>
+            <ForecastDefinitionCards key={`roles:${tagVersionKey(viewed)}`} record={viewed} classifications={classifyNoteForForecast(viewed, forecastRegistry, canonicalRecords.get(viewed.id))} registry={forecastRegistry} readOnly={historical} disabled={!ready || Boolean(error)} onEdit={role => openDefinitionEditor(viewed, role)} />
             <section className="nt-detail-card"><h4>笔记摘要</h4><NoteExcerpt text={viewed.summary} /></section>
             <section className="nt-detail-card nt-supplement-summary"><div className="nt-card-heading"><h4>补充说明</h4>{!historical ? <button type="button" className="kw-button" disabled={!ready || Boolean(error)} onClick={() => openEditor(viewed, true)}>{viewed.supplement ? '修改补充说明' : '补充说明'}</button> : null}</div>{viewed.supplement ? <NoteExcerpt text={viewed.supplement} /> : <p className="nt-empty-copy">还没有补充说明。可补充使用场景、理解或需要纠正的内容。</p>}</section>
             {!historical && viewed.level === 'document' ? <NoteTagReextract key={tagVersionKey(viewed)} record={viewed} disabled={!ready || Boolean(error)} onAdopt={candidate => openEditor({ ...viewed, tags: [...candidate.tags], evidence: candidate.evidence, sourceReferences: [...(viewed.sourceReferences ?? []), ...viewed.evidence], extraction: candidate.extraction }, false, true)} /> : null}
@@ -227,13 +272,14 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
             {viewed.gaps.length ? <details className="nt-detail-card nt-boundaries"><summary>待补定义与边界 · {viewed.gaps.length} 项</summary><ul>{viewed.gaps.map((gap, index) => <li key={index}>{gap}</li>)}</ul></details> : null}
           </div>
           <div role="tabpanel" id="nt-panel-history" aria-labelledby="nt-tab-history" hidden={detailTab !== 'history'} tabIndex={0} className="nt-detail-panel">
-            <section className="nt-detail-card nt-history-card"><div className="nt-card-heading"><h4>标签历史 · {history.length} 个版本</h4></div><p className="nt-muted">查看旧版本不会覆盖当前标签。</p><ol className="nt-version-list">{history.map(record => <li key={tagVersionKey(record)}><div><div className="nt-version-heading"><strong>v{record.version}{record.sourceHash !== selected?.sourceHash ? ' · 旧原文' : ''}</strong>{tagVersionKey(record) === tagVersionKey(selected) ? <span>当前版本</span> : null}</div><time dateTime={record.createdAt}>{formatTime(record.createdAt)}</time><p>{record.revisionReason}</p></div><button type="button" className="kw-button" aria-label={`查看标签 v${record.version}`} onClick={() => { setViewedKey(tagVersionKey(record)); changeDetailTab('overview') }}>查看 v{record.version}</button></li>)}</ol></section>
+            <section className="nt-detail-card nt-history-card"><div className="nt-card-heading"><h4>标签与定义历史 · {history.length} 个版本</h4></div><p className="nt-muted">查看旧版本不会覆盖当前记录。</p><ol className="nt-version-list">{history.map(record => <li key={tagVersionKey(record)}><div><div className="nt-version-heading"><strong>v{record.version}{record.sourceHash !== selected?.sourceHash ? ' · 旧原文' : ''}</strong>{tagVersionKey(record) === tagVersionKey(selected) ? <span>当前版本</span> : null}</div><time dateTime={record.createdAt}>{formatTime(record.createdAt)}</time><p>{record.revisionReason}</p></div><button type="button" className="kw-button" aria-label={`查看标签 v${record.version}`} onClick={() => { setViewedKey(tagVersionKey(record)); changeDetailTab('overview') }}>查看 v{record.version}</button></li>)}</ol></section>
             <details className="nt-detail-card"><summary>来源与保存信息</summary><p className="nt-source-hash">原文 SHA-256：{viewed.sourceHash}</p><p className="nt-muted">标签保存在当前浏览器，可通过“导出标签与历史”备份。</p></details>
           </div>
         </> : <div className="kw-empty"><h3>选择一篇笔记查看标签依据</h3></div>}
       </section>
     </div>
     {editor ? <TagEditor key={tagVersionKey(editor)} record={editor} supplementEntry={supplementEntry} aiEntry={aiEntry} error={writeError} onSave={save} onCancel={closeEditor} /> : null}
+    {definitionEditor ? <ForecastDefinitionEditor key={`${tagVersionKey(definitionEditor.record)}:${definitionEditor.role}`} role={definitionEditor.role} title={definitionEditor.record.title} initial={definitionEditor.record.forecastDefinitions?.find(item => item.role === definitionEditor.role)} error={writeError} onSave={saveDefinition} onCancel={closeDefinitionEditor} /> : null}
   </section>
 }
 
