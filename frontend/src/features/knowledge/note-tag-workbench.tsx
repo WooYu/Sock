@@ -94,6 +94,7 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
   const [viewedKey, setViewedKey] = useState<string | null>(null)
   const [detailNavigation, setDetailNavigation] = useState<{ id: string; tab: NoteDetailTab }>({ id: '', tab: 'overview' })
   const [page, setPage] = useState(0)
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null)
   const [editor, setEditor] = useState<NoteTagRecord | null>(null)
   const [definitionEditor, setDefinitionEditor] = useState<{ record: NoteTagRecord; role: DefinitionRole } | null>(null)
   const [advancedFilters, setAdvancedFilters] = useState(false)
@@ -201,6 +202,7 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
   }
 
   function choose(record: NoteTagRecord) {
+    setEditingNoteId(null)
     setSelectedId(record.id); setViewedKey(null); setDetailNavigation({ id: record.id, tab: 'overview' })
     if (window.matchMedia?.('(max-width: 760px)').matches) detailRef.current?.scrollIntoView({ block: 'start', behavior: 'instant' })
   }
@@ -251,22 +253,23 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
             <p className="nt-note-file">{viewed.file}</p>
           </header>
           {historical ? <div className="kw-history-banner"><span>历史标签版本，只读{viewed.sourceHash !== selected?.sourceHash ? ' · 原文版本已更新' : ''}</span><button type="button" onClick={() => { setViewedKey(null); changeDetailTab('overview') }}>返回当前标签</button></div> : <div className="nt-detail-actions" aria-label="笔记操作">
-            <button type="button" className="kw-button kw-primary" disabled={!ready || Boolean(error)} onClick={() => openEditor(viewed)}>编辑标签</button>
-            {viewed.status !== 'reviewed' ? <button type="button" className="kw-button" disabled={!ready || Boolean(error) || !viewed.tags.length} onClick={confirmTags}>确认标签</button> : null}
+            <button type="button" className="kw-button" disabled={!ready || Boolean(error)} aria-expanded={editingNoteId === viewed.id} aria-controls="nt-edit-controls" onClick={() => setEditingNoteId(id => id === viewed.id ? null : viewed.id)}>{editingNoteId === viewed.id ? '完成编辑' : '编辑笔记'}</button>
+            <span className="nt-reading-hint">标签核对不代表预测效果已验证</span>
           </div>}
-          {!historical ? <p className="nt-review-help">标签核对确认分类；具体使用条件请在下方“预估作用”中补充定义。</p> : null}
+          {!historical && editingNoteId === viewed.id ? <section className="nt-edit-controls" id="nt-edit-controls" aria-label="笔记编辑选项">
+            <div className="nt-edit-basics"><button type="button" className="kw-button kw-primary" disabled={!ready || Boolean(error)} onClick={() => openEditor(viewed, true)}>标签与补充说明</button>
+            {viewed.status !== 'reviewed' ? <button type="button" className="kw-button" disabled={!ready || Boolean(error) || !viewed.tags.length} onClick={confirmTags}>确认标签</button> : null}</div>
+            <p className="nt-muted">用途与条件可在下方对应内容处编辑。</p>
+            {viewed.level === 'document' ? <details className="nt-secondary-actions"><summary>AI 重新提取</summary><NoteTagReextract key={tagVersionKey(viewed)} record={viewed} disabled={!ready || Boolean(error)} onAdopt={candidate => openEditor({ ...viewed, tags: [...candidate.tags], evidence: candidate.evidence, sourceReferences: [...(viewed.sourceReferences ?? []), ...viewed.evidence], extraction: candidate.extraction }, false, true)} /></details> : null}
+          </section> : null}
           <section className="nt-current-tags" aria-label="当前标签">
             <div className="nt-facets">{(historical ? [...TAG_DIMENSIONS, ...LEGACY_TAG_DIMENSIONS.filter(dimension => !TAG_DIMENSIONS.some(active => active.id === dimension.id))] : TAG_DIMENSIONS).map((dimension) => <div key={dimension.id}><strong>{dimension.label}</strong><span className="nt-chips">{viewed.tags.filter(tag => tag.startsWith(`${dimension.id}.`)).map(tag => <span key={tag}>{TAG_LABELS[tag]}</span>)}{!viewed.tags.some(tag => tag.startsWith(`${dimension.id}.`)) ? <small className="nt-muted">待补充</small> : null}</span></div>)}</div>
           </section>
           <NoteDetailNavigation active={detailTab} onChange={changeDetailTab} />
           <div role="tabpanel" id="nt-panel-overview" aria-labelledby="nt-tab-overview" hidden={detailTab !== 'overview'} tabIndex={0} className="nt-detail-panel">
-            <ForecastDefinitionCards key={`roles:${viewed.id}:${historical ? tagVersionKey(viewed) : 'current'}`} record={viewed} classifications={classifyNoteForForecast(viewed, forecastRegistry, canonicalRecords.get(viewed.id))} registry={forecastRegistry} readOnly={historical} disabled={!ready || Boolean(error)} onEdit={role => openDefinitionEditor(viewed, role)} />
-            <section className="nt-detail-card"><h4>笔记摘要</h4><NoteExcerpt text={viewed.summary} /></section>
+            <ForecastDefinitionCards key={`roles:${viewed.id}:${historical ? tagVersionKey(viewed) : 'current'}`} record={viewed} classifications={classifyNoteForForecast(viewed, forecastRegistry, canonicalRecords.get(viewed.id))} registry={forecastRegistry} readOnly={historical} editing={!historical && editingNoteId === viewed.id} disabled={!ready || Boolean(error)} onEdit={role => openDefinitionEditor(viewed, role)} />
+            <section className="nt-detail-card nt-note-summary"><h4>笔记摘要</h4><NoteExcerpt text={viewed.summary} /></section>
             {viewed.supplement ? <section className="nt-detail-card nt-supplement-summary"><h4>补充说明</h4><NoteExcerpt text={viewed.supplement} /></section> : null}
-            {!historical ? <details className="nt-detail-card nt-secondary-actions" key={`actions:${viewed.id}`}><summary>更多操作</summary><div className="nt-secondary-content">
-              <div><h4>补充个人理解</h4><p className="nt-muted">记录使用场景、理解或需要纠正的内容。</p>{!historical ? <button type="button" className="kw-button" disabled={!ready || Boolean(error)} onClick={() => openEditor(viewed, true)}>{viewed.supplement ? '修改补充说明' : '补充说明'}</button> : null}</div>
-            {!historical && viewed.level === 'document' ? <NoteTagReextract key={tagVersionKey(viewed)} record={viewed} disabled={!ready || Boolean(error)} onAdopt={candidate => openEditor({ ...viewed, tags: [...candidate.tags], evidence: candidate.evidence, sourceReferences: [...(viewed.sourceReferences ?? []), ...viewed.evidence], extraction: candidate.extraction }, false, true)} /> : null}
-            </div></details> : null}
             <details className="nt-detail-card nt-version-note"><summary>本次修订信息 <span>{formatTime(viewed.createdAt)}</span></summary><p className="nt-revision">{viewed.version === 1 ? '自动候选' : '人工修订'} · {viewed.revisionReason}</p></details>
           </div>
           <div role="tabpanel" id="nt-panel-source" aria-labelledby="nt-tab-source" hidden={detailTab !== 'source'} tabIndex={0} className="nt-detail-panel">

@@ -10,8 +10,6 @@ test('forecast roles filter notes and retain the cited rule source', async ({ pa
   await page.getByRole('button', { name: /^查看标签：/ }).first().click()
   const roles = page.getByRole('region', { name: '笔记的预估作用', exact: true })
   await expect(roles).toContainText('入场条件')
-  await roles.locator('.nt-purpose-disclosure > summary').filter({ hasText: '入场条件' }).click()
-  await roles.getByText('已关联条件规则，是否适用另行核对', { exact: true }).first().click()
   await roles.getByText(/查看原文依据/).first().click()
   await expect(roles).toContainText('日MA20下方的新参与过滤')
   await expect(roles.locator('blockquote').first()).toBeVisible()

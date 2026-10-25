@@ -225,7 +225,6 @@
 }
 
 @media (max-width: 720px) {
-  .rs-chart-workspace .sc-kline-axis-labels text { font-size: 23px; fill: var(--sc-muted); transform-box: fill-box; transform-origin: center; transform: scaleY(.65); }
   .rs-chart-workspace .sc-key-level-label { display: none; }
 }
 /* Keep candles primary; indicators have separate hue and line-weight roles. */

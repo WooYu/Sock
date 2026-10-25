@@ -10,7 +10,7 @@ import { ChartToolbar } from './chart-toolbar'
 import { useChartWorkspace } from './use-chart-workspace'
 import { createChartTransform } from './chart-coordinates'
 import { bollinger, movingAverage, withPredictionMovingAverages } from './chart-math'
-import type { ChartPeriod, DrawingRecoveryRecord, PredictionSnapshot, TimePricePoint } from './chart-types'
+import { DEFAULT_DRAWING_COLORS, type ChartPeriod, type DrawingRecoveryRecord, type PredictionSnapshot, type TimePricePoint } from './chart-types'
 import type { DrawingMove } from './drawing-engine'
 import { ChartCanvas } from './chart-canvas'
 import { IndicatorForecastDetails } from './indicator-forecast-details'
@@ -225,7 +225,7 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
     const end = candles.at(-1)
     const start = candles.at(-2) ?? end
     if (!start || !end) return
-    commands.create({ id: `rectangle-${crypto.randomUUID()}`, symbol: workspace.symbol, period: activePeriod, kind: 'rectangle', points: [{ time: start.day, price: start.low }, { time: end.day, price: end.high }], style: { color: '#ef4444', width: 2, lineStyle: 'solid', opacity: 1 }, locked: false, visible: true, version: 0, updatedAt: new Date().toISOString() })
+    commands.create({ id: `rectangle-${crypto.randomUUID()}`, symbol: workspace.symbol, period: activePeriod, kind: 'rectangle', points: [{ time: start.day, price: start.low }, { time: end.day, price: end.high }], style: { color: DEFAULT_DRAWING_COLORS.rectangle, width: 2, lineStyle: 'solid', opacity: 1 }, locked: false, visible: true, version: 0, updatedAt: new Date().toISOString() })
   }
   const resetView = () => {
     setManualPrice(null)

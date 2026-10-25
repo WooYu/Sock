@@ -17,8 +17,8 @@ test('filters and editor contain exactly the new taxonomy', async ({ page }) => 
   for (const label of ['使用目的', '周期', '适用范围', '数据依赖', '可计算性']) {
     await expect(page.getByRole('combobox', { name: label, exact: true })).toHaveCount(0)
   }
-  await page.locator('.nt-secondary-actions > summary').click()
-  await page.getByRole('button', { name: '编辑标签', exact: true }).click()
+  await page.getByRole('button', { name: '编辑笔记', exact: true }).click()
+  await page.getByRole('button', { name: '标签与补充说明', exact: true }).click()
   const editor = page.getByRole('dialog')
   await expect(editor.locator('fieldset')).toHaveCount(2)
   await expect(editor.getByRole('checkbox')).toHaveCount(27)

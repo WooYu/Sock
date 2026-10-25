@@ -1,5 +1,6 @@
 import { useId, type PointerEvent as ReactPointerEvent, type ReactNode, type SyntheticEvent } from 'react'
 import type { ChartTransform } from './chart-coordinates'
+import { ChartTooltipFrame } from './chart-tooltip-frame'
 import type { DrawingObject } from './chart-types'
 
 type DrawingLayerProps = {
@@ -29,7 +30,7 @@ export function DrawingLayer({ drawings, transform, selectedId, onSelect, onFocu
   const clipId = useId()
   const clipped = transform.domainTimes.length > transform.times.length
   return (
-    <g data-testid="drawing-layer" pointerEvents={interactionsDisabled ? 'none' : undefined} clipPath={clipped ? `url(#${clipId})` : undefined}>
+    <g className="sc-drawing-layer" data-testid="drawing-layer" pointerEvents={interactionsDisabled ? 'none' : undefined} clipPath={clipped ? `url(#${clipId})` : undefined}>
       {clipped ? <defs><clipPath id={clipId}><rect x={transform.rect.left} y={transform.rect.top} width={transform.rect.width} height={transform.rect.height} /></clipPath></defs> : null}
       {drawings.map((drawing) => {
         if (!drawing.visible || !drawing.points.length || drawing.points.some((point) => !transform.hasTime(point.time))) return null
@@ -68,33 +69,32 @@ export function DrawingLayer({ drawings, transform, selectedId, onSelect, onFocu
           hitArea = <line data-testid="drawing-hit-area" {...interaction} pointerEvents="stroke" stroke="transparent" strokeWidth={hitWidth} x1={points[0].x} x2={points[1].x} y1={points[0].y} y2={points[1].y} />
         } else if (drawing.kind === 'text') {
           const text = drawing.text ?? '文字备注'
-          visible = <text fill={drawing.style.color} opacity={drawing.style.opacity} {...interaction} x={points[0].x} y={points[0].y}>{text}</text>
-          hitArea = <rect data-testid="drawing-hit-area" fill="transparent" height="28" {...interaction} pointerEvents="all" width={labelWidth(text)} x={points[0].x - 4} y={points[0].y - 20} />
+          visible = <ChartTooltipFrame x={points[0].x} y={points[0].y} maxWidth={labelWidth(text)} testId="drawing-label-frame" interactive={!interactionsDisabled}>{() => <g {...interaction} opacity={drawing.style.opacity}><rect data-testid="drawing-hit-area" fill="transparent" height="30" pointerEvents="all" width={labelWidth(text)} x={-4} y={-21} /><text fill={drawing.style.color}>{text}</text></g>}</ChartTooltipFrame>
+          hitArea = null
         } else {
-          const text = `${markerLabel(drawing.kind)} · 价格 ${drawing.points[0].price.toFixed(2)}`
-          visible = <g {...interaction}><circle cx={points[0].x} cy={points[0].y} fill={drawing.style.color} opacity={drawing.style.opacity} r="8" /><text fill={drawing.style.color} x={points[0].x + 11} y={points[0].y + 4}>{text}</text></g>
-          hitArea = <rect data-testid="drawing-hit-area" fill="transparent" height="28" {...interaction} pointerEvents="all" width={21 + labelWidth(text)} x={points[0].x - 10} y={points[0].y - 14} />
+          const text = `${markerLabel(drawing.kind)} ${drawing.points[0].price.toFixed(2)}`
+          visible = <ChartTooltipFrame x={points[0].x} y={points[0].y} maxWidth={labelWidth(text) + 24} testId="drawing-label-frame" interactive={!interactionsDisabled}>{() => <g {...interaction} opacity={drawing.style.opacity}><rect data-testid="drawing-hit-area" fill="var(--sc-surface)" fillOpacity="0.94" stroke={drawing.style.color} strokeOpacity="0.4" strokeWidth="1" height="28" rx="6" pointerEvents="all" width={24 + labelWidth(text)} x={-10} y={-14} /><circle fill={drawing.style.color} r="3" /><text fill="var(--sc-foreground)" x={10} y={4}>{text}</text></g>}</ChartTooltipFrame>
+          hitArea = null
         }
 
         return (
           <g data-selected={selected || undefined} data-testid={drawing.kind === 'rectangle' ? 'annotation-rectangle' : drawing.kind === 'trend-line' ? 'annotation-trend-line' : drawing.kind === 'horizontal-line' ? 'annotation-horizontal-line' : drawing.kind === 'text' ? 'annotation-text' : `annotation-${drawing.kind}`} key={drawing.id}>
             <g data-testid="drawing-object">
             {visible}
-            {drawing.kind === 'horizontal-line' ? <text data-testid="drawing-price-label" fill={drawing.style.color} fontSize="11" textAnchor="end" x={transform.rect.left + transform.rect.width - 4} y={points[0].y - 5}>{drawing.points[0].price.toFixed(2)}</text> : null}
+            {drawing.kind === 'horizontal-line' ? <ChartTooltipFrame x={transform.rect.left + transform.rect.width - 4} y={points[0].y} maxWidth={100} testId="drawing-price-frame">{() => <text data-testid="drawing-price-label" fill={drawing.style.color} fontSize="12" textAnchor="end" y={-6}>{drawing.points[0].price.toFixed(2)}</text>}</ChartTooltipFrame> : null}
             {hitArea}
             {selected && !drawing.locked && !interactionsDisabled ? points.map((point, index) => (
-              <circle
+              <ChartTooltipFrame key={`${drawing.id}-${index}`} x={point.x} y={point.y} maxWidth={16} testId="drawing-handle-frame" interactive>{() => <circle
                 data-testid="drawing-handle"
                 fill="var(--sc-surface)"
-                key={`${drawing.id}-${index}`}
                 onClick={(event) => event.stopPropagation()}
                 onPointerDown={(event) => { event.stopPropagation(); onFocusEditor?.(); onMovePoint(drawing.id, index, event) }}
                 r="5"
                 stroke={drawing.style.color}
                 strokeWidth="2"
-                cx={point.x}
-                cy={point.y}
-              />
+                cx={0}
+                cy={0}
+              />}</ChartTooltipFrame>
             )) : null}
             </g>
           </g>

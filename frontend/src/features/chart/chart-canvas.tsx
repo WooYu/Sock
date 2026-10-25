@@ -4,7 +4,7 @@ import { useId, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type
 import type { Candle } from '../workspace/stock-workspace-types'
 import type { ChartTransform } from './chart-coordinates'
 import type { ChartTool } from './chart-annotation-store'
-import type { DrawingKind, DrawingObject, PredictionSnapshot, TimePricePoint } from './chart-types'
+import { DEFAULT_DRAWING_COLORS, type DrawingKind, type DrawingObject, type PredictionSnapshot, type TimePricePoint } from './chart-types'
 import { MA_COLORS, MA_PERIODS, formatChartTime, isIntradayPeriod, type ChartPeriod, type IndicatorKey, type IndicatorValue, type IndicatorValues, type MaKey } from './chart-periods'
 import type { DrawingMove } from './drawing-engine'
 import { DrawingLayer } from './drawing-layer'
@@ -177,7 +177,7 @@ function HistoricalLayer({ candles, transform, keyLevels, showKeyLevels, kind = 
       <g className="sc-kline-axis-labels">
         {[0, 1, 2, 3, 4].map((line) => {
           const y = transform.rect.top + line * (transform.rect.height / 4)
-          return <text key={line} x={viewBox.width - 10} textAnchor="end" y={y + 4}>{priceText(transform.priceForY(y))}</text>
+          return <ChartTooltipFrame key={line} x={viewBox.width - 10} y={y} maxWidth={100} testId="chart-price-label">{() => <text textAnchor="end" y={4}>{priceText(transform.priceForY(y))}</text>}</ChartTooltipFrame>
         })}
       </g>
       <g clipPath={`url(#${priceClipId})`}>{kind === 'intraday' ? <IntradayPrices candles={candles} transform={transform} previousClose={previousClose} /> : <g data-testid="candlestick-layer">
@@ -196,10 +196,10 @@ function HistoricalLayer({ candles, transform, keyLevels, showKeyLevels, kind = 
         const height = Number(((candle.volume / maxVolume) * volumeHeight).toFixed(4))
         return <rect height={height} key={candle.day} width={candleWidth} x={transform.xForTime(candle.day) - candleWidth / 2} y={volumeTop + volumeHeight - height} />
       })}</g>
-      <text className="sc-volume-label" x={transform.rect.left} y={volumeTop - 7}>成交量</text>
+      <ChartTooltipFrame x={transform.rect.left} y={volumeTop - 7} maxWidth={100} testId="chart-volume-label">{() => <text className="sc-volume-label">成交量</text>}</ChartTooltipFrame>
       {sessions.length ? <g data-testid="five-day-sessions">{sessions.map((session, index) => <g key={session.day}>
         {index ? <line x1={transform.xForTime(session.first)} x2={transform.xForTime(session.first)} y1={transform.rect.top} y2={volumeTop + volumeHeight} stroke="var(--sc-border)" strokeDasharray="3 4" /> : null}
-        <text x={(transform.xForTime(session.first) + transform.xForTime(session.last)) / 2} y={volumeTop + volumeHeight + 22} textAnchor="middle" fill="var(--sc-muted)" fontSize="11">{session.day.slice(5)}</text>
+        <ChartTooltipFrame x={(transform.xForTime(session.first) + transform.xForTime(session.last)) / 2} y={volumeTop + volumeHeight + 22} maxWidth={100} testId="chart-date-label">{() => <text textAnchor="middle" fill="var(--sc-muted)" fontSize="11">{session.day.slice(5)}</text>}</ChartTooltipFrame>
       </g>)}</g> : null}
       <g className="sc-kline-axis-labels" aria-label={isIntradayPeriod(period) ? '交易时间' : '交易日期'}>{(sessions.length ? [] : candles).filter((_, index) => index % Math.max(1, Math.ceil(candles.length / 5)) === 0).map((candle) => <ChartTooltipFrame key={candle.day} x={transform.xForTime(candle.day)} y={volumeTop + volumeHeight + 22} maxWidth={100} testId="chart-date-label">{() => <text x={0} y={0} textAnchor="middle" fontSize="11">{axisTime(candle.day, period)}</text>}</ChartTooltipFrame>)}</g>
     </g>
@@ -321,7 +321,7 @@ export function ChartCanvas(props: ChartCanvasProps) {
     period: props.period,
     kind,
     points,
-    style: { color: '#ef4444', width: 2, lineStyle: 'solid', opacity: 1 },
+    style: { color: DEFAULT_DRAWING_COLORS[kind], width: 2, lineStyle: 'solid', opacity: 1 },
     text: kind === 'text' ? '文字备注' : undefined,
     locked: false,
     visible: true,

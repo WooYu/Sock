@@ -18,6 +18,11 @@ export type DrawingKind =
   | 'target'
   | 'stop-loss'
 
+export const DEFAULT_DRAWING_COLORS: Record<DrawingKind, string> = {
+  'trend-line': '#668fc7', 'horizontal-line': '#668fc7', rectangle: '#668fc7', text: '#668fc7',
+  buy: '#329b88', sell: '#c87988', target: '#8b83c8', 'stop-loss': '#bd8954',
+}
+
 export type DrawingStyle = {
   color: string
   width: number

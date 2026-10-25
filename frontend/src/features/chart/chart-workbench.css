@@ -123,3 +123,5 @@
   .rs-candle-inspection dd { font-size: 13px; }
   .rs-studio .rs-workbench .rs-forecast-value-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+.sc-drawing-layer text { font-family: var(--sc-font-body); font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: 0; }
+.sc-kline-axis-labels text, .sc-volume-label { font-family: var(--sc-font-body); font-variant-numeric: tabular-nums; }

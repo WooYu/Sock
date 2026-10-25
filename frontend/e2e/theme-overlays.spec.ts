@@ -35,8 +35,8 @@ for (const theme of ['c', 'd'] as const) {
     await page.keyboard.press('Escape')
 
     await page.goto('/knowledge?view=notes')
-    await page.locator('.nt-secondary-actions > summary').click()
-    await page.getByRole('region', { name: '标签详情' }).getByRole('button', { name: '补充说明', exact: true }).click()
+    await page.getByRole('button', { name: '编辑笔记', exact: true }).click()
+    await page.getByRole('region', { name: '标签详情' }).getByRole('button', { name: '标签与补充说明', exact: true }).click()
     const editor = page.getByRole('dialog', { name: '修订笔记标签' })
     await expect(editor).toHaveCSS('background-color', surface)
     expect(await editor.getByLabel('补充说明', { exact: true }).evaluate(el => getComputedStyle(el).fontFamily)).toContain(font)

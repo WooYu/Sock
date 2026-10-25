@@ -11,26 +11,32 @@ const fixture: NoteCatalog = { ...complete, documents: complete.documents.filter
 beforeEach(() => localStorage.clear())
 afterEach(() => vi.unstubAllGlobals())
 
+function startEditing() {
+  const entry = screen.queryByRole('button', { name: '编辑笔记' })
+  if (entry) fireEvent.click(entry)
+}
+
 describe('note tagging workbench', () => {
-  it('keeps secondary actions and definition controls out of the reading view until requested', () => {
+  it('shows purposes without nested disclosures and uses a single editing entry', () => {
     const fetchMock = vi.fn()
     vi.stubGlobal('fetch', fetchMock)
     render(<NoteTagWorkbench catalog={fixture} />)
-    expect(screen.getByRole('button', { name: '补充说明' })).not.toBeVisible()
-    expect(screen.getByRole('button', { name: 'AI 重新提取标签' })).not.toBeVisible()
-    expect(screen.queryByRole('button', { name: '重置标签筛选' })).not.toBeInTheDocument()
-    fireEvent.click(screen.getByText('更多操作', { exact: true }))
-    expect(screen.getByRole('button', { name: '补充说明' })).toBeVisible()
-    expect(screen.getByRole('button', { name: 'AI 重新提取标签' })).toBeVisible()
+    const detail = screen.getByRole('region', { name: '标签详情' })
+    expect(within(detail).getAllByRole('button')).toHaveLength(1)
+    expect(screen.queryByRole('button', { name: '标签与补充说明' })).not.toBeInTheDocument()
+    startEditing()
+    expect(screen.getByRole('button', { name: '标签与补充说明' })).toBeVisible()
     expect(fetchMock).not.toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: '查看标签：均线金叉' }))
-    expect(screen.getByRole('button', { name: '补充定义：入场条件' })).not.toBeVisible()
-    fireEvent.click(screen.getByText('入场条件', { selector: 'strong' }))
+    expect(screen.getByText('入场条件', { selector: 'strong' })).toBeVisible()
+    expect(screen.queryByRole('button', { name: '补充定义：入场条件' })).not.toBeInTheDocument()
+    startEditing()
     expect(screen.getByRole('button', { name: '补充定义：入场条件' })).toBeVisible()
   })
   it('edits a forecast definition, retains filters, and restores its draft after reopening', () => {
     render(<NoteTagWorkbench catalog={fixture} />)
     fireEvent.change(screen.getByRole('textbox', { name: '搜索笔记与标签' }), { target: { value: '均线金叉' } })
+    startEditing()
     fireEvent.click(screen.getByRole('button', { name: '补充定义：入场条件' }))
     const editor = screen.getByRole('dialog')
     fireEvent.change(within(editor).getByLabelText('条件或计算方法'), { target: { value: 'MA5 向上穿越 MA20' } })
@@ -39,6 +45,7 @@ describe('note tagging workbench', () => {
     expect(screen.getByRole('textbox', { name: '搜索笔记与标签' })).toHaveValue('均线金叉')
     expect(within(screen.getByRole('region', { name: '笔记的预估作用' })).getByText('定义草稿')).toBeVisible()
     expect(screen.getByRole('status')).toHaveTextContent('仍需补齐条件')
+    startEditing()
     fireEvent.click(screen.getByRole('button', { name: '编辑定义：入场条件' }))
     expect(screen.getByLabelText('条件或计算方法')).toHaveValue('MA5 向上穿越 MA20')
   })
@@ -54,6 +61,7 @@ describe('note tagging workbench', () => {
   it('retains an unsaved definition when a concurrent version prevents saving', () => {
     render(<NoteTagWorkbench catalog={fixture} />)
     fireEvent.click(screen.getByRole('button', { name: '查看标签：均线金叉' }))
+    startEditing()
     fireEvent.click(screen.getByRole('button', { name: '补充定义：入场条件' }))
     fireEvent.change(screen.getByLabelText('条件或计算方法'), { target: { value: '尚未保存的条件' } })
     const seed = fixture.documents.find(record => record.file === '01-ma-golden-cross.md')!
@@ -88,7 +96,8 @@ describe('note tagging workbench', () => {
     expect(screen.getByRole('tabpanel', { name: '版本历史' })).toBeVisible()
     fireEvent.click(screen.getByRole('button', { name: '查看标签：选股总结' }))
     expect(overview).toHaveAttribute('aria-selected', 'true')
-    expect(screen.getByRole('button', { name: '编辑标签' })).toBeVisible()
+    startEditing()
+    expect(screen.getByRole('button', { name: '标签与补充说明' })).toBeVisible()
   })
 
   it('previews fresh dual-model results and appends a version only after editor save', async () => {
@@ -97,6 +106,7 @@ describe('note tagging workbench', () => {
     const fetchMock = vi.fn().mockResolvedValue(Response.json({ id: original.id, sourceHash: original.sourceHash, candidate, models: [{ name: 'DeepSeek', tags: ['topic.ma', 'topic.climb'] }, { name: 'Codex', tags: ['topic.ma'] }] }))
     vi.stubGlobal('fetch', fetchMock)
     render(<NoteTagWorkbench catalog={fixture} />)
+    startEditing()
     fireEvent.click(screen.getByRole('button', { name: 'AI 重新提取标签' }))
     await screen.findByRole('button', { name: '采用本次结果并编辑' })
     expect(screen.getByText('模型分歧（未采用）')).toBeInTheDocument()
@@ -120,6 +130,7 @@ describe('note tagging workbench', () => {
     const original = currentTagRecords(fixture.documents, [])[0]
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ id: original.id, sourceHash: original.sourceHash, candidate: null, models: [{ name: 'DeepSeek', tags: ['topic.ma'] }, { name: 'Codex', error: 'Codex 未配置' }] })))
     render(<NoteTagWorkbench catalog={fixture} />)
+    startEditing()
     fireEvent.click(screen.getByRole('button', { name: 'AI 重新提取标签' }))
     await screen.findByText('Codex 未配置')
     expect(screen.queryByRole('button', { name: '采用本次结果并编辑' })).not.toBeInTheDocument()
@@ -148,7 +159,8 @@ describe('note tagging workbench', () => {
   it('previews supplementary suggestions before applying and saves them in one version', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ suggestions: [{ tagId: 'topic.sell', action: 'add', quote: '卖出研究', reason: '用户补充卖出主题', conflict: '原文未说明卖出' }] })))
     const view = render(<NoteTagWorkbench catalog={fixture} />)
-    fireEvent.click(screen.getByRole('button', { name: '补充说明' }))
+    startEditing()
+    fireEvent.click(screen.getByRole('button', { name: '标签与补充说明' }))
     const editor = screen.getByRole('dialog')
     expect(within(editor).getByLabelText('补充说明')).toHaveFocus()
     fireEvent.change(within(editor).getByLabelText('补充说明'), { target: { value: '增加卖出研究' } })
@@ -196,7 +208,8 @@ describe('note tagging workbench', () => {
     const view = render(<NoteTagWorkbench catalog={fixture} />)
     await user.click(screen.getByRole('button', { name: '查看标签：选股总结' }))
     const details = screen.getByRole('region', { name: '标签详情' })
-    await user.click(within(details).getByRole('button', { name: '编辑标签' }))
+    startEditing()
+    await user.click(within(details).getByRole('button', { name: '标签与补充说明' }))
     const editor = screen.getByRole('dialog', { name: '修订笔记标签' })
     await user.click(within(editor).getByRole('checkbox', { name: '卖出' }))
     await user.type(within(editor).getByLabelText('修订原因'), '另按卖出研究；保留原有日线解释。')
@@ -216,20 +229,22 @@ describe('note tagging workbench', () => {
     await user.click(screen.getByRole('tab', { name: '版本历史' }))
     await user.click(screen.getByRole('button', { name: '查看标签 v1' }))
     expect(screen.getByText('历史标签版本，只读')).toBeInTheDocument()
-    expect(within(screen.getByRole('region', { name: '标签详情' })).queryByRole('button', { name: '编辑标签' })).not.toBeInTheDocument()
+    expect(within(screen.getByRole('region', { name: '标签详情' })).queryByRole('button', { name: '标签与补充说明' })).not.toBeInTheDocument()
   })
 
   it('preserves corrupt local records and disables writes until they can be recovered', async () => {
     localStorage.setItem(NOTE_TAG_STORAGE_KEY, '{broken')
     render(<NoteTagWorkbench catalog={fixture} />)
     expect(await screen.findByRole('alert')).toHaveTextContent('未被覆盖')
-    expect(screen.getByRole('button', { name: '编辑标签' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: '编辑笔记' })).toBeDisabled()
     expect(localStorage.getItem(NOTE_TAG_STORAGE_KEY)).toBe('{broken')
   })
 
   it('records tag review without upgrading computation readiness or clearing missing definitions', async () => {
     render(<NoteTagWorkbench catalog={fixture} />)
+    startEditing()
     await screen.findByRole('button', { name: '确认标签' })
+    startEditing()
     fireEvent.click(screen.getByRole('button', { name: '确认标签' }))
     expect(screen.queryByRole('button', { name: '确认标签' })).not.toBeInTheDocument()
     const versions = parseTagLedger(localStorage.getItem(NOTE_TAG_STORAGE_KEY))
