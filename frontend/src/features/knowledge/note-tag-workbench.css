@@ -189,9 +189,7 @@
 .nt-definition-content dt { color: var(--sc-muted); }
 .nt-definition-content dd { margin: 0; }
 .nt-purpose-evidence blockquote { max-height: 240px; overflow-y: auto; overscroll-behavior: contain; }
-.nt-add-purpose { display: flex; align-items: end; flex-wrap: wrap; gap: 12px; margin: 12px 0; }
-.nt-add-purpose label { display: grid; gap: 6px; font-size: 12px; color: var(--sc-muted); }
-.nt-add-purpose select, .nt-definition-editor input { min-height: 44px; width: 100%; border: 1px solid var(--sc-border); border-radius: 6px; padding: 8px; color: var(--sc-foreground); background: var(--sc-surface); }
+.nt-definition-editor select, .nt-definition-editor input { min-height: 44px; width: 100%; border: 1px solid var(--sc-border); border-radius: 6px; padding: 8px; color: var(--sc-foreground); background: var(--sc-surface); }
 .nt-definition-editor { width: min(720px, 100%); }
 .nt-definition-editor .nt-editor-field { font-size: 13px; }
 .nt-definition-editor textarea { font-size: 14px; line-height: 1.7; resize: vertical; }
@@ -291,3 +289,14 @@
   .nt-reading-hint { flex-basis: 100%; }
   .nt-reading-detail .nt-definition-condition { font-size: 16px; }
 }
+
+/* Keep note actions aligned across reading and editing sections. */
+.nt-reading-detail .kw-button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 14px; margin: 0; box-sizing: border-box; line-height: 20px; border-radius: 8px; }
+.nt-reading-detail .kw-primary { background: var(--sc-primary) !important; border-color: var(--sc-primary) !important; color: var(--sc-on-primary); }
+.nt-reading-detail .nt-detail-actions { align-items: center; }
+.nt-edit-basics { align-items: center; }
+
+.nt-definition-editor .nt-editor-footer .kw-button { min-height: 44px; }
+
+.nt-definition-editor .nt-editor-heading h2 { margin: 0; font-size: 18px; line-height: 1.5; }
+.nt-definition-editor #nt-definition-help { margin: 0 0 12px !important; font-size: 12px; line-height: 1.7; }

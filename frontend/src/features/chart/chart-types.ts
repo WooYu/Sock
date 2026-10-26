@@ -19,8 +19,8 @@ export type DrawingKind =
   | 'stop-loss'
 
 export const DEFAULT_DRAWING_COLORS: Record<DrawingKind, string> = {
-  'trend-line': '#668fc7', 'horizontal-line': '#668fc7', rectangle: '#668fc7', text: '#668fc7',
-  buy: '#329b88', sell: '#c87988', target: '#8b83c8', 'stop-loss': '#bd8954',
+  'trend-line': '#2962ff', 'horizontal-line': '#2962ff', rectangle: '#2962ff', text: '#2962ff',
+  buy: '#089981', sell: '#f23645', target: '#089981', 'stop-loss': '#f23645',
 }
 
 export type DrawingStyle = {

@@ -3,6 +3,34 @@ import { describe, expect, it, vi } from 'vitest'
 import { ForecastDefinitionEditor } from './note-forecast-definition-editor'
 
 describe('forecast definition editor', () => {
+  it('switches purposes directly, but protects dirty input until discard is confirmed', () => {
+    const changeRole = vi.fn(), cancel = vi.fn()
+    render(<ForecastDefinitionEditor role="entry" title="示例笔记" onRoleChange={changeRole} onSave={vi.fn()} onCancel={cancel} error="" />)
+    fireEvent.change(screen.getByLabelText('用途', { exact: true }), { target: { value: 'target' } })
+    expect(changeRole).toHaveBeenCalledWith('target')
+    changeRole.mockClear()
+    fireEvent.change(screen.getByLabelText('条件或计算方法'), { target: { value: '保留这段条件' } })
+    fireEvent.change(screen.getByLabelText('用途', { exact: true }), { target: { value: 'exit' } })
+    expect(changeRole).not.toHaveBeenCalled()
+    expect(screen.getByRole('alert')).toHaveTextContent('切换用途')
+    fireEvent.click(screen.getByRole('button', { name: '继续编辑' }))
+    expect(screen.getByLabelText('用途', { exact: true })).toHaveValue('entry')
+    expect(screen.getByLabelText('条件或计算方法')).toHaveValue('保留这段条件')
+    fireEvent.change(screen.getByLabelText('用途', { exact: true }), { target: { value: 'exit' } })
+    fireEvent.click(screen.getByRole('button', { name: '放弃修改' }))
+    expect(changeRole).toHaveBeenCalledWith('exit')
+    expect(cancel).not.toHaveBeenCalled()
+  })
+  it('closes instead of switching when escape follows a pending purpose change', () => {
+    const changeRole = vi.fn(), cancel = vi.fn()
+    render(<ForecastDefinitionEditor role="entry" title="示例笔记" onRoleChange={changeRole} onSave={vi.fn()} onCancel={cancel} error="" />)
+    fireEvent.change(screen.getByLabelText('条件或计算方法'), { target: { value: '未保存条件' } })
+    fireEvent.change(screen.getByLabelText('用途', { exact: true }), { target: { value: 'exit' } })
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' })
+    fireEvent.click(screen.getByRole('button', { name: '放弃修改' }))
+    expect(cancel).toHaveBeenCalledOnce()
+    expect(changeRole).not.toHaveBeenCalled()
+  })
   it('returns focus to the opening control after the editor closes', () => {
     const trigger = document.createElement('button')
     document.body.append(trigger)

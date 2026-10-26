@@ -259,7 +259,7 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
           {!historical && editingNoteId === viewed.id ? <section className="nt-edit-controls" id="nt-edit-controls" aria-label="笔记编辑选项">
             <div className="nt-edit-basics"><button type="button" className="kw-button kw-primary" disabled={!ready || Boolean(error)} onClick={() => openEditor(viewed, true)}>标签与补充说明</button>
             {viewed.status !== 'reviewed' ? <button type="button" className="kw-button" disabled={!ready || Boolean(error) || !viewed.tags.length} onClick={confirmTags}>确认标签</button> : null}</div>
-            <p className="nt-muted">用途与条件可在下方对应内容处编辑。</p>
+            <p className="nt-muted">在下方“编辑用途与定义”中统一补充用途和判断条件。</p>
             {viewed.level === 'document' ? <details className="nt-secondary-actions"><summary>AI 重新提取</summary><NoteTagReextract key={tagVersionKey(viewed)} record={viewed} disabled={!ready || Boolean(error)} onAdopt={candidate => openEditor({ ...viewed, tags: [...candidate.tags], evidence: candidate.evidence, sourceReferences: [...(viewed.sourceReferences ?? []), ...viewed.evidence], extraction: candidate.extraction }, false, true)} /></details> : null}
           </section> : null}
           <section className="nt-current-tags" aria-label="当前标签">
@@ -287,7 +287,7 @@ export function NoteTagWorkbench({ catalog = defaultCatalog }: { catalog?: NoteC
       </section>
     </div>
     {editor ? <TagEditor key={tagVersionKey(editor)} record={editor} supplementEntry={supplementEntry} aiEntry={aiEntry} error={writeError} onSave={save} onCancel={closeEditor} /> : null}
-    {definitionEditor ? <ForecastDefinitionEditor key={`${tagVersionKey(definitionEditor.record)}:${definitionEditor.role}`} role={definitionEditor.role} title={definitionEditor.record.title} initial={definitionEditor.record.forecastDefinitions?.find(item => item.role === definitionEditor.role)} error={writeError} onSave={saveDefinition} onCancel={closeDefinitionEditor} /> : null}
+    {definitionEditor ? <ForecastDefinitionEditor key={`${tagVersionKey(definitionEditor.record)}:${definitionEditor.role}`} role={definitionEditor.role} title={definitionEditor.record.title} initial={definitionEditor.record.forecastDefinitions?.find(item => item.role === definitionEditor.role)} error={writeError} onRoleChange={role => setDefinitionEditor(current => current ? { ...current, role } : null)} onSave={saveDefinition} onCancel={closeDefinitionEditor} /> : null}
   </section>
 }
 
