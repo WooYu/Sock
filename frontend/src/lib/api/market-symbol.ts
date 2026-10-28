@@ -16,6 +16,7 @@ export function isMarketIndex(symbol: string): boolean {
 
 export function matchingMarketIndices(query: string): Security[] {
   const term = query.trim().toLowerCase()
+  if (term === 'a50') return []
   if (term === '000852' || ['399006', '399903', '399310'].includes(term)) return indices.filter(({ security }) => security.code.slice(2) === term).map(({ security }) => ({ ...security }))
   if (!term || /^\d+$/.test(term)) return []
   return indices.filter(({ aliases }) => aliases.some(alias => {

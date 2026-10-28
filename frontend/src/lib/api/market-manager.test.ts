@@ -65,13 +65,19 @@ describe('managed market sources', () => {
     ['399006', 'sz399006', '创业板指'],
     ['中证100', 'sz399903', '中证100'],
     ['399903', 'sz399903', '中证100'],
-    ['A50', 'sz399310', '国证A50'],
+    ['国证A50', 'sz399310', '国证A50'],
     ['399310', 'sz399310', '国证A50'],
   ])('finds %s as the explicitly named index', async (query, symbol, name) => {
     vi.stubGlobal('fetch', vi.fn(async () => bad()))
     const results = await (await import('./market-manager')).managedSearch(query)
     expect(results).toMatchObject([{ code: symbol, name }])
     if (query === '中证100') expect(results.some(item => item.code === 'sh000852')).toBe(false)
+  })
+
+  test('does not present the domestic index as the A50 futures continuous contract', async () => {
+    const { matchingMarketIndices } = await import('./market-symbol')
+    expect(matchingMarketIndices('A50')).toEqual([])
+    expect(matchingMarketIndices('A50期货主连')).toEqual([])
   })
 
   test.each(['sz399006', 'sz399903', 'sz399310'])('fetches %s as a raw index, never a stock', async symbol => {
