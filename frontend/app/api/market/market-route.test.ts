@@ -16,27 +16,27 @@ describe('market BFF source selection', () => {
     expect(await response.json()).toMatchObject({ quote: { security: { code: '300502', name: '新易盛', exchange: 'SZ' }, price: 12, previousClose: 11 }, dailyCandles: [{ volume: 10000 }, { volume: 15000 }], source: { name: '腾讯公开行情·延时', online: true, state: 'DELAYED' } })
   })
 
-  test('keeps the configured backend path and response unchanged', async () => {
+  test('prefers Tencent even when a backend is configured', async () => {
     vi.stubEnv('STOCKCAL_API_BASE_URL', 'https://backend.example/')
-    const fetcher = vi.fn(async () => Response.json({ adjustment: 'qfq', quote: { security: { code: '600519', name: '后端股票' }, price: 1200 }, dailyCandles: [] }))
+    const fetcher = vi.fn(async () => Response.json(providerSnapshot))
     vi.stubGlobal('fetch', fetcher)
-    const response = await callSnapshot('600519')
+    const response = await callSnapshot('300502')
     expect(response.status).toBe(200)
-    expect(await response.json()).toMatchObject({ quote: { price: 1200 } })
-    expect(fetcher).toHaveBeenCalledWith('https://backend.example/api/v1/market/stocks/600519/snapshot', expect.objectContaining({ cache: 'no-store' }))
+    expect(await response.json()).toMatchObject({ source: { name: '腾讯公开行情·延时' }, quote: { price: 12 } })
+    expect(fetcher).toHaveBeenCalledTimes(1)
   })
 
-  test('does not silently switch sources after a configured backend fails', async () => {
+  test('reports all providers unavailable without leaking errors', async () => {
     vi.stubEnv('STOCKCAL_API_BASE_URL', 'https://backend.example/')
     const fetcher = vi.fn(async () => new Response('private upstream details', { status: 503 }))
     vi.stubGlobal('fetch', fetcher)
     const response = await callSnapshot()
     expect(response.status).toBe(502)
-    expect(await response.json()).toEqual({ message: '行情暂时不可用' })
-    expect(fetcher).toHaveBeenCalledTimes(1)
+    expect(await response.json()).toEqual({ code: 'MARKET_ALL_SOURCES_UNAVAILABLE', message: '各行情源暂不可用，请稍后重试' })
+    expect(fetcher).toHaveBeenCalledTimes(4)
   })
 
-  test('upgrades legacy backend raw history to explicit forward adjustment without changing its quote', async () => {
+  test('does not mix backend quotes into Tencent adjusted history', async () => {
     vi.stubEnv('STOCKCAL_API_BASE_URL', 'https://backend.example/')
     const fetcher = vi.fn(async (url: string) => url.startsWith('https://backend.example/')
       ? Response.json({ quote: { security: { code: '300502', name: '新易盛' }, price: 12 }, dailyCandles: [], source: { name: '后端日线' } })
@@ -44,8 +44,8 @@ describe('market BFF source selection', () => {
     vi.stubGlobal('fetch', fetcher)
     const response = await callSnapshot()
     expect(response.status).toBe(200)
-    expect(await response.json()).toMatchObject({ adjustment: 'qfq', quote: { price: 12 }, dailyCandles: [{ close: 11 }, { close: 12 }], source: { name: '腾讯公开行情·延时 · 报价 后端日线' } })
-    expect(fetcher).toHaveBeenCalledTimes(2)
+    expect(await response.json()).toMatchObject({ adjustment: 'qfq', quote: { price: 12 }, dailyCandles: [{ close: 11 }, { close: 12 }], source: { name: '腾讯公开行情·延时' } })
+    expect(fetcher).toHaveBeenCalledTimes(1)
   })
 
   test('rejects invalid symbols before requesting data', async () => {

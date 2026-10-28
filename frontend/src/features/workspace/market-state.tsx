@@ -15,7 +15,7 @@ export function MarketLoadingState({ variant }: { variant: MarketStateVariant })
       <div className="sc-market-loading-heading">
         <span aria-hidden="true" className="sc-market-spinner" />
         <div>
-          <p className="sc-eyebrow">真实行情 · 阿里云后端</p>
+          <p className="sc-eyebrow">真实行情</p>
           <h1>正在加载真实行情</h1>
           <p>{copy.title}，请稍候。</p>
         </div>

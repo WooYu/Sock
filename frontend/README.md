@@ -12,6 +12,8 @@ npm run dev
 
 默认访问 http://localhost:3000。模板通过`STOCKCAL_RECORDS_API_BASE_URL`连接本机研究记录后端，并使用腾讯公开行情。仅在后端行情供应商已配置时启用`STOCKCAL_API_BASE_URL`；行情和AI密钥只配置在后端。数据库、后端与Windows启动步骤见[本地运行指南](../docs/handoff/2026-10-17-stockcal-local-run.md)。已有`.env.local`应保留并合并设置。
 
+行情优先使用腾讯，失败时尝试东方财富，再按需使用已配置的后端。实际来源显示在图表旁；Tushare 后端只作为短窗口不复权日线回退，不用于复权或分钟行情。服务器必须能访问相应供应商，某一网络环境的访问成功不代表生产环境可用。
+
 ## 验证
 
 ```bash

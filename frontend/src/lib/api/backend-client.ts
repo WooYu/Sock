@@ -25,11 +25,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export function searchSecurities(query: string) {
-  return request<Security[]>(`/api/v1/market/search?q=${encodeURIComponent(query)}`)
+  return request<Security[]>(`/api/v1/market/search?q=${encodeURIComponent(query)}`, { signal: AbortSignal.timeout(8000) })
 }
 
 export function getMarketSnapshot(symbol: string) {
-  return request<MarketSnapshot>(`/api/v1/market/stocks/${encodeURIComponent(symbol)}/snapshot`)
+  return request<MarketSnapshot>(`/api/v1/market/stocks/${encodeURIComponent(symbol)}/snapshot`, { signal: AbortSignal.timeout(8000) })
 }
 
 export function getPredictionSnapshot(symbol: string, period: ChartPeriod, authorization?: string): Promise<PredictionSnapshot> {

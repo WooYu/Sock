@@ -90,3 +90,8 @@ test('minutes stay raw while longer periods default to forward adjustment', asyn
   expect(fetcher.mock.calls[0][0]).toContain('adjustment=none')
   expect(fetcher.mock.calls[1][0]).toContain('adjustment=qfq')
 })
+
+test('does not pass raw Tushare history off as forward-adjusted daily candles', async () => {
+  vi.stubGlobal('fetch', vi.fn(async () => Response.json({ adjustment: 'none', quote: { security: { code: '600519' } }, dailyCandles: [], source: { name: 'Tushare Pro 日线' } })))
+  await expect(browserMarketClient.series('600519', 'day', undefined, 'qfq')).rejects.toThrow('当前来源不提供前复权日线')
+})

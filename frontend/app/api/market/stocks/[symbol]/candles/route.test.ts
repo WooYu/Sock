@@ -27,11 +27,11 @@ describe('public multi-period candle endpoint', () => {
     expect(fetcher).not.toHaveBeenCalled()
   })
 
-  test('reports missing data independently of a provider error', async () => {
+  test('reports a safe error when neither public provider can supply data', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => Response.json({ code: 0, data: {} })))
     const missing = await call()
-    expect(missing.status).toBe(404)
-    expect(await missing.json()).toMatchObject({ code: 'PUBLIC_MARKET_NO_DATA' })
+    expect(missing.status).toBe(502)
+    expect(await missing.json()).toMatchObject({ code: 'MARKET_ALL_SOURCES_UNAVAILABLE' })
     vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('internal network address') }))
     const failed = await call()
     expect(failed.status).toBe(502)

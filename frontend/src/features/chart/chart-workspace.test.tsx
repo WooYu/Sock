@@ -26,6 +26,14 @@ const prediction: PredictionSnapshot = {
 const renderChart = () => render(<ChartWorkspace prediction={prediction} snapshot={snapshot} />)
 
 describe('ChartWorkspace', () => {
+  test('shows quote and chart sources and selects raw data for Tushare fallback', async () => {
+    const raw = { ...snapshot, adjustment: 'none' as const, source: { ...snapshot.source, name: 'Tushare Pro 日线' } }
+    const loader = vi.fn<import('./use-chart-series').ChartSeriesLoader>(async (symbol, period, _signal, adjustment) => ({ symbol, period, adjustment: adjustment!, kind: 'candles', bars: raw.dailyCandles, source: raw.source, limitedHistory: true }))
+    render(<ChartWorkspace variant="studio" snapshot={raw} loadSeries={loader} />)
+    await waitFor(() => expect(screen.getByText('图表：Tushare Pro 日线 · 不复权')).toBeInTheDocument())
+    expect(loader).toHaveBeenCalledWith('600519', 'day', expect.any(AbortSignal), 'none')
+  })
+
   test.each(['qfq', 'hfq'] as const)('persists %s drawings across remounts and isolates price bases', async (adjustment) => {
     const adjusted = { ...snapshot, adjustment }
     const view = render(<ChartWorkspace variant="studio" snapshot={adjusted} />)
