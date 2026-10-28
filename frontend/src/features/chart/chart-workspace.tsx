@@ -29,7 +29,7 @@ import { StudioChartControls } from '../research/studio-chart-controls'
 import { DrawingList } from '../research/drawing-list'
 import { isIntradayPeriod, CHART_PERIODS, DEFAULT_INDICATORS, MA_COLORS, MA_PERIODS, PERIOD_LABELS, canonicalPeriodTime, type IndicatorKey, type IndicatorValue, type MaKey } from './chart-periods'
 import { useChartSeries, type ChartSeriesLoader } from './use-chart-series'
-import { isMarketIndex } from '@/lib/api/market-symbol'
+import { isA50Futures, isMarketIndex } from '@/lib/api/market-symbol'
 
 export { aggregateCandles } from './chart-math'
 
@@ -64,9 +64,10 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
   const setActivePeriod = (period: ChartPeriod) => { setSelectedProjectionTime(null); if (controlledPeriod === undefined) setInternalPeriod(period); onPeriodChange?.(period) }
   const fiveDay = activePeriod === '5day'
   const symbol = snapshot?.quote.security.code ?? ''
+  const futures = isA50Futures(symbol)
   const [adjustment, setAdjustment] = useState<'none' | 'qfq' | 'hfq'>(snapshot?.source.name === 'Tushare Pro 日线' && snapshot.adjustment === 'none' ? 'none' : (isStudio && loadSeries) || !snapshot ? 'qfq' : snapshot.adjustment ?? 'none')
   const index = isMarketIndex(symbol)
-  const priceBasis = symbol === 'DEMO' || index || isIntradayPeriod(activePeriod) ? 'none' : adjustment
+  const priceBasis = symbol === 'DEMO' || index || futures || isIntradayPeriod(activePeriod) ? 'none' : adjustment
   const { workspace, drawings, selectedId, syncStatus, commands } = useChartWorkspace({ symbol: priceBasis === 'none' ? symbol : `${symbol}-${priceBasis}`, period: activePeriod, localOnly: symbol === 'DEMO' })
   const [maVisible, setMaVisible] = useState(true)
   const configuredIndicators = { ...DEFAULT_INDICATORS, ...workspace.indicators }
@@ -98,7 +99,7 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
   const fullBoll = useMemo(() => bollinger(allCandles, 20, 2), [allCandles])
   const boll = useMemo(() => ({ upper: fullBoll.upper.slice(visibleStart, visibleEnd), middle: fullBoll.middle.slice(visibleStart, visibleEnd), lower: fullBoll.lower.slice(visibleStart, visibleEnd) }), [fullBoll, visibleStart, visibleEnd])
   const projection = useMemo(() => {
-    if (!isStudio || activePrediction || fiveDay) return []
+    if (!isStudio || activePrediction || fiveDay || futures) return []
     return projectIndicators(allCandles, activePeriod, scenarioCalendar).map(point => {
       const refs = forecastReferences?.filter(ref => (ref.adjustment ?? 'none') === priceBasis && ref.period === activePeriod && ref.target.horizon === point.horizon && ref.originBarKey === allCandles.at(-1)?.day) ?? []
       const target = refs.find(ref => ref.target.barKey)?.target.barKey
@@ -106,8 +107,8 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
       for (const ref of refs) if (!ref.valid) delete ranges[ref.indicator]
       return { ...point, ranges, ...(target ? { day: target, estimated: false } : {}), values: { ...point.values, ...Object.fromEntries(refs.map(ref => [ref.indicator, ref.valid ? ref.value : null])) } }
     })
-  }, [activePeriod, activePrediction, allCandles, isStudio, forecastReferences, priceBasis, fiveDay])
-  const sessionProjection = useMemo(() => isStudio && !fiveDay && layers.prediction ? projectSessionIndicators(allCandles, activePeriod, scenarioCalendar) : null, [activePeriod, allCandles, isStudio, layers.prediction, fiveDay])
+  }, [activePeriod, activePrediction, allCandles, isStudio, forecastReferences, priceBasis, fiveDay, futures])
+  const sessionProjection = useMemo(() => isStudio && !fiveDay && !futures && layers.prediction ? projectSessionIndicators(allCandles, activePeriod, scenarioCalendar) : null, [activePeriod, allCandles, isStudio, layers.prediction, fiveDay, futures])
   const visibleProjection = useMemo(() => layers.prediction && (intraday || viewport.atLatest) ? projection : [], [layers.prediction, intraday, viewport.atLatest, projection])
   const activeProjectionTime = visibleProjection.some(point => point.day === selectedProjectionTime) ? selectedProjectionTime : null
   const visiblePrediction = layers.prediction && (!isStudio || viewport.atLatest) ? activePrediction : null
@@ -304,7 +305,7 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
         {!isStudio ? <aside aria-label="桌面绘图工具" className="sc-chart-left-tools"><ChartToolbar activeTool={activeTool} onToolChange={setActiveTool} compact={isStudio} />{!isStudio ? <button aria-pressed={crosshair} className={crosshair ? 'is-active' : ''} onClick={() => setCrosshair((value) => !value)} title="十字光标" type="button">十字光标</button> : null}</aside> : null}
 
         <div className="sc-kline-main-column">
-          {isStudio ? <><StudioChartControls period={activePeriod} onPeriod={setActivePeriod} mode={mode} onMode={changeMode} onSettings={() => setMobileSheet('settings')} />
+          {isStudio ? <><StudioChartControls period={activePeriod} onPeriod={setActivePeriod} mode={mode} onMode={changeMode} onSettings={() => setMobileSheet('settings')} calendarOnly={futures} />
             <div className="rs-workbench-tool-space">
               {mode === 'draw' ? <nav aria-label="绘图工具" className="rs-workbench-drawing-tools" data-testid="chart-mobile-toolbar">
                 <button type="button" aria-pressed={activeTool === 'pointer'} onClick={() => setActiveTool('pointer')}><StudioIcon name="pointer" size={17} />选择</button>
@@ -328,6 +329,7 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
           <div className="sc-kline-chart-panel">
             {isStudio ? <div className="rs-workbench-legend"><span><i className="sc-candle-rise" />{intraday ? '分时价格' : '历史行情'}</span>{visibleProjection.length ? <span><i className="rs-forecast-swatch" />指标推演</span> : null}<details><summary>MA / BOLL</summary><div>{MA_PERIODS.map(period => { const key = `ma${period}` as MaKey; return indicators[key] ? <span key={key} style={{ color: indicatorColors[key] }}>MA{period} {movingAverages[key].at(-1)?.toFixed(2) ?? '—'}</span> : null })}{indicators.boll ? <span>BOLL 20, 2</span> : null}{intraday && !index ? <span>成交均价</span> : null}</div></details></div> : <div className="sc-kline-chart-heading"><div className="sc-kline-legend">{intraday ? <><span style={{ color: '#5651da' }}>分时价格</span>{index ? <span>指数不展示成交均价</span> : <span style={{ color: '#c79b28' }}>成交均价</span>}<span>不含午间休市</span></> : <><span><i className="sc-candle-rise" />历史行情</span>{visiblePrediction || visibleProjection.length ? <span><i className="rs-forecast-swatch" />MA/BOLL 后4根 · 点选查看</span> : null}{MA_PERIODS.map((period) => { const key = `ma${period}` as MaKey; return indicators[key] ? <span key={key} style={{ color: indicatorColors[key] }}>{`MA${period}`} {movingAverages[key].at(-1)?.toFixed(2) ?? '—'}</span> : null })}</>}</div></div>}
             {isStudio ? <p className="rs-market-sources"><span>报价：{snapshot.source.name} · {new Date(snapshot.source.fetchedAt).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })}</span><span>图表：{series.data ? `${series.data.source.name} · ${series.data.adjustment === 'qfq' ? '前复权' : series.data.adjustment === 'hfq' ? '后复权' : '不复权'}` : '暂无数据'}</span></p> : null}
+            {futures ? <p className="rs-series-note">东方财富当月连续期货；成交量单位为手，最新日K可能未收盘。夜盘分时、分钟线和预测暂不支持。</p> : null}
             {series.loading ? <p className="rs-series-message" role="status">正在加载{PERIOD_LABELS[activePeriod]}行情…</p> : null}
             {series.error ? <p className="rs-series-message is-error" role="status">{series.error}<button type="button" onClick={series.retry}>重新加载该周期</button></p> : null}
             <div className="sc-kline-chart-scroll" ref={chartScrollRef}>{candles.length ? <div className="sc-kline-chart-surface" data-zoom={isStudio ? Math.round(allCandles.length / Math.max(1, viewport.count) * 100) : zoom} data-price-min={minPrice} data-price-max={maxPrice} data-price-auto={!manualPriceActive} data-visible-start={visibleStart} data-visible-end={visibleEnd} style={{ width: isStudio ? '100%' : `${zoom}%` }}><ChartCanvas editingEnabled={!isStudio || mode === 'draw'} inspectionTarget={isStudio ? inspectionTarget : undefined} key={`${symbol}:${activePeriod}:${priceBasis}:${mode}`} navigationMode={isStudio ? activeTool === 'pan' ? 'pan' : activeTool === 'pointer' ? navigationMode : 'inspect' : undefined} onPricePan={isStudio ? panPrice : undefined} onPriceScale={isStudio ? scalePrice : undefined} onPriceReset={isStudio ? () => setManualPrice(null) : undefined} precedingClose={visibleStart > 0 ? allCandles[visibleStart - 1]?.close : undefined} limitRatio={snapshot?.quote.limitRatio} selectedProjectionTime={activeProjectionTime} onSelectProjectionTime={setSelectedProjectionTime} projectedTimes={visibleProjection.map(point => point.day)} projectedEstimated={visibleProjection.some(point => point.estimated)} projectedRanges={visibleProjection.map(point => point.ranges)} panOnPointer={isStudio && !intraday} onViewportZoom={isStudio && !intraday ? viewport.zoomBy : undefined} onViewportPan={isStudio && !intraday ? viewport.panBy : undefined} onViewportReset={isStudio ? resetView : undefined} activeTool={activeTool} candles={candles} kind={intraday ? 'intraday' : 'candles'} previousClose={series.data?.previousClose} crosshair={crosshair} drawings={drawings} hoveredDay={hoveredDay} indicatorValues={indicatorValues} indicators={indicators} keyLevels={keyLevels} onCreateDrawing={(drawing) => { commands.create(drawing); if (isStudio) setActiveTool('pointer') }} onDeleteSelected={deleteSelectedDrawing} onHoverDay={setHoveredDay} onMoveDrawing={moveDrawing} onMovePoint={moveDrawingPoint} onPan={panChart} onPanEnd={commitPan} onRedo={commands.redo} onSelectDrawing={(id) => { commands.select(id) }} onSelectPredictionDay={selectPredictionDay} onUndo={commands.undo} period={activePeriod} prediction={visiblePrediction} selectedId={selectedId} selectedPredictionDay={activePredictionDay} showDrawings={layers.annotations} showKeyLevels={layers.keyLevels} symbol={workspace.symbol} transform={transform} /></div> : <div className="rs-series-empty">{series.loading ? '正在准备图表' : '此周期暂无可绘制的数据，可切换其他周期或重试。'}</div>}</div>
@@ -353,7 +355,7 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
         </div>
 
         {!isStudio ? <aside aria-label="图层与对象属性" className="sc-kline-side-column sc-chart-right-rail"><ChartLayerPanel layers={layers} onChange={(key, value) => setLayers(old => ({ ...old, [key]: value }))} />{inspector}{recovery}<section className="sc-kline-side-card"><p className="sc-eyebrow">当前观察</p><h2>{snapshot.quote.security.name}</h2><dl><div><dt>现价</dt><dd>{priceText(currentPrice)}</dd></div><div><dt>数据源</dt><dd>{snapshot.source.name}</dd></div><div><dt>更新时间</dt><dd>{new Date(snapshot.source.fetchedAt).toLocaleString('zh-CN')}</dd></div></dl></section></aside> : null}
-        {footer && !fiveDay ? <div className="sc-chart-results">{isStudio ? <details className="rs-workbench-research" open={researchOpen} onToggle={event => onResearchOpenChange?.(event.currentTarget.open)}><summary><strong>研究结果与依据</strong><span>预测价位 · 笔记规则 · 多周期分析</span></summary>{footer}</details> : footer}</div> : null}
+        {footer && !fiveDay && !futures ? <div className="sc-chart-results">{isStudio ? <details className="rs-workbench-research" open={researchOpen} onToggle={event => onResearchOpenChange?.(event.currentTarget.open)}><summary><strong>研究结果与依据</strong><span>预测价位 · 笔记规则 · 多周期分析</span></summary>{footer}</details> : footer}</div> : null}
       </div>
 
 
@@ -363,8 +365,8 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
       {mobileSheet === 'markers' ? <ChartMobileSheet onClose={() => setMobileSheet(null)} title="标记类型"><div className="sc-chart-marker-picker">{markerTools.map(([tool, label]) => <button aria-pressed={activeTool === tool} key={tool} onClick={() => chooseMobileTool(tool)} type="button">{label}</button>)}</div></ChartMobileSheet> : null}
       {mobileSheet === 'settings' ? <ChartMobileSheet onClose={() => setMobileSheet(null)} title="图表设置">
         <div className="rs-workbench-settings-panel">
-          <label className="rs-price-basis">价格口径 <select aria-label="价格复权方式" value={priceBasis} disabled={index || isIntradayPeriod(activePeriod) || symbol === 'DEMO'} onChange={event => setAdjustment(event.target.value as typeof adjustment)}><option value="qfq">前复权</option><option value="none">不复权</option><option value="hfq">后复权</option></select></label>
-          <p>{index ? '指数使用原始点位，无需复权。' : isIntradayPeriod(activePeriod) ? '分钟数据仅提供不复权。' : '跨软件对照时，请统一日期、周期和复权方式。'}</p>
+          <label className="rs-price-basis">价格口径 <select aria-label="价格复权方式" value={priceBasis} disabled={index || futures || isIntradayPeriod(activePeriod) || symbol === 'DEMO'} onChange={event => setAdjustment(event.target.value as typeof adjustment)}><option value="qfq">前复权</option><option value="none">不复权</option><option value="hfq">后复权</option></select></label>
+          <p>{futures ? '期货当月连续合约使用原始行情，不进行股票复权。' : index ? '指数使用原始点位，无需复权。' : isIntradayPeriod(activePeriod) ? '分钟数据仅提供不复权。' : '跨软件对照时，请统一日期、周期和复权方式。'}</p>
           {!fiveDay ? <><div className="rs-workbench-setting-toggles"><button type="button" aria-label="MA总开关" aria-pressed={maVisible} onClick={() => setMaVisible(value => !value)}>MA {maVisible ? '开' : '关'}</button><button type="button" aria-label="BOLL总开关" aria-pressed={indicators.boll} onClick={() => setIndicators(old => ({ ...old, boll: !indicators.boll }))}>BOLL {indicators.boll ? '开' : '关'}</button><button type="button" aria-label="十字光标" aria-pressed={crosshair} onClick={() => setCrosshair(value => !value)}>十字光标</button></div><fieldset className="rs-workbench-indicators"><legend>均线与布林指标</legend>{indicatorOptions.map(([key, label]) => <label key={key}><input aria-label={label} checked={indicators[key]} onChange={event => setIndicators(old => ({ ...old, [key]: event.target.checked }))} role="switch" type="checkbox" />{label}</label>)}</fieldset><ChartLayerPanel layers={layers} onChange={(key, value) => setLayers(old => ({ ...old, [key]: value }))} /></> : <p>五日分时不进行指标推演。</p>}
           <button type="button" onClick={resetView}>复位视图</button>
         </div>

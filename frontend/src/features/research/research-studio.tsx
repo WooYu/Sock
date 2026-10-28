@@ -20,6 +20,7 @@ import { ResearchEvidence } from './research-evidence'
 import { StudioIcon } from './studio-icon'
 import { createPreviewData, loadPreviewSeries } from './preview-data'
 import { browserMarketClient, clearMarketReads } from '@/lib/api/browser-client'
+import { isA50Futures } from '@/lib/api/market-symbol'
 import './research-studio.css'
 const ScenarioAnalysisPanel = dynamic(() => import('../scenario/scenario-analysis-panel').then(m => m.ScenarioAnalysisPanel), {
   loading: () => <p role="status">正在准备多周期分析…</p>,
@@ -63,7 +64,7 @@ function Studio({ initialPreview, initialSymbol }: { initialPreview: boolean; in
   const cached = workspace.current ?? workspace.lastSuccessful
   const current = cached?.symbol === selectedSymbol ? cached : null
   const market = demo ? preview.market : current?.market
-  const automatic = useAutomaticForecast({ symbol: selectedSymbol, sourceMode: demo ? 'demo' : 'real', client: demo ? previewScenarioClient : browserMarketClient, name: market?.quote.security.name })
+  const automatic = useAutomaticForecast({ symbol: selectedSymbol, sourceMode: demo ? 'demo' : 'real', client: demo ? previewScenarioClient : browserMarketClient, name: market?.quote.security.name, enabled: !isA50Futures(selectedSymbol) })
   const candidates = useMemo(() => automatic.analysis ? dailyCandidates(automatic.analysis) : null, [automatic.analysis])
   const selectedLevel = levelSelection?.owner === selectedSymbol ? candidates?.levels.find(level => level.id === levelSelection.id) ?? null : null
   const selectLevel = (level: MergedLevel) => setLevelSelection({ owner: selectedSymbol, id: level.id })

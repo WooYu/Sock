@@ -1,5 +1,5 @@
 import type { ScenarioAnalysis } from './scenario-types'
-import { validMarketSymbol } from '@/lib/api/market-symbol'
+import { isA50Futures, validMarketSymbol } from '@/lib/api/market-symbol'
 import { isChartTime, isIsoTimestamp } from '../chart/chart-periods'
 import { ANALYSIS_PERIODS, barEndAt, isTradingCalendar } from './scenario-calendar'
 import { SCENARIO_INDICATORS } from './scenario-calculator'
@@ -36,7 +36,7 @@ function snapshotValid(value: unknown): value is ScenarioAnalysis {
     if (!s || s.schemaVersion !== 1 || typeof s.id !== 'string' || !s.id.trim() || typeof s.definitionVersion !== 'string'
       || !Number.isSafeInteger(s.version) || s.version < 1 || (s.version === 1 ? s.previousVersion !== undefined : s.previousVersion !== s.version - 1)
       || !['live', 'replay'].includes(s.kind) || !isIsoTimestamp(s.createdAt) || !s.input || s.input.sourceMode !== 'real'
-      || !validMarketSymbol.test(s.input.symbol) || !isIsoTimestamp(s.input.asOf) || Date.parse(s.createdAt) < Date.parse(s.input.asOf)
+      || !validMarketSymbol.test(s.input.symbol) || isA50Futures(s.input.symbol) || !isIsoTimestamp(s.input.asOf) || Date.parse(s.createdAt) < Date.parse(s.input.asOf)
       || !s.input.periods || !s.input.loadIssues || !s.annotations || !s.states || typeof s.entryBlocked !== 'boolean') return false
     if (s.input.calendar !== null && !isTradingCalendar(s.input.calendar)) return false
     for (const [period, input] of Object.entries(s.input.periods)) {

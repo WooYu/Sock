@@ -14,10 +14,10 @@ import { resolveDailyPriceLimit } from '../scenario/scenario-price-ladder'
 export const FORECAST_HORIZONS: Horizon[] = [1, 2, 3, 4]
 
 /** Calculation never creates an artificial human confirmation or saves a record. */
-export function useAutomaticForecast({ symbol, sourceMode, client, name }: {
-  symbol: string; sourceMode: 'real' | 'demo'; client: Pick<BrowserMarketClient, 'series'>; name?: string
+export function useAutomaticForecast({ symbol, sourceMode, client, name, enabled = true }: {
+  symbol: string; sourceMode: 'real' | 'demo'; client: Pick<BrowserMarketClient, 'series'>; name?: string; enabled?: boolean
 }) {
-  const loader = useScenarioInputs({ symbol, sourceMode, client, calendar: scenarioCalendar })
+  const loader = useScenarioInputs({ symbol, sourceMode, client, calendar: scenarioCalendar, enabled })
   const [saved, setSaved] = useState<{ owner: string; annotations: AnalysisAnnotations } | null>(null)
   const owner = symbol + ':' + sourceMode
   const [noteRules, setNoteRules] = useState<ScenarioRule[] | null>(null)
@@ -64,7 +64,7 @@ export function useAutomaticForecast({ symbol, sourceMode, client, name }: {
     } catch (error) { return { analysis: null, error: error instanceof Error ? error.message : '预测计算失败' } }
   }, [loader.input, annotations, owner, symbol, name, noteRules])
   const periods = ANALYSIS_PERIODS.filter(p => result.analysis?.input.periods[p])
-  return { ...result, periods, loading: loader.status === 'loading' || !!next || !noteRules && !noteRuleError,
+  return { ...result, periods, loading: enabled && (loader.status === 'loading' || !!next || !noteRules && !noteRuleError),
     issues: [...loader.issues, ...(noteRuleError ? [noteRuleError] : [])],
     clearPeriod: plan?.clearPeriod ?? null, refresh: loader.refresh }
 }

@@ -4,7 +4,7 @@ import type { AnalysisInput, AnalysisPeriod } from './scenario-types'
 import { ANALYSIS_PERIODS } from './scenario-calendar'
 import type { LoadScenarioArgs } from './scenario-loader'
 import { loadScenarioInputs } from './scenario-loader'
-export type ScenarioInputArgs = Omit<LoadScenarioArgs, 'asOf' | 'signal' | 'periods' | 'clock'> & { sourceMode: AnalysisInput['sourceMode']; clock?: () => string }
+export type ScenarioInputArgs = Omit<LoadScenarioArgs, 'asOf' | 'signal' | 'periods' | 'clock'> & { sourceMode: AnalysisInput['sourceMode']; clock?: () => string; enabled?: boolean }
 export type ScenarioInputState = { input: AnalysisInput | null; loadedAt: string | null; status: 'idle' | 'loading' | 'ready' | 'partial' | 'error'; issues: string[]; refresh: () => Promise<void>; loadPeriod: (period: AnalysisPeriod) => Promise<void>; retainThrough: (period: AnalysisPeriod) => void }
 const defaultClock = () => new Date().toISOString()
 function classify(input: AnalysisInput, requested: number): ScenarioInputState['status'] {
@@ -14,7 +14,7 @@ function classify(input: AnalysisInput, requested: number): ScenarioInputState['
 function loadMessages(input: AnalysisInput): string[] {
   return Object.entries(input.loadIssues).flatMap(([period, issues]) => issues.map(issue => period + '：' + issue))
 }
-export function useScenarioInputs({ symbol, calendar, client, sourceMode, clock }: ScenarioInputArgs): ScenarioInputState {
+export function useScenarioInputs({ symbol, calendar, client, sourceMode, clock, enabled = true }: ScenarioInputArgs): ScenarioInputState {
   const owner = symbol + ':' + sourceMode
   const [state, setState] = useState<{ owner: string; input: AnalysisInput | null; loadedAt: string | null; status: ScenarioInputState['status']; issues: string[] }>({
     owner: '', input: null, loadedAt: null, status: 'idle', issues: [],
@@ -22,6 +22,7 @@ export function useScenarioInputs({ symbol, calendar, client, sourceMode, clock 
   const generation = useRef(0), controller = useRef<AbortController | null>(null)
   const currentInput = useRef<AnalysisInput | null>(null), requestedPeriods = useRef<AnalysisPeriod[]>(['day']), previousOwner = useRef('')
   const refresh = useCallback(async () => {
+    if (!enabled) return
     // Keep an absent clock absent in the dependency list. Production optimizers may
     // inline a default arrow parameter, recreating it on every render.
     const readClock = clock ?? defaultClock
@@ -49,7 +50,7 @@ export function useScenarioInputs({ symbol, calendar, client, sourceMode, clock 
       if (control.signal.aborted || token !== generation.current) return
       setState({ owner, input: null, loadedAt: null, status: 'error', issues: [error instanceof Error ? error.message : '分析行情暂不可用'] })
     }
-  }, [owner, symbol, calendar, client, sourceMode, clock])
+  }, [owner, symbol, calendar, client, sourceMode, clock, enabled])
   const loadPeriod = useCallback(async (period: AnalysisPeriod) => {
     const base = currentInput.current
     if (!base || base.symbol !== symbol || base.sourceMode !== sourceMode) return
@@ -77,6 +78,6 @@ export function useScenarioInputs({ symbol, calendar, client, sourceMode, clock 
     queueMicrotask(() => { if (active) void refresh() })
     return () => { active = false; controller.current?.abort() }
   }, [owner, refresh])
-  const visible = state.owner === owner ? state : { input: null, loadedAt: null, status: 'loading' as const, issues: [] }
+  const visible = !enabled ? { input: null, loadedAt: null, status: 'idle' as const, issues: [] } : state.owner === owner ? state : { input: null, loadedAt: null, status: 'loading' as const, issues: [] }
   return { ...visible, refresh, loadPeriod, retainThrough }
 }

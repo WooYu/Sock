@@ -3,6 +3,10 @@ import { normalizeScenarioSeries } from './scenario-inputs'
 import { seriesFixture } from './scenario-test-fixtures'
 
 describe('scenario candle boundaries', () => {
+  test('rejects futures under the A-share session and calendar rules', () => {
+    const series = { ...seriesFixture(), symbol: 'cn00y', adjustment: 'none' as const }
+    expect(() => normalizeScenarioSeries(series, series.source.fetchedAt)).toThrow(/不支持期货分析/)
+  })
   test.each(['sz399006', 'sz399903', 'sz399310'])('accepts the qualified index identity %s', symbol => {
     const series = { ...seriesFixture(), symbol, adjustment: 'none' as const }
     expect(normalizeScenarioSeries(series, series.source.fetchedAt).symbol).toBe(symbol)

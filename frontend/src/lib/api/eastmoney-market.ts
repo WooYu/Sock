@@ -2,13 +2,14 @@ import { aggregateCandles } from '@/features/chart/chart-math'
 import { canonicalPeriodTime, isCalendarDate, isIntradayPeriod, type ChartPeriod } from '@/features/chart/chart-periods'
 import type { ChartSeries, PriceAdjustment } from '@/features/chart/chart-market-types'
 import type { Candle, MarketSnapshot, Security } from '@/features/workspace/stock-workspace-types'
-import { isMarketIndex } from './market-symbol'
+import { isA50Futures, isMarketIndex } from './market-symbol'
 import { PublicMarketError } from './public-market'
 
 const fail = () => new PublicMarketError('EASTMONEY_UNAVAILABLE', '东方财富行情暂不可用', 502)
 const source = () => ({ name: '东方财富公开行情·延时', fetchedAt: new Date().toISOString(), state: 'DELAYED', online: true })
 
 function market(symbol: string) {
+  if (isA50Futures(symbol)) return { secid: '104.CN00Y', code: 'CN00Y', exchange: 'SGX' }
   if (isMarketIndex(symbol)) return { secid: `${symbol.slice(0, 2).toLowerCase() === 'sh' ? 1 : 0}.${symbol.slice(2)}`, code: symbol.slice(2), exchange: symbol.slice(0, 2).toUpperCase() }
   if (!/^(?:6\d{5}|[03]\d{5}|[48]\d{5}|92\d{4})$/.test(symbol)) throw new PublicMarketError('MARKET_SYMBOL_INVALID', '请输入有效的证券代码', 400)
   const exchange = symbol.startsWith('6') ? 'SH' : /^[03]/.test(symbol) ? 'SZ' : 'BJ'
@@ -60,6 +61,24 @@ async function data(symbol: string, host: 'push2' | 'push2his', path: string, pa
 
 export async function getEastmoneyChartSeries(symbol: string, period: ChartPeriod, requested: PriceAdjustment): Promise<ChartSeries> {
   market(symbol)
+  if (isA50Futures(symbol)) {
+    if (requested !== 'none') throw new PublicMarketError('FUTURES_ADJUSTMENT_UNSUPPORTED', '期货行情不支持股票复权', 400)
+    if (isIntradayPeriod(period)) throw new PublicMarketError('FUTURES_PERIOD_UNSUPPORTED', '期货夜盘分时与分钟线暂不支持', 400)
+    const entry = await data(symbol, 'push2his', '/api/qt/stock/kline/get', { fields1: 'f1,f2,f3,f4,f5,f6', fields2: 'f51,f52,f53,f54,f55,f56,f57', klt: '101', fqt: '0', end: '20500101', lmt: '640' })
+    if (!Array.isArray(entry.klines) || !entry.klines.length || entry.klines.length > 2000) throw fail()
+    const rows = new Map<string, Candle>()
+    for (const row of entry.klines) {
+      if (typeof row !== 'string') throw fail()
+      const values = row.split(',')
+      if (values.length < 7) throw fail()
+      const day = time(values[0], false), open = num(values[1], true), close = num(values[2], true), high = num(values[3], true), low = num(values[4], true)
+      if (high < Math.max(open, close) || low > Math.min(open, close)) throw fail()
+      rows.set(day, { day, endTime: day, open, close, high, low, volume: num(values[5]) })
+    }
+    const daily = [...rows.values()].sort((a, b) => a.day.localeCompare(b.day))
+    const bars = period === 'day' ? daily : aggregateCandles(daily, period)
+    return { symbol, period, adjustment: 'none', kind: 'candles', bars, source: source(), limitedHistory: bars.length < 250, note: '东方财富当月连续合约；成交量单位为手，日K可能尚未收盘。周、月、季、年线由所载日线聚合；换月与交易日口径以数据源为准。' }
+  }
   if (isIntradayPeriod(period) && requested !== 'none') throw new PublicMarketError('MARKET_ADJUSTMENT_UNSUPPORTED', '分时与分钟行情仅支持不复权', 400)
   const adjustment = isMarketIndex(symbol) ? 'none' : requested
   if (period === 'intraday' || period === '5day') {
@@ -99,7 +118,7 @@ export async function getEastmoneyChartSeries(symbol: string, period: ChartPerio
 
 export async function getEastmoneySnapshot(symbol: string): Promise<MarketSnapshot> {
   const identity = market(symbol)
-  const adjustment = isMarketIndex(symbol) ? 'none' : 'qfq'
+  const adjustment = isMarketIndex(symbol) || isA50Futures(symbol) ? 'none' : 'qfq'
   const [entry, series] = await Promise.all([
     data(symbol, 'push2', '/api/qt/stock/get', { fields: 'f13,f43,f44,f45,f46,f47,f48,f57,f58,f59,f60' }),
     getEastmoneyChartSeries(symbol, 'day', adjustment),
@@ -111,7 +130,7 @@ export async function getEastmoneySnapshot(symbol: string): Promise<MarketSnapsh
   const price = num(entry.f43, true) / scale, previousClose = num(entry.f60, true) / scale
   const open = num(entry.f46, true) / scale, high = num(entry.f44, true) / scale, low = num(entry.f45, true) / scale
   if (high < Math.max(open, price) || low > Math.min(open, price)) throw fail()
-  return { adjustment, quote: { security: { code: isMarketIndex(symbol) ? symbol.toLowerCase() : symbol, name: entry.f58.trim(), exchange: identity.exchange }, price, previousClose, open, high, low, volume: num(entry.f47) * 100, turnover: num(entry.f48) }, dailyCandles: series.bars, source: series.source }
+  return { adjustment, quote: { security: { code: isMarketIndex(symbol) || isA50Futures(symbol) ? symbol.toLowerCase() : symbol, name: entry.f58.trim(), exchange: identity.exchange }, price, previousClose, open, high, low, volume: num(entry.f47) * (isA50Futures(symbol) ? 1 : 100), ...(isA50Futures(symbol) ? {} : { turnover: num(entry.f48) }) }, dailyCandles: series.bars, source: series.source }
 }
 
 export async function searchEastmoneySecurities(query: string): Promise<Security[]> {

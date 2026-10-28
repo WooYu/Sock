@@ -74,10 +74,22 @@ describe('managed market sources', () => {
     if (query === '中证100') expect(results.some(item => item.code === 'sh000852')).toBe(false)
   })
 
-  test('does not present the domestic index as the A50 futures continuous contract', async () => {
+  test('identifies the A50 futures continuous contract without confusing the domestic index', async () => {
     const { matchingMarketIndices } = await import('./market-symbol')
-    expect(matchingMarketIndices('A50')).toEqual([])
-    expect(matchingMarketIndices('A50期货主连')).toEqual([])
+    expect(matchingMarketIndices('A50')).toMatchObject([{ code: 'cn00y', name: 'A50期指当月连续' }])
+    expect(matchingMarketIndices('A50期货主连')).toMatchObject([{ code: 'cn00y' }])
+  })
+
+  test('routes A50 futures only to Eastmoney and preserves contract volume and raw basis', async () => {
+    const fetcher = vi.fn<typeof fetch>(async input => String(input).includes('/kline/get')
+      ? Response.json({ rc: 0, data: { code: 'CN00Y', market: 104, klines: ['2026-10-29,12986,12982,13001,12968,28247,0'] } })
+      : Response.json({ rc: 0, data: { f13: 104, f57: 'CN00Y', f58: 'A50期指当月连续', f59: 1, f43: 129820, f60: 129920, f46: 129860, f44: 130010, f45: 129680, f47: 28247, f48: 0 } }))
+    vi.stubGlobal('fetch', fetcher)
+    const api = await import('./market-manager')
+    expect(await api.managedSnapshot('cn00y')).toMatchObject({ adjustment: 'none', quote: { price: 12982, volume: 28247, security: { code: 'cn00y' } }, dailyCandles: [{ volume: 28247 }], source: { name: '东方财富公开行情·延时' } })
+    expect(fetcher.mock.calls.every(([url]) => String(url).includes('secid=104.CN00Y'))).toBe(true)
+    await expect(api.managedSeries('cn00y', 'intraday', 'none')).rejects.toMatchObject({ code: 'FUTURES_PERIOD_UNSUPPORTED' })
+    await expect(api.managedSeries('cn00y', 'day', 'qfq')).rejects.toMatchObject({ code: 'FUTURES_ADJUSTMENT_UNSUPPORTED' })
   })
 
   test.each(['sz399006', 'sz399903', 'sz399310'])('fetches %s as a raw index, never a stock', async symbol => {

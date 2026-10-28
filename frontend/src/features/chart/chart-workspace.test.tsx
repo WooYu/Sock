@@ -26,6 +26,16 @@ const prediction: PredictionSnapshot = {
 const renderChart = () => render(<ChartWorkspace prediction={prediction} snapshot={snapshot} />)
 
 describe('ChartWorkspace', () => {
+  test('A50 futures disable stock-session forecasts and unsupported intraday controls', async () => {
+    const future = { ...snapshot, adjustment: 'none' as const, quote: { ...snapshot.quote, security: { code: 'cn00y', name: 'A50期指当月连续' } } }
+    render(<ChartWorkspace variant="studio" snapshot={future} />)
+    expect(screen.getByRole('tab', { name: '分时' })).toBeDisabled()
+    expect(screen.getByText(/夜盘分时、分钟线和预测暂不支持/)).toBeInTheDocument()
+    expect(screen.queryByLabelText('选择指标预测时间')).not.toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: '图表设置' }))
+    expect(screen.getByLabelText('价格复权方式')).toBeDisabled()
+    expect(screen.getByText('期货当月连续合约使用原始行情，不进行股票复权。')).toBeInTheDocument()
+  })
   test('shows quote and chart sources and selects raw data for Tushare fallback', async () => {
     const raw = { ...snapshot, adjustment: 'none' as const, source: { ...snapshot.source, name: 'Tushare Pro 日线' } }
     const loader = vi.fn<import('./use-chart-series').ChartSeriesLoader>(async (symbol, period, _signal, adjustment) => ({ symbol, period, adjustment: adjustment!, kind: 'candles', bars: raw.dailyCandles, source: raw.source, limitedHistory: true }))

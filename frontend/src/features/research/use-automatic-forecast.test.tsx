@@ -12,6 +12,15 @@ beforeEach(() => localStorage.clear())
 const series = (symbol: string, period: ChartPeriod) => seriesFixture({ symbol, period: period as AnalysisPeriod,
   closes: Array.from({ length: 30 }, (_, i) => 10 + i * .1), fetchedAt: '2026-10-15T16:00:00+08:00' })
 
+test('disabled forecasts do not request A-share scenario inputs', async () => {
+  const client = { series: vi.fn(async (symbol: string, period: ChartPeriod) => series(symbol, period)) }
+  const { result } = renderHook(() => useAutomaticForecast({ symbol: 'cn00y', sourceMode: 'real', client, enabled: false }))
+  await new Promise(resolve => setTimeout(resolve, 50))
+  expect(client.series).not.toHaveBeenCalled()
+  expect(result.current.analysis).toBeNull()
+  expect(result.current.loading).toBe(false)
+})
+
 test('automatically descends through 15m and calculates all four horizons without saving confirmations', async () => {
   const client = { series: vi.fn(async (symbol: string, period: ChartPeriod) => series(symbol, period)) }
   const { result } = renderHook(() => useAutomaticForecast({ symbol: '603533', sourceMode: 'real', client }))

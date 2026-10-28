@@ -1,5 +1,5 @@
 import { canonicalPeriodTime, isIsoTimestamp } from '../chart/chart-periods'
-import { validMarketSymbol } from '@/lib/api/market-symbol'
+import { isA50Futures, validMarketSymbol } from '@/lib/api/market-symbol'
 import type { ChartSeries } from '../chart/chart-market-types'
 import type { Candle } from '../workspace/stock-workspace-types'
 import { ANALYSIS_PERIODS, barEndAt, sessionEnds } from './scenario-calendar'
@@ -23,7 +23,7 @@ function knownMinuteGap(before: string, next: string, period: AnalysisPeriod): b
 export function normalizeScenarioSeries(series: ChartSeries, asOf: string): PeriodInput {
   if (!ANALYSIS_PERIODS.includes(series.period as AnalysisPeriod) || series.kind !== 'candles') throw new Error('分析周期无效')
   if (series.adjustment !== 'none' && !(series.period === 'day' && series.adjustment === 'qfq')) throw new Error('行情复权口径无效')
-  if (series.symbol !== 'DEMO' && !validMarketSymbol.test(series.symbol)) throw new Error('股票代码无效')
+  if (series.symbol !== 'DEMO' && (!validMarketSymbol.test(series.symbol) || isA50Futures(series.symbol))) throw new Error('股票代码无效或不支持期货分析')
   if (!isIsoTimestamp(asOf) || !series.source || !isIsoTimestamp(series.source.fetchedAt) || !Array.isArray(series.bars)) throw new Error('行情来源或截止时间无效')
   const period = series.period as AnalysisPeriod
   const cutoff = Math.min(Date.parse(asOf), Date.parse(series.source.fetchedAt))

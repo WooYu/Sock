@@ -4,7 +4,7 @@ import type { ChartSeries, PriceAdjustment } from '@/features/chart/chart-market
 import type { MarketSnapshot, Security } from '@/features/workspace/stock-workspace-types'
 import { getMarketSnapshot, searchSecurities } from './backend-client'
 import { getEastmoneyChartSeries, getEastmoneySnapshot, searchEastmoneySecurities } from './eastmoney-market'
-import { isMarketIndex, matchingMarketIndices, validMarketSymbol } from './market-symbol'
+import { isA50Futures, isMarketIndex, matchingMarketIndices, validMarketSymbol } from './market-symbol'
 import { getPublicChartSeries, getPublicMarketSnapshot, PublicMarketError, searchPublicSecurities } from './public-market'
 
 function validateSymbol(symbol: string) {
@@ -38,6 +38,7 @@ async function tushareSnapshot(symbol: string): Promise<MarketSnapshot> {
 
 export async function managedSnapshot(symbol: string): Promise<MarketSnapshot> {
   validateSymbol(symbol)
+  if (isA50Futures(symbol)) return getEastmoneySnapshot(symbol)
   return fallback([
     () => getPublicMarketSnapshot(symbol),
     () => getEastmoneySnapshot(symbol),
@@ -47,6 +48,7 @@ export async function managedSnapshot(symbol: string): Promise<MarketSnapshot> {
 
 export async function managedSeries(symbol: string, period: ChartPeriod, adjustment: PriceAdjustment): Promise<ChartSeries> {
   validateSymbol(symbol)
+  if (isA50Futures(symbol)) return getEastmoneyChartSeries(symbol, period, adjustment)
   if (isIntradayPeriod(period) && adjustment !== 'none') throw new PublicMarketError('MARKET_ADJUSTMENT_UNSUPPORTED', '分时与分钟行情仅支持不复权', 400)
   return fallback([
     () => getPublicChartSeries(symbol, period, adjustment),
