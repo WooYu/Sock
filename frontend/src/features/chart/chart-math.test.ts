@@ -117,6 +117,8 @@ describe('chart math', () => {
     expect(formatChartTime('2026-09-07', 'day')).toBe('2026-09-07')
     expect(formatChartTime('2026-09-30', 'quarter')).toBe('2026 Q3')
     expect(formatChartTime('2026-12-31', 'year')).toBe('2026')
+    expect(formatChartTime('2026-10-29T02:14:00+08:00', 'intraday', true)).toBe('2026-10-29 02:14 +08:00')
+    expect(() => formatChartTime('2026-10-29T02:14:00+08:00', 'intraday')).toThrow()
   })
 
   test.each([0, -1, 2.5, Number.NaN])('rejects invalid indicator windows %s', (size) => {

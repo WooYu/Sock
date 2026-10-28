@@ -74,8 +74,8 @@ export function isChartTime(value: unknown, period: ChartPeriod): value is strin
   return isPriceLinePeriod(period) || canonicalPeriodTime(value, period) === value
 }
 
-export function formatChartTime(time: string, period: ChartPeriod): string {
-  const canonical = canonicalPeriodTime(time, period)
+export function formatChartTime(time: string, period: ChartPeriod, continuousSession = false): string {
+  const canonical = continuousSession && isIntradayPeriod(period) && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00\+08:00$/.test(time) && isIsoTimestamp(time) ? time : canonicalPeriodTime(time, period)
   if (isIntradayPeriod(period)) return `${canonical.slice(0, 16).replace('T', ' ')} +08:00`
   if (period === 'month') return canonical.slice(0, 7)
   if (period === 'quarter') return `${canonical.slice(0, 4)} Q${Math.floor((Number(canonical.slice(5, 7)) - 1) / 3) + 1}`

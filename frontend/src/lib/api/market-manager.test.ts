@@ -88,7 +88,7 @@ describe('managed market sources', () => {
     const api = await import('./market-manager')
     expect(await api.managedSnapshot('cn00y')).toMatchObject({ adjustment: 'none', quote: { price: 12982, volume: 28247, security: { code: 'cn00y' } }, dailyCandles: [{ volume: 28247 }], source: { name: '东方财富公开行情·延时' } })
     expect(fetcher.mock.calls.every(([url]) => String(url).includes('secid=104.CN00Y'))).toBe(true)
-    await expect(api.managedSeries('cn00y', 'intraday', 'none')).rejects.toMatchObject({ code: 'FUTURES_PERIOD_UNSUPPORTED' })
+    await expect(api.managedSeries('cn00y', '5day', 'none')).rejects.toMatchObject({ code: 'FUTURES_PERIOD_UNSUPPORTED' })
     await expect(api.managedSeries('cn00y', 'day', 'qfq')).rejects.toMatchObject({ code: 'FUTURES_ADJUSTMENT_UNSUPPORTED' })
   })
 

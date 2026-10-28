@@ -26,15 +26,27 @@ const prediction: PredictionSnapshot = {
 const renderChart = () => render(<ChartWorkspace prediction={prediction} snapshot={snapshot} />)
 
 describe('ChartWorkspace', () => {
-  test('A50 futures disable stock-session forecasts and unsupported intraday controls', async () => {
+  test('A50 futures disable stock-session forecasts and unsupported five-day controls', async () => {
     const future = { ...snapshot, adjustment: 'none' as const, quote: { ...snapshot.quote, security: { code: 'cn00y', name: 'A50期指当月连续' } } }
     render(<ChartWorkspace variant="studio" snapshot={future} />)
-    expect(screen.getByRole('tab', { name: '分时' })).toBeDisabled()
-    expect(screen.getByText(/夜盘分时、分钟线和预测暂不支持/)).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: '分时' })).toBeEnabled()
+    expect(screen.getByRole('option', { name: '5日' })).toBeDisabled()
+    expect(screen.getByRole('option', { name: '2小时' })).toBeDisabled()
+    expect(screen.getByText(/跨夜分时和分钟线暂不支持绘图及预测/)).toBeInTheDocument()
     expect(screen.queryByLabelText('选择指标预测时间')).not.toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: '图表设置' }))
     expect(screen.getByLabelText('价格复权方式')).toBeDisabled()
     expect(screen.getByText('期货当月连续合约使用原始行情，不进行股票复权。')).toBeInTheDocument()
+  })
+
+  test('A50 overnight samples render without applying A-share session boundaries', async () => {
+    const future = { ...snapshot, adjustment: 'none' as const, quote: { ...snapshot.quote, security: { code: 'cn00y', name: 'A50期指当月连续' } } }
+    const loader = vi.fn<import('./use-chart-series').ChartSeriesLoader>(async (symbol, period) => ({ symbol, period, adjustment: 'none', kind: 'intraday', bars: ['2026-10-28T16:45:00+08:00', '2026-10-29T02:14:00+08:00'].map((day, i) => ({ day, open: 12982 + i, high: 12982 + i, low: 12982 + i, close: 12982 + i, volume: 5, averagePrice: 12982 })), source: snapshot.source, limitedHistory: true }))
+    render(<ChartWorkspace variant="studio" snapshot={future} period="intraday" loadSeries={loader} />)
+    await waitFor(() => expect(screen.getByTestId('intraday-price-line')).toBeInTheDocument())
+    expect(screen.getByTestId('intraday-average-line')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '绘图' })).toBeDisabled()
+    expect(screen.queryByLabelText('选择指标预测时间')).not.toBeInTheDocument()
   })
   test('shows quote and chart sources and selects raw data for Tushare fallback', async () => {
     const raw = { ...snapshot, adjustment: 'none' as const, source: { ...snapshot.source, name: 'Tushare Pro 日线' } }

@@ -1,5 +1,78 @@
 # StockCal Web-first 部署说明
 
+## 现有阿里云实例更新
+
+2026-10-29 只读检查：现有后端位于 `/root/stockcal`，由 `stockcal-app-1`、`stockcal-postgres-1`、`stockcal-redis-1` 和独立标签工作器组成；前端位于 `/home/admin/stockcal-domestic`，由 `stockcal-web-web-1` 运行。实际后端运行时使用额外 Compose 文件，更新时须保留它们。部署前重新核对，不能假设这些状态永远不变。
+
+**安全前提：**检查时后端 `STOCKCAL_AUTH_REQUIRED=false`，8080、5432、6379 监听所有网卡。监听公网不等于安全组实际开放，但必须在阿里云安全组和主机防火墙核对：数据库和 Redis 不对公网开放，后端只允许确需访问的受信来源；修改前确认不会切断现有生产访问。认证、短信与访问控制没有经过生产验证之前，不要把前端公开到互联网。以下先用 SSH 隧道访问；HTTPS 域名和适用备案需另行配置。
+
+### 备份与检查
+
+通过 SSH 登录服务器，以下命令以 root 身份运行。先确认当前路径无未提交源码改动，并保存现有镜像与 PostgreSQL 备份：
+
+```bash
+git -C /root/stockcal status --short
+sudo -u admin git -C /home/admin/stockcal-domestic status --short
+umask 077
+BACKUP="/root/stockcal-backups/$(date +%Y%m%d-%H%M%S)"
+mkdir -p "$BACKUP"
+git -C /root/stockcal rev-parse HEAD > "$BACKUP/backend-revision.txt"
+sudo -u admin git -C /home/admin/stockcal-domestic rev-parse HEAD > "$BACKUP/frontend-revision.txt"
+docker exec stockcal-postgres-1 sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Fc' > "$BACKUP/postgres.dump"
+test -s "$BACKUP/postgres.dump" && docker exec -i stockcal-postgres-1 pg_restore -l < "$BACKUP/postgres.dump" > /dev/null
+cp -p /root/stockcal/.env "$BACKUP/backend.env"
+docker tag "$(docker inspect --format '{{.Image}}' stockcal-app-1)" "stockcal-app:rollback-$(basename "$BACKUP")"
+docker tag "$(docker inspect --format '{{.Image}}' stockcal-web-web-1)" "stockcal-web:rollback-$(basename "$BACKUP")"
+```
+
+如果 `git status` 有改动、备份命令失败或数据库备份校验失败，停止更新并先处理原因。备份包含敏感信息，保持 root 权限并另行做好异机备份；不要把备份或 `.env` 提交到 Git。
+
+### 更新后端
+
+后端目录当前为游离提交；以下先确认新提交是当前版本的后继，避免覆盖服务器独有历史。确认该命令输出 `fast-forward OK` 后再继续：
+
+```bash
+cd /root/stockcal
+git fetch origin agent/local-first-watchlist
+git merge-base --is-ancestor HEAD FETCH_HEAD && echo 'fast-forward OK'
+```
+
+```bash
+git switch --detach FETCH_HEAD
+REV=$(git rev-parse --short HEAD)
+mkdir -p /root/stockcal-deploy
+printf 'services:\n  app:\n    image: stockcal-app:deploy-%s\n' "$REV" > /root/stockcal-deploy/app-image.yaml
+docker compose -f compose.yaml -f /root/stockcal-tag-release-20261020/compose.tags.yaml -f /root/stockcal-tag-worker/runtime.compose.yaml -f /root/stockcal-deploy/app-image.yaml up -d --no-deps --build app
+docker ps --filter name=stockcal-app-1
+curl -fsS http://127.0.0.1:8080/actuator/health
+```
+
+最后的镜像覆盖文件避免覆盖现有运行时文件中固定的旧镜像标签。后端重启时 Flyway 可能执行数据库迁移；不要删除数据库卷，镜像回退本身也不会回退数据库迁移。
+
+### 更新前端
+
+前端仓库归 `admin` 所有；若状态干净，使用快进更新，不覆盖已有配置：
+
+```bash
+sudo -u admin git -C /home/admin/stockcal-domestic fetch origin agent/local-first-watchlist
+sudo -u admin git -C /home/admin/stockcal-domestic merge --ff-only FETCH_HEAD
+cd /home/admin/stockcal-domestic
+STOCKCAL_API_BASE_URL=http://host.docker.internal:8080 STOCKCAL_RECORDS_API_BASE_URL=http://host.docker.internal:8080 docker compose -f compose.domestic.yaml up -d --build web
+docker ps --filter name=stockcal-web-web-1
+curl -fsS http://127.0.0.1:3000/api/health
+docker exec stockcal-web-web-1 wget -qO- http://host.docker.internal:8080/actuator/health
+```
+
+此命令仅供后端位于同一宿主机且 8080 容器端口可从宿主机网关访问的情况。两个变量不会自动写入环境文件；每次重建或重新创建前端容器时需重新提供，或安全地加入已有 `.env`。不同网络拓扑应使用后端实际可达地址，不要用容器内 `localhost`。上述步骤不会改变 Vercel 现有生产入口。
+
+从自己的 Windows 电脑保持 SSH 会话：
+
+```powershell
+ssh -L 13000:127.0.0.1:3000 服务器用户名@服务器公网IP
+```
+
+浏览器访问 `http://127.0.0.1:13000`，核对登录、现有记录和 A50。若网页健康但东方财富请求失败，应检查容器内到东方财富的网络；数据源曾间歇性关闭连接，不能以本机浏览器访问成功代替服务器验证。
+
 ## 不依赖 Vercel 的国内部署
 
 可在能访问腾讯行情的国内 Linux 服务器运行 Next.js，浏览器无需访问 Vercel。安装 Docker 和 Compose，在仓库根目录执行：

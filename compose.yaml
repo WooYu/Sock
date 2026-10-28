@@ -72,6 +72,7 @@ services:
       STOCKCAL_AI_MODEL: ${STOCKCAL_AI_MODEL:-deepseek-chat}
       AI_API_KEY: ${AI_API_KEY:-}
       PORT: "3000"
+      HOSTNAME: "0.0.0.0"
     ports:
       - "3000:3000"
     depends_on:

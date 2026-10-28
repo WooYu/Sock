@@ -1,5 +1,5 @@
 import { aggregateCandles } from '@/features/chart/chart-math'
-import { canonicalPeriodTime, isCalendarDate, isIntradayPeriod, type ChartPeriod } from '@/features/chart/chart-periods'
+import { canonicalPeriodTime, isCalendarDate, isIntradayPeriod, isIsoTimestamp, type ChartPeriod } from '@/features/chart/chart-periods'
 import type { ChartSeries, PriceAdjustment } from '@/features/chart/chart-market-types'
 import type { Candle, MarketSnapshot, Security } from '@/features/workspace/stock-workspace-types'
 import { isA50Futures, isMarketIndex } from './market-symbol'
@@ -19,17 +19,23 @@ function market(symbol: string) {
 async function request(host: 'push2' | 'push2his' | 'searchapi', path: string, params: Record<string, string>) {
   const url = new URL(`https://${host}.eastmoney.com${path}`)
   for (const [key, value] of Object.entries(params)) url.searchParams.set(key, value)
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), 8000)
-  try {
-    const response = await fetch(url, { cache: 'no-store', redirect: 'error', signal: controller.signal, headers: { Accept: 'application/json', Referer: 'https://quote.eastmoney.com/' } })
-    if (!response.ok || Number(response.headers.get('content-length')) > 2_000_000) throw fail()
-    const body = await response.arrayBuffer()
-    if (body.byteLength > 2_000_000) throw fail()
-    const json: unknown = JSON.parse(new TextDecoder().decode(body))
-    if (!json || typeof json !== 'object' || Array.isArray(json)) throw fail()
-    return json as Record<string, unknown>
-  } catch { throw fail() } finally { clearTimeout(timer) }
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 8000)
+    try {
+      const response = await fetch(url, { cache: 'no-store', redirect: 'error', signal: controller.signal, headers: { Accept: 'application/json', Referer: 'https://quote.eastmoney.com/' } })
+      if (!response.ok || Number(response.headers.get('content-length')) > 2_000_000) throw fail()
+      const body = await response.arrayBuffer()
+      if (body.byteLength > 2_000_000) throw fail()
+      const json: unknown = JSON.parse(new TextDecoder().decode(body))
+      if (!json || typeof json !== 'object' || Array.isArray(json)) throw fail()
+      return json as Record<string, unknown>
+    } catch (error) {
+      if (attempt || controller.signal.aborted || !(error instanceof TypeError)) throw fail()
+      await new Promise(resolve => setTimeout(resolve, 250))
+    } finally { clearTimeout(timer) }
+  }
+  throw fail()
 }
 
 function obj(value: unknown): Record<string, unknown> {
@@ -63,7 +69,30 @@ export async function getEastmoneyChartSeries(symbol: string, period: ChartPerio
   market(symbol)
   if (isA50Futures(symbol)) {
     if (requested !== 'none') throw new PublicMarketError('FUTURES_ADJUSTMENT_UNSUPPORTED', '期货行情不支持股票复权', 400)
-    if (isIntradayPeriod(period)) throw new PublicMarketError('FUTURES_PERIOD_UNSUPPORTED', '期货夜盘分时与分钟线暂不支持', 400)
+    if (period === '5day' || period === '120m') throw new PublicMarketError('FUTURES_PERIOD_UNSUPPORTED', '该期货周期暂不支持', 400)
+    if (period === 'intraday' || /^\d+m$/.test(period)) {
+      const trend = period === 'intraday'
+      const entry = await data(symbol, 'push2his', trend ? '/api/qt/stock/trends2/get' : '/api/qt/stock/kline/get', trend
+        ? { fields1: 'f1,f2,f3,f4,f5,f6,f7,f8', fields2: 'f51,f52,f53,f54,f55,f56,f57,f58', ndays: '1', iscr: '0' }
+        : { fields1: 'f1,f2,f3,f4,f5,f6', fields2: 'f51,f52,f53,f54,f55,f56,f57', klt: period.slice(0, -1), fqt: '0', end: '20500101', lmt: '640' })
+      const input = trend ? entry.trends : entry.klines
+      if (!Array.isArray(input) || !input.length || input.length > 2000) throw fail()
+      const rows = new Map<string, Candle>()
+      for (const raw of input) {
+        if (typeof raw !== 'string') throw fail()
+        const values = raw.split(',')
+        if (values.length < (trend ? 8 : 7) || !/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(values[0])) throw fail()
+        const day = `${values[0].replace(' ', 'T')}:00+08:00`
+        if (!isIsoTimestamp(day)) throw fail()
+        const close = num(values[2], true), volume = num(values[5])
+        const open = trend ? close : num(values[1], true), high = trend ? close : num(values[3], true), low = trend ? close : num(values[4], true)
+        if (high < Math.max(open, close) || low > Math.min(open, close)) throw fail()
+        const average = trend && values[7] !== '-' && values[7] !== '' ? num(values[7]) : 0
+        rows.set(day, { day, endTime: day, open, close, high, low, volume, ...(average > 0 ? { averagePrice: average } : {}) })
+      }
+      const bars = [...rows.values()].sort((a, b) => a.day.localeCompare(b.day))
+      return { symbol, period, adjustment: 'none', kind: trend ? 'intraday' : 'candles', bars, source: source(), limitedHistory: bars.length < 250, ...(trend && entry.preClose ? { previousClose: num(entry.preClose, true) } : {}), note: '东方财富当月连续合约；跨夜时间按北京时间显示，成交量单位为手，不使用A股时段或交易日历。' }
+    }
     const entry = await data(symbol, 'push2his', '/api/qt/stock/kline/get', { fields1: 'f1,f2,f3,f4,f5,f6', fields2: 'f51,f52,f53,f54,f55,f56,f57', klt: '101', fqt: '0', end: '20500101', lmt: '640' })
     if (!Array.isArray(entry.klines) || !entry.klines.length || entry.klines.length > 2000) throw fail()
     const rows = new Map<string, Candle>()

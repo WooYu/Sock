@@ -4,6 +4,24 @@ import { afterEach, describe, expect, test, vi } from 'vitest'
 afterEach(() => vi.unstubAllGlobals())
 
 describe('Eastmoney market adapter', () => {
+  test('retries a transient transport reset once', async () => {
+    const fetcher = vi.fn<typeof fetch>().mockRejectedValueOnce(new TypeError('socket reset')).mockResolvedValueOnce(Response.json({ rc: 0, data: { market: 104, code: 'CN00Y', klines: ['2026-10-29,12986,12982,13001,12968,28247,0'] } }))
+    vi.stubGlobal('fetch', fetcher)
+    const result = await (await import('./eastmoney-market')).getEastmoneyChartSeries('cn00y', 'day', 'none')
+    expect(result.bars).toHaveLength(1)
+    expect(fetcher).toHaveBeenCalledTimes(2)
+  })
+  test('preserves overnight A50 price samples, provider VWAP and contracts', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => Response.json({ rc: 0, data: { market: 104, code: 'CN00Y', preClose: 12992, trends: ['2026-10-28 16:45,12986,12984,12986,12984,6,0,12985.5', '2026-10-29 02:14,12986,12983,12986,12982,21,0,12984.39'] } })))
+    const result = await (await import('./eastmoney-market')).getEastmoneyChartSeries('cn00y', 'intraday', 'none')
+    expect(result).toMatchObject({ period: 'intraday', kind: 'intraday', previousClose: 12992, bars: [{ day: '2026-10-28T16:45:00+08:00', volume: 6, averagePrice: 12985.5 }, { day: '2026-10-29T02:14:00+08:00', volume: 21, averagePrice: 12984.39 }] })
+  })
+
+  test('preserves provider minute candle boundaries outside A-share sessions', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => Response.json({ rc: 0, data: { market: 104, code: 'CN00Y', klines: ['2026-10-28 22:45,12990,12983,12999,12976,3375,0', '2026-10-29 02:45,12989,12983,12995,12980,1192,0'] } })))
+    const result = await (await import('./eastmoney-market')).getEastmoneyChartSeries('cn00y', '60m', 'none')
+    expect(result.bars).toMatchObject([{ day: '2026-10-28T22:45:00+08:00', volume: 3375 }, { day: '2026-10-29T02:45:00+08:00', volume: 1192 }])
+  })
   test('parses index trends without a fabricated average price', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => Response.json({ rc: 0, data: { code: '000852', preClose: 6427.17, trends: ['2026-10-28 09:30,0,6487.84,6487.84,6487.84,2,20000,6488'] } })))
     const result = await (await import('./eastmoney-market')).getEastmoneyChartSeries('sh000852', 'intraday', 'none')
