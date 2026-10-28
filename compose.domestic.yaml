@@ -1,0 +1,22 @@
+name: stockcal-web
+
+services:
+  web:
+    build:
+      context: ./frontend
+    environment:
+      PORT: "3000"
+      STOCKCAL_RECORDS_API_BASE_URL: ${STOCKCAL_RECORDS_API_BASE_URL:-}
+      STOCKCAL_API_BASE_URL: ${STOCKCAL_API_BASE_URL:-}
+      AI_API_KEY: ${AI_API_KEY:-}
+      STOCKCAL_AI_BASE_URL: ${STOCKCAL_AI_BASE_URL:-https://api.deepseek.com}
+      STOCKCAL_AI_MODEL: ${STOCKCAL_AI_MODEL:-deepseek-chat}
+    ports:
+      - "127.0.0.1:${STOCKCAL_WEB_PORT:-3000}:3000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s

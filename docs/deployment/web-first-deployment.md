@@ -1,5 +1,20 @@
 # StockCal Web-first 部署说明
 
+## 不依赖 Vercel 的国内部署
+
+可在能访问腾讯行情的国内 Linux 服务器运行 Next.js，浏览器无需访问 Vercel。安装 Docker 和 Compose，在仓库根目录执行：
+
+```bash
+docker compose -f compose.domestic.yaml up -d --build
+curl -fsS http://127.0.0.1:3000/api/health
+```
+
+容器只监听服务器回环地址。使用 Nginx 或负载均衡将已配置 HTTPS 的域名反向代理到 `127.0.0.1:3000`；公网入口需配置访问控制、请求大小限制和限流。域名、证书、国内服务器网络及适用的备案要求需要自行准备，部署代码本身不会生成公网地址或保证可访问性。更新代码后重新执行上述 Compose 命令。
+
+默认使用腾讯公开延时行情，不需要 Tushare 密钥或后端。自选、绘图等本地数据仍保存在各浏览器；跨设备共享、账号及研究记录需要现有后端和数据库。需要时在服务器环境或根目录 `.env` 中设置 `STOCKCAL_RECORDS_API_BASE_URL` 指向可从容器访问的后端地址（容器内 `localhost` 不是宿主机），并确保后端启用认证、保护数据库及备份。只有后端行情供应商已配置时才设置 `STOCKCAL_API_BASE_URL`，否则留空。密钥只放服务端，不提交 `.env`。现有 Vercel 部署和生产数据不会自动迁移或关闭。
+
+中证1000可搜索“中证1000”或 `sh000852`，指数行情不复权。指数分析记录目前仅保存在本机，现有后端研究记录接口尚不接受指数代码。
+
 ## 运行边界
 
 - 当前生产前端部署在 Vercel，项目根目录为 `frontend`，连接 `WooYu/Sock`；生产入口为 `https://frontend-xi-nine-18.vercel.app`。此拓扑于 2026-09-16 确认。

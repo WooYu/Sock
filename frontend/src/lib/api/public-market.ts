@@ -1,4 +1,4 @@
-import { isShanghaiComposite, matchesShanghaiComposite, shanghaiComposite } from './market-symbol'
+import { isMarketIndex, matchingMarketIndices } from './market-symbol'
 import { canonicalPeriodTime, isChartPeriod, isIntradayPeriod, type ChartPeriod } from '@/features/chart/chart-periods'
 import { aggregateCandles } from '@/features/chart/chart-math'
 import type { ChartSeries, PriceAdjustment } from '@/features/chart/chart-market-types'
@@ -84,7 +84,7 @@ function optionalPositive(value: unknown): number | undefined {
 }
 
 function marketCode(symbol: string): string {
-  if (isShanghaiComposite(symbol)) return shanghaiComposite.code
+  if (isMarketIndex(symbol)) return symbol.toLowerCase()
   if (!/^(?:6\d{5}|[03]\d{5}|[48]\d{5}|92\d{4})$/.test(symbol)) throw new PublicMarketError('MARKET_SYMBOL_INVALID', '请输入有效的六位 A 股代码', 400)
   return `${symbol.startsWith('6') ? 'sh' : /^[03]/.test(symbol) ? 'sz' : 'bj'}${symbol}`
 }
@@ -136,7 +136,7 @@ type NativeSeries = { bars: Candle[]; entry: Record<string, unknown>; fetchedAt:
 function nativeSeries(symbol: string, period: ChartPeriod, adjustment: PriceAdjustment): Promise<NativeSeries> {
   const code = marketCode(symbol)
   const minute = /^\d+m$/.test(period)
-  if (isShanghaiComposite(symbol)) adjustment = 'none'
+  if (isMarketIndex(symbol)) adjustment = 'none'
   const field = minute ? `m${period.slice(0, -1)}` : `${adjustment === 'none' ? '' : adjustment}${period}`
   const url = new URL(minute ? 'https://ifzq.gtimg.cn/appstock/app/kline/mkline' : 'https://web.ifzq.gtimg.cn/appstock/app/fqkline/get')
   url.searchParams.set('param', minute ? `${code},${field},,640` : `${code},${period},,,640,${adjustment === 'none' ? '' : adjustment}`)
@@ -200,7 +200,7 @@ function intradaySeries(symbol: string, period: 'intraday' | '5day' = 'intraday'
       for (const [time, sample] of [...samples].sort(([a], [b]) => a.localeCompare(b))) {
         if (!Number.isFinite(sample.volume) || sample.volume < previousVolume || sample.amount < previousAmount || (sample.volume === 0 && sample.amount > 0)) throw invalidData()
         // Index turnover / aggregate constituent volume is not an index-point VWAP.
-        bars.push({ day: time, endTime: time, open: sample.price, high: sample.price, low: sample.price, close: sample.price, volume: sample.volume - previousVolume, turnover: sample.amount - previousAmount, ...(!isShanghaiComposite(symbol) && sample.volume > 0 ? { averagePrice: sample.amount / sample.volume } : {}) })
+        bars.push({ day: time, endTime: time, open: sample.price, high: sample.price, low: sample.price, close: sample.price, volume: sample.volume - previousVolume, turnover: sample.amount - previousAmount, ...(!isMarketIndex(symbol) && sample.volume > 0 ? { averagePrice: sample.amount / sample.volume } : {}) })
         previousVolume = sample.volume
         previousAmount = sample.amount
       }
@@ -208,7 +208,7 @@ function intradaySeries(symbol: string, period: 'intraday' | '5day' = 'intraday'
       allBars.push(...bars)
     }
     if (!allBars.length) throw noData()
-    return { symbol, period, adjustment: 'none', kind: 'intraday', bars: allBars, ...(period === 'intraday' ? { previousClose: optionalPositive(quoteFields(entry, code)?.[4]) } : {}), source: source(new Date().toISOString()), limitedHistory: true, note: period === '5day' ? `最近 ${Math.min(5, sessions.size)} 个交易日分时走势；按交易日分别计算成交量与均价，不补造缺失交易日。` : isShanghaiComposite(symbol) ? '当日指数点位采样，不含盘后定价；总成交额/总成交量不代表指数均价，不绘制该均价线；柱形为每分钟成交量。' : '当日正常交易时段的价格采样，不含盘后定价；均价为累计成交额/累计成交量，柱形为每分钟成交量。' }
+    return { symbol, period, adjustment: 'none', kind: 'intraday', bars: allBars, ...(period === 'intraday' ? { previousClose: optionalPositive(quoteFields(entry, code)?.[4]) } : {}), source: source(new Date().toISOString()), limitedHistory: true, note: period === '5day' ? `最近 ${Math.min(5, sessions.size)} 个交易日分时走势；${isMarketIndex(symbol) ? '指数不绘制均价线' : '按交易日分别计算成交量与均价'}，不补造缺失交易日。` : isMarketIndex(symbol) ? '当日指数点位采样，不含盘后定价；总成交额/总成交量不代表指数均价，不绘制该均价线；柱形为每分钟成交量。' : '当日正常交易时段的价格采样，不含盘后定价；均价为累计成交额/累计成交量，柱形为每分钟成交量。' }
   })
 }
 
@@ -217,7 +217,7 @@ export async function getPublicChartSeries(symbol: string, period: ChartPeriod =
   if (!isChartPeriod(period)) throw new PublicMarketError('MARKET_PERIOD_INVALID', '不支持的行情周期', 400)
   if (!['none', 'qfq', 'hfq'].includes(adjustment)) throw new PublicMarketError('MARKET_ADJUSTMENT_INVALID', '不支持的复权方式', 400)
   if (isIntradayPeriod(period) && adjustment !== 'none') throw new PublicMarketError('MARKET_ADJUSTMENT_UNSUPPORTED', '分时与分钟行情仅支持不复权', 400)
-  if (isShanghaiComposite(symbol)) adjustment = 'none'
+  if (isMarketIndex(symbol)) adjustment = 'none'
   if (period === 'intraday' || period === '5day') {
     const result = await intradaySeries(symbol, period)
     return { ...result, bars: result.bars.map((bar) => ({ ...bar })) }
@@ -231,7 +231,7 @@ export async function getPublicChartSeries(symbol: string, period: ChartPeriod =
 
 export async function getPublicMarketSnapshot(symbol: string): Promise<MarketSnapshot> {
   const code = marketCode(symbol)
-  const adjustment = isShanghaiComposite(symbol) ? 'none' : 'qfq'
+  const adjustment = isMarketIndex(symbol) ? 'none' : 'qfq'
   const loaded = await nativeSeries(symbol, 'day', adjustment)
   const fields = quoteFields(loaded.entry, code)
   if (!fields || fields[2] !== code.slice(2) || typeof fields[1] !== 'string' || !fields[1].trim()) throw invalidData()
@@ -240,17 +240,19 @@ export async function getPublicMarketSnapshot(symbol: string): Promise<MarketSna
   if ((high !== undefined && high < Math.max(price, open ?? price)) || (low !== undefined && low > Math.min(price, open ?? price))) throw invalidData()
   const amount = typeof fields[35] === 'string' ? fields[35].split('/')[2] : undefined
   const turnover = amount ? number(amount) : optionalPositive(fields[37]) !== undefined ? number(fields[37]) * 10000 : undefined
-  return { adjustment, quote: { security: { code: isShanghaiComposite(symbol) ? shanghaiComposite.code : symbol, name: fields[1].trim(), exchange: code.slice(0, 2).toUpperCase() }, price, previousClose: optionalPositive(fields[4]), open, high, low, volume: fields[6] === undefined ? undefined : number(fields[6]) * 100, turnover }, dailyCandles: loaded.bars.map((bar) => ({ ...bar })), source: source(loaded.fetchedAt) }
+  return { adjustment, quote: { security: { code: isMarketIndex(symbol) ? symbol.toLowerCase() : symbol, name: fields[1].trim(), exchange: code.slice(0, 2).toUpperCase() }, price, previousClose: optionalPositive(fields[4]), open, high, low, volume: fields[6] === undefined ? undefined : number(fields[6]) * 100, turnover }, dailyCandles: loaded.bars.map((bar) => ({ ...bar })), source: source(loaded.fetchedAt) }
 }
 
 export async function searchPublicSecurities(query: string): Promise<Security[]> {
   const term = query.trim()
   if (!term) return []
   if (term.length > 80) throw new PublicMarketError('MARKET_QUERY_INVALID', '搜索内容过长，请输入股票代码、名称或拼音', 400)
-  if (matchesShanghaiComposite(term) && term !== '000001') return [{ ...shanghaiComposite }]
+  const indices = matchingMarketIndices(term)
+  if (indices.length && term !== '000852') return indices
   if (/^\d{6}$/.test(term)) {
-    try { return [(await getPublicMarketSnapshot(term)).quote.security] } catch (error) {
-      if (error instanceof PublicMarketError && (error.status === 400 || error.status === 404)) return []
+    try { return [...indices, (await getPublicMarketSnapshot(term)).quote.security] } catch (error) {
+      if (indices.length) return indices
+      if (error instanceof PublicMarketError && (error.status === 400 || error.status === 404)) return indices
       throw error
     }
   }

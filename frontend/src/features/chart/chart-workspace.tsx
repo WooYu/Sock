@@ -29,7 +29,7 @@ import { StudioChartControls } from '../research/studio-chart-controls'
 import { DrawingList } from '../research/drawing-list'
 import { isIntradayPeriod, CHART_PERIODS, DEFAULT_INDICATORS, MA_COLORS, MA_PERIODS, PERIOD_LABELS, canonicalPeriodTime, type IndicatorKey, type IndicatorValue, type MaKey } from './chart-periods'
 import { useChartSeries, type ChartSeriesLoader } from './use-chart-series'
-import { isShanghaiComposite } from '@/lib/api/market-symbol'
+import { isMarketIndex } from '@/lib/api/market-symbol'
 
 export { aggregateCandles } from './chart-math'
 
@@ -65,7 +65,7 @@ export function ChartWorkspace({ snapshot, prediction = null, status = 'ready', 
   const fiveDay = activePeriod === '5day'
   const symbol = snapshot?.quote.security.code ?? ''
   const [adjustment, setAdjustment] = useState<'none' | 'qfq' | 'hfq'>((isStudio && loadSeries) || !snapshot ? 'qfq' : snapshot.adjustment ?? 'none')
-  const index = isShanghaiComposite(symbol)
+  const index = isMarketIndex(symbol)
   const priceBasis = symbol === 'DEMO' || index || isIntradayPeriod(activePeriod) ? 'none' : adjustment
   const { workspace, drawings, selectedId, syncStatus, commands } = useChartWorkspace({ symbol: priceBasis === 'none' ? symbol : `${symbol}-${priceBasis}`, period: activePeriod, localOnly: symbol === 'DEMO' })
   const [maVisible, setMaVisible] = useState(true)

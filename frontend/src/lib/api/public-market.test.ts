@@ -172,6 +172,25 @@ describe('Tencent public market adapter', () => {
     expect(new URL(fetcher.mock.calls[0][0] as string).searchParams.get('param')).toBe('sh000001,day,,,640,')
   })
 
+  test('supports CSI 1000 aliases and raw index history without confusing the stock code', async () => {
+    const data = payload('day', daily, 'sh000852')
+    data.data.sh000852.qt.sh000852[1] = '中证1000'
+    const fetcher = vi.fn<typeof fetch>(async () => Response.json(data)); vi.stubGlobal('fetch', fetcher)
+    const api = await load()
+    for (const query of ['中证1000', 'sh000852', 'zz1000']) {
+      expect(await api.searchPublicSecurities(query)).toMatchObject([{ code: 'sh000852', name: '中证1000' }])
+    }
+    expect(await api.getPublicMarketSnapshot('SH000852')).toMatchObject({ adjustment: 'none', quote: { security: { code: 'sh000852', exchange: 'SH' } } })
+    expect(await api.getPublicChartSeries('sh000852', 'day', 'qfq')).toMatchObject({ adjustment: 'none' })
+    expect(new URL(fetcher.mock.calls[0][0] as string).searchParams.get('param')).toBe('sh000852,day,,,640,')
+  })
+
+  test('numeric CSI 1000 code retains the distinct stock search result', async () => {
+    const data = payload('qfqday', daily, 'sz000852')
+    vi.stubGlobal('fetch', vi.fn(async () => Response.json(data)))
+    expect(await (await load()).searchPublicSecurities('000852')).toMatchObject([{ code: 'sh000852' }, { code: '000852' }])
+  })
+
   test('does not evaluate script returned by smartbox', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => new Response('globalThis.pwned = true;')))
     await expect((await load()).searchPublicSecurities('xys')).rejects.toMatchObject({ status: 502 })

@@ -22,7 +22,7 @@ function knownMinuteGap(before: string, next: string, period: AnalysisPeriod): b
 export function normalizeScenarioSeries(series: ChartSeries, asOf: string): PeriodInput {
   if (!ANALYSIS_PERIODS.includes(series.period as AnalysisPeriod) || series.kind !== 'candles') throw new Error('分析周期无效')
   if (series.adjustment !== 'none' && !(series.period === 'day' && series.adjustment === 'qfq')) throw new Error('行情复权口径无效')
-  if (!/^(?:\d{6}|sh000001|DEMO)$/.test(series.symbol)) throw new Error('股票代码无效')
+  if (!/^(?:\d{6}|sh000001|sh000852|DEMO)$/.test(series.symbol)) throw new Error('股票代码无效')
   if (!isIsoTimestamp(asOf) || !series.source || !isIsoTimestamp(series.source.fetchedAt) || !Array.isArray(series.bars)) throw new Error('行情来源或截止时间无效')
   const period = series.period as AnalysisPeriod
   const cutoff = Math.min(Date.parse(asOf), Date.parse(series.source.fetchedAt))

@@ -94,3 +94,14 @@ test('supports index search and snapshots with a legacy backend configured', asy
     expect(String(fetcher.mock.calls[0][0])).toContain('web.ifzq.gtimg.cn')
   } finally { vi.unstubAllGlobals(); vi.unstubAllEnvs() }
 })
+
+test('routes CSI 1000 to the public provider with a configured backend', async () => {
+  vi.stubEnv('STOCKCAL_API_BASE_URL', 'https://backend.example/')
+  const fetcher = vi.fn<typeof fetch>(async () => Response.json({ code: 0, data: { sh000852: { day: [['2026-09-16', '10', '11', '12', '9', '100']], qt: { sh000852: ['1', '中证1000', '000852', '11', '10', '10', '100'] } } } }))
+  vi.stubGlobal('fetch', fetcher)
+  try {
+    expect(await (await callSearch('中证1000')).json()).toMatchObject([{ code: 'sh000852' }])
+    expect(await (await callSnapshot('sh000852')).json()).toMatchObject({ adjustment: 'none', quote: { security: { code: 'sh000852' } } })
+    expect(String(fetcher.mock.calls[0][0])).toContain('web.ifzq.gtimg.cn')
+  } finally { vi.unstubAllGlobals(); vi.unstubAllEnvs() }
+})

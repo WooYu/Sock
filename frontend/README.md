@@ -24,6 +24,6 @@ Playwright 使用 `npm run test:e2e`，默认自动启动本地开发服务；�
 
 ## 部署
 
-当前生产拓扑为 **Vercel 前端 + 阿里云 Spring Boot 后端**。Vercel 项目根目录设为 `frontend`，通过服务端环境变量 `STOCKCAL_API_BASE_URL` 连接后端；密钥不得写入 `NEXT_PUBLIC_*` 变量。Docker standalone 镜像用于可选自托管部署。
+当前生产拓扑为 **Vercel 前端 + 阿里云 Spring Boot 后端**。也可使用仓库根目录的 `compose.domestic.yaml` 自托管前端，不依赖 Vercel；具体步骤和同步限制见部署说明。密钥不得写入 `NEXT_PUBLIC_*` 变量。
 
 路由统一位于 `app/`，业务模块位于 `src/features/`，共享代码位于 `src/shared/`。不要同时新增 `src/app/`：根级 `app/` 存在时 Next.js 会忽略它。部署说明见 [Web-first 部署文档](../docs/deployment/web-first-deployment.md)。
