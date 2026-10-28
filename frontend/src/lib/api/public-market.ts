@@ -248,7 +248,7 @@ export async function searchPublicSecurities(query: string): Promise<Security[]>
   if (!term) return []
   if (term.length > 80) throw new PublicMarketError('MARKET_QUERY_INVALID', '搜索内容过长，请输入股票代码、名称或拼音', 400)
   const indices = matchingMarketIndices(term)
-  if (indices.length && term !== '000852') return indices
+  if (indices.length && (!/^\d+$/.test(term) || term.startsWith('399'))) return indices
   if (/^\d{6}$/.test(term)) {
     try { return [...indices, (await getPublicMarketSnapshot(term)).quote.security] } catch (error) {
       if (indices.length) return indices

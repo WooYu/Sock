@@ -9,7 +9,7 @@ const fail = () => new PublicMarketError('EASTMONEY_UNAVAILABLE', '东方财富�
 const source = () => ({ name: '东方财富公开行情·延时', fetchedAt: new Date().toISOString(), state: 'DELAYED', online: true })
 
 function market(symbol: string) {
-  if (isMarketIndex(symbol)) return { secid: `1.${symbol.slice(2)}`, code: symbol.slice(2), exchange: 'SH' }
+  if (isMarketIndex(symbol)) return { secid: `${symbol.slice(0, 2).toLowerCase() === 'sh' ? 1 : 0}.${symbol.slice(2)}`, code: symbol.slice(2), exchange: symbol.slice(0, 2).toUpperCase() }
   if (!/^(?:6\d{5}|[03]\d{5}|[48]\d{5}|92\d{4})$/.test(symbol)) throw new PublicMarketError('MARKET_SYMBOL_INVALID', '请输入有效的证券代码', 400)
   const exchange = symbol.startsWith('6') ? 'SH' : /^[03]/.test(symbol) ? 'SZ' : 'BJ'
   return { secid: `${exchange === 'SH' ? 1 : exchange === 'SZ' ? 0 : 0}.${symbol}`, code: symbol, exchange }

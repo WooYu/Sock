@@ -1,4 +1,5 @@
 import { isCalendarDate, isIsoTimestamp } from '../chart/chart-periods'
+import { validMarketSymbol } from '@/lib/api/market-symbol'
 import { indicatorSeries } from '../scenario/scenario-calculator'
 import { barEndAt } from '../scenario/scenario-calendar'
 import { validCandle } from '../scenario/scenario-inputs'
@@ -35,7 +36,7 @@ export function parseNotePriceSnapshots(raw: string | null): NotePriceSnapshot[]
     for (const record of ledger.records as NotePriceSnapshot[]) {
       if (record.schemaVersion !== 1 || typeof record.id !== 'string' || ids.has(record.id)
         || record.run.definitionVersion !== NOTE_PRICE_VERSION || !['real', 'demo'].includes(record.input.sourceMode)
-        || !/^(?:\d{6}|sh000001|sh000852|DEMO)$/.test(record.input.symbol)) throw new Error()
+        || (record.input.symbol !== 'DEMO' && !validMarketSymbol.test(record.input.symbol))) throw new Error()
       const expected = freezeNotePriceSnapshot(record.input, record.run.config, record.id, record.createdAt)
       if (JSON.stringify(record.run) !== JSON.stringify(expected.run) || record.timing !== expected.timing) throw new Error()
       ids.add(record.id)

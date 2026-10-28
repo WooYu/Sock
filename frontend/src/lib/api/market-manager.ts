@@ -64,7 +64,7 @@ export async function managedSearch(query: string): Promise<Security[]> {
   if (!term) return []
   if (term.length > 80) throw new PublicMarketError('MARKET_QUERY_INVALID', '搜索内容过长', 400)
   const indices = matchingMarketIndices(term)
-  if (indices.length && term !== '000852') return indices
+  if (indices.length && (!/^\d+$/.test(term) || term.startsWith('399'))) return indices
   try {
     const result = await fallback([
       () => searchPublicSecurities(term),

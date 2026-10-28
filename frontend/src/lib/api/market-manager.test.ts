@@ -59,4 +59,26 @@ describe('managed market sources', () => {
     expect(await api.managedSearch('新易盛')).toEqual([{ code: '300502', name: '新易盛', exchange: 'SZ', initials: 'xys' }])
     expect(await api.managedSearch('中证1000')).toMatchObject([{ code: 'sh000852' }])
   })
+
+  test.each([
+    ['创业板指', 'sz399006', '创业板指'],
+    ['399006', 'sz399006', '创业板指'],
+    ['中证100', 'sz399903', '中证100'],
+    ['399903', 'sz399903', '中证100'],
+    ['A50', 'sz399310', '国证A50'],
+    ['399310', 'sz399310', '国证A50'],
+  ])('finds %s as the explicitly named index', async (query, symbol, name) => {
+    vi.stubGlobal('fetch', vi.fn(async () => bad()))
+    const results = await (await import('./market-manager')).managedSearch(query)
+    expect(results).toMatchObject([{ code: symbol, name }])
+    if (query === '中证100') expect(results.some(item => item.code === 'sh000852')).toBe(false)
+  })
+
+  test.each(['sz399006', 'sz399903', 'sz399310'])('fetches %s as a raw index, never a stock', async symbol => {
+    const fetcher = vi.fn<typeof fetch>(async () => Response.json({ code: 0, data: { [symbol]: { day: [['2026-10-28', '10', '11', '12', '9', '100']], qt: { [symbol]: ['1', '测试指数', symbol.slice(2), '11', '10', '10', '100'] } } } }))
+    vi.stubGlobal('fetch', fetcher)
+    const api = await import('./market-manager')
+    expect(await api.managedSnapshot(symbol)).toMatchObject({ adjustment: 'none', quote: { security: { code: symbol, exchange: 'SZ' } } })
+    expect(new URL(fetcher.mock.calls[0][0] as string).searchParams.get('param')).toBe(`${symbol},day,,,640,`)
+  })
 })

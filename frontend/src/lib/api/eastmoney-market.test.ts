@@ -24,6 +24,13 @@ describe('Eastmoney market adapter', () => {
     await expect((await import('./eastmoney-market')).getEastmoneyChartSeries('sh000852', 'day', 'none')).rejects.toMatchObject({ code: 'EASTMONEY_UNAVAILABLE' })
   })
 
+  test('routes Shenzhen indices to their correct Eastmoney market', async () => {
+    const fetcher = vi.fn<typeof fetch>(async () => Response.json({ rc: 0, data: { market: 0, code: '399006', klines: ['2026-10-28,10,11,12,9,100,110000'] } }))
+    vi.stubGlobal('fetch', fetcher)
+    expect(await (await import('./eastmoney-market')).getEastmoneyChartSeries('sz399006', 'day', 'qfq')).toMatchObject({ adjustment: 'none' })
+    expect(String(fetcher.mock.calls[0][0])).toContain('secid=0.399006')
+  })
+
   test('does not compute a fictitious index average across five sessions', async () => {
     const trends = ['2026-10-27 09:30,0,6400,6400,6400,2,10000,6401', '2026-10-28 09:30,0,6500,6500,6500,3,15000,6501']
     vi.stubGlobal('fetch', vi.fn(async () => Response.json({ rc: 0, data: { market: 1, code: '000852', trends } })))
